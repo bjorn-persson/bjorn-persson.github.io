@@ -45,3 +45,7 @@
 .button:hover {
     background: var(--lightcolor);
 }
+
+.profile .profile_inner span a {
+    text-decoration: underline;
+}

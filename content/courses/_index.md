@@ -1,4 +1,4 @@
 ---
 title: "Courses"
-description: "Courses on philology by Professor Dr von Igelfeld and esteemed colleagues. For undergraduate and graduate students."
+description: "Courses by Björn Persson and esteemed colleagues. For undergraduate and graduate students."
 ---

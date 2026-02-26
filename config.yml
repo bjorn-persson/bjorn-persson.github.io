@@ -1,5 +1,5 @@
 baseURL: "https://bnpersson.github.io" 
-title: tbd
+title: Björn Persson
 theme: PaperMod
 
 enableInlineShortcodes: true
@@ -12,25 +12,16 @@ taxonomies:
 
 menu:
     main:
-        - name: Books
-          url: books/
-          weight: 5 
         - name: Papers
           url: papers/
           weight: 2
-        - name: Courses
-          url: courses/
-          weight: 3
-        - name: Data
-          url: data/
-          weight: 4 
-        - name: Blog
-          url: https://en.wikipedia.org/wiki/Moritz-Maria_von_Igelfeld_(character)
-          weight: 6
+        - name: Visualizations
+          url: visualizations/
+          weight: 5
 
 params:
-    description: "This website hosts Moritz-Maria von Igelfeld's research papers, books, course materials, data, curriculum vitae, and contact information."
-    author: Moritz-Maria von Igelfeld
+    description: "This website hosts Björn Persson's research papers, courses, data, curriculum vitae, and contact information."
+    author: Björn Persson
     # googleAnalyticsID: "G-XXXXX"
     DateFormat: "January 2006"
     defaultTheme: light
@@ -54,50 +45,24 @@ params:
     math: true
     profileMode:
           enabled: true
-          title: Professor Dr von Igelfeld
-          subtitle: "I am a Professor in the Institute of Romance Philology at the University of Regensburg, Germany. My research focuses on Portuguese irregular verbs. I was a doctoral student of Professor Dr Dieter Vogelsang in Munich, and later a second assistant of Professor Walter Schoeffler-Henschell at the University of Wiesbaden."
+          title: Björn N. Persson, PhD
+          subtitle: "My name is Björn Persson. I'm a postdoctoral researcher at Karolinska Institutet, Sweden. My work is in psychology, focusing on individual differences and sex differences in cognition, personality and interests. My PhD <a href='https://www.utupub.fi/bitstream/handle/10024/148451/AnnalesB496Persson.pdf?sequence=1'>thesis</a> was about the \"Dark Triad\", or perhaps more accurately, three variants of antagonistic personality traits. While I have put the Dark Triad behind me, specifically, I'm still interested in psychopathology, especially the distinction between normal and abnormal personality traits.<br><br>This page functions as both a portfolio of sorts and a place where I can upload various things I'd like to save or may want to share. Like many others, I've been inspired by Kristoffer Magnusson (<a href='https://www.rpsychologist.com'>www.rpsychologist.com</a>), in particular his visualizations. Now in the age of AI, it's possible to create similar interactive visualizations without having the actual programming chops, which is more up my alley."
           imageUrl: "picture.jpeg"
           imageWidth: 160
           imageHeight: 160
           buttons:
             - name: Papers
               url: papers/
-            - name: Data
-              url: data/
-            - name: Books
-              url: books/
-            - name: Courses
-              url: courses/
-            - name: Tags
-              url: tags/
-            - name: Archive
-              url: archive/
-            - name: Blog
-              url: https://en.wikipedia.org/wiki/Moritz-Maria_von_Igelfeld_(character)
+            - name: Visualizations
+              url: visualizations/
 
     socialIcons:
         - name: CV
-          url: cv.pdf
+          url: bnp_cv.pdf
         - name: Email
-          url: mailto:igelfeld@regensburg.edu
-        - name: Zoom
-          url: https://www.zoom.us/my/igelfeld
-        - name: Location
-          url: location/
-        - name: Office Hours
-          url: officehours/
+          url: mailto:persson.jb@gmail.com
         - name: Google Scholar
-          url: https://scholar.google.com/citations?user=cL23w-4AAAAJ
-        - name: GitHub
-          url: https://github.com/pmichaillat
-        - name: Substack
-          url: https://pmichaillat.substack.com
-        - name: YouTube
-          url: https://www.youtube.com/@pmichaillat
-        - name: Twitter
-          url: https://x.com/pmichaillat
-        - name: Bluesky
-          url: https://bsky.app/profile/pmichaillat.bsky.social
+          url: https://scholar.google.com/citations?user=SiCYagsAAAAJ
 
     assets:
         disableScrollBarStyle: true
@@ -105,7 +70,7 @@ params:
         hiddenInList: false
         hiddenInSingle: true
     label:
-      text: "Moritz-Maria von Igelfeld"
+      text: "Björn Persson"
       icon: favicon.ico
       iconHeight: 18
 

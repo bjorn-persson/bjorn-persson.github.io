@@ -2,7 +2,7 @@
 title: "Location"
 date: 2024-05-08
 hidemeta: true
-description: "Professor Dr von Igelfeld's mailing and office addresses at the Institute of Romance Philology."
+description: "Björn Persson's mailing and office address at Karolinska Institutet."
 
 ---
 
@@ -10,10 +10,9 @@ description: "Professor Dr von Igelfeld's mailing and office addresses at the In
 
 #### Mailing address
 
-Professor Dr von Igelfeld  
-Institute of Romance Philology  
-University of Regensburg  
-Regensburg, Germany
+Björn Persson
+Karolinska Institutet
+Stockholm, Sweden
 
 ---
 
