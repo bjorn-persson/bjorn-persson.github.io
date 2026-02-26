@@ -1,6 +1,6 @@
 ---
 title: "Empathy and Universal Values Explicated by the Empathy-Altruism Hypothesis"
-date: 2016-02-17
+date: 2016-03-18
 tags: ["empathy","social values","altruism","personality","social psychology"]
 author: ["Björn N. Persson","Petri J. Kajonius"]
 description: "Two studies test the empathy-altruism hypothesis by examining how emotional and cognitive empathy relate to Schwartz's universal social values. Published in The Journal of Social Psychology, 2016."

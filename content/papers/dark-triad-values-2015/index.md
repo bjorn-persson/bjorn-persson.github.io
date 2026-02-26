@@ -1,6 +1,6 @@
 ---
 title: "Hedonism, Achievement, and Power: Universal Values That Characterize the Dark Triad"
-date: 2015-01-01
+date: 2015-01-17
 tags: ["Dark Triad","personality","social values","Machiavellianism","narcissism","psychopathy"]
 author: ["Petri J. Kajonius","Björn N. Persson","Peter K. Jonason"]
 description: "Using cross-cultural data from Sweden and the US, this paper maps Dark Triad personality traits onto Schwartz's universal social values. Published in Personality and Individual Differences, 2015."

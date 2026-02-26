@@ -1,6 +1,6 @@
 ---
 title: "Searching for Machiavelli but Finding Psychopathy and Narcissism"
-date: 2019-01-10
+date: 2019-05-01
 tags: ["Machiavellianism","narcissism","psychopathy","Dark Triad","personality disorders"]
 author: ["Björn N. Persson"]
 description: "This paper investigates whether Machiavellianism represents a distinct construct or largely reflects psychopathy and narcissism, using multiple Machiavellianism measures and hierarchical analysis. Published in Personality Disorders, 2019."

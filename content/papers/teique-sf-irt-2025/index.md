@@ -1,6 +1,6 @@
 ---
 title: "Item Response Theory Modelling of the Trait Emotional Intelligence Questionnaire-Short Form: Item Streamlining, Differential Item Functioning, and Validity in a Swedish Multicenter Cross-Sectional Study"
-date: 2025-01-01
+date: 2025-08-29
 tags: ["emotional intelligence","item response theory","psychometrics","measurement","Sweden"]
 author: ["Anna M. Dåderman","Björn N. Persson","Inger Ahlstrand","Jenny Hallgren","Ingrid Larsson","Margaretha Larsson","Annelie J. Sundler","Lena Hedén","Håkan Nunstedt","Aimée Ekman","Qarin Lood","Isabelle Andersson Hammar","Sandra Pennbrant"]
 description: "Using IRT, this paper psychometrically refines the TEIQue-SF to a 12-item version in a Swedish multicenter sample of 845 healthcare and social work students. Published in BMC Psychology, 2025."

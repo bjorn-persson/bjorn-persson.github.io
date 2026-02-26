@@ -1,6 +1,6 @@
 ---
 title: "Predicting Intimate Partner Violence Recidivism Using the Swedish Prison and Probation Service's Risk-Need-Responsivity Assessment (RNR-A)"
-date: 2023-01-01
+date: 2023-02-07
 tags: ["intimate partner violence","recidivism","risk assessment","criminology","probation"]
 author: ["Louise C. Starfelt Sutton","Björn N. Persson","Maria Danielsson"]
 description: "This study evaluates the predictive utility of the RNR-A for intimate partner violence recidivism in a cohort of 3,145 clients. Published in Nordic Journal of Criminology, 2023."

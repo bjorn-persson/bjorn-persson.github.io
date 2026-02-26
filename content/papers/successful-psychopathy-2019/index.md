@@ -1,6 +1,6 @@
 ---
 title: "Social Status as One Key Indicator of Successful Psychopathy: An Initial Empirical Investigation"
-date: 2019-01-10
+date: 2019-01-15
 tags: ["psychopathy","successful psychopathy","social status","personality disorders","triarchic model"]
 author: ["Björn N. Persson","Scott O. Lilienfeld"]
 description: "This paper proposes a two-dimensional view of successful psychopathy emphasizing social status, and tests predictions using the triarchic model. Published in Personality and Individual Differences, 2019."

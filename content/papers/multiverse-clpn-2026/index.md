@@ -1,6 +1,6 @@
 ---
 title: "Multiverse Analyses Can Be Used to Evaluate Cross-Lagged Panel Network Models: An Example with Psychological Flexibility"
-date: 2026-01-01
+date: 2026-02-20
 tags: ["multiverse analyses","cross-lagged panel network","psychological flexibility","statistical methods","meta-analysis"]
 author: ["Kimmo Sorjonen","Bo Melin","Marika Melin","Björn N. Persson"]
 description: "This paper proposes multiverse analyses for evaluating cross-lagged panel network models and demonstrates the approach using psychological flexibility data. Published in Acta Psychologica, 2026."
