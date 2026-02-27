@@ -1,4 +1,4 @@
----
+﻿---
 title: "Social Status as One Key Indicator of Successful Psychopathy: An Initial Empirical Investigation"
 date: 2019-01-15
 tags: ["psychopathy","successful psychopathy","social status","personality disorders","triarchic model"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1016/j.paid.2019.01.020"
     Text: "Personality and Individual Differences"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ Psychopathy is a personality disorder that researchers have subdivided into two 
 
 ##### Citation
 
-Persson, Björn N., and Scott O. Lilienfeld. 2019. "Social Status as One Key Indicator of Successful Psychopathy: An Initial Empirical Investigation." *Personality and Individual Differences* 141: 209–217. https://doi.org/10.1016/j.paid.2019.01.020.
+Persson, B. N., & Lilienfeld, S. O. (2019). Social status as one key indicator of successful psychopathy: An initial empirical investigation. *Personality and Individual Differences*, *141*, 209–217. https://doi.org/10.1016/j.paid.2019.01.020
 
 ```BibTeX
 @article{PL19,

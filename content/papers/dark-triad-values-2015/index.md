@@ -1,4 +1,4 @@
----
+﻿---
 title: "Hedonism, Achievement, and Power: Universal Values That Characterize the Dark Triad"
 date: 2015-01-17
 tags: ["Dark Triad","personality","social values","Machiavellianism","narcissism","psychopathy"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1016/j.paid.2014.12.055"
     Text: "Personality and Individual Differences"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ Using a sample of Swedes and Americans (N = 385), we attempted to understand the
 
 ##### Citation
 
-Kajonius, Petri J., Björn N. Persson, and Peter K. Jonason. 2015. "Hedonism, Achievement, and Power: Universal Values That Characterize the Dark Triad." *Personality and Individual Differences* 77: 173–178. https://doi.org/10.1016/j.paid.2014.12.055.
+Kajonius, P. J., Persson, B. N., & Jonason, P. K. (2015). Hedonism, achievement, and power: Universal values that characterize the Dark Triad. *Personality and Individual Differences*, *77*, 173–178. https://doi.org/10.1016/j.paid.2014.12.055
 
 ```BibTeX
 @article{KPJ15,

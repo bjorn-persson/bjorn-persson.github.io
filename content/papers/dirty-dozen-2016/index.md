@@ -1,4 +1,4 @@
----
+﻿---
 title: "The (Mis)measurement of the Dark Triad Dirty Dozen: Exploitation at the Core of the Scale"
 date: 2016-03-01
 tags: ["Dark Triad","psychometrics","item response theory","Machiavellianism","narcissism","psychopathy"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.7717/peerj.1748"
     Text: "PeerJ"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -33,7 +35,7 @@ editPost:
 
 ##### Citation
 
-Kajonius, Petri J., Björn N. Persson, Patricia Rosenberg, and Danilo Garcia. 2016. "The (Mis)measurement of the Dark Triad Dirty Dozen: Exploitation at the Core of the Scale." *PeerJ* 4: e1748. https://doi.org/10.7717/peerj.1748.
+Kajonius, P. J., Persson, B. N., Rosenberg, P., & Garcia, D. (2016). The (mis)measurement of the Dark Triad Dirty Dozen: Exploitation at the core of the scale. *PeerJ*, *4*, e1748. https://doi.org/10.7717/peerj.1748
 
 ```BibTeX
 @article{KPRG16,

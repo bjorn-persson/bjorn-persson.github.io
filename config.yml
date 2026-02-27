@@ -46,7 +46,7 @@ params:
     profileMode:
           enabled: true
           title: Björn N. Persson, PhD
-          subtitle: "My name is Björn Persson. I'm a postdoctoral researcher at Karolinska Institutet, Sweden. My work is in psychology, focusing on individual differences and sex differences in cognition, personality and interests. My PhD <a href='https://www.utupub.fi/bitstream/handle/10024/148451/AnnalesB496Persson.pdf?sequence=1'>thesis</a> was about the \"Dark Triad\", or perhaps more accurately, three variants of antagonistic personality traits. While I have put the Dark Triad behind me, specifically, I'm still interested in psychopathology, especially the distinction between normal and abnormal personality traits.<br><br>This page functions as both a portfolio of sorts and a place where I can upload various things I'd like to save or may want to share. Like many others, I've been inspired by Kristoffer Magnusson (<a href='https://www.rpsychologist.com'>www.rpsychologist.com</a>), in particular his visualizations. Now in the age of AI, it's possible to create similar interactive visualizations without having the actual programming chops, which is more up my alley."
+          subtitle: "I'm a postdoctoral researcher at Karolinska Institutet, Sweden. My work is in psychology, focusing on individual differences and sex differences in cognition, personality and interests. My PhD <a href='https://www.utupub.fi/bitstream/handle/10024/148451/AnnalesB496Persson.pdf?sequence=1'>thesis</a> was about the \"Dark Triad\", or perhaps more accurately, three variants of antagonistic personality traits. While I have put the Dark Triad behind me, specifically, I'm still interested in psychopathology, especially the distinction between normal and abnormal personality traits.<br><br>This page functions as both a portfolio of sorts and a place where I can upload various things I'd like to save or may want to share. Like many others, I've been inspired by Kristoffer Magnusson (<a href='https://www.rpsychologist.com'>www.rpsychologist.com</a>), in particular his visualizations. These days, AI makes it possible to create similar interactive visualizations without being a strong programmer, which is definitely more my lane."
           imageUrl: "picture.jpeg"
           imageWidth: 160
           imageHeight: 160
@@ -68,7 +68,7 @@ params:
         disableScrollBarStyle: true
     cover:
         hiddenInList: false
-        hiddenInSingle: true
+        hiddenInSingle: false
     label:
       text: "Björn Persson"
       icon: favicon.ico

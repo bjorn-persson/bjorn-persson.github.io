@@ -1,4 +1,4 @@
----
+﻿---
 title: "Testing Construct Independence in the Short Dark Triad Using Item Response Theory"
 date: 2017-05-26
 tags: ["Dark Triad","item response theory","Machiavellianism","narcissism","psychopathy","psychometrics"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1016/j.paid.2017.05.025"
     Text: "Personality and Individual Differences"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ The Dark Triad (i.e., Machiavellianism, narcissism and psychopathy) is a popular
 
 ##### Citation
 
-Persson, Björn N., Petri J. Kajonius, and Danilo Garcia. 2017. "Testing Construct Independence in the Short Dark Triad Using Item Response Theory." *Personality and Individual Differences* 117: 74–80. https://doi.org/10.1016/j.paid.2017.05.025.
+Persson, B. N., Kajonius, P. J., & Garcia, D. (2017). Testing construct independence in the Short Dark Triad using item response theory. *Personality and Individual Differences*, *117*, 74–80. https://doi.org/10.1016/j.paid.2017.05.025
 
 ```BibTeX
 @article{PKG17,

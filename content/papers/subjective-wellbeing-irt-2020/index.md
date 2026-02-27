@@ -1,4 +1,4 @@
----
+﻿---
 title: "Validation of Subjective Well-Being Measures Using Item Response Theory"
 date: 2020-01-22
 tags: ["well-being","item response theory","positive affect","life satisfaction","psychometrics"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.3389/fpsyg.2019.03036"
     Text: "Frontiers in Psychology"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -33,7 +35,7 @@ editPost:
 
 ##### Citation
 
-Al Nima, Ali, Kevin M. Cloninger, Björn N. Persson, Sverker Sikström, and Danilo Garcia. 2020. "Validation of Subjective Well-Being Measures Using Item Response Theory." *Frontiers in Psychology* 10: 3036. https://doi.org/10.3389/fpsyg.2019.03036.
+Al Nima, A., Cloninger, K. M., Persson, B. N., Sikström, S., & Garcia, D. (2020). Validation of subjective well-being measures using item response theory. *Frontiers in Psychology*, *10*, 3036. https://doi.org/10.3389/fpsyg.2019.03036
 
 ```BibTeX
 @article{ANPSG20,

@@ -1,4 +1,4 @@
----
+﻿---
 title: "Revisiting the Structure of the Short Dark Triad"
 date: 2017-04-06
 tags: ["Dark Triad","SD3","factor analysis","psychometrics","Machiavellianism","narcissism","psychopathy"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1177/1073191117701192"
     Text: "Assessment"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ In the past decade, extensive interest has been directed toward the Dark Triad (
 
 ##### Citation
 
-Persson, Björn N., Petri J. Kajonius, and Danilo Garcia. 2019. "Revisiting the Structure of the Short Dark Triad." *Assessment* 26 (1): 3–16. https://doi.org/10.1177/1073191117701192.
+Persson, B. N., Kajonius, P. J., & Garcia, D. (2019). Revisiting the structure of the Short Dark Triad. *Assessment*, *26*(1), 3–16. https://doi.org/10.1177/1073191117701192
 
 ```BibTeX
 @article{PKG19,

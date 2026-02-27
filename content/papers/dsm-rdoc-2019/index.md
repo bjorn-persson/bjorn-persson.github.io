@@ -1,4 +1,4 @@
----
+﻿---
 title: "Current Directions in Psychiatric Classification: From the DSM to RDoC"
 date: 2019-01-01
 tags: ["psychiatric classification","DSM","RDoC","personality disorders","psychopathology"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1007/978-3-319-90065-0_11"
     Text: "Personality and Brain Disorders (Springer)"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ In 2010, the National Institute of Mental Health initiated the Research Domain C
 
 ##### Citation
 
-Persson, Björn N. 2019. "Current Directions in Psychiatric Classification: From the DSM to RDoC." In *Personality and Brain Disorders*, edited by Danilo Garcia et al. Contemporary Clinical Neuroscience. Springer. https://doi.org/10.1007/978-3-319-90065-0_11.
+Persson, B. N. (2019). Current directions in psychiatric classification: From the DSM to RDoC. In D. Garcia et al. (Eds.), *Personality and brain disorders*. Springer. https://doi.org/10.1007/978-3-319-90065-0_11
 
 ```BibTeX
 @incollection{P19a,

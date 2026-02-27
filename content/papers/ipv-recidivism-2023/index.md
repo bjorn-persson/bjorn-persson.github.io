@@ -1,4 +1,4 @@
----
+﻿---
 title: "Predicting Intimate Partner Violence Recidivism Using the Swedish Prison and Probation Service's Risk-Need-Responsivity Assessment (RNR-A)"
 date: 2023-02-07
 tags: ["intimate partner violence","recidivism","risk assessment","criminology","probation"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.18261/njc.24.1.4"
     Text: "Nordic Journal of Criminology"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ The Swedish Prison and Probation Service (SPPS) provides risk-reducing intervent
 
 ##### Citation
 
-Starfelt Sutton, Louise C., Björn N. Persson, and Maria Danielsson. 2023. "Predicting Intimate Partner Violence Recidivism Using the Swedish Prison and Probation Service's Risk-Need-Responsivity Assessment (RNR-A)." *Nordic Journal of Criminology* 24 (1): 1–20. https://doi.org/10.18261/njc.24.1.4.
+Starfelt Sutton, L. C., Persson, B. N., & Danielsson, M. (2023). Predicting intimate partner violence recidivism using the Swedish Prison and Probation Service's Risk-Need-Responsivity Assessment (RNR-A). *Nordic Journal of Criminology*, *24*(1), 1–20. https://doi.org/10.18261/njc.24.1.4
 
 ```BibTeX
 @article{SPD23,

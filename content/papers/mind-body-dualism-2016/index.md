@@ -1,4 +1,4 @@
----
+﻿---
 title: "The Relationship between Mind-Body Dualism and Personal Values"
 date: 2016-05-22
 tags: ["mind-body problem","dualism","personal values","philosophy of mind","psychology"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.5539/ijps.v8n2p126"
     Text: "International Journal of Psychological Studies"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ Dualists view the mind and the body as two fundamental different "things", equal
 
 ##### Citation
 
-Grankvist, Gunne, Petri Kajonius, and Björn Persson. 2016. "The Relationship between Mind-Body Dualism and Personal Values." *International Journal of Psychological Studies* 8 (2): 126–133. https://doi.org/10.5539/ijps.v8n2p126.
+Grankvist, G., Kajonius, P., & Persson, B. (2016). The relationship between mind-body dualism and personal values. *International Journal of Psychological Studies*, *8*(2), 126–133. https://doi.org/10.5539/ijps.v8n2p126
 
 ```BibTeX
 @article{GKP16,

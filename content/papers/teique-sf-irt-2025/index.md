@@ -1,4 +1,4 @@
----
+﻿---
 title: "Item Response Theory Modelling of the Trait Emotional Intelligence Questionnaire-Short Form: Item Streamlining, Differential Item Functioning, and Validity in a Swedish Multicenter Cross-Sectional Study"
 date: 2025-08-29
 tags: ["emotional intelligence","item response theory","psychometrics","measurement","Sweden"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1186/s40359-025-03271-1"
     Text: "BMC Psychology"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -33,7 +35,7 @@ editPost:
 
 ##### Citation
 
-Dåderman, Anna M., Björn N. Persson, Inger Ahlstrand, Jenny Hallgren, Ingrid Larsson, Margaretha Larsson, Annelie J. Sundler, Lena Hedén, Håkan Nunstedt, Aimée Ekman, Qarin Lood, Isabelle Andersson Hammar, and Sandra Pennbrant. 2025. "Item Response Theory Modelling of the Trait Emotional Intelligence Questionnaire-Short Form." *BMC Psychology* 13: 987. https://doi.org/10.1186/s40359-025-03271-1.
+Dåderman, A. M., Persson, B. N., Ahlstrand, I., Hallgren, J., Larsson, I., Larsson, M., Sundler, A. J., Hedén, L., Nunstedt, H., Ekman, A., Lood, Q., Andersson Hammar, I., & Pennbrant, S. (2025). Item response theory modelling of the Trait Emotional Intelligence Questionnaire-Short Form. *BMC Psychology*, *13*, 987. https://doi.org/10.1186/s40359-025-03271-1
 
 ```BibTeX
 @article{DP25,

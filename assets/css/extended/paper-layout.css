@@ -1,0 +1,86 @@
+/* List entry card: text left, cover thumbnail right */
+.post-entry .entry-body {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.post-entry .entry-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.post-entry .entry-cover-sidebar {
+    width: 150px;
+    flex-shrink: 0;
+}
+
+.post-entry .entry-cover-sidebar .entry-cover {
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.post-entry .entry-cover-sidebar .entry-cover img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0;
+    border-radius: 0;
+}
+
+@media (max-width: 600px) {
+    .post-entry .entry-body {
+        flex-direction: column;
+    }
+
+    .post-entry .entry-cover-sidebar {
+        width: 100%;
+    }
+}
+
+/* Cover image sidebar layout for paper pages */
+.post-with-cover {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.post-with-cover > .post-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.cover-sidebar {
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.cover-sidebar .entry-cover {
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: left;
+}
+
+.cover-sidebar .entry-cover img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0;
+    border-radius: 0;
+}
+
+@media (max-width: 768px) {
+    .post-with-cover {
+        flex-direction: column;
+    }
+
+    .cover-sidebar {
+        width: 100%;
+        max-width: 280px;
+    }
+}

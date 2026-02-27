@@ -1,4 +1,4 @@
----
+﻿---
 title: "Searching for Machiavelli but Finding Psychopathy and Narcissism"
 date: 2019-05-01
 tags: ["Machiavellianism","narcissism","psychopathy","Dark Triad","personality disorders"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1037/per0000323"
     Text: "Personality Disorders: Theory, Research, and Treatment"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ Machiavellianism is a psychological construct reflecting individual differences 
 
 ##### Citation
 
-Persson, Björn N. 2019. "Searching for Machiavelli but Finding Psychopathy and Narcissism." *Personality Disorders: Theory, Research, and Treatment* 10 (3): 235–245. https://doi.org/10.1037/per0000323.
+Persson, B. N. (2019). Searching for Machiavelli but finding psychopathy and narcissism. *Personality Disorders: Theory, Research, and Treatment*, *10*(3), 235–245. https://doi.org/10.1037/per0000323
 
 ```BibTeX
 @article{P19b,

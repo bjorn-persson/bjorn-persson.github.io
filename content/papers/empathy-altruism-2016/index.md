@@ -1,4 +1,4 @@
----
+﻿---
 title: "Empathy and Universal Values Explicated by the Empathy-Altruism Hypothesis"
 date: 2016-03-18
 tags: ["empathy","social values","altruism","personality","social psychology"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1080/00224545.2016.1152212"
     Text: "The Journal of Social Psychology"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ Research reports that empathy is on the decline in present-day society, together
 
 ##### Citation
 
-Persson, Björn N., and Petri J. Kajonius. 2016. "Empathy and Universal Values Explicated by the Empathy-Altruism Hypothesis." *The Journal of Social Psychology*. https://doi.org/10.1080/00224545.2016.1152212.
+Persson, B. N., & Kajonius, P. J. (2016). Empathy and universal values explicated by the empathy-altruism hypothesis. *The Journal of Social Psychology*. https://doi.org/10.1080/00224545.2016.1152212
 
 ```BibTeX
 @article{PK16,

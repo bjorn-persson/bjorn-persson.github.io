@@ -1,4 +1,4 @@
----
+﻿---
 title: "IRT Analyses of the Swedish Dark Triad Dirty Dozen"
 date: 2018-03-07
 tags: ["Dark Triad","item response theory","Swedish","psychometrics","Dirty Dozen"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1016/j.heliyon.2018.e00569"
     Text: "Heliyon"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -33,7 +35,7 @@ editPost:
 
 ##### Citation
 
-Garcia, Danilo, Björn N. Persson, Ali Al Nima, Joel Gruneau Brulin, Max Rapp-Ricciardi, and Petri J. Kajonius. 2018. "IRT Analyses of the Swedish Dark Triad Dirty Dozen." *Heliyon* 4: e00569. https://doi.org/10.1016/j.heliyon.2018.e00569.
+Garcia, D., Persson, B. N., Al Nima, A., Gruneau Brulin, J., Rapp-Ricciardi, M., & Kajonius, P. J. (2018). IRT analyses of the Swedish Dark Triad Dirty Dozen. *Heliyon*, *4*, e00569. https://doi.org/10.1016/j.heliyon.2018.e00569
 
 ```BibTeX
 @article{GPNBK18,

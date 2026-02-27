@@ -1,4 +1,4 @@
----
+﻿---
 title: "Multiverse Analyses Can Be Used to Evaluate Cross-Lagged Panel Network Models: An Example with Psychological Flexibility"
 date: 2026-02-20
 tags: ["multiverse analyses","cross-lagged panel network","psychological flexibility","statistical methods","meta-analysis"]
@@ -9,8 +9,10 @@ editPost:
     URL: "https://doi.org/10.1016/j.actpsy.2026.106468"
     Text: "Acta Psychologica"
 
----
-
+cover:
+    image: "cover.png"
+    alt: "Paper preview"
+    relative: true
 ---
 
 ##### Download
@@ -27,7 +29,7 @@ Cross-lagged panel network (CLPN) models estimate prospective effects between se
 
 ##### Citation
 
-Sorjonen, Kimmo, Bo Melin, Marika Melin, and Björn N. Persson. 2026. "Multiverse Analyses Can Be Used to Evaluate Cross-Lagged Panel Network Models: An Example with Psychological Flexibility." *Acta Psychologica* 264: 106468. https://doi.org/10.1016/j.actpsy.2026.106468.
+Sorjonen, K., Melin, B., Melin, M., & Persson, B. N. (2026). Multiverse analyses can be used to evaluate cross-lagged panel network models: An example with psychological flexibility. *Acta Psychologica*, *264*, 106468. https://doi.org/10.1016/j.actpsy.2026.106468
 
 ```BibTeX
 @article{SMP26,
