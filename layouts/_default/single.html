@@ -1,7 +1,15 @@
 {{- define "main" }}
 
+{{- $isHidden := (.Param "cover.hiddenInSingle") | default (.Param "cover.hidden") | default false }}
+{{- $hasCover := (and .Params.cover.image (not $isHidden)) }}
+
 <article class="post-single">
   <header class="post-header">
+    {{- if $hasCover }}
+    <div class="cover-sidebar">
+      {{- partial "cover.html" (dict "cxt" . "IsSingle" true "isHidden" $isHidden) }}
+    </div>
+    {{- end }}
     {{ partial "breadcrumbs.html" . }}
     <h1 class="post-title entry-hint-parent">
       {{ .Title }}
@@ -23,33 +31,16 @@
     </div>
     {{- end }}
   </header>
-  {{- $isHidden := (.Param "cover.hiddenInSingle") | default (.Param "cover.hidden") | default false }}
-  {{- $hasCover := (and .Params.cover.image (not $isHidden)) }}
   {{- if (.Param "ShowToc") }}
   {{- partial "toc.html" . }}
   {{- end }}
 
-  {{- if $hasCover }}
-  <div class="post-with-cover">
-    {{- if .Content }}
-    <div class="post-content">
-      {{- if not (.Param "disableAnchoredHeadings") }}
-      {{- partial "anchored_headings.html" .Content -}}
-      {{- else }}{{ .Content }}{{ end }}
-    </div>
-    {{- end }}
-    <div class="cover-sidebar">
-      {{- partial "cover.html" (dict "cxt" . "IsSingle" true "isHidden" $isHidden) }}
-    </div>
-  </div>
-  {{- else }}
   {{- if .Content }}
   <div class="post-content">
     {{- if not (.Param "disableAnchoredHeadings") }}
     {{- partial "anchored_headings.html" .Content -}}
     {{- else }}{{ .Content }}{{ end }}
   </div>
-  {{- end }}
   {{- end }}
 
   <footer class="post-footer">

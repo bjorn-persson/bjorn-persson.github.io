@@ -1,4 +1,5 @@
-/* List entry card: text left, cover thumbnail right */
+/* === List page: text left, thumbnail right (flex) === */
+
 .post-entry .entry-body {
     display: flex;
     gap: 16px;
@@ -40,21 +41,20 @@
     }
 }
 
-/* Cover image sidebar layout for paper pages */
-.post-with-cover {
-    display: flex;
-    gap: 40px;
-    align-items: flex-start;
-}
-
-.post-with-cover > .post-content {
-    flex: 1;
-    min-width: 0;
-}
+/* === Single page: cover sidebar floats to the right of the header === */
 
 .cover-sidebar {
+    float: right;
     width: 200px;
-    flex-shrink: 0;
+    margin: 0 0 20px 24px;
+}
+
+/* On wide screens: push sidebar outside the content column */
+@media (min-width: 1200px) {
+    .cover-sidebar {
+        margin-right: -220px; /* 200px image + 20px gap */
+        margin-left: 0;
+    }
 }
 
 .cover-sidebar .entry-cover {
@@ -74,13 +74,14 @@
     border-radius: 0;
 }
 
-@media (max-width: 768px) {
-    .post-with-cover {
-        flex-direction: column;
-    }
+.post-footer {
+    clear: both;
+}
 
+@media (max-width: 768px) {
     .cover-sidebar {
-        width: 100%;
-        max-width: 280px;
+        float: none;
+        max-width: 200px;
+        margin: 0 0 20px 0;
     }
 }
