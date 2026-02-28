@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(powershell -Command \"Get-ChildItem ''c:\\\\Users\\\\perss\\\\Documents\\\\Projekt\\\\personal_website\\\\bjorn-persson.github.io\\\\papers'' | Where-Object {$_Name -like ''12*''} | Select-Object -ExpandProperty FullName | ForEach-Object { [System.Text.Encoding]::Unicode.GetBytes\\($_ | ForEach-Object { ''{0:X2}'' -f $_} }\")",
-      "Bash(hugo --quiet)",
-      "Bash(xargs grep -l \"entry-header\\\\|entry-content\\\\|post-entry\")"
-    ]
-  }
-}
