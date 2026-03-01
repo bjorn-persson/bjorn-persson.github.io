@@ -255,7 +255,7 @@ const models = {
   logistic: {
     params: [
       { id: 'b0', label: 'β₀ (intercept)', min: -5, max: 5, step: 0.1, def: 0 },
-      { id: 'b1', label: 'β₁', min: -5, max: 5, step: 0.1, def: 2 },
+      { id: 'b1', label: 'β₁', min: -10, max: 10, step: 0.1, def: 2 },
       { id: 'n', label: 'N', min: 20, max: 500, step: 1, def: 120 },
     ],
     dgp(p) {

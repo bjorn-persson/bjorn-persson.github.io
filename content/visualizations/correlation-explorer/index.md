@@ -898,7 +898,7 @@ function distanceCorrelation(pts) {
     }
   dCovXY /= (n * n); dVarX /= (n * n); dVarY /= (n * n);
   const den = Math.sqrt(dVarX * dVarY);
-  return den < 1e-15 ? 0 : Math.sqrt(dCovXY / den);
+  return den < 1e-15 ? 0 : Math.sqrt(Math.max(0, dCovXY) / den);
 }
 
 // ══════════════════════════════════

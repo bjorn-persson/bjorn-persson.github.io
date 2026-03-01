@@ -100,7 +100,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
   </div>
   <div class="irt-control-group">
     <div class="irt-control-label">
-      <span>Difficulty (b): The trait level where probability of endorsement is midway.</span>
+      <span>Difficulty (b): The inflection point of the curve. P(θ=b) = (1+c)/2 — midway between the guessing floor c and 1.</span>
       <span class="irt-value-display" id="bVal">0.00</span>
     </div>
     <input type="range" id="bSlider" min="-3.0" max="3.0" step="0.1" value="0.0">

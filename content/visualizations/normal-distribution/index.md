@@ -1,6 +1,6 @@
 ---
 title: "Normal Distribution"
-description: "Interactive visualization of the standard normal cumulative distribution function. Click the curve to compute probabilities; a second click shows the probability between two z-values."
+description: "Interactive visualization of the standard normal density. Click the bell curve to shade the lower tail and read off P(Z ≤ z); a second click shows the probability between two z-values."
 ---
 
 <style>
