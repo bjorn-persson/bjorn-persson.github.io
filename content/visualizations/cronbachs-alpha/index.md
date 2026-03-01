@@ -59,7 +59,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 }
 .ca-stat-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 .ca-stat {
@@ -76,6 +76,116 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   color: var(--secondary);
   margin-bottom: 2px;
   line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ca-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border-radius: 50%;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.54rem;
+  font-weight: 600;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: border-color 0.2s, color 0.2s;
+}
+.ca-info-btn:hover {
+  border-color: #0d8a74;
+  color: #0d8a74;
+}
+.ca-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(60, 60, 80, 0.6);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.ca-modal-overlay.visible {
+  display: flex;
+}
+.ca-modal {
+  background: var(--theme);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 24px 28px;
+  position: relative;
+}
+.ca-modal h2 {
+  font-family: 'Source Serif 4', serif;
+  font-size: 1.1rem;
+  color: var(--primary);
+  margin-bottom: 4px;
+  padding-right: 30px;
+}
+.ca-modal .ca-modal-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(13, 138, 116, 0.1);
+  color: #0d8a74;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+.ca-modal p {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.74rem;
+  color: var(--secondary);
+  line-height: 1.65;
+  margin-bottom: 8px;
+}
+.ca-modal .formula {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.76rem;
+  color: #0d8a74;
+  background: rgba(13, 138, 116, 0.06);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 10px 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.ca-modal .section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.63rem;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 16px;
+  margin-bottom: 4px;
+}
+.ca-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.1rem;
+  background: none;
+  border: none;
+  color: var(--secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+.ca-modal-close:hover {
+  color: var(--primary);
 }
 .ca-stat-value {
   font-size: 1.05rem;
@@ -99,6 +209,9 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   color: var(--secondary);
   text-transform: uppercase;
   letter-spacing: 0.07em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 .ca-panel canvas {
   display: block;
@@ -148,54 +261,54 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
         <input type="range" id="ca_alpha" min="0.40" max="1.00" step="0.01" value="0.80">
       </div>
       <div class="ca-control-group">
-        <label>True score (0–100): <span class="ca-val" id="ca_true_val">65</span></label>
-        <input type="range" id="ca_true" min="0" max="100" step="1" value="65">
+        <label>True score: <span class="ca-val" id="ca_true_val">100</span></label>
+        <input type="range" id="ca_true" min="40" max="160" step="1" value="100">
       </div>
       <div class="ca-control-group">
         <label>Test SD (score units): <span class="ca-val" id="ca_sd_val">15</span></label>
-        <input type="range" id="ca_sd" min="5" max="25" step="1" value="15">
+        <input type="range" id="ca_sd" min="1" max="30" step="1" value="15">
       </div>
     </div>
     <div class="ca-stat-row">
       <div class="ca-stat" id="ca_sem_card">
-        <div class="ca-stat-label">SEM (score units)</div>
+        <div class="ca-stat-label">SEM (score units) <button class="ca-info-btn" onclick="caShowInfo('sem')" title="About SEM">?</button></div>
         <div class="ca-stat-value" id="ca_sem_val">—</div>
       </div>
       <div class="ca-stat" id="ca_ci68_card">
-        <div class="ca-stat-label">68% true-score CI width</div>
+        <div class="ca-stat-label">68% true-score CI width <button class="ca-info-btn" onclick="caShowInfo('ci68')" title="About 68% CI">?</button></div>
         <div class="ca-stat-value" id="ca_ci68_val">—</div>
       </div>
       <div class="ca-stat" id="ca_ci95_card">
-        <div class="ca-stat-label">95% true-score CI width</div>
+        <div class="ca-stat-label">95% true-score CI width <button class="ca-info-btn" onclick="caShowInfo('ci95')" title="About 95% CI">?</button></div>
         <div class="ca-stat-value" id="ca_ci95_val">—</div>
-      </div>
-      <div class="ca-stat" id="ca_ratt_card">
-        <div class="ca-stat-label">Max observable r (same α)</div>
-        <div class="ca-stat-value" id="ca_ratt_val">—</div>
       </div>
     </div>
     <div class="ca-interp" id="ca_interp">—</div>
     <div class="ca-panels">
       <div class="ca-panel">
-        <div class="ca-panel-label">Observed score → true-score CI</div>
+        <div class="ca-panel-label">Observed score → true-score CI <button class="ca-info-btn" onclick="caShowInfo('scorePanel')" title="About this panel">?</button></div>
         <canvas id="ca_score" height="290"></canvas>
       </div>
       <div class="ca-panel">
-        <div class="ca-panel-label">Repeated testing distribution</div>
+        <div class="ca-panel-label">Repeated testing distribution <button class="ca-info-btn" onclick="caShowInfo('distPanel')" title="About this panel">?</button></div>
         <canvas id="ca_dist" height="290"></canvas>
       </div>
-    </div>
-    <div class="ca-panel">
-      <div class="ca-panel-label">Correlation attenuation by reliability</div>
-      <canvas id="ca_att" height="220"></canvas>
     </div>
   </div>
   <p class="ca-note">
     <strong>SEM = SD × √(1 − α).</strong>
     The 95% true-score CI for an observed score X is [X − 1.96·SEM, X + 1.96·SEM].<br>
-    Correlation attenuation: observed r = true r × α (when both measures have the same α). At α = 0.70, a true r = 0.50 appears as r ≈ 0.35 — a 30% underestimate.<br>
     Rules of thumb: α ≥ 0.90 for high-stakes individual decisions; α ≥ 0.70 for research/group comparisons.
   </p>
+</div>
+
+<div class="ca-modal-overlay" id="caModalOverlay" onclick="if(event.target===this)caCloseInfo()">
+  <div class="ca-modal">
+    <button class="ca-modal-close" onclick="caCloseInfo()">&times;</button>
+    <h2 id="caModalTitle"></h2>
+    <span class="ca-modal-badge" id="caModalBadge"></span>
+    <div id="caModalBody"></div>
+  </div>
 </div>
 
 <script>
@@ -204,10 +317,8 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 
   const scoreCanvas = document.getElementById('ca_score');
   const distCanvas  = document.getElementById('ca_dist');
-  const attCanvas   = document.getElementById('ca_att');
   const sCtx = scoreCanvas.getContext('2d');
   const dCtx = distCanvas.getContext('2d');
-  const aCtx = attCanvas.getContext('2d');
 
   function normalPdf(x, mu, sigma) {
     if (sigma <= 0) return 0;
@@ -227,18 +338,18 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     const pw = W - PAD_L - PAD_R;
     const midY = PAD_T + (H - PAD_T - PAD_B) / 2;
 
-    const xMin = 0, xMax = 100;
+    const xMin = 40, xMax = 160;
     function toX(v) { return PAD_L + (v - xMin) / (xMax - xMin) * pw; }
 
     // Axis
-    sCtx.beginPath(); sCtx.moveTo(toX(0), midY); sCtx.lineTo(toX(100), midY);
+    sCtx.beginPath(); sCtx.moveTo(toX(xMin), midY); sCtx.lineTo(toX(xMax), midY);
     sCtx.strokeStyle = '#c0c0d8'; sCtx.lineWidth = 1; sCtx.stroke();
 
     // Tick marks
     sCtx.font = '9px IBM Plex Mono, monospace';
     sCtx.fillStyle = '#888899';
     sCtx.textAlign = 'center';
-    for (let t = 0; t <= 100; t += 10) {
+    for (let t = xMin; t <= xMax; t += 20) {
       const tx = toX(t);
       sCtx.beginPath(); sCtx.moveTo(tx, midY - 4); sCtx.lineTo(tx, midY + 4);
       sCtx.strokeStyle = '#c0c0d8'; sCtx.lineWidth = 1; sCtx.stroke();
@@ -246,10 +357,10 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     }
 
     // 95% CI band
-    const lo95 = Math.max(0, trueScore - 1.96 * sem);
-    const hi95 = Math.min(100, trueScore + 1.96 * sem);
-    const lo68 = Math.max(0, trueScore - sem);
-    const hi68 = Math.min(100, trueScore + sem);
+    const lo95 = Math.max(xMin, trueScore - 1.96 * sem);
+    const hi95 = Math.min(xMax, trueScore + 1.96 * sem);
+    const lo68 = Math.max(xMin, trueScore - sem);
+    const hi68 = Math.min(xMax, trueScore + sem);
 
     const bandH = 22;
     // 95% fill
@@ -314,8 +425,8 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     const pw = W - PAD_L - PAD_R;
     const ph = H - PAD_T - PAD_B;
 
-    const xMin = Math.max(0, trueScore - 4 * Math.max(sem, sd * 0.3));
-    const xMax = Math.min(100, trueScore + 4 * Math.max(sem, sd * 0.3));
+    const xMin = trueScore - 4 * Math.max(sem, sd * 0.3);
+    const xMax = trueScore + 4 * Math.max(sem, sd * 0.3);
     function toX(v) { return PAD_L + (v - xMin) / (xMax - xMin) * pw; }
 
     const steps = 300;
@@ -413,144 +524,31 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     dCtx.fillText('68%', toX((lo68x + hi68x) / 2), PAD_T + ph - 8);
   }
 
-  // ── Attenuation curve ─────────────────────────────────────────────────────
-  function drawAttenuation(alpha) {
-    const W = attCanvas.width / dpr;
-    const H = attCanvas.height / dpr;
-    aCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    aCtx.clearRect(0, 0, W, H);
-
-    const PAD_L = 48, PAD_R = 16, PAD_T = 28, PAD_B = 40;
-    const pw = W - PAD_L - PAD_R;
-    const ph = H - PAD_T - PAD_B;
-
-    function toX(a) { return PAD_L + (a - 0.4) / (1.0 - 0.4) * pw; }
-    function toY(r) { return PAD_T + ph - r * ph; }
-
-    // Grid
-    aCtx.strokeStyle = '#e4e4f0'; aCtx.lineWidth = 0.5;
-    for (let r = 0; r <= 1.01; r += 0.25) {
-      aCtx.beginPath(); aCtx.moveTo(PAD_L, toY(r)); aCtx.lineTo(PAD_L + pw, toY(r)); aCtx.stroke();
-    }
-    for (let a = 0.4; a <= 1.01; a += 0.1) {
-      aCtx.beginPath(); aCtx.moveTo(toX(a), PAD_T); aCtx.lineTo(toX(a), PAD_T + ph); aCtx.stroke();
-    }
-
-    // True r curves: 0.30, 0.50, 0.70
-    const trueRs = [0.30, 0.50, 0.70];
-    const rColors = ['#6d28d9', '#c2640a', '#0d8a74'];
-    const rLabels = ['true r = 0.30', 'true r = 0.50', 'true r = 0.70'];
-
-    for (let ri = 0; ri < trueRs.length; ri++) {
-      const trueR = trueRs[ri];
-      aCtx.beginPath();
-      for (let ai = 0; ai <= 200; ai++) {
-        const a = 0.4 + (1.0 - 0.4) * ai / 200;
-        // attenuation: observed r = true_r * alpha (both measures same alpha)
-        const obsR = trueR * a;
-        const x = toX(a), y = toY(obsR);
-        ai === 0 ? aCtx.moveTo(x, y) : aCtx.lineTo(x, y);
-      }
-      aCtx.strokeStyle = rColors[ri]; aCtx.lineWidth = 1.8;
-      aCtx.setLineDash(ri === 2 ? [] : ri === 1 ? [6, 3] : [3, 3]);
-      aCtx.stroke(); aCtx.setLineDash([]);
-    }
-
-    // Current alpha vertical marker
-    const ax = toX(alpha);
-    aCtx.beginPath(); aCtx.moveTo(ax, PAD_T); aCtx.lineTo(ax, PAD_T + ph);
-    aCtx.strokeStyle = 'rgba(200,60,90,0.6)'; aCtx.lineWidth = 1.5;
-    aCtx.setLineDash([4, 3]); aCtx.stroke(); aCtx.setLineDash([]);
-
-    // Dots at intersection
-    for (let ri = 0; ri < trueRs.length; ri++) {
-      const obsR = trueRs[ri] * alpha;
-      aCtx.beginPath(); aCtx.arc(ax, toY(obsR), 4, 0, Math.PI * 2);
-      aCtx.fillStyle = rColors[ri]; aCtx.fill();
-    }
-
-    // Axes
-    aCtx.strokeStyle = '#c0c0d8'; aCtx.lineWidth = 1;
-    aCtx.beginPath(); aCtx.moveTo(PAD_L, PAD_T + ph); aCtx.lineTo(PAD_L + pw, PAD_T + ph); aCtx.stroke();
-    aCtx.beginPath(); aCtx.moveTo(PAD_L, PAD_T); aCtx.lineTo(PAD_L, PAD_T + ph); aCtx.stroke();
-
-    // X-axis ticks and labels
-    aCtx.font = '9px IBM Plex Mono, monospace';
-    aCtx.fillStyle = '#888899';
-    aCtx.textAlign = 'center';
-    for (let a = 0.4; a <= 1.01; a += 0.1) {
-      const sx = toX(a);
-      aCtx.beginPath(); aCtx.moveTo(sx, PAD_T + ph); aCtx.lineTo(sx, PAD_T + ph + 4);
-      aCtx.strokeStyle = '#c0c0d8'; aCtx.lineWidth = 1; aCtx.stroke();
-      aCtx.fillText(a.toFixed(1), sx, PAD_T + ph + 16);
-    }
-
-    // Y-axis ticks and labels
-    aCtx.textAlign = 'right';
-    for (let r = 0; r <= 1.01; r += 0.25) {
-      const sy = toY(r);
-      aCtx.beginPath(); aCtx.moveTo(PAD_L, sy); aCtx.lineTo(PAD_L - 4, sy);
-      aCtx.strokeStyle = '#c0c0d8'; aCtx.lineWidth = 1; aCtx.stroke();
-      aCtx.fillText(r.toFixed(2), PAD_L - 7, sy + 3);
-    }
-
-    // Axis labels
-    aCtx.textAlign = 'center';
-    aCtx.fillText("Cronbach's α", PAD_L + pw / 2, PAD_T + ph + 30);
-    aCtx.save();
-    aCtx.translate(13, PAD_T + ph / 2);
-    aCtx.rotate(-Math.PI / 2);
-    aCtx.fillText('Observed r', 0, 0);
-    aCtx.restore();
-
-    // Legend — bottom-right
-    const legX = PAD_L + pw - 4;
-    const legY = PAD_T + ph - 14;
-    for (let ri = trueRs.length - 1; ri >= 0; ri--) {
-      const ly = legY - ri * 16;
-      aCtx.strokeStyle = rColors[ri]; aCtx.lineWidth = 1.8;
-      aCtx.setLineDash(ri === 2 ? [] : ri === 1 ? [6, 3] : [3, 3]);
-      aCtx.beginPath(); aCtx.moveTo(legX - 48, ly); aCtx.lineTo(legX - 28, ly); aCtx.stroke();
-      aCtx.setLineDash([]);
-      aCtx.fillStyle = rColors[ri]; aCtx.font = '9px IBM Plex Mono, monospace'; aCtx.textAlign = 'right';
-      aCtx.fillText(rLabels[ri], legX, ly + 3);
-    }
-
-    // Title
-    aCtx.font = 'bold 10px IBM Plex Mono, monospace';
-    aCtx.fillStyle = '#888899';
-    aCtx.textAlign = 'center';
-    aCtx.fillText('Correlation attenuation (observed r = true r × α)', W / 2, 16);
-  }
-
   // ── Stats update ──────────────────────────────────────────────────────────
   function updateStats(alpha, trueScore, sd) {
     const sem = sd * Math.sqrt(1 - alpha);
     const ci68 = 2 * sem;
     const ci95 = 2 * 1.96 * sem;
-    const rMaxSame = alpha; // max observable r if both measures have same alpha
-
     document.getElementById('ca_sem_val').textContent = sem.toFixed(2);
     document.getElementById('ca_ci68_val').textContent = ci68.toFixed(1);
     document.getElementById('ca_ci95_val').textContent = ci95.toFixed(1);
-    document.getElementById('ca_ratt_val').textContent = rMaxSame.toFixed(2);
 
     const warn = alpha < 0.7;
     const ok   = alpha >= 0.9;
 
-    for (const id of ['ca_sem_card', 'ca_ci68_card', 'ca_ci95_card', 'ca_ratt_card']) {
+    for (const id of ['ca_sem_card', 'ca_ci68_card', 'ca_ci95_card']) {
       const el = document.getElementById(id);
       el.classList.toggle('warn', warn);
       el.classList.toggle('ok', ok && !warn);
     }
-    for (const id of ['ca_sem_val', 'ca_ci68_val', 'ca_ci95_val', 'ca_ratt_val']) {
+    for (const id of ['ca_sem_val', 'ca_ci68_val', 'ca_ci95_val']) {
       const el = document.getElementById(id);
       el.classList.toggle('warn', warn);
     }
 
     const interpEl = document.getElementById('ca_interp');
-    const lo95 = Math.max(0, trueScore - 1.96 * sem).toFixed(0);
-    const hi95 = Math.min(100, trueScore + 1.96 * sem).toFixed(0);
+    const lo95 = (trueScore - 1.96 * sem).toFixed(0);
+    const hi95 = (trueScore + 1.96 * sem).toFixed(0);
     let msg = '';
     if (alpha >= 0.90) {
       msg = `<span class="ok">Good reliability (α = ${alpha.toFixed(2)}).</span> A score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Suitable for individual high-stakes decisions.`;
@@ -566,11 +564,10 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   // ── Resize + render ───────────────────────────────────────────────────────
   function resizeCanvases() {
     dpr = window.devicePixelRatio || 1;
-    for (const c of [scoreCanvas, distCanvas, attCanvas]) {
+    for (const c of [scoreCanvas, distCanvas]) {
       const rect = c.getBoundingClientRect();
       if (rect.width > 0) {
         c.width = rect.width * dpr;
-        // keep explicit height for score and dist; attCanvas self-governs
       }
     }
   }
@@ -587,7 +584,6 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     updateStats(alpha, trueScore, sd);
     drawScore(alpha, trueScore, sd);
     drawDist(alpha, trueScore, sd);
-    drawAttenuation(alpha);
   }
 
   function resize() {
@@ -602,4 +598,88 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   window.addEventListener('resize', resize);
   requestAnimationFrame(() => requestAnimationFrame(resize));
 })();
+
+const caInfoContent = {
+  sem: {
+    title: 'Standard Error of Measurement',
+    badge: 'SEM',
+    body: `
+      <p>The SEM quantifies how much an observed score is expected to differ from a person's true score due to measurement error alone. It is the standard deviation of the distribution of observed scores you would get if you tested the same person infinitely many times.</p>
+      <div class="formula">SEM = SD &times; &radic;(1 &minus; &alpha;)</div>
+      <p>where SD is the standard deviation of the test in the population and &alpha; is the reliability coefficient.</p>
+      <div class="section-label">Interpretation</div>
+      <p>A smaller SEM means higher measurement precision. At &alpha; = 1.00, SEM = 0 (no error). At &alpha; = 0.00, SEM equals the full test SD (observed scores are pure noise). The SEM is expressed in the same units as the test scores.</p>
+      <div class="section-label">Why it matters</div>
+      <p>The SEM is the building block for confidence intervals. Any single observed score is just one draw from a distribution centered on the true score, with spread equal to the SEM. Lower reliability widens this distribution, making individual scores less informative.</p>
+    `
+  },
+  ci68: {
+    title: '68% True-Score Confidence Interval',
+    badge: '68% CI',
+    body: `
+      <p>The 68% CI gives the range within which a person's true score is expected to fall with roughly 68% probability, given their observed score. Its width equals two SEMs (one SEM above and below the observed score).</p>
+      <div class="formula">68% CI width = 2 &times; SEM</div>
+      <div class="section-label">Why 68%?</div>
+      <p>In a normal distribution, approximately 68% of values fall within &plusmn;1 standard deviation of the mean. Since the SEM is the standard deviation of measurement error, &plusmn;1 SEM around an observed score captures about 68% of the true-score distribution.</p>
+      <div class="section-label">Interpretation</div>
+      <p>On an IQ-scale test (SD = 15) with &alpha; = 0.90, the SEM is about 4.7 points, so the 68% CI width is roughly 9.5 points. This means there is about a 1-in-3 chance the person's true score lies outside this range. For individual decisions, the wider 95% CI is usually preferred.</p>
+    `
+  },
+  ci95: {
+    title: '95% True-Score Confidence Interval',
+    badge: '95% CI',
+    body: `
+      <p>The 95% CI gives the range within which a person's true score is expected to fall with approximately 95% probability. It extends &plusmn;1.96 SEMs around the observed score.</p>
+      <div class="formula">95% CI width = 2 &times; 1.96 &times; SEM &asymp; 3.92 &times; SEM</div>
+      <div class="section-label">Interpretation</div>
+      <p>This is the interval most commonly reported in clinical and educational assessment. If the 95% CI is wide relative to meaningful score differences, individual scores cannot be interpreted with confidence.</p>
+      <div class="section-label">Example</div>
+      <p>On an IQ-scale test (SD = 15) with &alpha; = 0.90, the 95% CI width is about 18.6 points. A person scoring 110 has a 95% CI of roughly [101, 119]. With &alpha; = 0.70, that width balloons to about 32.3 points — nearly the entire range between "average" and "superior" classifications.</p>
+      <div class="section-label">Clinical guideline</div>
+      <p>&alpha; &ge; 0.90 is generally recommended for high-stakes individual decisions (diagnosis, placement). &alpha; &ge; 0.70 may suffice for group-level research comparisons where individual precision is less critical.</p>
+    `
+  },
+  scorePanel: {
+    title: 'Observed Score → True-Score CI',
+    badge: 'Score scale',
+    body: `
+      <p>This panel shows a number line with the observed score marked as a point, surrounded by shaded bands representing the confidence intervals around it.</p>
+      <div class="section-label">What the bands mean</div>
+      <p>The darker inner band is the 68% CI (&plusmn;1 SEM). The lighter outer band is the 95% CI (&plusmn;1.96 SEM). These intervals represent the range of true scores that are plausible given the observed score and the test's reliability.</p>
+      <div class="section-label">How to read it</div>
+      <p>A narrow band means the test is precise — the observed score is a good estimate of the true score. A wide band means there is substantial measurement error, and the person's true ability could be meaningfully different from what was observed.</p>
+      <div class="section-label">Clinical use</div>
+      <p>When two people's CIs overlap substantially, their observed score difference may not reflect a real difference in ability. This is why reporting scores as intervals rather than points is standard practice in psychological assessment.</p>
+    `
+  },
+  distPanel: {
+    title: 'Repeated Testing Distribution',
+    badge: 'Error distribution',
+    body: `
+      <p>This panel shows the distribution of observed scores you would expect if you tested the same person many times with parallel forms of the test. The curve is a normal distribution centered on the true score, with a standard deviation equal to the SEM.</p>
+      <div class="section-label">What the curve shows</div>
+      <p>The peak of the curve is at the true score. The spread is determined entirely by the SEM: lower reliability means a wider, flatter curve (more variable observed scores), while higher reliability produces a tall, narrow curve (observed scores cluster tightly around the truth).</p>
+      <div class="section-label">The shaded regions</div>
+      <p>The darker shading covers the central 68% of the distribution — the range within which most observed scores would fall. The lighter shading extends to 95%. Scores outside the 95% region would occur fewer than 1 in 20 times.</p>
+      <div class="section-label">Intuition</div>
+      <p>Think of this as the "noise" in the measurement process. Even if a person's true ability never changes, their observed scores will vary from one testing to the next. This panel makes that variability visible.</p>
+    `
+  }
+};
+
+function caShowInfo(key) {
+  const info = caInfoContent[key];
+  document.getElementById('caModalTitle').textContent = info.title;
+  document.getElementById('caModalBadge').textContent = info.badge;
+  document.getElementById('caModalBody').innerHTML = info.body;
+  document.getElementById('caModalOverlay').classList.add('visible');
+}
+
+function caCloseInfo() {
+  document.getElementById('caModalOverlay').classList.remove('visible');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') caCloseInfo();
+});
 </script>
