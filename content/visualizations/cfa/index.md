@@ -11,18 +11,22 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 
 #cfa-wrap { color: var(--primary); max-width: 100%; }
 
+/* Override PaperMod content width for this page only */
+.main:has(#cfa-wrap) { --main-width: 1100px; }
+
 .cfa-subtitle {
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
-  margin: 0 0 1.2rem 0;
+  margin: 0 0 1.4rem 0;
   line-height: 1.55;
 }
 
 .cfa-main {
   display: grid;
-  grid-template-columns: 330px 1fr;
+  grid-template-columns: 370px 1fr;
   gap: 16px;
   align-items: start;
+  max-width: 1200px;
 }
 
 @media (max-width: 820px) {
@@ -33,7 +37,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 
 #path-canvas {
   width: 100%;
-  height: 360px;
+  height: 400px;
   background: #f4f4f8;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -50,12 +54,12 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 }
 
 .ctrl-group-title {
-  font-size: 0.62rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: #888899;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .slider-row {
@@ -67,9 +71,9 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 .slider-row:last-child { margin-bottom: 0; }
 
 .slider-label {
-  font-size: 0.68rem;
+  font-size: 0.88rem;
   color: var(--secondary);
-  width: 26px;
+  width: 30px;
   flex-shrink: 0;
 }
 
@@ -98,9 +102,9 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 }
 
 .slider-val {
-  font-size: 0.68rem;
+  font-size: 0.88rem;
   color: var(--primary);
-  width: 36px;
+  width: 40px;
   text-align: right;
   flex-shrink: 0;
 }
@@ -109,12 +113,13 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .cfa-btn {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  padding: 5px 10px;
+  font-size: 0.9rem;
+  padding: 6px 12px;
   background: transparent;
   border: 1px solid var(--border);
   color: var(--primary);
@@ -132,14 +137,14 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 
 .matrices-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .matrix-wrap { display: flex; flex-direction: column; gap: 4px; }
 
 .matrix-title {
-  font-size: 0.62rem;
+  font-size: 0.82rem;
   color: #888899;
   font-weight: 500;
   text-align: center;
@@ -158,8 +163,8 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
   position: absolute;
   background: rgba(30,30,50,0.88);
   color: #fff;
-  font-size: 0.62rem;
-  padding: 3px 7px;
+  font-size: 0.82rem;
+  padding: 4px 9px;
   border-radius: 3px;
   pointer-events: none;
   display: none;
@@ -187,13 +192,13 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
   gap: 1px;
 }
 .fit-badge-label {
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   color: #888899;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 .fit-badge-val {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--primary);
 }
@@ -201,14 +206,14 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 .fit-badge-val.poor { color: #c83c5a; }
 
 .status-badge {
-  font-size: 0.68rem;
+  font-size: 0.88rem;
   color: #888899;
   padding: 4px 0;
 }
 
 #fit-curve-canvas {
   width: 100%;
-  height: 110px;
+  height: 130px;
   background: #f4f4f8;
   border: 1px solid var(--border);
   border-radius: 3px;
@@ -269,6 +274,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 </div>
 </div>
 <div class="cfa-right">
+<span class="status-badge" id="status-badge" style="text-align:center">Adjust sliders or click Randomize &rarr; Run</span>
 <div class="btn-row">
 <button class="cfa-btn" id="btn-randomize">Randomize</button>
 <button class="cfa-btn" id="btn-step">Step</button>
@@ -308,7 +314,6 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 <span class="fit-badge-label">Iteration</span>
 <span class="fit-badge-val" id="iter-val">&mdash;</span>
 </div>
-<span class="status-badge" id="status-badge">Adjust sliders or click Randomize &rarr; Run</span>
 </div>
 <canvas id="fit-curve-canvas"></canvas>
 </div>
@@ -513,12 +518,12 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     var s = setupCanvas(el);
     var ctx = s.ctx, w = s.w, h = s.h;
     var n   = 6;
-    var pad = { l: 18, t: 4, r: 4, b: 18 };
+    var pad = { l: 28, t: 4, r: 4, b: 26 };
     var cw  = (w - pad.l - pad.r) / n;
     var ch  = (h - pad.t - pad.b) / n;
     var i, j, x, y;
 
-    ctx.font = '9px "IBM Plex Mono", monospace';
+    ctx.font = '12px "IBM Plex Mono", monospace';
 
     for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
@@ -532,9 +537,9 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
       }
       ctx.fillStyle = '#888899';
       ctx.textAlign = 'right';
-      ctx.fillText(MAT_LABELS[i], pad.l - 2, pad.t + (i + 0.67) * ch);
+      ctx.fillText(MAT_LABELS[i], pad.l - 3, pad.t + (i + 0.67) * ch);
       ctx.textAlign = 'center';
-      ctx.fillText(MAT_LABELS[i], pad.l + (i + 0.5) * cw, pad.t + n * ch + 13);
+      ctx.fillText(MAT_LABELS[i], pad.l + (i + 0.5) * cw, pad.t + n * ch + 16);
     }
 
     el._meta = { pad: pad, cw: cw, ch: ch, n: n, M: M };
@@ -580,10 +585,10 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     if (lbl) {
       var t = (lblT !== undefined) ? lblT : 0.5;
       var mx = x1 + t * (x2 - x1), my = y1 + t * (y2 - y1);
-      ctx.font = '9px "IBM Plex Mono", monospace';
+      ctx.font = '12px "IBM Plex Mono", monospace';
       ctx.fillStyle = color;
       ctx.textAlign = lblRight ? 'left' : 'right';
-      ctx.fillText(lbl, mx + (lblRight ? 5 : -5), my + 4);
+      ctx.fillText(lbl, mx + (lblRight ? 2 : -2), my + 4);
     }
     ctx.restore();
   }
@@ -608,10 +613,10 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     ctx.lineTo(x1 - aL * Math.cos(a1 + 0.4), y1 - aL * Math.sin(a1 + 0.4));
     ctx.closePath(); ctx.fill();
     if (lbl) {
-      ctx.font = '10px "IBM Plex Mono", monospace';
+      ctx.font = '13px "IBM Plex Mono", monospace';
       ctx.fillStyle = color;
       ctx.textAlign = 'center';
-      ctx.fillText(lbl, mx, my - 5);
+      ctx.fillText(lbl, mx, my - 6);
     }
     ctx.restore();
   }
@@ -627,8 +632,8 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     var PURPLE = '#6d28d9';
     var GRAY   = '#888899';
 
-    var fR  = 32;
-    var iW  = 50, iH = 24, iRad = 3;
+    var fR  = 36;
+    var iW  = 56, iH = 28, iRad = 3;
     var fY  = 90;
     var iY  = h - 62;
     var f1X = w * 0.27, f2X = w * 0.73;
@@ -644,7 +649,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     for (i = 0; i < 6; i++) {
       var fX    = i < 3 ? f1X : f2X;
       var color = i < 3 ? TEAL : PURPLE;
-      var right = i < 3;
+      var right = i >= 3;
       var lbl   = '\u03bb' + (i + 1) + '=' + lambda[i].toFixed(2);
       arrow(ctx, fX, fY + fR, iXs[i], iY - iH / 2, color, lbl, right, lblTs[i]);
     }
@@ -657,9 +662,9 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
       ctx.beginPath(); ctx.arc(f[0], fY, fR, 0, Math.PI * 2);
       ctx.fillStyle = f[3]; ctx.fill();
       ctx.strokeStyle = f[2]; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.font = '13px "IBM Plex Mono", monospace';
+      ctx.font = '16px "IBM Plex Mono", monospace';
       ctx.fillStyle = f[2]; ctx.textAlign = 'center';
-      ctx.fillText(f[1], f[0], fY + 5);
+      ctx.fillText(f[1], f[0], fY + 6);
     }
 
     // Indicators
@@ -670,9 +675,9 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
       roundedRect(ctx, x - iW/2, iY - iH/2, iW, iH, iRad);
       ctx.fillStyle = fill; ctx.fill();
       ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.font = '11px "IBM Plex Mono", monospace';
+      ctx.font = '14px "IBM Plex Mono", monospace';
       ctx.fillStyle = color; ctx.textAlign = 'center';
-      ctx.fillText('x' + (i + 1), x, iY + 4);
+      ctx.fillText('x' + (i + 1), x, iY + 5);
 
       // Unique variance arrow (dashed, downward)
       var delta = 1 - lambda[i] * lambda[i];
@@ -690,14 +695,14 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
       ctx.lineTo(x - 4, iY + iH / 2 + 13);
       ctx.lineTo(x + 4, iY + iH / 2 + 13);
       ctx.closePath(); ctx.fill();
-      ctx.font = '8px "IBM Plex Mono", monospace';
+      ctx.font = '11px "IBM Plex Mono", monospace';
       ctx.fillStyle = GRAY; ctx.textAlign = 'center';
-      ctx.fillText('\u03b4=' + delta.toFixed(2), x, iY + iH / 2 + 31);
+      ctx.fillText('\u03b4=' + delta.toFixed(2), x, iY + iH / 2 + 34);
       ctx.restore();
     }
 
     // Footer note
-    ctx.font = '8px "IBM Plex Mono", monospace';
+    ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.fillStyle = GRAY; ctx.textAlign = 'left';
     ctx.fillText('x\u2081\u2013x\u2083 \u2192 F1   x\u2084\u2013x\u2086 \u2192 F2   \u03b4 = 1\u2212\u03bb\u00b2', 4, h - 4);
   }
@@ -709,7 +714,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     if (!el) return;
     var s = setupCanvas(el);
     var ctx = s.ctx, w = s.w, h = s.h;
-    var pad = { l: 44, t: 8, r: 10, b: 22 };
+    var pad = { l: 50, t: 8, r: 10, b: 26 };
     var pw = w - pad.l - pad.r;
     var ph = h - pad.t - pad.b;
 
@@ -720,7 +725,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     ctx.stroke();
 
     if (optHistory.length < 2) {
-      ctx.font = '10px "IBM Plex Mono", monospace';
+      ctx.font = '16px "IBM Plex Mono", monospace';
       ctx.fillStyle = '#aaaacc'; ctx.textAlign = 'center';
       ctx.fillText('Run the optimizer to see convergence', pad.l + pw / 2, pad.t + ph / 2 + 4);
       return;
@@ -729,7 +734,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     var maxY = Math.max(0.02, optHistory[0] * 1.1);
     var n    = optHistory.length;
     var tick, frac, y, x, i;
-    ctx.font = '9px "IBM Plex Mono", monospace';
+    ctx.font = '12px "IBM Plex Mono", monospace';
 
     for (tick = 0; tick <= 4; tick++) {
       frac = tick / 4;
@@ -780,7 +785,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
       var el = document.getElementById(ids[i]);
       if (!el) continue;
       var pw = el.parentElement.getBoundingClientRect().width;
-      el.style.height = Math.max(80, Math.round(pw)) + 'px';
+      el.style.height = Math.max(80, Math.round(pw * 1.1)) + 'px';
     }
   }
 

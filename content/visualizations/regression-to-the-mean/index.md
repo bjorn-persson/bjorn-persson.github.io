@@ -9,7 +9,7 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 
 .rtm-wrap { font-family: 'IBM Plex Mono', monospace; }
 .rtm-subtitle {
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 18px;
   line-height: 1.6;
@@ -19,14 +19,14 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
   grid-template-columns: 1fr 1fr;
   gap: 10px 24px;
   margin-bottom: 16px;
-  font-size: 0.78rem;
+  font-size: 1.0rem;
 }
 .rtm-control-group {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-.rtm-control-group label { color: var(--secondary); font-size: 0.72rem; }
+.rtm-control-group label { color: var(--secondary); font-size: 0.92rem; }
 .rtm-val { color: #0d8a74; font-weight: 600; }
 .rtm-controls input[type="range"] {
   -webkit-appearance: none;
@@ -61,11 +61,11 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 }
 .rtm-btn {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.92rem;
   background: none;
   border: 1px solid var(--border);
   color: var(--secondary);
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: 4px;
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
@@ -85,10 +85,10 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
   flex-wrap: wrap;
   gap: 8px 20px;
   margin-top: 12px;
-  font-size: 0.72rem;
+  font-size: 0.92rem;
 }
 .rtm-badge {
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 4px;
   background: #f0f0f8;
   border: 1px solid #e0e0ec;
@@ -99,7 +99,7 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 .rtm-badge .rtm-bval.lo { color: #6d28d9; }
 .rtm-note {
   margin-top: 12px;
-  font-size: 0.68rem;
+  font-size: 0.88rem;
   color: var(--secondary);
   line-height: 1.6;
 }
@@ -201,7 +201,7 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 
   function mean(arr) { return arr.reduce((s, v) => s + v, 0) / arr.length; }
 
-  const PAD_L = 50, PAD_R = 18, PAD_T = 18, PAD_B = 42;
+  const PAD_L = 58, PAD_R = 20, PAD_T = 22, PAD_B = 50;
 
   function draw() {
     const rho = parseFloat(document.getElementById('rtm_rho').value);
@@ -273,10 +273,10 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
       ctx.stroke();
 
       // Slope annotation
-      ctx.font = '10px IBM Plex Mono, monospace';
+      ctx.font = '13px IBM Plex Mono, monospace';
       ctx.fillStyle = '#0d8a74';
       ctx.textAlign = 'left';
-      ctx.fillText(`slope = ρ ≈ ${regSlope.toFixed(2)}`, PAD_L + pw * 0.05, PAD_T + 14);
+      ctx.fillText(`slope = ρ ≈ ${regSlope.toFixed(2)}`, PAD_L + pw * 0.05, PAD_T + 16);
     }
 
     // Highlight bands
@@ -347,11 +347,11 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 
     // Axis labels
     ctx.fillStyle = '#888899';
-    ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.font = '14px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('Score at Time 1', PAD_L + pw/2, PAD_T + ph + 32);
+    ctx.fillText('Score at Time 1', PAD_L + pw/2, PAD_T + ph + 38);
     ctx.save();
-    ctx.translate(14, PAD_T + ph/2);
+    ctx.translate(16, PAD_T + ph/2);
     ctx.rotate(-Math.PI/2);
     ctx.fillText('Score at Time 2', 0, 0);
     ctx.restore();
@@ -359,12 +359,12 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
     // Tick labels
     ctx.textAlign = 'center';
     ctx.fillStyle = '#888899';
-    ctx.font = '10px IBM Plex Mono, monospace';
+    ctx.font = '13px IBM Plex Mono, monospace';
     for (let i = 0; i <= 4; i++) {
       const v = mn + i * (mx - mn) / 4;
       ctx.beginPath(); ctx.moveTo(sx(v), PAD_T+ph); ctx.lineTo(sx(v), PAD_T+ph+4);
       ctx.strokeStyle='#c0c0d8'; ctx.lineWidth=1; ctx.stroke();
-      ctx.fillText(v.toFixed(1), sx(v), PAD_T+ph+16);
+      ctx.fillText(v.toFixed(1), sx(v), PAD_T+ph+19);
     }
 
     // Overall r

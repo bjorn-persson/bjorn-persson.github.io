@@ -11,17 +11,17 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   font-family: 'IBM Plex Mono', monospace;
 }
 .rv-subtitle {
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
-  margin-bottom: 18px;
+  margin-bottom: 21px;
   line-height: 1.6;
 }
 .rv-controls {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px 24px;
-  margin-bottom: 18px;
-  font-size: 0.78rem;
+  margin-bottom: 21px;
+  font-size: 1.0rem;
 }
 .rv-control-group {
   display: flex;
@@ -30,7 +30,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
 }
 .rv-control-group label {
   color: var(--secondary);
-  font-size: 0.72rem;
+  font-size: 0.92rem;
 }
 .rv-control-group .rv-val {
   color: #0d8a74;
@@ -73,7 +73,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   gap: 6px;
 }
 .rv-canvas-label {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: var(--secondary);
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -91,8 +91,8 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   flex-wrap: wrap;
 }
 .rv-badge {
-  font-size: 0.72rem;
-  padding: 3px 10px;
+  font-size: 0.92rem;
+  padding: 4px 12px;
   border-radius: 4px;
   background: #f0f0f8;
   border: 1px solid #e0e0ec;
@@ -103,10 +103,10 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   font-weight: 600;
 }
 .rv-note {
-  font-size: 0.68rem;
+  font-size: 0.88rem;
   color: var(--secondary);
   line-height: 1.6;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 @media (max-width: 600px) {
   .rv-controls { grid-template-columns: 1fr; }
@@ -138,11 +138,11 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   <div class="rv-canvases">
     <div class="rv-canvas-block">
       <div class="rv-canvas-label">Target (N = 40 arrows)</div>
-      <canvas id="rv_target" height="300"></canvas>
+      <canvas id="rv_target" height="350"></canvas>
     </div>
     <div class="rv-canvas-block">
       <div class="rv-canvas-label">Observed Score Distribution</div>
-      <canvas id="rv_dist" height="300"></canvas>
+      <canvas id="rv_dist" height="350"></canvas>
     </div>
   </div>
   <p class="rv-note">
@@ -282,7 +282,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     tCtx.fill();
 
     // Label
-    tCtx.font = `${11 * dpr / dpr}px IBM Plex Mono, monospace`;
+    tCtx.font = `${14 * dpr / dpr}px IBM Plex Mono, monospace`;
     tCtx.fillStyle = '#888899';
     tCtx.textAlign = 'center';
     tCtx.fillText('● = cluster mean', cx, H - 8);
@@ -294,7 +294,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     dCtx.clearRect(0, 0, W, H);
 
-    const PAD_L = 46, PAD_R = 16, PAD_T = 18, PAD_B = 32;
+    const PAD_L = 58, PAD_R = 18, PAD_T = 24, PAD_B = 42;
     const pw = W - PAD_L - PAD_R;
     const ph = H - PAD_T - PAD_B;
 
@@ -384,30 +384,30 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T); dCtx.lineTo(PAD_L, PAD_T + ph); dCtx.stroke();
 
     // X ticks
-    dCtx.font = '10px IBM Plex Mono, monospace';
+    dCtx.font = '13px IBM Plex Mono, monospace';
     dCtx.fillStyle = '#888899';
     dCtx.textAlign = 'center';
     for (let t = 0; t <= 1.001; t += 0.25) {
       const sx = toSx(t);
       dCtx.beginPath(); dCtx.moveTo(sx, PAD_T + ph); dCtx.lineTo(sx, PAD_T + ph + 4);
       dCtx.strokeStyle = '#c0c0d8'; dCtx.lineWidth = 1; dCtx.stroke();
-      dCtx.fillText(t.toFixed(2), sx, PAD_T + ph + 16);
+      dCtx.fillText(t.toFixed(2), sx, PAD_T + ph + 18);
     }
 
     // Y axis label
     dCtx.save();
-    dCtx.translate(13, PAD_T + ph / 2);
+    dCtx.translate(15, PAD_T + ph / 2);
     dCtx.rotate(-Math.PI / 2);
     dCtx.textAlign = 'center';
     dCtx.fillStyle = '#888899';
-    dCtx.font = '10px IBM Plex Mono, monospace';
+    dCtx.font = '13px IBM Plex Mono, monospace';
     dCtx.fillText('density', 0, 0);
     dCtx.restore();
 
     // Legend
     const legX = PAD_L + pw - 4;
     dCtx.textAlign = 'right';
-    dCtx.font = '10px IBM Plex Mono, monospace';
+    dCtx.font = '13px IBM Plex Mono, monospace';
 
     dCtx.strokeStyle = '#0d8a74'; dCtx.lineWidth = 2; dCtx.setLineDash([]);
     dCtx.beginPath(); dCtx.moveTo(legX - 52, PAD_T + 10); dCtx.lineTo(legX - 32, PAD_T + 10); dCtx.stroke();

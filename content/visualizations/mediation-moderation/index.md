@@ -9,7 +9,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
 
 .mm-wrap { font-family: 'IBM Plex Mono', monospace; }
 .mm-subtitle {
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 18px;
   line-height: 1.6;
@@ -25,14 +25,14 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   gap: 10px;
 }
 .mm-panel-header {
-  font-size: 0.82rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--primary);
   border-bottom: 2px solid #e0e0ec;
   padding-bottom: 6px;
 }
 .mm-panel-header span {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   font-weight: 400;
   color: var(--secondary);
   margin-left: 8px;
@@ -47,7 +47,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 0.72rem;
+  font-size: 0.92rem;
 }
 .mm-control-group label { color: var(--secondary); }
 .mm-val { color: #0d8a74; font-weight: 600; }
@@ -77,14 +77,14 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   border: none;
 }
 .mm-readout {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: var(--secondary);
   display: flex;
   flex-direction: column;
   gap: 4px;
   background: #f4f4f8;
   border-radius: 5px;
-  padding: 8px 10px;
+  padding: 10px 12px;
 }
 .mm-readout .mm-row {
   display: flex;
@@ -94,7 +94,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
 .mm-readout .mm-rval.accent { color: #c2640a; }
 .mm-note {
   margin-top: 12px;
-  font-size: 0.68rem;
+  font-size: 0.88rem;
   color: var(--secondary);
   line-height: 1.6;
 }
@@ -221,12 +221,12 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     ctx.stroke();
     ctx.fillStyle = '#333';
     ctx.textAlign = 'center';
-    ctx.font = `bold 14px IBM Plex Mono, monospace`;
+    ctx.font = `bold 17px IBM Plex Mono, monospace`;
     ctx.fillText(label, x, y + 3);
     if (sub) {
-      ctx.font = '9px IBM Plex Mono, monospace';
+      ctx.font = '15px IBM Plex Mono, monospace';
       ctx.fillStyle = '#888899';
-      ctx.fillText(sub, x, y + 16);
+      ctx.fillText(sub, x, y + 18);
     }
   }
 
@@ -254,7 +254,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     drawArrow(mCtx, Xc, Yc, Yc_x, Yc_y, cp, cpColor, Math.abs(cp) < 0.05);
 
     // Path labels
-    mCtx.font = '11px IBM Plex Mono, monospace';
+    mCtx.font = '14px IBM Plex Mono, monospace';
     mCtx.textAlign = 'center';
 
     mCtx.fillStyle = aColor;
@@ -288,7 +288,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   const modCanvas = document.getElementById('mod_canvas');
   const rCtx = modCanvas.getContext('2d');
 
-  const PAD_L = 44, PAD_R = 14, PAD_T = 14, PAD_B = 34;
+  const PAD_L = 52, PAD_R = 16, PAD_T = 16, PAD_B = 40;
 
   function drawMod() {
     const W = modCanvas.width / dpr;
@@ -376,18 +376,18 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     // Slope = 0 annotation
     if (Math.abs(slopeCur) < 0.08) {
       rCtx.fillStyle = '#c0c0d8';
-      rCtx.font = '10px IBM Plex Mono, monospace';
+      rCtx.font = '13px IBM Plex Mono, monospace';
       rCtx.textAlign = 'center';
       rCtx.fillText('slope ≈ 0', toSx(0.5), toSy(0.5) - 10);
     }
 
     // X axis label
     rCtx.fillStyle = '#888899';
-    rCtx.font = '11px IBM Plex Mono, monospace';
+    rCtx.font = '14px IBM Plex Mono, monospace';
     rCtx.textAlign = 'center';
-    rCtx.fillText('X (predictor)', PAD_L + pw / 2, PAD_T + ph + 26);
+    rCtx.fillText('X (predictor)', PAD_L + pw / 2, PAD_T + ph + 30);
     rCtx.save();
-    rCtx.translate(13, PAD_T + ph / 2);
+    rCtx.translate(15, PAD_T + ph / 2);
     rCtx.rotate(-Math.PI / 2);
     rCtx.fillText('Y (outcome)', 0, 0);
     rCtx.restore();
@@ -395,13 +395,13 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     // X ticks
     rCtx.textAlign = 'center';
     rCtx.fillStyle = '#888899';
-    rCtx.font = '10px IBM Plex Mono, monospace';
+    rCtx.font = '13px IBM Plex Mono, monospace';
     for (let i = 0; i <= 4; i++) {
-      rCtx.fillText(['Low','','','','High'][i] || '', toSx(i/4), PAD_T + ph + 15);
+      rCtx.fillText(['Low','','','','High'][i] || '', toSx(i/4), PAD_T + ph + 17);
     }
 
     // Legend
-    rCtx.font = '9px IBM Plex Mono, monospace';
+    rCtx.font = '12px IBM Plex Mono, monospace';
     const legEntries = [
       { label: 'W = −1σ', color: '#6d28d9' },
       { label: 'W =  0',  color: '#888899' },

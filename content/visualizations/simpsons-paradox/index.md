@@ -9,9 +9,9 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
 .sp-wrap { font-family: 'IBM Plex Mono', monospace; }
 .sp-subtitle {
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
-  margin-bottom: 18px;
+  margin-bottom: 21px;
   line-height: 1.6;
 }
 .sp-controls {
@@ -19,7 +19,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   flex-direction: column;
   gap: 10px;
   margin-bottom: 16px;
-  font-size: 0.78rem;
+  font-size: 1.0rem;
 }
 .sp-control-group {
   display: flex;
@@ -28,7 +28,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 }
 .sp-control-group label {
   color: var(--secondary);
-  font-size: 0.72rem;
+  font-size: 0.92rem;
 }
 .sp-val { color: #0d8a74; font-weight: 600; }
 .sp-controls input[type="range"] {
@@ -66,12 +66,12 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 .sp-readout {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 20px;
-  margin-top: 12px;
-  font-size: 0.72rem;
+  gap: 10px 24px;
+  margin-top: 14px;
+  font-size: 0.92rem;
 }
 .sp-badge {
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 4px;
   background: #f0f0f8;
   border: 1px solid #e0e0ec;
@@ -79,14 +79,14 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 }
 .sp-badge .sp-badge-val { font-weight: 600; }
 .sp-note {
-  margin-top: 12px;
-  font-size: 0.68rem;
+  margin-top: 14px;
+  font-size: 0.88rem;
   color: var(--secondary);
   line-height: 1.6;
 }
 .sp-phase-label {
   margin-bottom: 10px;
-  font-size: 0.8rem;
+  font-size: 1.0rem;
   color: #0d8a74;
   font-weight: 600;
   min-height: 1.2em;
@@ -265,7 +265,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     return { ...g, pts };
   });
 
-  const PAD_L = 48, PAD_R = 16, PAD_T = 16, PAD_B = 38;
+  const PAD_L = 62, PAD_R = 18, PAD_T = 18, PAD_B = 50;
 
   function pearsonR(pts) {
     const n = pts.length;
@@ -387,11 +387,11 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
     // Axis labels
     ctx.fillStyle = '#888899';
-    ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.font = '14px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('Study Hours →', PAD_L + pw / 2, PAD_T + ph + 28);
+    ctx.fillText('Study Hours →', PAD_L + pw / 2, PAD_T + ph + 38);
     ctx.save();
-    ctx.translate(13, PAD_T + ph / 2);
+    ctx.translate(15, PAD_T + ph / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillText('Exam Score →', 0, 0);
     ctx.restore();
@@ -399,10 +399,10 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     // X tick labels
     ctx.textAlign = 'center';
     ctx.fillStyle = '#888899';
-    ctx.font = '10px IBM Plex Mono, monospace';
+    ctx.font = '13px IBM Plex Mono, monospace';
     const xLabels = ['Low', '', 'Mid', '', 'High'];
     for (let i = 0; i <= 4; i++) {
-      if (xLabels[i]) ctx.fillText(xLabels[i], toSx(i/4), PAD_T + ph + 15);
+      if (xLabels[i]) ctx.fillText(xLabels[i], toSx(i/4), PAD_T + ph + 17);
     }
 
     // Group legend (visible when t > 0.1)
@@ -411,7 +411,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       ctx.globalAlpha = legAlpha;
       const legX = PAD_L + pw - 4;
       const legY0 = PAD_T + 8;
-      ctx.font = '10px IBM Plex Mono, monospace';
+      ctx.font = '13px IBM Plex Mono, monospace';
       for (let gi = 0; gi < allGroups.length; gi++) {
         const g = allGroups[gi];
         const ly = legY0 + gi * 18;

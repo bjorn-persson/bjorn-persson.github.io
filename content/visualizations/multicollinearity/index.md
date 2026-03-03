@@ -9,7 +9,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 
 .mc-wrap { font-family: 'IBM Plex Mono', monospace; }
 .mc-subtitle {
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 18px;
   line-height: 1.6;
@@ -28,7 +28,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   background: #f4f4f8;
 }
 .mc-canvas-label {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: var(--secondary);
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -43,7 +43,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 0.72rem;
+  font-size: 0.92rem;
 }
 .mc-control-group label { color: var(--secondary); }
 .mc-val { color: #0d8a74; font-weight: 600; }
@@ -81,25 +81,25 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 .mc-stat-card {
   background: #f4f4f8;
   border-radius: 5px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-left: 3px solid #e0e0ec;
   transition: border-color 0.3s;
 }
 .mc-stat-card.warn { border-left-color: #c83c5a; }
 .mc-stat-label {
-  font-size: 0.64rem;
+  font-size: 0.84rem;
   color: var(--secondary);
   margin-bottom: 2px;
 }
 .mc-stat-value {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #0d8a74;
   transition: color 0.3s;
 }
 .mc-stat-value.warn { color: #c83c5a; }
 .mc-wobble-label {
-  font-size: 0.72rem;
+  font-size: 0.92rem;
   color: var(--secondary);
   margin-top: 8px;
   min-height: 1.4em;
@@ -107,7 +107,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 .mc-wobble-label span { color: #c83c5a; font-weight: 600; }
 .mc-note {
   margin-top: 14px;
-  font-size: 0.68rem;
+  font-size: 0.88rem;
   color: var(--secondary);
   line-height: 1.6;
   grid-column: 1 / -1;
@@ -226,7 +226,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     return arr.map(v => (v - mn) / range);
   }
 
-  const PAD = 36;
+  const PAD = 42;
 
   function drawScatter(pts, r) {
     const W = scatterCanvas.width / dpr;
@@ -273,13 +273,13 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 
     // Correlation annotation
     const rColor = r > 0.9 ? '#c83c5a' : r > 0.7 ? '#c2640a' : '#888899';
-    sCtx.font = 'bold 13px IBM Plex Mono, monospace';
+    sCtx.font = 'bold 16px IBM Plex Mono, monospace';
     sCtx.fillStyle = rColor;
     sCtx.textAlign = 'center';
     sCtx.fillText(`r(X₁,X₂) = ${r.toFixed(3)}`, W/2, PAD - 8);
 
     // Axis labels
-    sCtx.font = '11px IBM Plex Mono, monospace';
+    sCtx.font = '14px IBM Plex Mono, monospace';
     sCtx.fillStyle = '#888899';
     sCtx.textAlign = 'center';
     sCtx.fillText('X₁', W/2, PAD + ph + 24);
@@ -290,7 +290,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     sCtx.restore();
 
     // Color legend
-    sCtx.font = '9px IBM Plex Mono, monospace';
+    sCtx.font = '12px IBM Plex Mono, monospace';
     sCtx.textAlign = 'left';
     sCtx.fillStyle = 'rgba(13,138,116,0.8)';
     sCtx.fillText('high Y', PAD + pw - 36, PAD + ph - 6);
@@ -304,7 +304,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     pCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     pCtx.clearRect(0, 0, W, H);
 
-    const PAD_L = 44, PAD_R = 14, PAD_T = 26, PAD_B = 32;
+    const PAD_L = 52, PAD_R = 16, PAD_T = 32, PAD_B = 38;
     const pw = W - PAD_L - PAD_R, ph = H - PAD_T - PAD_B;
 
     const x1n = normalize(pts.map(p => p.x1));
@@ -389,7 +389,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 
     // Axis labels
     pCtx.fillStyle = '#888899';
-    pCtx.font = '11px IBM Plex Mono, monospace';
+    pCtx.font = '14px IBM Plex Mono, monospace';
     pCtx.textAlign = 'center';
     pCtx.fillText('X₁', PAD_L + pw/2, PAD_T + ph + 24);
     pCtx.save();
@@ -400,7 +400,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 
     // VIF annotation
     const vifColor = vif > 10 ? '#c83c5a' : vif > 5 ? '#c2640a' : '#888899';
-    pCtx.font = 'bold 11px IBM Plex Mono, monospace';
+    pCtx.font = 'bold 14px IBM Plex Mono, monospace';
     pCtx.fillStyle = vifColor;
     pCtx.textAlign = 'center';
     pCtx.fillText(`VIF = ${vif.toFixed(1)}`, PAD_L + pw/2, PAD_T - 8);

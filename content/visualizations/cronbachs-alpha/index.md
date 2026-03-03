@@ -9,9 +9,9 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 
 .ca-wrap { font-family: 'IBM Plex Mono', monospace; }
 .ca-subtitle {
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
-  margin-bottom: 18px;
+  margin-bottom: 21px;
   line-height: 1.6;
 }
 .ca-layout {
@@ -23,7 +23,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px 20px;
-  font-size: 0.72rem;
+  font-size: 0.92rem;
 }
 .ca-control-group {
   display: flex;
@@ -65,14 +65,14 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 .ca-stat {
   background: #f4f4f8;
   border-radius: 5px;
-  padding: 8px 10px;
+  padding: 9px 12px;
   border-left: 3px solid #e0e0ec;
   transition: border-color 0.3s;
 }
 .ca-stat.warn { border-left-color: #c83c5a; }
 .ca-stat.ok   { border-left-color: #0d8a74; }
 .ca-stat-label {
-  font-size: 0.62rem;
+  font-size: 0.82rem;
   color: var(--secondary);
   margin-bottom: 2px;
   line-height: 1.3;
@@ -84,12 +84,12 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   padding: 0;
   border-radius: 50%;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.54rem;
+  font-size: 0.72rem;
   font-weight: 600;
   background: none;
   border: 1px solid var(--border);
@@ -129,14 +129,14 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 }
 .ca-modal h2 {
   font-family: 'Source Serif 4', serif;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   color: var(--primary);
   margin-bottom: 4px;
   padding-right: 30px;
 }
 .ca-modal .ca-modal-badge {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.62rem;
+  font-size: 0.82rem;
   padding: 2px 7px;
   border-radius: 3px;
   background: rgba(13, 138, 116, 0.1);
@@ -146,14 +146,14 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 }
 .ca-modal p {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.74rem;
+  font-size: 0.94rem;
   color: var(--secondary);
   line-height: 1.65;
   margin-bottom: 8px;
 }
 .ca-modal .formula {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.76rem;
+  font-size: 0.96rem;
   color: #0d8a74;
   background: rgba(13, 138, 116, 0.06);
   padding: 8px 12px;
@@ -164,7 +164,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 }
 .ca-modal .section-label {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.63rem;
+  font-size: 0.83rem;
   color: var(--secondary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -176,7 +176,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   top: 14px;
   right: 14px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   background: none;
   border: none;
   color: var(--secondary);
@@ -188,7 +188,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   color: var(--primary);
 }
 .ca-stat-value {
-  font-size: 1.05rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #0d8a74;
   transition: color 0.3s;
@@ -205,7 +205,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   gap: 6px;
 }
 .ca-panel-label {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: var(--secondary);
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -220,10 +220,10 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   background: #f4f4f8;
 }
 .ca-interp {
-  font-size: 0.72rem;
+  font-size: 0.92rem;
   color: var(--secondary);
   line-height: 1.6;
-  padding: 8px 10px;
+  padding: 9px 12px;
   background: #f4f4f8;
   border-radius: 5px;
   border-left: 3px solid #e0e0ec;
@@ -234,7 +234,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 .ca-interp span.hl { color: #c83c5a; font-weight: 600; }
 .ca-interp span.ok { color: #0d8a74; font-weight: 600; }
 .ca-note {
-  font-size: 0.68rem;
+  font-size: 0.88rem;
   color: var(--secondary);
   line-height: 1.6;
   margin-top: 4px;
@@ -287,11 +287,11 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     <div class="ca-panels">
       <div class="ca-panel">
         <div class="ca-panel-label">Observed score → true-score CI <button class="ca-info-btn" onclick="caShowInfo('scorePanel')" title="About this panel">?</button></div>
-        <canvas id="ca_score" height="290"></canvas>
+        <canvas id="ca_score" height="350"></canvas>
       </div>
       <div class="ca-panel">
         <div class="ca-panel-label">Repeated testing distribution <button class="ca-info-btn" onclick="caShowInfo('distPanel')" title="About this panel">?</button></div>
-        <canvas id="ca_dist" height="290"></canvas>
+        <canvas id="ca_dist" height="350"></canvas>
       </div>
     </div>
   </div>
@@ -334,7 +334,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     sCtx.clearRect(0, 0, W, H);
 
     const sem = sd * Math.sqrt(1 - alpha);
-    const PAD_L = 20, PAD_R = 20, PAD_T = 36, PAD_B = 48;
+    const PAD_L = 20, PAD_R = 20, PAD_T = 42, PAD_B = 54;
     const pw = W - PAD_L - PAD_R;
     const midY = PAD_T + (H - PAD_T - PAD_B) / 2;
 
@@ -346,14 +346,14 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     sCtx.strokeStyle = '#c0c0d8'; sCtx.lineWidth = 1; sCtx.stroke();
 
     // Tick marks
-    sCtx.font = '9px IBM Plex Mono, monospace';
+    sCtx.font = '14px IBM Plex Mono, monospace';
     sCtx.fillStyle = '#888899';
     sCtx.textAlign = 'center';
     for (let t = xMin; t <= xMax; t += 20) {
       const tx = toX(t);
       sCtx.beginPath(); sCtx.moveTo(tx, midY - 4); sCtx.lineTo(tx, midY + 4);
       sCtx.strokeStyle = '#c0c0d8'; sCtx.lineWidth = 1; sCtx.stroke();
-      sCtx.fillText(t, tx, midY + 15);
+      sCtx.fillText(t, tx, midY + 18);
     }
 
     // 95% CI band
@@ -378,10 +378,10 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     sCtx.beginPath(); sCtx.moveTo(toX(hi95), midY - bandH - 12); sCtx.lineTo(toX(hi95), midY - bandH - 4); sCtx.stroke();
 
     // 95% label above bracket
-    sCtx.font = '9px IBM Plex Mono, monospace';
+    sCtx.font = '13px IBM Plex Mono, monospace';
     sCtx.fillStyle = 'rgba(200,60,90,0.8)';
     sCtx.textAlign = 'center';
-    sCtx.fillText('95% CI', toX((lo95 + hi95) / 2), midY - bandH - 14);
+    sCtx.fillText('95% CI', toX((lo95 + hi95) / 2), midY - bandH - 16);
 
     // True score marker
     const tsx = toX(trueScore);
@@ -395,22 +395,22 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     sCtx.fill();
 
     // Labels
-    sCtx.font = '10px IBM Plex Mono, monospace';
+    sCtx.font = '13px IBM Plex Mono, monospace';
     sCtx.fillStyle = '#0d8a74';
     sCtx.textAlign = 'center';
-    sCtx.fillText(`Score = ${trueScore}`, tsx, midY - bandH - 28);
+    sCtx.fillText(`Score = ${trueScore}`, tsx, midY - bandH - 30);
 
     // SEM annotation below axis
-    sCtx.font = '9px IBM Plex Mono, monospace';
+    sCtx.font = '13px IBM Plex Mono, monospace';
     sCtx.fillStyle = '#888899';
     sCtx.textAlign = 'center';
-    sCtx.fillText(`SEM = ${sem.toFixed(1)} pts  |  68% CI: [${lo68.toFixed(0)}, ${hi68.toFixed(0)}]  |  95% CI: [${lo95.toFixed(0)}, ${hi95.toFixed(0)}]`, W / 2, H - 10);
+    sCtx.fillText(`SEM = ${sem.toFixed(1)} pts  |  68% CI: [${lo68.toFixed(0)}, ${hi68.toFixed(0)}]  |  95% CI: [${lo95.toFixed(0)}, ${hi95.toFixed(0)}]`, W / 2, H - 12);
 
     // Title
-    sCtx.font = 'bold 10px IBM Plex Mono, monospace';
+    sCtx.font = 'bold 13px IBM Plex Mono, monospace';
     sCtx.fillStyle = alpha >= 0.9 ? '#0d8a74' : alpha >= 0.7 ? '#c2640a' : '#c83c5a';
     sCtx.textAlign = 'center';
-    sCtx.fillText(`α = ${alpha.toFixed(2)}  →  SEM = ${sem.toFixed(1)}`, W / 2, 16);
+    sCtx.fillText(`α = ${alpha.toFixed(2)}  →  SEM = ${sem.toFixed(1)}`, W / 2, 18);
   }
 
   // ── Repeated-testing distribution ────────────────────────────────────────
@@ -421,7 +421,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     dCtx.clearRect(0, 0, W, H);
 
     const sem = sd * Math.sqrt(1 - alpha);
-    const PAD_L = 44, PAD_R = 14, PAD_T = 28, PAD_B = 36;
+    const PAD_L = 50, PAD_R = 14, PAD_T = 30, PAD_B = 42;
     const pw = W - PAD_L - PAD_R;
     const ph = H - PAD_T - PAD_B;
 
@@ -483,7 +483,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T); dCtx.lineTo(PAD_L, PAD_T + ph); dCtx.stroke();
 
     // X-axis ticks
-    dCtx.font = '9px IBM Plex Mono, monospace';
+    dCtx.font = '12px IBM Plex Mono, monospace';
     dCtx.fillStyle = '#888899';
     dCtx.textAlign = 'center';
     for (let i = 0; i <= 4; i++) {
@@ -491,7 +491,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
       const sx = toX(xv);
       dCtx.beginPath(); dCtx.moveTo(sx, PAD_T + ph); dCtx.lineTo(sx, PAD_T + ph + 4);
       dCtx.strokeStyle = '#c0c0d8'; dCtx.lineWidth = 1; dCtx.stroke();
-      dCtx.fillText(xv.toFixed(0), sx, PAD_T + ph + 16);
+      dCtx.fillText(xv.toFixed(0), sx, PAD_T + ph + 18);
     }
 
     // Y-axis label
@@ -500,25 +500,26 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
     dCtx.rotate(-Math.PI / 2);
     dCtx.textAlign = 'center';
     dCtx.fillStyle = '#888899';
-    dCtx.font = '9px IBM Plex Mono, monospace';
+    dCtx.font = '12px IBM Plex Mono, monospace';
     dCtx.fillText('frequency', 0, 0);
     dCtx.restore();
 
     // Title
-    dCtx.font = 'bold 10px IBM Plex Mono, monospace';
+    dCtx.font = 'bold 13px IBM Plex Mono, monospace';
     dCtx.fillStyle = '#888899';
     dCtx.textAlign = 'center';
-    dCtx.fillText(`Observed scores if true score = ${trueScore}`, W / 2, 16);
+    dCtx.fillText(`Observed scores if true score = ${trueScore}`, W / 2, 18);
 
     // Legend
-    dCtx.font = '9px IBM Plex Mono, monospace';
+    dCtx.font = '12px IBM Plex Mono, monospace';
     dCtx.textAlign = 'left';
     dCtx.fillStyle = '#0d8a74';
-    dCtx.fillText(`true score = ${trueScore}`, toX(trueScore) + 6, PAD_T + 14);
+    dCtx.fillText(`true score = ${trueScore}`, toX(trueScore) + 6, PAD_T + 16);
 
     // 68%/95% labels
     const lo68x = Math.max(xMin, lo68);
     const hi68x = Math.min(xMax, hi68);
+    dCtx.font = '12px IBM Plex Mono, monospace';
     dCtx.fillStyle = 'rgba(200,60,90,0.9)';
     dCtx.textAlign = 'center';
     dCtx.fillText('68%', toX((lo68x + hi68x) / 2), PAD_T + ph - 8);

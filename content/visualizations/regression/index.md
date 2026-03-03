@@ -13,9 +13,9 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
 
 .viz-embed .subtitle {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   line-height: 1.5;
 }
 
@@ -25,7 +25,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
   gap: 10px 16px;
   margin-bottom: 14px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.78rem;
+  font-size: 1.0rem;
 }
 
 .viz-embed .control-group {
@@ -36,7 +36,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
 
 .viz-embed .control-group label {
   color: var(--secondary);
-  font-size: 0.72rem;
+  font-size: 0.92rem;
 }
 
 .viz-embed .control-group .val {
@@ -82,11 +82,11 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
 
 .viz-embed .btn {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.92rem;
   background: none;
   border: 1px solid var(--border);
   color: var(--secondary);
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: 4px;
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
@@ -125,7 +125,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
 .viz-embed .equation {
   margin-top: 10px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.8rem;
+  font-size: 1.0rem;
   color: var(--primary);
   line-height: 1.6;
 }
@@ -136,14 +136,14 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
 .viz-embed .stats {
   margin-top: 4px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   color: var(--secondary);
 }
 
 .viz-embed .note {
   margin-top: 14px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: var(--secondary);
   line-height: 1.5;
 }
@@ -499,7 +499,7 @@ function render() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
   const W = rect.width, H = rect.height;
-  const PAD_L = 55, PAD_R = 20, PAD_T = 20, PAD_B = 40;
+  const PAD_L = 62, PAD_R = 20, PAD_T = 20, PAD_B = 46;
   const pw = W - PAD_L - PAD_R, ph = H - PAD_T - PAD_B;
 
   ctx.clearRect(0, 0, W, H);
@@ -567,11 +567,11 @@ function render() {
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
   // ── Tick labels ──
-  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.font = '14px IBM Plex Mono, monospace';
   ctx.fillStyle = '#888899';
   ctx.textAlign = 'center';
   for (let t = Math.ceil(xmin / xStep) * xStep; t <= xmax; t += xStep) {
-    ctx.fillText(fmtTick(t, xStep), toSx(t), PAD_T + ph + 16);
+    ctx.fillText(fmtTick(t, xStep), toSx(t), PAD_T + ph + 18);
   }
   ctx.textAlign = 'right';
   for (let t = Math.ceil(ymin / yStep) * yStep; t <= ymax; t += yStep) {
@@ -580,11 +580,11 @@ function render() {
 
   // ── Axis labels ──
   ctx.fillStyle = '#888899';
-  ctx.font = '12px IBM Plex Mono, monospace';
+  ctx.font = '15px IBM Plex Mono, monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 34);
+  ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 38);
   ctx.save();
-  ctx.translate(14, PAD_T + ph / 2);
+  ctx.translate(16, PAD_T + ph / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.fillText(isLogistic ? 'P(Y=1)' : 'Y', 0, 0);
   ctx.restore();
@@ -647,7 +647,7 @@ function render() {
 
   // ── Legend ──
   const lx = PAD_L + 12, ly = PAD_T + 14;
-  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.font = '14px IBM Plex Mono, monospace';
 
   ctx.strokeStyle = 'rgba(13, 138, 116, 0.65)';
   ctx.lineWidth = 2.5;

@@ -9,9 +9,9 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
 
 .viz-embed .irt-subtitle {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
-  margin-bottom: 16px;
+  margin-bottom: 19px;
   line-height: 1.5;
 }
 
@@ -19,7 +19,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
   position: relative;
   height: max(280px, calc(100vh - 520px));
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   background: #f4f4f8;
   border-radius: 6px;
   overflow: hidden;
@@ -28,7 +28,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
 .viz-embed .irt-controls {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .viz-embed .irt-control-group {
@@ -41,7 +41,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
 .viz-embed .irt-control-label {
   display: flex;
   justify-content: space-between;
-  font-size: 0.76rem;
+  font-size: 0.96rem;
   color: var(--secondary);
 }
 
@@ -159,14 +159,14 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
                     title: {
                         display: true,
                         text: 'Latent Trait Level (θ)',
-                        font: { size: 12, family: 'IBM Plex Mono, monospace' },
+                        font: { size: 15, family: 'IBM Plex Mono, monospace' },
                         color: '#888899'
                     },
                     min: -4,
                     max: 4,
                     ticks: {
                         stepSize: 1,
-                        font: { size: 11, family: 'IBM Plex Mono, monospace' },
+                        font: { size: 14, family: 'IBM Plex Mono, monospace' },
                         color: '#888899'
                     },
                     grid: { color: '#e4e4f0' },
@@ -176,14 +176,14 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
                     title: {
                         display: true,
                         text: 'Probability P(θ)',
-                        font: { size: 12, family: 'IBM Plex Mono, monospace' },
+                        font: { size: 15, family: 'IBM Plex Mono, monospace' },
                         color: '#888899'
                     },
                     min: 0,
                     max: 1,
                     ticks: {
                         stepSize: 0.2,
-                        font: { size: 11, family: 'IBM Plex Mono, monospace' },
+                        font: { size: 14, family: 'IBM Plex Mono, monospace' },
                         color: '#888899'
                     },
                     grid: { color: '#e4e4f0' },

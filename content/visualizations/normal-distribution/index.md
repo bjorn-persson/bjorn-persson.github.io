@@ -13,9 +13,9 @@ description: "Interactive visualization of the standard normal density. Click th
 
 .viz-embed .subtitle {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.78rem;
+  font-size: 1.0rem;
   color: var(--secondary);
-  margin-bottom: 18px;
+  margin-bottom: 21px;
   line-height: 1.5;
 }
 
@@ -31,10 +31,10 @@ description: "Interactive visualization of the standard normal density. Click th
 .viz-embed .readout {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 28px;
-  margin-top: 14px;
+  gap: 14px 32px;
+  margin-top: 16px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
 }
 
 .viz-embed .readout .label { color: var(--secondary); }
@@ -46,7 +46,7 @@ description: "Interactive visualization of the standard normal density. Click th
 .viz-embed .mode-indicator {
   margin-top: 12px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   color: #0d8a74;
   opacity: 0.8;
 }
@@ -54,7 +54,7 @@ description: "Interactive visualization of the standard normal density. Click th
 .viz-embed .note {
   margin-top: 14px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: var(--secondary);
   line-height: 1.5;
 }
@@ -62,11 +62,11 @@ description: "Interactive visualization of the standard normal density. Click th
 .viz-embed .reset-btn {
   margin-top: 10px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.92rem;
   background: none;
   border: 1px solid var(--border);
   color: var(--secondary);
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 4px;
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
@@ -113,7 +113,7 @@ const rZ1 = document.getElementById('r_z1');
 const rZ2 = document.getElementById('r_z2');
 
 const Z_MIN = -4, Z_MAX = 4;
-const PAD_L = 52, PAD_R = 20, PAD_T = 20, PAD_B = 40;
+const PAD_L = 60, PAD_R = 24, PAD_T = 24, PAD_B = 46;
 
 let dpr = 1;
 
@@ -242,7 +242,7 @@ function draw() {
   ctx.stroke();
 
   // Ticks
-  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.font = '14px IBM Plex Mono, monospace';
   ctx.fillStyle = '#888899';
   ctx.textAlign = 'center';
   for (let t = Z_MIN; t <= Z_MAX; t++) {
@@ -252,7 +252,7 @@ function draw() {
     ctx.lineTo(tx, PAD_T + plotH + 5);
     ctx.strokeStyle = '#c0c0d8';
     ctx.stroke();
-    ctx.fillText(t.toString(), tx, PAD_T + plotH + 18);
+    ctx.fillText(t.toString(), tx, PAD_T + plotH + 21);
   }
 
   // Y axis label
@@ -261,7 +261,7 @@ function draw() {
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center';
   ctx.fillStyle = '#888899';
-  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.font = '14px IBM Plex Mono, monospace';
   ctx.fillText('\u03C6(z)', 0, 0);
   ctx.restore();
 
