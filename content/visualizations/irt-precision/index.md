@@ -7,7 +7,13 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
 
-.irt-wrap { font-family: 'IBM Plex Mono', monospace; }
+.irt-wrap {
+  font-family: 'IBM Plex Mono', monospace;
+  --irt-wide: 1300px;
+  width: var(--irt-wide);
+  max-width: calc(100vw - 40px);
+  margin-left: calc((100% - min(var(--irt-wide), 100vw - 40px)) / 2);
+}
 .irt-subtitle {
   font-size: 1.0rem;
   color: var(--secondary);
@@ -16,8 +22,22 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 }
 .irt-layout {
   display: flex;
+  flex-direction: row;
+  gap: 28px;
+}
+.irt-left {
+  flex: 1;
+  display: flex;
   flex-direction: column;
   gap: 22px;
+  min-width: 0;
+}
+.irt-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
 }
 .irt-model-toggle {
   display: inline-flex;
@@ -45,7 +65,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 }
 .irt-controls {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 12px 23px;
   font-size: 0.92rem;
 }
@@ -218,11 +238,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   transition: color 0.3s;
 }
 .irt-stat-value.warn { color: #c83c5a; }
-.irt-panels {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+/* panels are now direct children of .irt-right */
 .irt-panel {
   display: flex;
   flex-direction: column;
@@ -265,12 +281,19 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   line-height: 1.6;
   margin-top: 4px;
 }
+@media (max-width: 900px) {
+  .irt-wrap {
+    --irt-wide: 100%;
+    margin-left: 0;
+  }
+  .irt-layout { flex-direction: column; }
+}
 @media (max-width: 600px) {
-  .irt-controls { grid-template-columns: 1fr 1fr; }
+  .irt-controls { grid-template-columns: 1fr; }
   .irt-stat-row  { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 400px) {
-  .irt-controls { grid-template-columns: 1fr; }
+  .irt-stat-row  { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -281,54 +304,52 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     A test can be highly reliable at one trait level and nearly useless at another.
   </p>
   <div class="irt-layout">
-    <div class="irt-controls">
-      <div class="irt-control-group">
-        <label>Number of items: <span class="irt-val" id="irt_nitems_val">10</span></label>
-        <input type="range" id="irt_nitems" min="5" max="30" step="1" value="10">
+    <div class="irt-left">
+      <div class="irt-controls">
+        <div class="irt-control-group">
+          <label>Number of items: <span class="irt-val" id="irt_nitems_val">10</span></label>
+          <input type="range" id="irt_nitems" min="5" max="30" step="1" value="10">
+        </div>
+        <div class="irt-control-group">
+          <label>&theta; (person's trait): <span class="irt-val" id="irt_theta_val">0.0</span></label>
+          <input type="range" id="irt_theta" min="-3.0" max="3.0" step="0.1" value="0.0">
+        </div>
+        <div class="irt-control-group">
+          <label>Avg discrimination (a): <span class="irt-val" id="irt_avgdisc_val">1.5</span></label>
+          <input type="range" id="irt_avgdisc" min="0.5" max="3.0" step="0.1" value="1.5">
+        </div>
+        <div class="irt-control-group">
+          <label>Avg difficulty (b): <span class="irt-val" id="irt_avgdiff_val">0.0</span></label>
+          <input type="range" id="irt_avgdiff" min="-2.0" max="2.0" step="0.1" value="0.0">
+        </div>
+        <div class="irt-control-group" id="irt_cat_group" style="display:none">
+          <label>Response categories: <span class="irt-val" id="irt_ncat_val">5</span></label>
+          <input type="range" id="irt_ncat" min="2" max="7" step="1" value="5">
+        </div>
       </div>
-      <div class="irt-control-group">
-        <label>Avg discrimination (a): <span class="irt-val" id="irt_avgdisc_val">1.5</span></label>
-        <input type="range" id="irt_avgdisc" min="0.5" max="3.0" step="0.1" value="1.5">
+      <div class="irt-stat-row">
+        <div class="irt-stat" id="irt_se_card">
+          <div class="irt-stat-label">SE(&theta;) <button class="irt-info-btn" onclick="irtShowInfo('seTheta')" title="About SE(θ)">?</button></div>
+          <div class="irt-stat-value" id="irt_se_val">&mdash;</div>
+        </div>
+        <div class="irt-stat" id="irt_ci68_card">
+          <div class="irt-stat-label">68% CI width <button class="irt-info-btn" onclick="irtShowInfo('ci68')" title="About 68% CI">?</button></div>
+          <div class="irt-stat-value" id="irt_ci68_val">&mdash;</div>
+        </div>
+        <div class="irt-stat" id="irt_ci95_card">
+          <div class="irt-stat-label">95% CI width <button class="irt-info-btn" onclick="irtShowInfo('ci95')" title="About 95% CI">?</button></div>
+          <div class="irt-stat-value" id="irt_ci95_val">&mdash;</div>
+        </div>
       </div>
-      <div class="irt-control-group">
-        <label>Avg difficulty (b): <span class="irt-val" id="irt_avgdiff_val">0.0</span></label>
-        <input type="range" id="irt_avgdiff" min="-2.0" max="2.0" step="0.1" value="0.0">
+      <div class="irt-score-bar">
+        <canvas id="irt_scorebar" height="180"></canvas>
       </div>
-      <div class="irt-control-group" id="irt_cat_group" style="display:none">
-        <label>Response categories: <span class="irt-val" id="irt_ncat_val">5</span></label>
-        <input type="range" id="irt_ncat" min="2" max="7" step="1" value="5">
-      </div>
-      <div class="irt-control-group">
-        <label>&theta; (person's trait): <span class="irt-val" id="irt_theta_val">0.0</span></label>
-        <input type="range" id="irt_theta" min="-3.0" max="3.0" step="0.1" value="0.0">
-      </div>
+      <div class="irt-interp" id="irt_interp">&mdash;</div>
     </div>
-    <div class="irt-stat-row">
-      <div class="irt-stat" id="irt_se_card">
-        <div class="irt-stat-label">SE(&theta;) <button class="irt-info-btn" onclick="irtShowInfo('seTheta')" title="About SE(θ)">?</button></div>
-        <div class="irt-stat-value" id="irt_se_val">&mdash;</div>
-      </div>
-      <div class="irt-stat" id="irt_ci68_card">
-        <div class="irt-stat-label">68% CI width <button class="irt-info-btn" onclick="irtShowInfo('ci68')" title="About 68% CI">?</button></div>
-        <div class="irt-stat-value" id="irt_ci68_val">&mdash;</div>
-      </div>
-      <div class="irt-stat" id="irt_ci95_card">
-        <div class="irt-stat-label">95% CI width <button class="irt-info-btn" onclick="irtShowInfo('ci95')" title="About 95% CI">?</button></div>
-        <div class="irt-stat-value" id="irt_ci95_val">&mdash;</div>
-      </div>
-    </div>
-    <div class="irt-score-bar">
-      <canvas id="irt_scorebar" height="180"></canvas>
-    </div>
-    <div class="irt-interp" id="irt_interp">&mdash;</div>
-    <div class="irt-panels">
+    <div class="irt-right">
       <div class="irt-panel">
         <div class="irt-panel-label">Test information function <button class="irt-info-btn" onclick="irtShowInfo('tifPanel')" title="About this panel">?</button></div>
         <canvas id="irt_info" height="340"></canvas>
-      </div>
-      <div class="irt-panel">
-        <div class="irt-panel-label">Sampling distribution at current &theta; <button class="irt-info-btn" onclick="irtShowInfo('distPanel')" title="About this panel">?</button></div>
-        <canvas id="irt_dist" height="340"></canvas>
       </div>
     </div>
   </div>
@@ -356,10 +377,8 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 
   const scoreBarCanvas = document.getElementById('irt_scorebar');
   const infoCanvas = document.getElementById('irt_info');
-  const distCanvas = document.getElementById('irt_dist');
   const sbCtx = scoreBarCanvas.getContext('2d');
   const iCtx = infoCanvas.getContext('2d');
-  const dCtx = distCanvas.getContext('2d');
 
   // ── IRT math ───────────────────────────────────────────────────────────────
 
@@ -428,12 +447,6 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   }
 
   function thetaToT(theta) { return 50 + 10 * theta; }
-
-  function normalPdf(x, mu, sigma) {
-    if (sigma <= 0) return 0;
-    const z = (x - mu) / sigma;
-    return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2 * Math.PI));
-  }
 
   // ── Score bar ──────────────────────────────────────────────────────────────
 
@@ -522,7 +535,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     iCtx.clearRect(0, 0, W, H);
 
-    const PAD_L = 44, PAD_R = 44, PAD_T = 28, PAD_B = 36;
+    const PAD_L = 52, PAD_R = 64, PAD_T = 32, PAD_B = 44;
     const pw = W - PAD_L - PAD_R;
     const ph = H - PAD_T - PAD_B;
 
@@ -614,14 +627,14 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.beginPath(); iCtx.moveTo(PAD_L + pw, PAD_T); iCtx.lineTo(PAD_L + pw, PAD_T + ph); iCtx.stroke();
 
     // X-axis ticks
-    iCtx.font = '9px IBM Plex Mono, monospace';
+    iCtx.font = '13px IBM Plex Mono, monospace';
     iCtx.fillStyle = '#888899';
     iCtx.textAlign = 'center';
     for (let t = -3; t <= 3; t += 1) {
       const sx = toX(t);
       iCtx.beginPath(); iCtx.moveTo(sx, PAD_T + ph); iCtx.lineTo(sx, PAD_T + ph + 4);
       iCtx.strokeStyle = '#c0c0d8'; iCtx.lineWidth = 1; iCtx.stroke();
-      iCtx.fillText(t, sx, PAD_T + ph + 16);
+      iCtx.fillText(t, sx, PAD_T + ph + 20);
     }
 
     // Left Y-axis ticks (Info)
@@ -646,144 +659,34 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 
     // Axis labels
     iCtx.save();
-    iCtx.translate(11, PAD_T + ph / 2);
+    iCtx.translate(22, PAD_T + ph / 2);
     iCtx.rotate(-Math.PI / 2);
     iCtx.textAlign = 'center';
     iCtx.fillStyle = '#0d8a74';
-    iCtx.font = '9px IBM Plex Mono, monospace';
+    iCtx.font = '13px IBM Plex Mono, monospace';
     iCtx.fillText('I(\u03B8)', 0, 0);
     iCtx.restore();
 
     iCtx.save();
-    iCtx.translate(W - 7, PAD_T + ph / 2);
+    iCtx.translate(W - 18, PAD_T + ph / 2);
     iCtx.rotate(Math.PI / 2);
     iCtx.textAlign = 'center';
     iCtx.fillStyle = '#c83c5a';
-    iCtx.font = '9px IBM Plex Mono, monospace';
+    iCtx.font = '13px IBM Plex Mono, monospace';
     iCtx.fillText('SE(\u03B8)', 0, 0);
     iCtx.restore();
 
     // Title
-    iCtx.font = 'bold 10px IBM Plex Mono, monospace';
+    iCtx.font = 'bold 13px IBM Plex Mono, monospace';
     iCtx.fillStyle = '#888899';
     iCtx.textAlign = 'center';
-    iCtx.fillText('Test Information (solid) & SE (dashed)', W / 2, 14);
+    iCtx.fillText('Test Information (solid) & SE (dashed)', W / 2, 18);
 
     // X-axis label
-    iCtx.font = '9px IBM Plex Mono, monospace';
+    iCtx.font = '13px IBM Plex Mono, monospace';
     iCtx.fillStyle = '#888899';
     iCtx.textAlign = 'center';
     iCtx.fillText('\u03B8', PAD_L + pw / 2, H - 4);
-  }
-
-  // ── Sampling distribution panel ────────────────────────────────────────────
-
-  function drawDistPanel(theta, seVal) {
-    const W = distCanvas.width / dpr;
-    const H = distCanvas.height / dpr;
-    dCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    dCtx.clearRect(0, 0, W, H);
-
-    const PAD_L = 44, PAD_R = 14, PAD_T = 28, PAD_B = 36;
-    const pw = W - PAD_L - PAD_R;
-    const ph = H - PAD_T - PAD_B;
-
-    const spread = Math.max(seVal, 0.3);
-    const xMin = theta - 4 * spread;
-    const xMax = theta + 4 * spread;
-    function toX(v) { return PAD_L + (v - xMin) / (xMax - xMin) * pw; }
-
-    const steps = 300;
-    const peakPdf = normalPdf(theta, theta, Math.max(seVal, 0.01));
-    function toY(density) { return PAD_T + ph - (density / (peakPdf * 1.18)) * ph; }
-
-    // Grid
-    dCtx.strokeStyle = '#e4e4f0'; dCtx.lineWidth = 0.5;
-    for (let i = 0; i <= 4; i++) {
-      const xv = xMin + (xMax - xMin) * i / 4;
-      dCtx.beginPath(); dCtx.moveTo(toX(xv), PAD_T); dCtx.lineTo(toX(xv), PAD_T + ph); dCtx.stroke();
-    }
-
-    // CI shading
-    const lo95 = theta - 1.96 * seVal, hi95 = theta + 1.96 * seVal;
-    const lo68 = theta - seVal, hi68 = theta + seVal;
-
-    function shadeCurve(loVal, hiVal, color) {
-      dCtx.beginPath();
-      const loClamped = Math.max(xMin, loVal);
-      const hiClamped = Math.min(xMax, hiVal);
-      dCtx.moveTo(toX(loClamped), toY(0));
-      for (let i = 0; i <= steps; i++) {
-        const x = loClamped + (hiClamped - loClamped) * i / steps;
-        dCtx.lineTo(toX(x), toY(normalPdf(x, theta, seVal)));
-      }
-      dCtx.lineTo(toX(hiClamped), toY(0));
-      dCtx.closePath();
-      dCtx.fillStyle = color;
-      dCtx.fill();
-    }
-
-    shadeCurve(lo95, hi95, 'rgba(200,60,90,0.12)');
-    shadeCurve(lo68, hi68, 'rgba(200,60,90,0.25)');
-
-    // Full curve
-    dCtx.beginPath();
-    for (let i = 0; i <= steps; i++) {
-      const x = xMin + (xMax - xMin) * i / steps;
-      const y = toY(normalPdf(x, theta, seVal));
-      i === 0 ? dCtx.moveTo(toX(x), y) : dCtx.lineTo(toX(x), y);
-    }
-    dCtx.strokeStyle = '#c83c5a'; dCtx.lineWidth = 2; dCtx.stroke();
-
-    // True theta line
-    const tsx = toX(theta);
-    dCtx.beginPath(); dCtx.moveTo(tsx, PAD_T); dCtx.lineTo(tsx, PAD_T + ph);
-    dCtx.strokeStyle = '#0d8a74'; dCtx.lineWidth = 1.5; dCtx.setLineDash([4, 3]);
-    dCtx.stroke(); dCtx.setLineDash([]);
-
-    // Axes
-    dCtx.strokeStyle = '#c0c0d8'; dCtx.lineWidth = 1;
-    dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T + ph); dCtx.lineTo(PAD_L + pw, PAD_T + ph); dCtx.stroke();
-    dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T); dCtx.lineTo(PAD_L, PAD_T + ph); dCtx.stroke();
-
-    // X-axis ticks
-    dCtx.font = '9px IBM Plex Mono, monospace';
-    dCtx.fillStyle = '#888899';
-    dCtx.textAlign = 'center';
-    for (let i = 0; i <= 4; i++) {
-      const xv = xMin + (xMax - xMin) * i / 4;
-      const sx = toX(xv);
-      dCtx.beginPath(); dCtx.moveTo(sx, PAD_T + ph); dCtx.lineTo(sx, PAD_T + ph + 4);
-      dCtx.strokeStyle = '#c0c0d8'; dCtx.lineWidth = 1; dCtx.stroke();
-      dCtx.fillText(xv.toFixed(1), sx, PAD_T + ph + 16);
-    }
-
-    // Y-axis label
-    dCtx.save();
-    dCtx.translate(13, PAD_T + ph / 2);
-    dCtx.rotate(-Math.PI / 2);
-    dCtx.textAlign = 'center';
-    dCtx.fillStyle = '#888899';
-    dCtx.font = '9px IBM Plex Mono, monospace';
-    dCtx.fillText('frequency', 0, 0);
-    dCtx.restore();
-
-    // Title
-    dCtx.font = 'bold 10px IBM Plex Mono, monospace';
-    dCtx.fillStyle = '#888899';
-    dCtx.textAlign = 'center';
-    dCtx.fillText('Estimated \u03B8 if true \u03B8 = ' + theta.toFixed(1), W / 2, 14);
-
-    // Legend
-    dCtx.font = '9px IBM Plex Mono, monospace';
-    dCtx.textAlign = 'left';
-    dCtx.fillStyle = '#0d8a74';
-    dCtx.fillText('true \u03B8 = ' + theta.toFixed(1), toX(theta) + 6, PAD_T + 14);
-
-    // 68% label
-    dCtx.fillStyle = 'rgba(200,60,90,0.9)';
-    dCtx.textAlign = 'center';
-    dCtx.fillText('68%', toX((Math.max(xMin, lo68) + Math.min(xMax, hi68)) / 2), PAD_T + ph - 8);
   }
 
   // ── Stats + interpretation ─────────────────────────────────────────────────
@@ -838,7 +741,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 
   function resizeCanvases() {
     dpr = window.devicePixelRatio || 1;
-    for (const c of [scoreBarCanvas, infoCanvas, distCanvas]) {
+    for (const c of [scoreBarCanvas, infoCanvas]) {
       const rect = c.getBoundingClientRect();
       if (rect.width > 0) {
         c.width = rect.width * dpr;
@@ -867,7 +770,6 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     updateStats(theta, seVal, rho);
     drawScoreBar(theta, seVal, items, currentModel);
     drawInfoPanel(theta, items, currentModel);
-    drawDistPanel(theta, seVal);
   }
 
   function resize() {
@@ -927,17 +829,6 @@ const irtInfoContent = {
       '<p><strong>Number of items:</strong> More items = more total information (the curves stack additively).</p>' +
       '<div class="section-label">2PL vs GRM</div>' +
       '<p>In the 2PL model, each item peaks at its difficulty. In the GRM, each item contributes information across its threshold range, often producing a broader information peak per item. More response categories generally increase information.</p>'
-  },
-  distPanel: {
-    title: 'Sampling Distribution',
-    badge: 'Error distribution',
-    body: '<p>This panel shows the distribution of estimated \u03B8 values you would expect if you tested the same person many times. The curve is a normal distribution centered on the true \u03B8, with a standard deviation equal to SE(\u03B8).</p>' +
-      '<div class="section-label">What the curve shows</div>' +
-      '<p>The peak is at the true \u03B8. The spread is determined by SE(\u03B8): lower SE means a taller, narrower curve (more precise estimates), while higher SE produces a wider, flatter curve.</p>' +
-      '<div class="section-label">The shaded regions</div>' +
-      '<p>The darker shading covers the central 68% of the distribution. The lighter shading extends to 95%. Scores outside the 95% region would occur fewer than 1 in 20 times.</p>' +
-      '<div class="section-label">Comparison to CTT</div>' +
-      '<p>This panel is directly analogous to the repeated-testing distribution in the CTT visualization. The key difference: in CTT, this curve has the same width for every true score. In IRT, it changes as you move \u03B8 \u2014 try sliding \u03B8 from the center to the tails and watch it widen.</p>'
   }
 };
 
