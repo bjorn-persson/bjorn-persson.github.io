@@ -8,7 +8,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 .viz-embed .irt-subtitle {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 19px;
@@ -20,7 +20,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
   height: max(280px, calc(100vh - 520px));
   width: 100%;
   margin-bottom: 24px;
-  background: #f4f4f8;
+  background: #181a24;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -47,7 +47,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
 
 .viz-embed .irt-value-display {
   font-weight: 600;
-  color: #0d8a74;
+  color: #2dd4bf;
 }
 
 .viz-embed .irt-controls input[type="range"] {
@@ -55,7 +55,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #e0e0ec;
+  background: #2a2d3a;
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -67,7 +67,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
 }
 
@@ -75,7 +75,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
   border: none;
 }
@@ -142,8 +142,8 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
             datasets: [{
                 label: 'Probability of Endorsement / Correct Response',
                 data: generateData(1.0, 0.0, 0.0),
-                borderColor: '#0d8a74',
-                backgroundColor: 'rgba(13, 138, 116, 0.08)',
+                borderColor: '#2dd4bf',
+                backgroundColor: 'rgba(45, 212, 191, 0.08)',
                 borderWidth: 2.5,
                 fill: true,
                 pointRadius: 0,
@@ -160,34 +160,34 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
                         display: true,
                         text: 'Latent Trait Level (θ)',
                         font: { size: 15, family: 'IBM Plex Mono, monospace' },
-                        color: '#888899'
+                        color: '#6b7084'
                     },
                     min: -4,
                     max: 4,
                     ticks: {
                         stepSize: 1,
                         font: { size: 14, family: 'IBM Plex Mono, monospace' },
-                        color: '#888899'
+                        color: '#6b7084'
                     },
-                    grid: { color: '#e4e4f0' },
-                    border: { color: '#c0c0d8' }
+                    grid: { color: '#1e2030' },
+                    border: { color: '#2a2d3a' }
                 },
                 y: {
                     title: {
                         display: true,
                         text: 'Probability P(θ)',
                         font: { size: 15, family: 'IBM Plex Mono, monospace' },
-                        color: '#888899'
+                        color: '#6b7084'
                     },
                     min: 0,
                     max: 1,
                     ticks: {
                         stepSize: 0.2,
                         font: { size: 14, family: 'IBM Plex Mono, monospace' },
-                        color: '#888899'
+                        color: '#6b7084'
                     },
-                    grid: { color: '#e4e4f0' },
-                    border: { color: '#c0c0d8' }
+                    grid: { color: '#1e2030' },
+                    border: { color: '#2a2d3a' }
                 }
             },
             plugins: {
@@ -215,3 +215,18 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
         });
     });
 </script>
+
+---
+
+##### Citation
+
+Persson, B. N. (2026). *IRT curve (3PL model)* [Interactive visualization]. https://bnpersson.github.io/visualizations/irt-curve/
+
+```BibTeX
+@misc{Persson2026irtcurve,
+  author = {Björn N. Persson},
+  year = {2026},
+  title = {IRT Curve (3PL Model)},
+  note = {Interactive visualization},
+  url = {https://bnpersson.github.io/visualizations/irt-curve/}}
+```

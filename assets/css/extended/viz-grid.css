@@ -1,0 +1,60 @@
+/* === Visualization grid layout === */
+
+.viz-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.viz-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.viz-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.viz-card-image {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--code-bg);
+}
+
+.viz-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.viz-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary);
+    opacity: 0.4;
+}
+
+.viz-card-title {
+    padding: 12px 14px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.3;
+}
+
+@media (max-width: 500px) {
+    .viz-grid {
+        grid-template-columns: 1fr;
+    }
+}

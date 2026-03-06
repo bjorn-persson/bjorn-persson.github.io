@@ -12,7 +12,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
 }
 
 .viz-embed .subtitle {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 18px;
@@ -40,7 +40,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
 }
 
 .viz-embed .control-group .val {
-  color: #0d8a74;
+  color: #2dd4bf;
   font-weight: 600;
 }
 
@@ -49,7 +49,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #e0e0ec;
+  background: #2a2d3a;
   border-radius: 2px;
   outline: none;
 }
@@ -60,7 +60,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
 }
 
@@ -68,7 +68,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
   border: none;
 }
@@ -94,14 +94,14 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
 }
 
 .viz-embed .btn:hover {
-  border-color: #0d8a74;
-  color: #0d8a74;
+  border-color: #2dd4bf;
+  color: #2dd4bf;
 }
 
 .viz-embed .btn.active {
-  border-color: #0d8a74;
-  color: #0d8a74;
-  background: rgba(13, 138, 116, 0.08);
+  border-color: #2dd4bf;
+  color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.08);
 }
 
 .viz-embed .btn.action {
@@ -118,7 +118,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
   display: block;
   width: 100%;
   height: max(280px, calc(100vh - 560px));
-  background: #f4f4f8;
+  background: #181a24;
   border-radius: 6px;
 }
 
@@ -130,7 +130,7 @@ description: "Interactive visualization for fitting linear, quadratic, cubic, an
   line-height: 1.6;
 }
 
-.viz-embed .equation .coef { color: #0d8a74; font-weight: 600; }
+.viz-embed .equation .coef { color: #2dd4bf; font-weight: 600; }
 .viz-embed .equation .fit-coef { color: #c2640a; font-weight: 600; }
 
 .viz-embed .stats {
@@ -549,7 +549,7 @@ function render() {
   function toSy(v) { return PAD_T + ph - (v - ymin) / (ymax - ymin) * ph; }
 
   // ── Grid ──
-  ctx.strokeStyle = '#e4e4f0';
+  ctx.strokeStyle = '#1e2030';
   ctx.lineWidth = 0.5;
   const xStep = niceStep(xmax - xmin, 8);
   const yStep = niceStep(ymax - ymin, 8);
@@ -561,14 +561,14 @@ function render() {
   }
 
   // ── Axes ──
-  ctx.strokeStyle = '#c0c0d8';
+  ctx.strokeStyle = '#2a2d3a';
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
   // ── Tick labels ──
   ctx.font = '14px IBM Plex Mono, monospace';
-  ctx.fillStyle = '#888899';
+  ctx.fillStyle = '#6b7084';
   ctx.textAlign = 'center';
   for (let t = Math.ceil(xmin / xStep) * xStep; t <= xmax; t += xStep) {
     ctx.fillText(fmtTick(t, xStep), toSx(t), PAD_T + ph + 18);
@@ -579,7 +579,7 @@ function render() {
   }
 
   // ── Axis labels ──
-  ctx.fillStyle = '#888899';
+  ctx.fillStyle = '#6b7084';
   ctx.font = '15px IBM Plex Mono, monospace';
   ctx.textAlign = 'center';
   ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 38);
@@ -600,7 +600,7 @@ function render() {
     const sx = toSx(xv), sy = toSy(yv);
     if (!started) { ctx.moveTo(sx, sy); started = true; } else ctx.lineTo(sx, sy);
   }
-  ctx.strokeStyle = 'rgba(13, 138, 116, 0.65)';
+  ctx.strokeStyle = 'rgba(45, 212, 191, 0.65)';
   ctx.lineWidth = 2.5;
   ctx.setLineDash([7, 5]);
   ctx.stroke();
@@ -631,7 +631,7 @@ function render() {
       if (sx < PAD_L || sx > PAD_L + pw || sy < PAD_T || sy > PAD_T + ph) continue;
       ctx.beginPath();
       ctx.arc(sx, sy, 3, 0, Math.PI * 2);
-      ctx.fillStyle = d.y === 1 ? 'rgba(109, 40, 217, 0.65)' : 'rgba(200, 60, 90, 0.65)';
+      ctx.fillStyle = d.y === 1 ? 'rgba(109, 40, 217, 0.65)' : 'rgba(239, 68, 68, 0.65)';
       ctx.fill();
     }
   } else {
@@ -649,12 +649,12 @@ function render() {
   const lx = PAD_L + 12, ly = PAD_T + 14;
   ctx.font = '14px IBM Plex Mono, monospace';
 
-  ctx.strokeStyle = 'rgba(13, 138, 116, 0.65)';
+  ctx.strokeStyle = 'rgba(45, 212, 191, 0.65)';
   ctx.lineWidth = 2.5;
   ctx.setLineDash([7, 5]);
   ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx + 22, ly); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = '#888899';
+  ctx.fillStyle = '#6b7084';
   ctx.textAlign = 'left';
   ctx.fillText('Population', lx + 28, ly + 4);
 
@@ -662,19 +662,19 @@ function render() {
     ctx.strokeStyle = '#c2640a';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(lx, ly + 16); ctx.lineTo(lx + 22, ly + 16); ctx.stroke();
-    ctx.fillStyle = '#888899';
+    ctx.fillStyle = '#6b7084';
     ctx.fillText('Fitted', lx + 28, ly + 20);
   }
 
   if (isLogistic && data.length > 0) {
     ctx.beginPath(); ctx.arc(lx + 6, ly + 32, 3, 0, Math.PI*2);
     ctx.fillStyle = 'rgba(109, 40, 217, 0.65)'; ctx.fill();
-    ctx.fillStyle = '#888899';
+    ctx.fillStyle = '#6b7084';
     ctx.fillText('Y = 1', lx + 28, ly + 36);
 
     ctx.beginPath(); ctx.arc(lx + 6, ly + 48, 3, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(200, 60, 90, 0.65)'; ctx.fill();
-    ctx.fillStyle = '#888899';
+    ctx.fillStyle = 'rgba(239, 68, 68, 0.65)'; ctx.fill();
+    ctx.fillStyle = '#6b7084';
     ctx.fillText('Y = 0', lx + 28, ly + 52);
   }
 }
@@ -703,3 +703,18 @@ buildControls();
 updateEquation();
 render();
 </script>
+
+---
+
+##### Citation
+
+Persson, B. N. (2026). *Regression models* [Interactive visualization]. https://bnpersson.github.io/visualizations/regression/
+
+```BibTeX
+@misc{Persson2026regression,
+  author = {Björn N. Persson},
+  year = {2026},
+  title = {Regression Models},
+  note = {Interactive visualization},
+  url = {https://bnpersson.github.io/visualizations/regression/}}
+```

@@ -9,6 +9,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
 .sp-wrap { font-family: 'IBM Plex Mono', monospace; }
 .sp-subtitle {
+  font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 21px;
@@ -30,13 +31,13 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   color: var(--secondary);
   font-size: 0.92rem;
 }
-.sp-val { color: #0d8a74; font-weight: 600; }
+.sp-val { color: #2dd4bf; font-weight: 600; }
 .sp-controls input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #e0e0ec;
+  background: #2a2d3a;
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -46,13 +47,13 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   appearance: none;
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
 }
 .sp-controls input[type="range"]::-moz-range-thumb {
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
   border: none;
 }
@@ -61,7 +62,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   width: 100%;
   aspect-ratio: 4 / 3;
   border-radius: 6px;
-  background: #f4f4f8;
+  background: #181a24;
 }
 .sp-readout {
   display: flex;
@@ -73,8 +74,8 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 .sp-badge {
   padding: 4px 12px;
   border-radius: 4px;
-  background: #f0f0f8;
-  border: 1px solid #e0e0ec;
+  background: #181a24;
+  border: 1px solid #2a2d3a;
   color: var(--secondary);
 }
 .sp-badge .sp-badge-val { font-weight: 600; }
@@ -87,7 +88,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 .sp-phase-label {
   margin-bottom: 10px;
   font-size: 1.0rem;
-  color: #0d8a74;
+  color: #2dd4bf;
   font-weight: 600;
   min-height: 1.2em;
 }
@@ -108,7 +109,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     <canvas id="sp_canvas"></canvas>
   </div>
   <div class="sp-readout">
-    <div class="sp-badge">Overall r: <span class="sp-badge-val" id="sp_overall_r" style="color:#c83c5a">—</span></div>
+    <div class="sp-badge">Overall r: <span class="sp-badge-val" id="sp_overall_r" style="color:#ef4444">—</span></div>
     <div class="sp-badge" id="sp_g1_badge" style="display:none">Major A r: <span class="sp-badge-val" id="sp_g1_r"></span></div>
     <div class="sp-badge" id="sp_g2_badge" style="display:none">Major B r: <span class="sp-badge-val" id="sp_g2_r"></span></div>
     <div class="sp-badge" id="sp_g3_badge" style="display:none">Major C r: <span class="sp-badge-val" id="sp_g3_r"></span></div>
@@ -135,10 +136,10 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   // We'll use: X = study hours normalized, Y = depression normalized
   // Group centers arranged from bottom-left to top-right (low stress → high stress majors)
   const GROUP_DEFS = [
-    { cx: 0.15, cy: 0.18, slope:  0.38, sigma: 0.07, color: '#0d8a74',  name: 'Education'      },
+    { cx: 0.15, cy: 0.18, slope:  0.38, sigma: 0.07, color: '#2dd4bf',  name: 'Education'      },
     { cx: 0.32, cy: 0.35, slope:  0.35, sigma: 0.07, color: '#6d28d9',  name: 'Social Science' },
     { cx: 0.50, cy: 0.50, slope:  0.32, sigma: 0.07, color: '#c2640a',  name: 'Business'       },
-    { cx: 0.68, cy: 0.65, slope:  0.30, sigma: 0.07, color: '#c83c5a',  name: 'Engineering'    },
+    { cx: 0.68, cy: 0.65, slope:  0.30, sigma: 0.07, color: '#ef4444',  name: 'Engineering'    },
     { cx: 0.84, cy: 0.80, slope:  0.28, sigma: 0.07, color: '#1565c0',  name: 'Medicine'       },
   ];
 
@@ -237,10 +238,10 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   // I'll redefine GROUP_DEFS inline with the data generation for this setup.
 
   const GP = [
-    { cx: 0.18, cy: 0.80, slope: 0.40, sigma: 0.065, color: '#0d8a74',  name: 'Education',       label: 'A' },
+    { cx: 0.18, cy: 0.80, slope: 0.40, sigma: 0.065, color: '#2dd4bf',  name: 'Education',       label: 'A' },
     { cx: 0.34, cy: 0.65, slope: 0.38, sigma: 0.065, color: '#6d28d9',  name: 'Social Sciences', label: 'B' },
     { cx: 0.50, cy: 0.50, slope: 0.36, sigma: 0.065, color: '#c2640a',  name: 'Business',        label: 'C' },
-    { cx: 0.66, cy: 0.35, slope: 0.34, sigma: 0.065, color: '#c83c5a',  name: 'Engineering',     label: 'D' },
+    { cx: 0.66, cy: 0.35, slope: 0.34, sigma: 0.065, color: '#ef4444',  name: 'Engineering',     label: 'D' },
     { cx: 0.82, cy: 0.20, slope: 0.32, sigma: 0.065, color: '#1565c0',  name: 'Medicine',        label: 'E' },
   ];
   // X = study hours (0=low, 1=high), Y = exam score (0=low, 1=high)
@@ -303,7 +304,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     function toSy(v) { return PAD_T + (1 - v) * ph; }
 
     // Grid
-    ctx.strokeStyle = '#e4e4f0';
+    ctx.strokeStyle = '#1e2030';
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const v = i / 4;
@@ -312,7 +313,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     }
 
     // Axes
-    ctx.strokeStyle = '#c0c0d8'; ctx.lineWidth = 1;
+    ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
@@ -342,9 +343,12 @@ summary: "Watch a global negative trend shatter into positive within-group trend
         const g = allGroups[gi];
         const gPts = blended.filter(p => p.group === gi);
         const reg = linReg(gPts);
-        const x0 = 0, x1 = 1;
-        const y0 = reg.m * x0 + reg.b;
-        const y1 = reg.m * x1 + reg.b;
+        let x0 = 0, x1 = 1;
+        let y0 = reg.m * x0 + reg.b;
+        let y1 = reg.m * x1 + reg.b;
+        // Clip: if y goes below 0, find x where y=0 and clamp
+        if (y0 < 0) { x0 = -reg.b / reg.m; y0 = 0; }
+        if (y1 < 0) { x1 = -reg.b / reg.m; y1 = 0; }
         ctx.beginPath();
         ctx.moveTo(toSx(x0), toSy(y0));
         ctx.lineTo(toSx(x1), toSy(y1));
@@ -363,7 +367,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       ctx.beginPath();
       ctx.moveTo(toSx(x0), toSy(reg.m * x0 + reg.b));
       ctx.lineTo(toSx(x1), toSy(reg.m * x1 + reg.b));
-      ctx.strokeStyle = '#888899';
+      ctx.strokeStyle = '#6b7084';
       ctx.lineWidth = 2.5;
       ctx.setLineDash([6, 4]);
       ctx.globalAlpha = Math.max(0, 1 - t * 1.4);
@@ -386,7 +390,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     }
 
     // Axis labels
-    ctx.fillStyle = '#888899';
+    ctx.fillStyle = '#6b7084';
     ctx.font = '14px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
     ctx.fillText('Study Hours →', PAD_L + pw / 2, PAD_T + ph + 38);
@@ -398,7 +402,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
     // X tick labels
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#888899';
+    ctx.fillStyle = '#6b7084';
     ctx.font = '13px IBM Plex Mono, monospace';
     const xLabels = ['Low', '', 'Mid', '', 'High'];
     for (let i = 0; i <= 4; i++) {
@@ -409,17 +413,18 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     if (t > 0.1) {
       const legAlpha = Math.min(1, (t - 0.1) / 0.3);
       ctx.globalAlpha = legAlpha;
-      const legX = PAD_L + pw - 4;
       const legY0 = PAD_T + 8;
       ctx.font = '13px IBM Plex Mono, monospace';
       for (let gi = 0; gi < allGroups.length; gi++) {
         const g = allGroups[gi];
         const ly = legY0 + gi * 18;
+        const tw = ctx.measureText(g.name).width;
+        const legX = PAD_L + pw - tw - 12;
         ctx.fillStyle = g.color;
-        ctx.beginPath(); ctx.arc(legX - 68, ly + 4, 4, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(legX - 8, ly + 4, 4, 0, Math.PI*2); ctx.fill();
         ctx.textAlign = 'left';
         ctx.fillStyle = g.color;
-        ctx.fillText(g.name, legX - 60, ly + 8);
+        ctx.fillText(g.name, legX, ly + 8);
       }
       ctx.globalAlpha = 1;
       ctx.textAlign = 'left';
@@ -428,7 +433,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     // Update readouts
     const allR = pearsonR(blended);
     document.getElementById('sp_overall_r').textContent = allR.toFixed(3);
-    document.getElementById('sp_overall_r').style.color = allR < 0 ? '#c83c5a' : '#0d8a74';
+    document.getElementById('sp_overall_r').style.color = allR < 0 ? '#ef4444' : '#2dd4bf';
 
     for (let gi = 0; gi < allGroups.length; gi++) {
       const gPts = blended.filter(p => p.group === gi).map(p => ({ x: p.x, y: p.y }));
@@ -437,7 +442,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       const badge = document.getElementById(`sp_g${gi+1}_badge`);
       if (el) {
         el.textContent = r.toFixed(3);
-        el.style.color = r > 0 ? '#0d8a74' : '#c83c5a';
+        el.style.color = r > 0 ? '#2dd4bf' : '#ef4444';
       }
       if (badge) badge.style.display = t > 0.15 ? '' : 'none';
     }
@@ -470,3 +475,18 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   resize();
 })();
 </script>
+
+---
+
+##### Citation
+
+Persson, B. N. (2026). *Simpson's paradox* [Interactive visualization]. https://bnpersson.github.io/visualizations/simpsons-paradox/
+
+```BibTeX
+@misc{Persson2026simpsons,
+  author = {Björn N. Persson},
+  year = {2026},
+  title = {Simpson's Paradox},
+  note = {Interactive visualization},
+  url = {https://bnpersson.github.io/visualizations/simpsons-paradox/}}
+```

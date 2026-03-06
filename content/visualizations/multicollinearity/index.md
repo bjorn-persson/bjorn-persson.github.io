@@ -9,6 +9,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 
 .mc-wrap { font-family: 'IBM Plex Mono', monospace; }
 .mc-subtitle {
+  font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 18px;
@@ -25,14 +26,17 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   width: 100%;
   aspect-ratio: 1;
   border-radius: 6px;
-  background: #f4f4f8;
+  background: #181a24;
 }
 .mc-canvas-label {
   font-size: 0.9rem;
-  color: var(--secondary);
+  color: #6b7084;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   margin-bottom: 6px;
+  min-height: 2.4em;
+  display: flex;
+  align-items: flex-end;
 }
 .mc-controls {
   display: flex;
@@ -46,13 +50,13 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   font-size: 0.92rem;
 }
 .mc-control-group label { color: var(--secondary); }
-.mc-val { color: #0d8a74; font-weight: 600; }
+.mc-val { color: #2dd4bf; font-weight: 600; }
 .mc-controls input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #e0e0ec;
+  background: #2a2d3a;
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -62,13 +66,13 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   appearance: none;
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
 }
 .mc-controls input[type="range"]::-moz-range-thumb {
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
   border: none;
 }
@@ -79,13 +83,13 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   margin-top: 4px;
 }
 .mc-stat-card {
-  background: #f4f4f8;
+  background: #181a24;
   border-radius: 5px;
   padding: 10px 12px;
-  border-left: 3px solid #e0e0ec;
+  border-left: 3px solid #2a2d3a;
   transition: border-color 0.3s;
 }
-.mc-stat-card.warn { border-left-color: #c83c5a; }
+.mc-stat-card.warn { border-left-color: #ef4444; }
 .mc-stat-label {
   font-size: 0.84rem;
   color: var(--secondary);
@@ -94,17 +98,17 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 .mc-stat-value {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #0d8a74;
+  color: #2dd4bf;
   transition: color 0.3s;
 }
-.mc-stat-value.warn { color: #c83c5a; }
+.mc-stat-value.warn { color: #ef4444; }
 .mc-wobble-label {
   font-size: 0.92rem;
   color: var(--secondary);
   margin-top: 8px;
   min-height: 1.4em;
 }
-.mc-wobble-label span { color: #c83c5a; font-weight: 600; }
+.mc-wobble-label span { color: #ef4444; font-weight: 600; }
 .mc-note {
   margin-top: 14px;
   font-size: 0.88rem;
@@ -128,7 +132,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       <div class="mc-canvas-wrap"><canvas id="mc_scatter"></canvas></div>
     </div>
     <div>
-      <div class="mc-canvas-label">Regression Plane Cross-section (Y on X₁)</div>
+      <div class="mc-canvas-label">Cross-section (Y on X₁)</div>
       <div class="mc-canvas-wrap"><canvas id="mc_plane"></canvas></div>
     </div>
     <div class="mc-controls" style="grid-column:1/-1">
@@ -244,7 +248,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     function sy(v) { return PAD + (1 - v) * ph; }
 
     // Grid
-    sCtx.strokeStyle = '#e4e4f0'; sCtx.lineWidth = 0.5;
+    sCtx.strokeStyle = '#1e2030'; sCtx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const v = i / 4;
       sCtx.beginPath(); sCtx.moveTo(sx(v), PAD); sCtx.lineTo(sx(v), PAD + ph); sCtx.stroke();
@@ -252,7 +256,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     }
 
     // Axes
-    sCtx.strokeStyle = '#c0c0d8'; sCtx.lineWidth = 1;
+    sCtx.strokeStyle = '#2a2d3a'; sCtx.lineWidth = 1;
     sCtx.beginPath(); sCtx.moveTo(PAD, PAD + ph); sCtx.lineTo(PAD + pw, PAD + ph); sCtx.stroke();
     sCtx.beginPath(); sCtx.moveTo(PAD, PAD); sCtx.lineTo(PAD, PAD + ph); sCtx.stroke();
 
@@ -262,9 +266,9 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       const px = sx(x1n[i]), py = sy(x2n[i]);
       // color: purple (low Y) → teal (high Y)
       const yv = yn[i];
-      const r_c = Math.round(13 + (109-13)*yv);
-      const g_c = Math.round(138 + (40-138)*yv);
-      const b_c = Math.round(116 + (217-116)*yv);
+      const r_c = Math.round(45 + (109-45)*yv);
+      const g_c = Math.round(212 + (40-212)*yv);
+      const b_c = Math.round(191 + (217-191)*yv);
       sCtx.beginPath();
       sCtx.arc(px, py, 4, 0, Math.PI * 2);
       sCtx.fillStyle = `rgba(${r_c},${g_c},${b_c},0.75)`;
@@ -272,7 +276,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     }
 
     // Correlation annotation
-    const rColor = r > 0.9 ? '#c83c5a' : r > 0.7 ? '#c2640a' : '#888899';
+    const rColor = r > 0.9 ? '#ef4444' : r > 0.7 ? '#f59e0b' : '#6b7084';
     sCtx.font = 'bold 16px IBM Plex Mono, monospace';
     sCtx.fillStyle = rColor;
     sCtx.textAlign = 'center';
@@ -280,7 +284,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 
     // Axis labels
     sCtx.font = '14px IBM Plex Mono, monospace';
-    sCtx.fillStyle = '#888899';
+    sCtx.fillStyle = '#6b7084';
     sCtx.textAlign = 'center';
     sCtx.fillText('X₁', W/2, PAD + ph + 24);
     sCtx.save();
@@ -292,7 +296,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     // Color legend
     sCtx.font = '12px IBM Plex Mono, monospace';
     sCtx.textAlign = 'left';
-    sCtx.fillStyle = 'rgba(13,138,116,0.8)';
+    sCtx.fillStyle = 'rgba(45,212,191,0.8)';
     sCtx.fillText('high Y', PAD + pw - 36, PAD + ph - 6);
     sCtx.fillStyle = 'rgba(109,40,217,0.8)';
     sCtx.fillText('low Y', PAD, PAD + ph - 6);
@@ -314,7 +318,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     function sy_fn(v) { return PAD_T + (1 - v) * ph; }
 
     // Grid
-    pCtx.strokeStyle = '#e4e4f0'; pCtx.lineWidth = 0.5;
+    pCtx.strokeStyle = '#1e2030'; pCtx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const v = i/4;
       pCtx.beginPath(); pCtx.moveTo(sx(v), PAD_T); pCtx.lineTo(sx(v), PAD_T+ph); pCtx.stroke();
@@ -322,7 +326,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     }
 
     // Axes
-    pCtx.strokeStyle = '#c0c0d8'; pCtx.lineWidth = 1;
+    pCtx.strokeStyle = '#2a2d3a'; pCtx.lineWidth = 1;
     pCtx.beginPath(); pCtx.moveTo(PAD_L, PAD_T+ph); pCtx.lineTo(PAD_L+pw, PAD_T+ph); pCtx.stroke();
     pCtx.beginPath(); pCtx.moveTo(PAD_L, PAD_T); pCtx.lineTo(PAD_L, PAD_T+ph); pCtx.stroke();
 
@@ -348,7 +352,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     pCtx.beginPath();
     pCtx.moveTo(sx(0), sy_fn(intercept));
     pCtx.lineTo(sx(1), sy_fn(intercept + slope));
-    pCtx.strokeStyle = '#0d8a74';
+    pCtx.strokeStyle = '#2dd4bf';
     pCtx.lineWidth = 2.5;
     pCtx.stroke();
 
@@ -388,7 +392,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     }
 
     // Axis labels
-    pCtx.fillStyle = '#888899';
+    pCtx.fillStyle = '#6b7084';
     pCtx.font = '14px IBM Plex Mono, monospace';
     pCtx.textAlign = 'center';
     pCtx.fillText('X₁', PAD_L + pw/2, PAD_T + ph + 24);
@@ -399,7 +403,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     pCtx.restore();
 
     // VIF annotation
-    const vifColor = vif > 10 ? '#c83c5a' : vif > 5 ? '#c2640a' : '#888899';
+    const vifColor = vif > 10 ? '#ef4444' : vif > 5 ? '#c2640a' : '#6b7084';
     pCtx.font = 'bold 14px IBM Plex Mono, monospace';
     pCtx.fillStyle = vifColor;
     pCtx.textAlign = 'center';
@@ -490,3 +494,18 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   requestAnimationFrame(() => requestAnimationFrame(resize));
 })();
 </script>
+
+---
+
+##### Citation
+
+Persson, B. N. (2026). *Multicollinearity in multiple regression* [Interactive visualization]. https://bnpersson.github.io/visualizations/multicollinearity/
+
+```BibTeX
+@misc{Persson2026multicollinearity,
+  author = {Björn N. Persson},
+  year = {2026},
+  title = {Multicollinearity in Multiple Regression},
+  note = {Interactive visualization},
+  url = {https://bnpersson.github.io/visualizations/multicollinearity/}}
+```

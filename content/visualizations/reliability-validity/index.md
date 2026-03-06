@@ -11,6 +11,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   font-family: 'IBM Plex Mono', monospace;
 }
 .rv-subtitle {
+  font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 21px;
@@ -33,7 +34,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   font-size: 0.92rem;
 }
 .rv-control-group .rv-val {
-  color: #0d8a74;
+  color: #2dd4bf;
   font-weight: 600;
 }
 .rv-controls input[type="range"] {
@@ -41,7 +42,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #e0e0ec;
+  background: #2a2d3a;
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -51,13 +52,13 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   appearance: none;
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
 }
 .rv-controls input[type="range"]::-moz-range-thumb {
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
   border: none;
 }
@@ -82,7 +83,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   display: block;
   width: 100%;
   border-radius: 6px;
-  background: #f4f4f8;
+  background: #181a24;
 }
 .rv-badges {
   display: flex;
@@ -94,12 +95,12 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   font-size: 0.92rem;
   padding: 4px 12px;
   border-radius: 4px;
-  background: #f0f0f8;
-  border: 1px solid #e0e0ec;
+  background: #181a24;
+  border: 1px solid #2a2d3a;
   color: var(--secondary);
 }
 .rv-badge .rv-badge-val {
-  color: #0d8a74;
+  color: #2dd4bf;
   font-weight: 600;
 }
 .rv-note {
@@ -235,12 +236,12 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     const maxR = Math.min(W, H) * 0.44;
 
     // Rings
-    const ringColors = ['#c83c5a', '#e8a020', '#e8d820', '#4caf50', '#2196f3', '#2196f3', '#ffffff', '#ffffff', '#ffffff', '#ffffff'];
+    const ringColors = ['#ef4444', '#e8a020', '#e8d820', '#4caf50', '#2196f3', '#2196f3', '#181a24', '#181a24', '#181a24', '#181a24'];
     for (let i = 10; i >= 1; i--) {
       const r = maxR * i / 10;
       tCtx.beginPath();
       tCtx.arc(cx, cy, r, 0, Math.PI * 2);
-      tCtx.fillStyle = ringColors[i - 1] || '#f0f0f0';
+      tCtx.fillStyle = ringColors[i - 1] || '#181a24';
       tCtx.fill();
       tCtx.strokeStyle = 'rgba(0,0,0,0.12)';
       tCtx.lineWidth = 0.5;
@@ -283,7 +284,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
 
     // Label
     tCtx.font = `${14 * dpr / dpr}px IBM Plex Mono, monospace`;
-    tCtx.fillStyle = '#888899';
+    tCtx.fillStyle = '#6b7084';
     tCtx.textAlign = 'center';
     tCtx.fillText('● = cluster mean', cx, H - 8);
   }
@@ -313,7 +314,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     function toSy(density) { return PAD_T + ph - (density / globalMax) * ph; }
 
     // Background grid
-    dCtx.strokeStyle = '#e4e4f0';
+    dCtx.strokeStyle = '#1e2030';
     dCtx.lineWidth = 0.5;
     for (let t = 0; t <= 1.001; t += 0.25) {
       const sx = toSx(t);
@@ -330,8 +331,8 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.lineTo(toSx(xMax), toSy(0));
     dCtx.closePath();
     const grad = dCtx.createLinearGradient(0, PAD_T, 0, PAD_T + ph);
-    grad.addColorStop(0, 'rgba(13,138,116,0.22)');
-    grad.addColorStop(1, 'rgba(13,138,116,0.04)');
+    grad.addColorStop(0, 'rgba(45,212,191,0.22)');
+    grad.addColorStop(1, 'rgba(45,212,191,0.04)');
     dCtx.fillStyle = grad;
     dCtx.fill();
 
@@ -342,7 +343,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       const y = toSy(normalPdf(x, mu, sigma));
       i === 0 ? dCtx.moveTo(toSx(x), y) : dCtx.lineTo(toSx(x), y);
     }
-    dCtx.strokeStyle = '#0d8a74';
+    dCtx.strokeStyle = '#2dd4bf';
     dCtx.lineWidth = 2;
     dCtx.stroke();
 
@@ -353,7 +354,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       const y = toSy(normalPdf(x, TRUE_SCORE, trueSD));
       i === 0 ? dCtx.moveTo(toSx(x), y) : dCtx.lineTo(toSx(x), y);
     }
-    dCtx.strokeStyle = '#c83c5a';
+    dCtx.strokeStyle = '#ef4444';
     dCtx.lineWidth = 1.5;
     dCtx.setLineDash([5, 4]);
     dCtx.stroke();
@@ -362,7 +363,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     // Bullseye line
     const bx = toSx(TRUE_SCORE);
     dCtx.beginPath(); dCtx.moveTo(bx, PAD_T); dCtx.lineTo(bx, PAD_T + ph);
-    dCtx.strokeStyle = 'rgba(200,60,90,0.35)';
+    dCtx.strokeStyle = 'rgba(239,68,68,0.35)';
     dCtx.lineWidth = 1;
     dCtx.setLineDash([3, 3]);
     dCtx.stroke();
@@ -371,26 +372,26 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     // Observed mean line
     const omx = toSx(mu);
     dCtx.beginPath(); dCtx.moveTo(omx, PAD_T); dCtx.lineTo(omx, PAD_T + ph);
-    dCtx.strokeStyle = 'rgba(13,138,116,0.5)';
+    dCtx.strokeStyle = 'rgba(45,212,191,0.5)';
     dCtx.lineWidth = 1;
     dCtx.setLineDash([3, 3]);
     dCtx.stroke();
     dCtx.setLineDash([]);
 
     // Axes
-    dCtx.strokeStyle = '#c0c0d8';
+    dCtx.strokeStyle = '#2a2d3a';
     dCtx.lineWidth = 1;
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T + ph); dCtx.lineTo(PAD_L + pw, PAD_T + ph); dCtx.stroke();
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T); dCtx.lineTo(PAD_L, PAD_T + ph); dCtx.stroke();
 
     // X ticks
     dCtx.font = '13px IBM Plex Mono, monospace';
-    dCtx.fillStyle = '#888899';
+    dCtx.fillStyle = '#6b7084';
     dCtx.textAlign = 'center';
     for (let t = 0; t <= 1.001; t += 0.25) {
       const sx = toSx(t);
       dCtx.beginPath(); dCtx.moveTo(sx, PAD_T + ph); dCtx.lineTo(sx, PAD_T + ph + 4);
-      dCtx.strokeStyle = '#c0c0d8'; dCtx.lineWidth = 1; dCtx.stroke();
+      dCtx.strokeStyle = '#2a2d3a'; dCtx.lineWidth = 1; dCtx.stroke();
       dCtx.fillText(t.toFixed(2), sx, PAD_T + ph + 18);
     }
 
@@ -399,7 +400,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.translate(15, PAD_T + ph / 2);
     dCtx.rotate(-Math.PI / 2);
     dCtx.textAlign = 'center';
-    dCtx.fillStyle = '#888899';
+    dCtx.fillStyle = '#6b7084';
     dCtx.font = '13px IBM Plex Mono, monospace';
     dCtx.fillText('density', 0, 0);
     dCtx.restore();
@@ -409,15 +410,15 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.textAlign = 'right';
     dCtx.font = '13px IBM Plex Mono, monospace';
 
-    dCtx.strokeStyle = '#0d8a74'; dCtx.lineWidth = 2; dCtx.setLineDash([]);
+    dCtx.strokeStyle = '#2dd4bf'; dCtx.lineWidth = 2; dCtx.setLineDash([]);
     dCtx.beginPath(); dCtx.moveTo(legX - 52, PAD_T + 10); dCtx.lineTo(legX - 32, PAD_T + 10); dCtx.stroke();
-    dCtx.fillStyle = '#0d8a74';
+    dCtx.fillStyle = '#2dd4bf';
     dCtx.fillText('observed', legX, PAD_T + 14);
 
-    dCtx.strokeStyle = '#c83c5a'; dCtx.lineWidth = 1.5; dCtx.setLineDash([5, 4]);
+    dCtx.strokeStyle = '#ef4444'; dCtx.lineWidth = 1.5; dCtx.setLineDash([5, 4]);
     dCtx.beginPath(); dCtx.moveTo(legX - 52, PAD_T + 26); dCtx.lineTo(legX - 32, PAD_T + 26); dCtx.stroke();
     dCtx.setLineDash([]);
-    dCtx.fillStyle = '#c83c5a';
+    dCtx.fillStyle = '#ef4444';
     dCtx.fillText('true score', legX, PAD_T + 30);
 
     dCtx.textAlign = 'left';
@@ -460,3 +461,18 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   resize();
 })();
 </script>
+
+---
+
+##### Citation
+
+Persson, B. N. (2026). *Reliability, validity & measurement error* [Interactive visualization]. https://bnpersson.github.io/visualizations/reliability-validity/
+
+```BibTeX
+@misc{Persson2026relval,
+  author = {Björn N. Persson},
+  year = {2026},
+  title = {Reliability, Validity \& Measurement Error},
+  note = {Interactive visualization},
+  url = {https://bnpersson.github.io/visualizations/reliability-validity/}}
+```

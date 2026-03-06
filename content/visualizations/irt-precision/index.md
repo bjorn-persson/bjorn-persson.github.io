@@ -15,6 +15,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   margin-left: calc((100% - min(var(--irt-wide), 100vw - 40px)) / 2);
 }
 .irt-subtitle {
+  font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 21px;
@@ -24,6 +25,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   display: flex;
   flex-direction: row;
   gap: 28px;
+  align-items: stretch;
 }
 .irt-left {
   flex: 1;
@@ -43,7 +45,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   display: inline-flex;
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid #e0e0ec;
+  border: 1px solid #2a2d3a;
 }
 .irt-toggle-btn {
   font-family: 'IBM Plex Mono', monospace;
@@ -51,17 +53,17 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   font-weight: 500;
   padding: 6px 19px;
   border: none;
-  background: #f4f4f8;
+  background: #181a24;
   color: var(--secondary);
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
 .irt-toggle-btn.active {
-  background: #0d8a74;
+  background: #2dd4bf;
   color: white;
 }
 .irt-toggle-btn:hover:not(.active) {
-  background: #e8e8f0;
+  background: #2a2d3a;
 }
 .irt-controls {
   display: grid;
@@ -75,13 +77,13 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   gap: 4px;
 }
 .irt-control-group label { color: var(--secondary); }
-.irt-val { color: #0d8a74; font-weight: 600; }
+.irt-val { color: #2dd4bf; font-weight: 600; }
 .irt-controls input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #e0e0ec;
+  background: #2a2d3a;
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -91,13 +93,13 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   appearance: none;
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
 }
 .irt-controls input[type="range"]::-moz-range-thumb {
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
   border: none;
 }
@@ -107,14 +109,14 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   gap: 8px;
 }
 .irt-stat {
-  background: #f4f4f8;
+  background: #181a24;
   border-radius: 5px;
   padding: 9px 12px;
-  border-left: 3px solid #e0e0ec;
+  border-left: 3px solid #2a2d3a;
   transition: border-color 0.3s;
 }
-.irt-stat.warn { border-left-color: #c83c5a; }
-.irt-stat.ok   { border-left-color: #0d8a74; }
+.irt-stat.warn { border-left-color: #ef4444; }
+.irt-stat.ok   { border-left-color: #2dd4bf; }
 .irt-stat-label {
   font-size: 0.82rem;
   color: var(--secondary);
@@ -144,8 +146,8 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   transition: border-color 0.2s, color 0.2s;
 }
 .irt-info-btn:hover {
-  border-color: #0d8a74;
-  color: #0d8a74;
+  border-color: #2dd4bf;
+  color: #2dd4bf;
 }
 .irt-modal-overlay {
   display: none;
@@ -183,8 +185,8 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   font-size: 0.82rem;
   padding: 2px 8px;
   border-radius: 3px;
-  background: rgba(13, 138, 116, 0.1);
-  color: #0d8a74;
+  background: rgba(45, 212, 191, 0.1);
+  color: #2dd4bf;
   display: inline-block;
   margin-bottom: 14px;
 }
@@ -198,8 +200,8 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 .irt-modal .formula {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.96rem;
-  color: #0d8a74;
-  background: rgba(13, 138, 116, 0.06);
+  color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.06);
   padding: 8px 12px;
   border-radius: 4px;
   margin: 10px 0;
@@ -234,15 +236,20 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 .irt-stat-value {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #0d8a74;
+  color: #2dd4bf;
   transition: color 0.3s;
 }
-.irt-stat-value.warn { color: #c83c5a; }
+.irt-stat-value.warn { color: #ef4444; }
+.irt-right-spacer {
+  flex-shrink: 0;
+}
 /* panels are now direct children of .irt-right */
 .irt-panel {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
+  min-height: 0;
 }
 .irt-panel-label {
   font-size: 0.9rem;
@@ -257,24 +264,24 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   display: block;
   width: 100%;
   border-radius: 6px;
-  background: #f4f4f8;
+  background: #181a24;
 }
 .irt-score-bar canvas { height: 180px; }
-.irt-panel canvas { height: 340px; }
+.irt-panel canvas { flex: 1; min-height: 200px; }
 .irt-interp {
   font-size: 0.92rem;
   color: var(--secondary);
   line-height: 1.6;
   padding: 8px 10px;
-  background: #f4f4f8;
+  background: #181a24;
   border-radius: 5px;
-  border-left: 3px solid #e0e0ec;
+  border-left: 3px solid #2a2d3a;
   transition: border-color 0.3s;
   min-height: 2.8em;
 }
-.irt-interp.warn { border-left-color: #c83c5a; }
-.irt-interp span.hl { color: #c83c5a; font-weight: 600; }
-.irt-interp span.ok { color: #0d8a74; font-weight: 600; }
+.irt-interp.warn { border-left-color: #ef4444; }
+.irt-interp span.hl { color: #ef4444; font-weight: 600; }
+.irt-interp span.ok { color: #2dd4bf; font-weight: 600; }
 .irt-note {
   font-size: 0.88rem;
   color: var(--secondary);
@@ -347,9 +354,10 @@ summary: "Explore how item discrimination, difficulty, and response categories s
       <div class="irt-interp" id="irt_interp">&mdash;</div>
     </div>
     <div class="irt-right">
+      <div class="irt-right-spacer" id="irt_right_spacer"></div>
       <div class="irt-panel">
         <div class="irt-panel-label">Test information function <button class="irt-info-btn" onclick="irtShowInfo('tifPanel')" title="About this panel">?</button></div>
-        <canvas id="irt_info" height="340"></canvas>
+        <canvas id="irt_info"></canvas>
       </div>
     </div>
   </div>
@@ -465,16 +473,16 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 
     // Axis
     sbCtx.beginPath(); sbCtx.moveTo(toX(xMin), midY); sbCtx.lineTo(toX(xMax), midY);
-    sbCtx.strokeStyle = '#c0c0d8'; sbCtx.lineWidth = 1; sbCtx.stroke();
+    sbCtx.strokeStyle = '#2a2d3a'; sbCtx.lineWidth = 1; sbCtx.stroke();
 
     // Theta ticks
     sbCtx.font = '12px IBM Plex Mono, monospace';
-    sbCtx.fillStyle = '#888899';
+    sbCtx.fillStyle = '#6b7084';
     sbCtx.textAlign = 'center';
     for (let t = -3; t <= 3; t += 1) {
       const tx = toX(t);
       sbCtx.beginPath(); sbCtx.moveTo(tx, midY - 5); sbCtx.lineTo(tx, midY + 5);
-      sbCtx.strokeStyle = '#c0c0d8'; sbCtx.lineWidth = 1; sbCtx.stroke();
+      sbCtx.strokeStyle = '#2a2d3a'; sbCtx.lineWidth = 1; sbCtx.stroke();
       sbCtx.fillText(t, tx, midY + 20);
     }
 
@@ -513,13 +521,13 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     // Theta marker
     const tsx = toX(theta);
     sbCtx.beginPath(); sbCtx.moveTo(tsx, midY - bandH - 2); sbCtx.lineTo(tsx, midY + bandH + 2);
-    sbCtx.strokeStyle = '#0d8a74'; sbCtx.lineWidth = 2.5; sbCtx.stroke();
+    sbCtx.strokeStyle = '#2dd4bf'; sbCtx.lineWidth = 2.5; sbCtx.stroke();
     sbCtx.beginPath(); sbCtx.arc(tsx, midY, 6, 0, Math.PI * 2);
-    sbCtx.fillStyle = '#0d8a74'; sbCtx.fill();
+    sbCtx.fillStyle = '#2dd4bf'; sbCtx.fill();
 
     // Label
     sbCtx.font = '12px IBM Plex Mono, monospace';
-    sbCtx.fillStyle = '#888899';
+    sbCtx.fillStyle = '#6b7084';
     sbCtx.textAlign = 'center';
     sbCtx.fillText(
       '\u03B8 = ' + theta.toFixed(1) + ' (T = ' + thetaToT(theta).toFixed(0) + ')  |  SE = ' + seVal.toFixed(2) + '  |  95% CI: [' + lo95.toFixed(2) + ', ' + hi95.toFixed(2) + ']',
@@ -561,7 +569,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     function toYSE(v) { return PAD_T + ph - (Math.min(v, maxSE) / maxSE) * ph; }
 
     // Grid
-    iCtx.strokeStyle = '#e4e4f0'; iCtx.lineWidth = 0.5;
+    iCtx.strokeStyle = '#1e2030'; iCtx.lineWidth = 0.5;
     for (let i = 0; i <= 6; i++) {
       const xv = xMin + (xMax - xMin) * i / 6;
       iCtx.beginPath(); iCtx.moveTo(toX(xv), PAD_T); iCtx.lineTo(toX(xv), PAD_T + ph); iCtx.stroke();
@@ -576,7 +584,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     }
     iCtx.lineTo(toX(xMax), toYInfo(0));
     iCtx.closePath();
-    iCtx.fillStyle = 'rgba(13, 138, 116, 0.12)';
+    iCtx.fillStyle = 'rgba(45, 212, 191, 0.12)';
     iCtx.fill();
 
     // Info curve stroke
@@ -586,7 +594,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
       const y = toYInfo(infoVals[i]);
       i === 0 ? iCtx.moveTo(toX(t), y) : iCtx.lineTo(toX(t), y);
     }
-    iCtx.strokeStyle = '#0d8a74'; iCtx.lineWidth = 2; iCtx.stroke();
+    iCtx.strokeStyle = '#2dd4bf'; iCtx.lineWidth = 2; iCtx.stroke();
 
     // SE curve (dashed, red)
     iCtx.beginPath();
@@ -595,51 +603,51 @@ summary: "Explore how item discrimination, difficulty, and response categories s
       const y = toYSE(seVals[i]);
       i === 0 ? iCtx.moveTo(toX(t), y) : iCtx.lineTo(toX(t), y);
     }
-    iCtx.strokeStyle = '#c83c5a'; iCtx.lineWidth = 1.5; iCtx.setLineDash([5, 3]);
+    iCtx.strokeStyle = '#ef4444'; iCtx.lineWidth = 1.5; iCtx.setLineDash([5, 3]);
     iCtx.stroke(); iCtx.setLineDash([]);
 
     // Current theta vertical line
     const tsx = toX(theta);
     iCtx.beginPath(); iCtx.moveTo(tsx, PAD_T); iCtx.lineTo(tsx, PAD_T + ph);
-    iCtx.strokeStyle = 'rgba(13, 138, 116, 0.5)'; iCtx.lineWidth = 1.5; iCtx.setLineDash([4, 3]);
+    iCtx.strokeStyle = 'rgba(45, 212, 191, 0.5)'; iCtx.lineWidth = 1.5; iCtx.setLineDash([4, 3]);
     iCtx.stroke(); iCtx.setLineDash([]);
 
     // Readoff dots
     const curInfo = testInfo(theta, items, model);
     const curSE = curInfo > 0 ? 1 / Math.sqrt(curInfo) : 10;
     iCtx.beginPath(); iCtx.arc(tsx, toYInfo(curInfo), 4, 0, Math.PI * 2);
-    iCtx.fillStyle = '#0d8a74'; iCtx.fill();
+    iCtx.fillStyle = '#2dd4bf'; iCtx.fill();
     iCtx.beginPath(); iCtx.arc(tsx, toYSE(curSE), 4, 0, Math.PI * 2);
-    iCtx.fillStyle = '#c83c5a'; iCtx.fill();
+    iCtx.fillStyle = '#ef4444'; iCtx.fill();
 
     // Horizontal readoff lines
     iCtx.setLineDash([2, 3]);
     iCtx.beginPath(); iCtx.moveTo(tsx, toYInfo(curInfo)); iCtx.lineTo(PAD_L, toYInfo(curInfo));
-    iCtx.strokeStyle = 'rgba(13, 138, 116, 0.4)'; iCtx.lineWidth = 1; iCtx.stroke();
+    iCtx.strokeStyle = 'rgba(45, 212, 191, 0.4)'; iCtx.lineWidth = 1; iCtx.stroke();
     iCtx.beginPath(); iCtx.moveTo(tsx, toYSE(curSE)); iCtx.lineTo(PAD_L + pw, toYSE(curSE));
     iCtx.strokeStyle = 'rgba(200, 60, 90, 0.4)'; iCtx.lineWidth = 1; iCtx.stroke();
     iCtx.setLineDash([]);
 
     // Axes
-    iCtx.strokeStyle = '#c0c0d8'; iCtx.lineWidth = 1;
+    iCtx.strokeStyle = '#2a2d3a'; iCtx.lineWidth = 1;
     iCtx.beginPath(); iCtx.moveTo(PAD_L, PAD_T + ph); iCtx.lineTo(PAD_L + pw, PAD_T + ph); iCtx.stroke();
     iCtx.beginPath(); iCtx.moveTo(PAD_L, PAD_T); iCtx.lineTo(PAD_L, PAD_T + ph); iCtx.stroke();
     iCtx.beginPath(); iCtx.moveTo(PAD_L + pw, PAD_T); iCtx.lineTo(PAD_L + pw, PAD_T + ph); iCtx.stroke();
 
     // X-axis ticks
     iCtx.font = '13px IBM Plex Mono, monospace';
-    iCtx.fillStyle = '#888899';
+    iCtx.fillStyle = '#6b7084';
     iCtx.textAlign = 'center';
     for (let t = -3; t <= 3; t += 1) {
       const sx = toX(t);
       iCtx.beginPath(); iCtx.moveTo(sx, PAD_T + ph); iCtx.lineTo(sx, PAD_T + ph + 4);
-      iCtx.strokeStyle = '#c0c0d8'; iCtx.lineWidth = 1; iCtx.stroke();
+      iCtx.strokeStyle = '#2a2d3a'; iCtx.lineWidth = 1; iCtx.stroke();
       iCtx.fillText(t, sx, PAD_T + ph + 20);
     }
 
     // Left Y-axis ticks (Info)
     iCtx.textAlign = 'right';
-    iCtx.fillStyle = '#0d8a74';
+    iCtx.fillStyle = '#2dd4bf';
     const infoStep = maxInfo > 20 ? Math.ceil(maxInfo / 4) : maxInfo > 5 ? Math.ceil(maxInfo / 4) : Math.ceil(maxInfo * 10 / 4) / 10;
     for (let v = 0; v <= maxInfo * 1.1; v += infoStep) {
       if (v === 0) continue;
@@ -650,7 +658,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 
     // Right Y-axis ticks (SE)
     iCtx.textAlign = 'left';
-    iCtx.fillStyle = '#c83c5a';
+    iCtx.fillStyle = '#ef4444';
     for (let v = 0; v <= maxSE; v += 0.5) {
       if (v === 0) continue;
       const y = toYSE(v);
@@ -662,7 +670,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.translate(22, PAD_T + ph / 2);
     iCtx.rotate(-Math.PI / 2);
     iCtx.textAlign = 'center';
-    iCtx.fillStyle = '#0d8a74';
+    iCtx.fillStyle = '#2dd4bf';
     iCtx.font = '13px IBM Plex Mono, monospace';
     iCtx.fillText('I(\u03B8)', 0, 0);
     iCtx.restore();
@@ -671,20 +679,20 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.translate(W - 18, PAD_T + ph / 2);
     iCtx.rotate(Math.PI / 2);
     iCtx.textAlign = 'center';
-    iCtx.fillStyle = '#c83c5a';
+    iCtx.fillStyle = '#ef4444';
     iCtx.font = '13px IBM Plex Mono, monospace';
     iCtx.fillText('SE(\u03B8)', 0, 0);
     iCtx.restore();
 
     // Title
     iCtx.font = 'bold 13px IBM Plex Mono, monospace';
-    iCtx.fillStyle = '#888899';
+    iCtx.fillStyle = '#6b7084';
     iCtx.textAlign = 'center';
     iCtx.fillText('Test Information (solid) & SE (dashed)', W / 2, 18);
 
     // X-axis label
     iCtx.font = '13px IBM Plex Mono, monospace';
-    iCtx.fillStyle = '#888899';
+    iCtx.fillStyle = '#6b7084';
     iCtx.textAlign = 'center';
     iCtx.fillText('\u03B8', PAD_L + pw / 2, H - 4);
   }
@@ -772,7 +780,19 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     drawInfoPanel(theta, items, currentModel);
   }
 
+  function syncSpacer() {
+    const controls = document.querySelector('.irt-controls');
+    const spacer = document.getElementById('irt_right_spacer');
+    const panelLabel = document.querySelector('.irt-panel-label');
+    if (controls && spacer && panelLabel) {
+      // Subtract the panel label height + panel gap (6px) so the canvas box aligns with the stat cards
+      const labelOffset = panelLabel.offsetHeight + 6;
+      spacer.style.height = Math.max(0, controls.offsetHeight - labelOffset + 5) + 'px';
+    }
+  }
+
   function resize() {
+    syncSpacer();
     resizeCanvases();
     update();
   }
@@ -848,3 +868,18 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') irtCloseInfo();
 });
 </script>
+
+---
+
+##### Citation
+
+Persson, B. N. (2026). *IRT precision: How test information shapes measurement error* [Interactive visualization]. https://bnpersson.github.io/visualizations/irt-precision/
+
+```BibTeX
+@misc{Persson2026irtprecision,
+  author = {Björn N. Persson},
+  year = {2026},
+  title = {IRT Precision: How Test Information Shapes Measurement Error},
+  note = {Interactive visualization},
+  url = {https://bnpersson.github.io/visualizations/irt-precision/}}
+```

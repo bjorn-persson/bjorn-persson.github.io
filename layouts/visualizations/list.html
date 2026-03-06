@@ -1,0 +1,43 @@
+{{- define "main" }}
+
+{{- if not .IsHome | and .Title }}
+<header class="page-header">
+  {{- partial "breadcrumbs.html" . }}
+  <h1>{{ .Title }}</h1>
+</header>
+{{- end }}
+
+{{- if .Content }}
+<div class="post-content">
+  {{- if not (.Param "disableAnchoredHeadings") }}
+  {{- partial "anchored_headings.html" .Content -}}
+  {{- else }}{{ .Content }}{{ end }}
+</div>
+{{- end }}
+
+{{- $pages := union .RegularPages .Sections }}
+
+<div class="viz-grid">
+{{- range $pages }}
+  <a class="viz-card" href="{{ .RelPermalink }}">
+    <div class="viz-card-image">
+      {{- $cover := (.Resources.ByType "image").GetMatch "*cover*" }}
+      {{- if $cover }}
+      <img loading="lazy"
+           src="{{ $cover.Permalink }}"
+           alt="{{ .Title }}"
+           width="{{ $cover.Width }}" height="{{ $cover.Height }}">
+      {{- else }}
+      <div class="viz-card-placeholder">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      </div>
+      {{- end }}
+    </div>
+    <div class="viz-card-title">{{ .Title }}</div>
+  </a>
+{{- end }}
+</div>
+
+{{- end }}{{- /* end main */ -}}

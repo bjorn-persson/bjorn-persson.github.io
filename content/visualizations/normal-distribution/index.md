@@ -12,7 +12,7 @@ description: "Interactive visualization of the standard normal density. Click th
 }
 
 .viz-embed .subtitle {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 21px;
@@ -23,7 +23,7 @@ description: "Interactive visualization of the standard normal density. Click th
   display: block;
   width: 100%;
   height: max(280px, calc(100vh - 460px));
-  background: #f4f4f8;
+  background: #181a24;
   border-radius: 6px;
   cursor: crosshair;
 }
@@ -39,7 +39,7 @@ description: "Interactive visualization of the standard normal density. Click th
 
 .viz-embed .readout .label { color: var(--secondary); }
 .viz-embed .readout .value { color: var(--primary); font-weight: 600; }
-.viz-embed .readout .prob-val { color: #0d8a74; }
+.viz-embed .readout .prob-val { color: #2dd4bf; }
 .viz-embed .readout .accent2 { color: #6d28d9; }
 .viz-embed .readout .hidden { display: none; }
 
@@ -47,7 +47,7 @@ description: "Interactive visualization of the standard normal density. Click th
   margin-top: 12px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.95rem;
-  color: #0d8a74;
+  color: #2dd4bf;
   opacity: 0.8;
 }
 
@@ -72,8 +72,8 @@ description: "Interactive visualization of the standard normal density. Click th
   transition: border-color 0.2s, color 0.2s;
 }
 .viz-embed .reset-btn:hover {
-  border-color: #0d8a74;
-  color: #0d8a74;
+  border-color: #2dd4bf;
+  color: #2dd4bf;
 }
 </style>
 
@@ -203,14 +203,14 @@ function draw() {
 
   // Shading
   if (state === 1 && z1 !== null) {
-    drawShade(Z_MIN, z1, 'rgba(13,138,116,0.22)', 'rgba(13,138,116,0.04)');
+    drawShade(Z_MIN, z1, 'rgba(45,212,191,0.22)', 'rgba(45,212,191,0.04)');
     if (hoverZ !== null) {
       const lo = Math.min(z1, hoverZ), hi = Math.max(z1, hoverZ);
       drawShade(lo, hi, 'rgba(109,40,217,0.12)', 'rgba(109,40,217,0.03)');
     }
   } else if (state === 2 && z1 !== null && z2 !== null) {
     const lo = Math.min(z1, z2), hi = Math.max(z1, z2);
-    drawShade(lo, hi, 'rgba(13,138,116,0.22)', 'rgba(13,138,116,0.04)');
+    drawShade(lo, hi, 'rgba(45,212,191,0.22)', 'rgba(45,212,191,0.04)');
   } else if (state === 0 && hoverZ !== null) {
     drawShade(Z_MIN, hoverZ, 'rgba(109,40,217,0.12)', 'rgba(109,40,217,0.03)');
   }
@@ -223,13 +223,13 @@ function draw() {
     const y = yFromPhi(phi(zi));
     i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
   }
-  ctx.strokeStyle = '#5555aa';
+  ctx.strokeStyle = '#7c7cdd';
   ctx.lineWidth = 2;
   ctx.stroke();
 
   // Vertical markers
-  if (z1 !== null) drawVertical(z1, '#0d8a74');
-  if (state === 2 && z2 !== null) drawVertical(z2, '#0d8a74');
+  if (z1 !== null) drawVertical(z1, '#2dd4bf');
+  if (state === 2 && z2 !== null) drawVertical(z2, '#2dd4bf');
   // Hover line
   if (hoverZ !== null && state !== 2) drawVertical(hoverZ, 'rgba(109,40,217,0.5)');
 
@@ -237,20 +237,20 @@ function draw() {
   ctx.beginPath();
   ctx.moveTo(PAD_L, PAD_T + plotH);
   ctx.lineTo(PAD_L + plotW, PAD_T + plotH);
-  ctx.strokeStyle = '#c0c0d8';
+  ctx.strokeStyle = '#2a2d3a';
   ctx.lineWidth = 1;
   ctx.stroke();
 
   // Ticks
   ctx.font = '14px IBM Plex Mono, monospace';
-  ctx.fillStyle = '#888899';
+  ctx.fillStyle = '#6b7084';
   ctx.textAlign = 'center';
   for (let t = Z_MIN; t <= Z_MAX; t++) {
     const tx = zToX(t);
     ctx.beginPath();
     ctx.moveTo(tx, PAD_T + plotH);
     ctx.lineTo(tx, PAD_T + plotH + 5);
-    ctx.strokeStyle = '#c0c0d8';
+    ctx.strokeStyle = '#2a2d3a';
     ctx.stroke();
     ctx.fillText(t.toString(), tx, PAD_T + plotH + 21);
   }
@@ -260,7 +260,7 @@ function draw() {
   ctx.translate(14, PAD_T + plotH / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#888899';
+  ctx.fillStyle = '#6b7084';
   ctx.font = '14px IBM Plex Mono, monospace';
   ctx.fillText('\u03C6(z)', 0, 0);
   ctx.restore();
@@ -356,3 +356,18 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 </script>
+
+---
+
+##### Citation
+
+Persson, B. N. (2026). *Normal distribution* [Interactive visualization]. https://bnpersson.github.io/visualizations/normal-distribution/
+
+```BibTeX
+@misc{Persson2026normal,
+  author = {Björn N. Persson},
+  year = {2026},
+  title = {Normal Distribution},
+  note = {Interactive visualization},
+  url = {https://bnpersson.github.io/visualizations/normal-distribution/}}
+```

@@ -1,0 +1,2273 @@
+---
+title: "Confirmatory Factor Analysis"
+description: "Interactive visualization of confirmatory factor analysis: see how factor loadings determine the model-implied covariance matrix, and watch an optimizer converge to the best-fitting parameter values."
+summary: "Explore how a two-factor CFA model constrains the covariance structure of observed variables, and watch gradient descent converge to the parameter values that minimize the discrepancy between observed and model-implied covariances."
+---
+
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg-surface: #181a24;
+    --bg-elevated: #1e2030;
+    --text: #c9cdd8;
+    --text-bright: #e8ecf4;
+    --text-dim: #6b7084;
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.15);
+    --orange: #f97316;
+    --orange-dim: rgba(249,115,22,0.15);
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --border: #2a2d3a;
+  }
+
+  /* Widen PaperMod content area for this page */
+  .post-content:has(.container) { max-width: 1000px; }
+  .main:has(.container) { --main-width: 1040px; }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  /* Header */
+  .hero {
+    padding: 100px 0 60px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 60px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 2.4em;
+    color: var(--text-bright);
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .hero .subtitle {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 80px;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    font-weight: 600;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.5em;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+  }
+  .section p {
+    margin-bottom: 16px;
+    max-width: 680px;
+  }
+  .section p:last-of-type {
+    margin-bottom: 28px;
+  }
+
+  /* Math inline */
+  .m {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    color: var(--teal);
+    padding: 1px 4px;
+    background: var(--teal-dim);
+    border-radius: 3px;
+  }
+
+  /* Visualization containers */
+  .viz-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .viz-box.wide {
+    padding: 28px 20px;
+  }
+  .viz-row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .viz-col {
+    flex: 1;
+    min-width: 280px;
+  }
+  .viz-title {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  /* Heatmap */
+  .heatmap-container {
+    display: inline-block;
+  }
+  .heatmap-container svg {
+    display: block;
+  }
+
+  /* Sliders */
+  .slider-group {
+    margin-bottom: 20px;
+  }
+  .slider-group-title {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .slider-label {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .slider-val {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--teal);
+    width: 42px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--teal);
+    cursor: pointer;
+    border: 2px solid var(--bg-surface);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--teal);
+    cursor: pointer;
+    border: 2px solid var(--bg-surface);
+  }
+  input[type="range"].phi-slider::-webkit-slider-thumb {
+    background: var(--orange);
+  }
+  input[type="range"].phi-slider::-moz-range-thumb {
+    background: var(--orange);
+  }
+
+  /* Path diagram */
+  .path-diagram svg text {
+    font-family: var(--mono);
+  }
+
+  /* Buttons */
+  .btn {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    font-weight: 600;
+    padding: 10px 20px;
+    border: 1px solid var(--teal);
+    background: transparent;
+    color: var(--teal);
+    border-radius: 5px;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+  }
+  .btn:hover {
+    background: var(--teal-dim);
+  }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .btn.btn-orange {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+  .btn.btn-orange:hover {
+    background: var(--orange-dim);
+  }
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* Fit stats */
+  .fit-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .fit-stat {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 18px;
+    min-width: 110px;
+  }
+  .fit-stat-label {
+    font-family: var(--mono);
+    font-size: 0.7em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .fit-stat-value {
+    font-family: var(--mono);
+    font-size: 1.15em;
+    font-weight: 600;
+    color: var(--text-bright);
+  }
+  .fit-stat-value.good { color: var(--teal); }
+  .fit-stat-value.poor { color: var(--orange); }
+  .fit-stat-value.bad { color: var(--red); }
+
+  /* Note boxes */
+  .note {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--teal);
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 0.92em;
+    border-radius: 0 6px 6px 0;
+    max-width: 680px;
+  }
+  .note.warn {
+    border-left-color: var(--orange);
+  }
+
+  /* Equation display */
+  .equation {
+    font-family: var(--mono);
+    font-size: 0.92em;
+    color: var(--text-bright);
+    background: var(--bg-elevated);
+    padding: 14px 20px;
+    border-radius: 6px;
+    margin: 16px 0;
+    display: inline-block;
+    letter-spacing: 0.01em;
+  }
+
+  /* Theta display */
+  .theta-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .theta-item {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+  }
+  .theta-val {
+    color: var(--text);
+  }
+
+  /* Identification demo */
+  .ident-columns {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .ident-col {
+    flex: 1;
+    min-width: 250px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .ident-col h4 {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .ident-param {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    margin-bottom: 4px;
+  }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    margin-top: 40px;
+  }
+  .footer p {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+  }
+
+  /* Info popups */
+  .info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--text-dim);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: var(--serif);
+    font-size: 0.55em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 8px;
+    vertical-align: middle;
+    transition: all 0.2s;
+    position: relative;
+    top: -2px;
+    line-height: 1;
+  }
+  .info-btn:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+    background: var(--teal-dim);
+  }
+  .info-btn.hero-info {
+    width: 32px;
+    height: 32px;
+    font-size: 0.45em;
+    border-width: 2px;
+    top: -4px;
+  }
+
+  .info-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .info-overlay.active {
+    display: flex;
+  }
+  .info-modal {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    max-width: 580px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 32px;
+    position: relative;
+  }
+  .info-modal-badge {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--teal);
+    background: var(--teal-dim);
+    padding: 3px 10px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+  }
+  .info-modal h3 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.25em;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+  .info-modal p {
+    font-size: 0.94em;
+    margin-bottom: 12px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .info-modal p:last-child {
+    margin-bottom: 0;
+  }
+  .info-modal .formula {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    color: var(--text-bright);
+    background: var(--bg-elevated);
+    padding: 10px 16px;
+    border-radius: 5px;
+    margin: 12px 0;
+    display: inline-block;
+  }
+  .info-modal em {
+    color: var(--text-bright);
+    font-style: italic;
+  }
+  .info-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .info-close:hover {
+    border-color: var(--text);
+    color: var(--text);
+  }
+
+  /* Scenario buttons */
+  .scenario-btn {
+    transition: all 0.2s;
+  }
+  .scenario-btn.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  /* MI table */
+  .mi-table {
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+  .mi-table th {
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.04em;
+    padding: 6px 12px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .mi-table td {
+    padding: 5px 12px;
+    text-align: center;
+    color: var(--text);
+  }
+  .mi-table td.mi-high {
+    color: var(--red);
+    font-weight: 600;
+  }
+  .mi-table td.mi-mod {
+    color: var(--orange);
+    font-weight: 500;
+  }
+  .mi-table td.mi-low {
+    color: var(--text-dim);
+  }
+  .mi-table td.mi-fixed {
+    color: var(--text-dim);
+    font-size: 0.85em;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.7em; }
+    .viz-row { flex-direction: column; }
+    .viz-col { min-width: auto; }
+    .viz-box { padding: 16px; }
+    .fit-stats { flex-direction: column; }
+  }
+</style>
+
+<div class="container">
+
+  <p class="subtitle" style="font-family: var(--mono); font-size: 0.82em; color: var(--text-dim); letter-spacing: 0.02em;">An interactive walkthrough of what CFA actually does</p>
+
+  <!-- SECTION 1 -->
+  <div class="section" id="sec1">
+    <div class="section-label">Section 1</div>
+    <h2>What's in a correlation matrix?<button class="info-btn" onclick="showInfo('sec1')">?</button></h2>
+    <p>Suppose we administer 6 questionnaire items to a large sample. We compute the correlations between every pair. The result is a symmetric matrix with ones on the diagonal — a <em>correlation matrix</em>.</p>
+    <p>This one has a visible pattern: items 1–3 correlate strongly with each other, items 4–6 correlate strongly with each other, and the cross-block correlations are weaker. Something is structuring these data. The question is: <em>what?</em></p>
+
+    <div class="viz-box">
+      <div class="viz-title">Observed Correlation Matrix (S)</div>
+      <div id="heatmap-observed" class="heatmap-container"></div>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section" id="sec2">
+    <div class="section-label">Section 2</div>
+    <h2>A model of the correlations<button class="info-btn" onclick="showInfo('sec2')">?</button></h2>
+    <p>CFA proposes an explanation: the items correlate because they share <em>latent factors</em>. Items 1–3 reflect Factor 1, items 4–6 reflect Factor 2, and the two factors may themselves be correlated.</p>
+    <p>The diagram below shows the <em>true model</em> — the actual structure that generated the observed matrix on this page. In practice, of course, you never know the true model. You hypothesize one and test it against the data. But having the ground truth here lets us see exactly what happens when parameters are right, and when they're wrong.</p>
+    <p>Each arrow from a factor to an item carries a <em>loading</em> (<span class="m">λ</span>) — the strength of influence. The curve between factors represents their correlation (<span class="m">φ</span>). Each item also has <em>residual variance</em> (<span class="m">θ</span>) — the part not explained by the factor.</p>
+
+    <div class="viz-box">
+      <div class="viz-title">The Model</div>
+      <div id="path-diagram" class="path-diagram"></div>
+    </div>
+
+    <p>This small set of parameters — 6 loadings, 1 factor correlation — fully determines a predicted correlation matrix. The central equation is:</p>
+    <div class="equation">Σ(θ) = ΛΦΛ′ + Θ</div>
+    <p>where <span class="m">Λ</span> is the matrix of loadings, <span class="m">Φ</span> is the factor correlation matrix, and <span class="m">Θ</span> is the diagonal matrix of residual variances. In the standardized case, <span class="m">θᵢ = 1 − λᵢ²</span>, so the loadings are the only free parameters governing each item.</p>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section" id="sec3">
+    <div class="section-label">Section 3</div>
+    <h2>From parameters to predictions<button class="info-btn" onclick="showInfo('sec3')">?</button></h2>
+    <p>This is the core of CFA: a handful of parameters generate an entire correlation matrix. But why do we need a second matrix at all?</p>
+    <p>The observed matrix tells you <em>what happened</em> in your data. The model-implied matrix tells you <em>what should have happened</em> if your theory is correct. "Implied" means: given these specific loadings and this factor correlation, what correlations between items does the model <em>predict?</em> If you claim two items share a factor, the model implies they should correlate — and it tells you exactly how much. Comparing the two matrices is how you test whether your measurement theory actually fits the data.</p>
+    <p>Drag the sliders below and watch the implied matrix update in real time. Compare it to the observed matrix on the left — how close can you get?</p>
+
+    <div class="viz-box wide">
+      <div style="display:flex;gap:28px;flex-wrap:wrap;">
+        <!-- Controls -->
+        <div style="flex:0 0 220px;">
+          <div class="slider-group">
+            <div class="slider-group-title">Factor 1 Loadings</div>
+            <div id="sliders-f1"></div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-group-title">Factor 2 Loadings</div>
+            <div id="sliders-f2"></div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-group-title">Factor Correlation</div>
+            <div id="slider-phi"></div>
+          </div>
+          <div style="margin-top:8px;">
+            <div class="slider-group-title">Residual Variances (derived)</div>
+            <div id="theta-display" class="theta-row"></div>
+          </div>
+        </div>
+
+        <!-- Matrices -->
+        <div style="flex:1;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">
+          <div class="viz-col">
+            <div class="viz-title">Observed (S)</div>
+            <div id="heatmap-obs-small" class="heatmap-container"></div>
+          </div>
+          <div class="viz-col">
+            <div class="viz-title">Model-Implied (Σ)</div>
+            <div id="heatmap-implied" class="heatmap-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Drag all loadings to their minimum — the implied matrix approaches an identity matrix (no correlations). Then increase them and watch correlations emerge. Set <span class="m">φ</span> to 0 and notice the cross-block correlations vanish entirely.
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section" id="sec4">
+    <div class="section-label">Section 4</div>
+    <h2>How wrong are we?<button class="info-btn" onclick="showInfo('sec4')">?</button></h2>
+    <p>The difference between the observed and implied matrices is the <em>residual matrix</em>. CFA estimation finds the parameters that make these residuals as small as possible, specifically by minimizing a fit function related to the maximum likelihood discrepancy.</p>
+
+    <div class="viz-box wide">
+      <div class="viz-row">
+        <div class="viz-col">
+          <div class="viz-title">Residual Matrix (S − Σ)</div>
+          <div id="heatmap-residual" class="heatmap-container"></div>
+        </div>
+        <div class="viz-col">
+          <div class="viz-title">Fit Function Value</div>
+          <div id="fit-value" style="font-family:var(--mono);font-size:2em;font-weight:600;color:var(--text-bright);margin:10px 0;"></div>
+          <div style="font-family:var(--mono);font-size:0.78em;color:var(--text-dim);margin-bottom:16px;">
+            F<sub>ML</sub> = log|Σ| + tr(SΣ⁻¹) − log|S| − p
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btn-fit" onclick="runOptimizer()">Fit the Model</button>
+            <button class="btn btn-orange" id="btn-reset" onclick="resetParams()">Reset</button>
+            <button class="btn" id="btn-randomize" onclick="randomizeParams()">Randomize</button>
+          </div>
+          <div id="iter-counter" style="font-family:var(--mono);font-size:0.82em;color:var(--text-dim);margin-top:12px;min-height:1.4em;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Click "Randomize" to scramble the parameters, then "Fit the Model" to watch the optimizer converge. The sliders will animate toward the best-fitting values. Try randomizing and fitting several times — the optimizer should find roughly the same solution each time.
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section" id="sec5">
+    <div class="section-label">Section 5</div>
+    <h2>Why constraints matter<button class="info-btn" onclick="showInfo('sec5')">?</button></h2>
+    <p>A subtle problem: different parameter values can produce the <em>exact same</em> implied matrix. If we multiply all loadings by some constant <span class="m">c</span> and divide the factor variance by <span class="m">c²</span>, the product <span class="m">ΛΦΛ′</span> is unchanged. The model is <em>underidentified</em>.</p>
+    <p>The standard fix is to constrain the factor variances to 1 — which is exactly what we do when we work with standardized loadings. This collapses the infinite family of equivalent solutions down to one. Below, drag the scaling constant and watch two parameter sets produce identical implied correlations.</p>
+
+    <div class="viz-box">
+      <div style="margin-bottom:16px;">
+        <div class="slider-row">
+          <span class="slider-label" style="width:auto;font-size:0.82em;color:var(--text-dim);">Scaling constant c:</span>
+          <input type="range" id="ident-slider" min="0.5" max="2.0" step="0.01" value="1.0" style="max-width:300px;">
+          <span class="slider-val" id="ident-c-val">1.00</span>
+        </div>
+      </div>
+      <div class="ident-columns" id="ident-display"></div>
+      <div style="margin-top:16px;">
+        <div class="viz-title">Both produce this implied matrix:</div>
+        <div id="heatmap-ident" class="heatmap-container"></div>
+      </div>
+    </div>
+
+    <div class="note">
+      The implied matrix never changes no matter how you drag the slider — that's the identification problem. Fixing factor variance = 1 (c = 1) selects one unique point from this infinite family of solutions.
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section" id="sec6">
+    <div class="section-label">Section 6</div>
+    <h2>Reading fit indices<button class="info-btn" onclick="showInfo('sec6')">?</button></h2>
+    <p>Once the model is fitted, we need to evaluate how well it reproduces the observed correlations. Fit indices are just different summaries of the residual matrix. They all look at the same information through different lenses.</p>
+    <p>The indices below update live based on the current slider settings. Click "Fit the Model" to see what good fit looks like, then drag a loading to its minimum and watch the indices deteriorate.</p>
+
+    <div class="viz-box wide">
+      <div style="display:flex;gap:28px;flex-wrap:wrap;">
+        <!-- Controls -->
+        <div style="flex:0 0 220px;">
+          <div class="slider-group">
+            <div class="slider-group-title">Factor 1 Loadings</div>
+            <div id="sliders-f1-s6"></div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-group-title">Factor 2 Loadings</div>
+            <div id="sliders-f2-s6"></div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-group-title">Factor Correlation</div>
+            <div id="slider-phi-s6"></div>
+          </div>
+          <div class="slider-group" style="margin-top:0;">
+            <div class="slider-group-title">Sample Size</div>
+            <div class="slider-row">
+              <span class="slider-label">N</span>
+              <input type="range" min="50" max="5000" step="10" value="500"
+                id="sl-sample-n-s6" oninput="onSampleNSlider(this.value)">
+              <span class="slider-val" id="sv-sample-n-s6" style="width:52px;">500</span>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="btn-row">
+              <button class="btn" style="flex:1;" onclick="runOptimizer()">Fit the Model</button>
+              <button class="btn btn-orange" style="flex:1;" onclick="resetParams()">Reset</button>
+            </div>
+            <div class="btn-row" style="margin-top:8px;">
+              <button class="btn" style="flex:1;" onclick="randomizeParams()">Randomize</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fit indices -->
+        <div style="flex:1;">
+          <div class="fit-stats" id="fit-indices"></div>
+          <div style="font-size:0.88em;margin-top:20px;">
+        <p style="margin-bottom:8px;"><span class="m">χ²</span> — The likelihood ratio test statistic. Drag the <span class="m">N</span> slider and watch it scale linearly.</p>
+        <p style="margin-bottom:8px;"><span class="m">RMSEA</span> — Badness-of-fit per degree of freedom. Below .06 is conventionally "good."</p>
+        <p style="margin-bottom:8px;"><span class="m">SRMR</span> — Average absolute residual correlation. Below .08 is conventionally "good."</p>
+        <p style="margin-bottom:0;"><span class="m">CFI</span> — Improvement over a baseline (independence) model. Above .95 is conventionally "good."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section" id="sec7">
+    <div class="section-label">Section 7</div>
+    <h2>When the model is wrong<button class="info-btn" onclick="showInfo('sec7')">?</button></h2>
+    <p>Everything above assumes the fitted model matches the process that generated the data. But what if it doesn't? A model can converge, produce parameter estimates, and report fit indices — all while being fundamentally wrong. The residuals reveal this: under correct specification they look like random noise, but under misspecification they show <em>structure</em>.</p>
+    <p>Select a data-generating scenario below. The "correct" scenario uses the same 2-factor simple structure you've been working with. The others generate data from a different truth, then fit the same 2-factor model to it. Watch the residual matrix and modification indices.</p>
+
+    <div class="viz-box wide">
+      <div style="margin-bottom:20px;">
+        <div class="slider-group-title">Data-Generating Model</div>
+        <div class="btn-row" id="scenario-buttons">
+          <button class="btn scenario-btn active" data-scenario="correct" onclick="switchScenario('correct')">Correct Model</button>
+          <button class="btn scenario-btn" data-scenario="missingFactor" onclick="switchScenario('missingFactor')">Missing Factor</button>
+          <button class="btn scenario-btn" data-scenario="crossLoading" onclick="switchScenario('crossLoading')">Omitted Cross-Loading</button>
+        </div>
+        <div id="scenario-description" style="font-family:var(--mono);font-size:0.82em;color:var(--text-dim);margin-top:10px;min-height:2.8em;"></div>
+      </div>
+
+      <div style="display:flex;gap:28px;flex-wrap:wrap;">
+        <!-- Residual heatmap -->
+        <div class="viz-col">
+          <div class="viz-title">Residual Matrix (S − Σ̂)</div>
+          <div id="heatmap-misspec-residual" class="heatmap-container"></div>
+        </div>
+
+        <!-- Fit indices + Modification indices -->
+        <div class="viz-col">
+          <div class="viz-title">Fit Indices (Fitted Model)</div>
+          <div class="fit-stats" id="misspec-fit-indices" style="margin-top:0;margin-bottom:20px;"></div>
+
+          <div class="viz-title">Modification Indices</div>
+          <div id="mi-table" style="margin-top:4px;"></div>
+          <div style="font-family:var(--mono);font-size:0.75em;color:var(--text-dim);margin-top:8px;">
+            MI = expected χ² decrease if this cross-loading were freed
+          </div>
+        </div>
+      </div>
+
+      <div id="misspec-iter-counter" style="font-family:var(--mono);font-size:0.82em;color:var(--text-dim);margin-top:12px;min-height:1.4em;"></div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Select "Missing Factor" and notice the block of structured residuals — the model can't reproduce correlations between items that actually belong to separate factors it doesn't know about. Select "Omitted Cross-Loading" and notice the residuals concentrate around one item. Then look at the modification indices: they point directly at the missing parameter.
+    </div>
+    <div class="note warn">
+      <strong>The lesson:</strong> Good fit indices do not mean the model is correct — they mean the model reproduces the covariance matrix reasonably well. Structured residuals and large modification indices are the diagnostic. A model that fits well by the numbers but shows patterned residuals is telling you something is missing.
+    </div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section" id="sec8">
+    <div class="section-label">Section 8</div>
+    <h2>What misspecification does to factor scores<button class="info-btn" onclick="showInfo('sec8')">?</button></h2>
+    <p>The preceding sections focused on reproducing correlations and diagnosing model fit. But in practice, we usually want <em>factor scores</em> — estimated latent variable values for each person. These scores are computed from the model parameters. If the parameters are wrong, the scores are wrong.</p>
+    <p>Below, 500 simulated individuals are generated from the true model. Each scatterplot shows how a person's <em>true</em> factor score (computed with the correct parameters) compares to their <em>estimated</em> score (computed with whatever the sliders are currently set to). When the sliders match the true values, the dots fall on the diagonal. As you introduce misspecification, the cloud disperses.</p>
+
+    <div class="viz-box wide">
+      <div style="display:flex;gap:28px;flex-wrap:wrap;">
+        <div style="flex:0 0 220px;">
+          <div class="slider-group">
+            <div class="slider-group-title">Factor 1 Loadings</div>
+            <div id="sliders-f1-s8"></div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-group-title">Factor 2 Loadings</div>
+            <div id="sliders-f2-s8"></div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-group-title">Factor Correlation</div>
+            <div id="slider-phi-s8"></div>
+          </div>
+          <div class="slider-group" style="margin-top:0;">
+            <div class="slider-group-title">Sample Size</div>
+            <div class="slider-row">
+              <span class="slider-label">N</span>
+              <input type="range" min="50" max="5000" step="10" value="500"
+                id="sl-sample-n-s8" oninput="onSampleNSlider(this.value)">
+              <span class="slider-val" id="sv-sample-n-s8" style="width:52px;">500</span>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="btn-row">
+              <button class="btn" style="flex:1;" onclick="runOptimizer()">Fit the Model</button>
+              <button class="btn btn-orange" style="flex:1;" onclick="resetParams()">Reset</button>
+            </div>
+            <div class="btn-row" style="margin-top:8px;">
+              <button class="btn" style="flex:1;" onclick="randomizeParams()">Randomize</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">
+          <div class="viz-col">
+            <div class="viz-title">Factor 1 Scores</div>
+            <div id="scatter-f1" class="heatmap-container"></div>
+            <div id="scatter-f1-stats" style="font-family:var(--mono);font-size:0.82em;color:var(--text-dim);margin-top:6px;"></div>
+          </div>
+          <div class="viz-col">
+            <div class="viz-title">Factor 2 Scores</div>
+            <div id="scatter-f2" class="heatmap-container"></div>
+            <div id="scatter-f2-stats" style="font-family:var(--mono);font-size:0.82em;color:var(--text-dim);margin-top:6px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Click "Fit the Model" first — the dots should cluster tightly around the diagonal. Then drag a single F1 loading to its minimum and notice two things: the F1 scatterplot disperses (obvious), but the F2 scatterplot also degrades when <span class="m">φ</span> is large (less obvious). Misspecification propagates through the factor correlation.
+    </div>
+    <div class="note warn">
+      <strong>Note:</strong> These are <em>regression factor scores</em> (W = ΦΛ′Σ⁻¹), the most common method. They are not the only method — Bartlett scores and others exist and would show somewhat different sensitivity patterns. The key lesson is general: wrong parameters yield wrong scores.
+    </div>
+  </div>
+
+  <!-- Footer note -->
+  <div class="note" style="border-left-color: #8b1a1a;">
+    This visualization is built as a pedagogical tool, this is not lavaan!<br><br>The observed matrix is a sample correlation matrix from 500 simulated observations drawn from the true model (a larger pool is generated for the factor score scatterplots). Each page load generates a fresh sample, so the exact numbers will vary. The optimizer uses gradient descent on the ML discrepancy function. All computations happen in your browser.
+  </div>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Confirmatory factor analysis</em> [Interactive visualization]. <a href="https://bnpersson.github.io/visualizations/cfa/" target="_blank">https://bnpersson.github.io/visualizations/cfa/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026cfa,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Confirmatory Factor Analysis}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bnpersson.github.io/visualizations/cfa/}</span>}
+</span></span></code></pre></div>
+  </div>
+
+</div>
+
+<script>
+// =============================================================
+// CONFIGURATION
+// =============================================================
+const N_ITEMS = 6;
+const N_FACTORS = 2;
+const ITEM_LABELS = ['x₁','x₂','x₃','x₄','x₅','x₆'];
+const FACTOR_LABELS = ['F₁','F₂'];
+let currentN = 500; // sample size (adjustable, synced across sections)
+const SAMPLE_N = 500; // N used for computing S_OBS
+const POOL_N = 5000;  // large pool for factor score scatterplots
+
+// Loading pattern: items 1-3 on F1, items 4-6 on F2
+const PATTERN = [[1,0],[1,0],[1,0],[0,1],[0,1],[0,1]];
+
+// True parameters used to generate observed matrix
+const TRUE_LAMBDA = [0.75, 0.80, 0.65, 0.70, 0.85, 0.60];
+const TRUE_PHI = 0.35;
+
+// Generate "observed" matrix = true model + sampling noise
+let SIM_RAW_DATA = null;
+const S_OBS = generateObserved();
+
+// Current parameter state
+let params = {
+  lambda: [0.50, 0.50, 0.50, 0.50, 0.50, 0.50],
+  phi: 0.30
+};
+
+let optimizerRunning = false;
+
+// =============================================================
+// LINEAR ALGEBRA UTILITIES
+// =============================================================
+function matCreate(rows, cols, fill=0) {
+  return Array.from({length:rows}, () => Array(cols).fill(fill));
+}
+
+function matMul(A, B) {
+  const m = A.length, n = B[0].length, p = B.length;
+  const C = matCreate(m, n);
+  for (let i=0; i<m; i++)
+    for (let j=0; j<n; j++)
+      for (let k=0; k<p; k++)
+        C[i][j] += A[i][k] * B[k][j];
+  return C;
+}
+
+function matTranspose(A) {
+  const m = A.length, n = A[0].length;
+  const T = matCreate(n, m);
+  for (let i=0; i<m; i++)
+    for (let j=0; j<n; j++)
+      T[j][i] = A[i][j];
+  return T;
+}
+
+function matAdd(A, B) {
+  return A.map((row,i) => row.map((v,j) => v + B[i][j]));
+}
+
+function matSub(A, B) {
+  return A.map((row,i) => row.map((v,j) => v - B[i][j]));
+}
+
+function matScale(A, s) {
+  return A.map(row => row.map(v => v * s));
+}
+
+function matTrace(A) {
+  let t = 0;
+  for (let i=0; i<A.length; i++) t += A[i][i];
+  return t;
+}
+
+// LU decomposition for determinant and inverse
+function luDecomp(A) {
+  const n = A.length;
+  const L = matCreate(n, n);
+  const U = matCreate(n, n);
+  const P = Array.from({length:n}, (_,i) => i); // permutation
+
+  // Copy A
+  const M = A.map(r => [...r]);
+
+  for (let k=0; k<n; k++) {
+    // Partial pivoting
+    let maxVal = Math.abs(M[k][k]), maxRow = k;
+    for (let i=k+1; i<n; i++) {
+      if (Math.abs(M[i][k]) > maxVal) { maxVal = Math.abs(M[i][k]); maxRow = i; }
+    }
+    if (maxRow !== k) {
+      [M[k], M[maxRow]] = [M[maxRow], M[k]];
+      [P[k], P[maxRow]] = [P[maxRow], P[k]];
+    }
+
+    if (Math.abs(M[k][k]) < 1e-12) return null; // singular
+
+    for (let i=k+1; i<n; i++) {
+      M[i][k] /= M[k][k];
+      for (let j=k+1; j<n; j++) {
+        M[i][j] -= M[i][k] * M[k][j];
+      }
+    }
+  }
+
+  for (let i=0; i<n; i++) {
+    L[i][i] = 1;
+    for (let j=0; j<i; j++) L[i][j] = M[i][j];
+    for (let j=i; j<n; j++) U[i][j] = M[i][j];
+  }
+
+  return {L, U, P};
+}
+
+function matDet(A) {
+  const lu = luDecomp(A);
+  if (!lu) return 0;
+  let det = 1;
+  for (let i=0; i<A.length; i++) det *= lu.U[i][i];
+  // Count permutation swaps
+  const P = lu.P;
+  let swaps = 0;
+  const visited = Array(P.length).fill(false);
+  for (let i=0; i<P.length; i++) {
+    if (visited[i] || P[i] === i) { visited[i] = true; continue; }
+    let cycleLen = 0, j = i;
+    while (!visited[j]) { visited[j] = true; j = P[j]; cycleLen++; }
+    swaps += cycleLen - 1;
+  }
+  return det * (swaps % 2 === 0 ? 1 : -1);
+}
+
+function matInverse(A) {
+  const n = A.length;
+  // Augmented matrix
+  const aug = A.map((row, i) => {
+    const r = [...row];
+    for (let j=0; j<n; j++) r.push(i===j ? 1 : 0);
+    return r;
+  });
+
+  for (let k=0; k<n; k++) {
+    let maxVal = Math.abs(aug[k][k]), maxRow = k;
+    for (let i=k+1; i<n; i++) {
+      if (Math.abs(aug[i][k]) > maxVal) { maxVal = Math.abs(aug[i][k]); maxRow = i; }
+    }
+    [aug[k], aug[maxRow]] = [aug[maxRow], aug[k]];
+
+    if (Math.abs(aug[k][k]) < 1e-12) return null;
+
+    const pivot = aug[k][k];
+    for (let j=0; j<2*n; j++) aug[k][j] /= pivot;
+
+    for (let i=0; i<n; i++) {
+      if (i === k) continue;
+      const factor = aug[i][k];
+      for (let j=0; j<2*n; j++) aug[i][j] -= factor * aug[k][j];
+    }
+  }
+
+  return aug.map(row => row.slice(n));
+}
+
+// =============================================================
+// CFA MODEL
+// =============================================================
+function buildLambda(lambdaVals) {
+  const L = matCreate(N_ITEMS, N_FACTORS);
+  for (let i=0; i<N_ITEMS; i++) {
+    for (let f=0; f<N_FACTORS; f++) {
+      L[i][f] = PATTERN[i][f] * lambdaVals[i];
+    }
+  }
+  return L;
+}
+
+function buildPhi(phi) {
+  return [[1, phi], [phi, 1]];
+}
+
+function buildTheta(lambdaVals) {
+  const T = matCreate(N_ITEMS, N_ITEMS);
+  for (let i=0; i<N_ITEMS; i++) {
+    T[i][i] = Math.max(0.01, 1 - lambdaVals[i] * lambdaVals[i]);
+  }
+  return T;
+}
+
+function impliedMatrix(lambdaVals, phi) {
+  const L = buildLambda(lambdaVals);
+  const P = buildPhi(phi);
+  const T = buildTheta(lambdaVals);
+  const LP = matMul(L, P);
+  const LPLt = matMul(LP, matTranspose(L));
+  return matAdd(LPLt, T);
+}
+
+// Cholesky decomposition: returns lower triangular L such that A = LL'
+function cholesky(A) {
+  const n = A.length;
+  const L = matCreate(n, n);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j <= i; j++) {
+      let sum = 0;
+      for (let k = 0; k < j; k++) sum += L[i][k] * L[j][k];
+      if (i === j) {
+        L[i][j] = Math.sqrt(Math.max(1e-10, A[i][i] - sum));
+      } else {
+        L[i][j] = (A[i][j] - sum) / L[j][j];
+      }
+    }
+  }
+  return L;
+}
+
+// Box-Muller transform for standard normal variates
+function randn() {
+  let u, v, s;
+  do {
+    u = 2 * Math.random() - 1;
+    v = 2 * Math.random() - 1;
+    s = u * u + v * v;
+  } while (s >= 1 || s === 0);
+  const mul = Math.sqrt(-2 * Math.log(s) / s);
+  return u * mul;
+}
+
+// Generate N observations from MVN with covariance matrix sigma
+function generateMVN(sigma, N) {
+  const p = sigma.length;
+  const L = cholesky(sigma);
+  const data = [];
+  for (let i = 0; i < N; i++) {
+    const z = Array.from({length: p}, () => randn());
+    const x = Array(p).fill(0);
+    for (let j = 0; j < p; j++) {
+      for (let k = 0; k <= j; k++) {
+        x[j] += L[j][k] * z[k];
+      }
+    }
+    data.push(x);
+  }
+  return data;
+}
+
+// Compute sample correlation matrix from raw data (N × p array)
+function sampleCorrelationMatrix(data) {
+  const N = data.length, p = data[0].length;
+  const means = Array(p).fill(0);
+  for (let i = 0; i < N; i++)
+    for (let j = 0; j < p; j++)
+      means[j] += data[i][j];
+  for (let j = 0; j < p; j++) means[j] /= N;
+
+  const C = matCreate(p, p);
+  for (let i = 0; i < N; i++)
+    for (let a = 0; a < p; a++)
+      for (let b = a; b < p; b++)
+        C[a][b] += (data[i][a] - means[a]) * (data[i][b] - means[b]);
+  for (let a = 0; a < p; a++)
+    for (let b = a; b < p; b++) {
+      C[a][b] /= (N - 1);
+      C[b][a] = C[a][b];
+    }
+
+  const R = matCreate(p, p);
+  for (let a = 0; a < p; a++)
+    for (let b = 0; b < p; b++)
+      R[a][b] = C[a][b] / Math.sqrt(C[a][a] * C[b][b]);
+  return R;
+}
+
+// Generate a real sample from the true model; store raw data for factor scores
+// We generate a large pool (POOL_N) for scatterplots and use the first SAMPLE_N for S_OBS
+function generateObserved() {
+  const sigma = impliedMatrix(TRUE_LAMBDA, TRUE_PHI);
+  SIM_RAW_DATA = generateMVN(sigma, POOL_N);
+  return sampleCorrelationMatrix(SIM_RAW_DATA.slice(0, SAMPLE_N));
+}
+
+function mlFitFunction(lambdaVals, phi, S) {
+  const sigma = impliedMatrix(lambdaVals, phi);
+  const detSigma = matDet(sigma);
+  const detS = matDet(S);
+  if (detSigma <= 0 || detS <= 0) return 999;
+  const sigmaInv = matInverse(sigma);
+  if (!sigmaInv) return 999;
+  const SsigmaInv = matMul(S, sigmaInv);
+  const tr = matTrace(SsigmaInv);
+  return Math.log(detSigma) + tr - Math.log(detS) - N_ITEMS;
+}
+
+// =============================================================
+// OPTIMIZER (gradient descent with backtracking line search)
+// =============================================================
+function numericalGradient(lambdaVals, phi, S) {
+  const eps = 1e-6;
+  const grad = { lambda: [], phi: 0 };
+  const f0 = mlFitFunction(lambdaVals, phi, S);
+
+  for (let i=0; i<N_ITEMS; i++) {
+    const lp = [...lambdaVals]; lp[i] += eps;
+    const lm = [...lambdaVals]; lm[i] -= eps;
+    grad.lambda[i] = (mlFitFunction(lp, phi, S) - mlFitFunction(lm, phi, S)) / (2 * eps);
+  }
+
+  grad.phi = (mlFitFunction(lambdaVals, phi + eps, S) - mlFitFunction(lambdaVals, phi - eps, S)) / (2 * eps);
+  return { grad, f0 };
+}
+
+function clampLambda(v) { return Math.max(0.05, Math.min(0.98, v)); }
+function clampPhi(v) { return Math.max(-0.95, Math.min(0.95, v)); }
+
+function applyStep(lam, phi, grad, stepSize) {
+  const newLam = lam.map((l, i) => clampLambda(l - stepSize * grad.lambda[i]));
+  const newPhi = clampPhi(phi - stepSize * grad.phi);
+  return { lam: newLam, phi: newPhi };
+}
+
+function gradNorm(grad) {
+  let s = 0;
+  for (let i = 0; i < N_ITEMS; i++) s += grad.lambda[i] * grad.lambda[i];
+  s += grad.phi * grad.phi;
+  return Math.sqrt(s);
+}
+
+async function runOptimizer() {
+  if (optimizerRunning) return;
+  optimizerRunning = true;
+  document.getElementById('btn-fit').disabled = true;
+  const counterEl = document.getElementById('iter-counter');
+
+  const maxIter = 300;
+  const c_armijo = 0.5;  // Armijo sufficient decrease parameter
+  const tau = 0.5;        // step shrink factor
+  let lam = [...params.lambda];
+  let phi = params.phi;
+  let finalIter = 0;
+  let converged = false;
+
+  for (let iter = 0; iter < maxIter; iter++) {
+    const { grad, f0 } = numericalGradient(lam, phi, S_OBS);
+    const gn = gradNorm(grad);
+    if (gn < 1e-6) { finalIter = iter; converged = true; break; }
+
+    // Backtracking line search
+    let alpha = 1.0;
+    const slopeProduct = gn * gn; // grad^T * (-grad) * (-1) = ||grad||^2
+    let accepted = false;
+    for (let ls = 0; ls < 30; ls++) {
+      const candidate = applyStep(lam, phi, grad, alpha);
+      const fNew = mlFitFunction(candidate.lam, candidate.phi, S_OBS);
+      if (fNew < f0 - c_armijo * alpha * slopeProduct) {
+        lam = candidate.lam;
+        phi = candidate.phi;
+        accepted = true;
+        break;
+      }
+      alpha *= tau;
+    }
+
+    // If line search fails completely, take a tiny step
+    if (!accepted) {
+      const tiny = applyStep(lam, phi, grad, 1e-4);
+      lam = tiny.lam;
+      phi = tiny.phi;
+    }
+
+    finalIter = iter + 1;
+
+    // Update UI every iteration for visible animation
+    params.lambda = [...lam];
+    params.phi = phi;
+    updateSliders();
+    updateAll();
+    counterEl.textContent = `Iteration ${finalIter}…`;
+    counterEl.style.color = 'var(--text-dim)';
+    await new Promise(r => setTimeout(r, 80));
+  }
+
+  // Final update
+  params.lambda = [...lam];
+  params.phi = phi;
+  updateSliders();
+  updateAll();
+
+  const fml = mlFitFunction(lam, phi, S_OBS);
+  counterEl.innerHTML = `Model converged in <span style="color:var(--teal)">${finalIter}</span> iterations — F<sub>ML</sub> = ${fml.toFixed(4)}`;
+  counterEl.style.color = 'var(--text)';
+
+  optimizerRunning = false;
+  document.getElementById('btn-fit').disabled = false;
+}
+
+function resetParams() {
+  params.lambda = [0.50, 0.50, 0.50, 0.50, 0.50, 0.50];
+  params.phi = 0.30;
+  document.getElementById('iter-counter').textContent = '';
+  updateSliders();
+  updateAll();
+}
+
+function randomizeParams() {
+  for (let i=0; i<N_ITEMS; i++) {
+    params.lambda[i] = 0.2 + Math.random() * 0.7;
+  }
+  params.phi = -0.6 + Math.random() * 1.2;
+  params.phi = clampPhi(params.phi);
+  document.getElementById('iter-counter').textContent = '';
+  updateSliders();
+  updateAll();
+}
+
+// =============================================================
+// RENDERING: HEATMAP
+// =============================================================
+function colorScale(val, maxAbs=1.0) {
+  // Diverging: teal (negative) -> dark -> orange (positive)
+  const t = Math.max(-1, Math.min(1, val / maxAbs));
+  if (t >= 0) {
+    // dark to orange
+    const r = Math.round(15 + t * (249 - 15));
+    const g = Math.round(17 + t * (115 - 17));
+    const b = Math.round(36 + t * (22 - 36));
+    return `rgb(${r},${g},${b})`;
+  } else {
+    // dark to teal
+    const s = -t;
+    const r = Math.round(15 + s * (45 - 15));
+    const g = Math.round(17 + s * (212 - 17));
+    const b = Math.round(36 + s * (191 - 36));
+    return `rgb(${r},${g},${b})`;
+  }
+}
+
+function textColor(val, maxAbs=1.0) {
+  return Math.abs(val/maxAbs) > 0.5 ? '#0f1117' : '#c9cdd8';
+}
+
+function renderHeatmap(containerId, matrix, opts={}) {
+  const container = document.getElementById(containerId);
+  const cellSize = opts.cellSize || 52;
+  const labelSpace = opts.labelSpace || 30;
+  const n = matrix.length;
+  const maxAbs = opts.maxAbs || 1.0;
+  const w = labelSpace + n * cellSize;
+  const h = labelSpace + n * cellSize;
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Column labels
+  for (let j=0; j<n; j++) {
+    const x = labelSpace + j * cellSize + cellSize/2;
+    svg += `<text x="${x}" y="${labelSpace-6}" text-anchor="middle"
+      font-family="var(--mono)" font-size="11" fill="#6b7084">${ITEM_LABELS[j]}</text>`;
+  }
+
+  // Row labels + cells
+  for (let i=0; i<n; i++) {
+    const y = labelSpace + i * cellSize;
+    svg += `<text x="${labelSpace-6}" y="${y + cellSize/2 + 4}" text-anchor="end"
+      font-family="var(--mono)" font-size="11" fill="#6b7084">${ITEM_LABELS[i]}</text>`;
+
+    for (let j=0; j<n; j++) {
+      const x = labelSpace + j * cellSize;
+      const val = matrix[i][j];
+      const bg = colorScale(val, maxAbs);
+      const fg = textColor(val, maxAbs);
+      const display = i === j && !opts.showDiag ? '' : val.toFixed(2);
+
+      svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}"
+        fill="${bg}" rx="2"/>`;
+      svg += `<text x="${x+cellSize/2}" y="${y+cellSize/2+4}" text-anchor="middle"
+        font-family="var(--mono)" font-size="${opts.fontSize||11}" font-weight="500" fill="${fg}">${display}</text>`;
+    }
+  }
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// =============================================================
+// RENDERING: PATH DIAGRAM
+// =============================================================
+function renderPathDiagram(containerId) {
+  const container = document.getElementById(containerId);
+  const w = 580, h = 280;
+  const fY = 50, iY = 220;  // factor and item y positions
+  const fX = [150, 430];     // factor x positions
+  const iPositions = [
+    [70, 150, 230],   // F1 items
+    [350, 430, 510]   // F2 items
+  ];
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Defs for arrowheads
+  svg += `<defs>
+    <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5"
+      markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6b7084"/>
+    </marker>
+  </defs>`;
+
+  // Factor correlation arc
+  const midX = (fX[0] + fX[1]) / 2;
+  const arcY = fY - 40;
+  svg += `<path d="M ${fX[0]+20} ${fY-10} Q ${midX} ${arcY} ${fX[1]-20} ${fY-10}"
+    fill="none" stroke="${params.phi >= 0 ? '#f97316' : '#2dd4bf'}" stroke-width="2"
+    marker-end="url(#arrow)" marker-start="url(#arrow)"/>`;
+  svg += `<text x="${midX}" y="${arcY + 2}" text-anchor="middle"
+    font-family="var(--mono)" font-size="12" font-weight="600"
+    fill="${params.phi >= 0 ? '#f97316' : '#2dd4bf'}">${params.phi.toFixed(2)}</text>`;
+
+  // Factors (circles)
+  for (let f=0; f<2; f++) {
+    svg += `<circle cx="${fX[f]}" cy="${fY}" r="24" fill="none"
+      stroke="var(--text-bright)" stroke-width="2"/>`;
+    svg += `<text x="${fX[f]}" y="${fY+5}" text-anchor="middle"
+      font-family="var(--mono)" font-size="13" font-weight="600"
+      fill="var(--text-bright)">${FACTOR_LABELS[f]}</text>`;
+  }
+
+  // Items and arrows
+  for (let f=0; f<2; f++) {
+    for (let k=0; k<3; k++) {
+      const idx = f * 3 + k;
+      const ix = iPositions[f][k];
+
+      // Arrow from factor to item
+      svg += `<line x1="${fX[f]}" y1="${fY+24}" x2="${ix}" y2="${iY-16}"
+        stroke="var(--teal)" stroke-width="1.5" marker-end="url(#arrow)"/>`;
+
+      // Loading label
+      const mx = (fX[f] + ix) / 2 + (k === 1 ? 14 : k === 0 ? -6 : 16);
+      const my = (fY + 24 + iY - 16) / 2;
+      svg += `<text x="${mx}" y="${my}" text-anchor="middle"
+        font-family="var(--mono)" font-size="11" font-weight="600"
+        fill="var(--teal)">${params.lambda[idx].toFixed(2)}</text>`;
+
+      // Item rectangle
+      svg += `<rect x="${ix-20}" y="${iY-14}" width="40" height="28" rx="4"
+        fill="var(--bg-elevated)" stroke="var(--border)" stroke-width="1.5"/>`;
+      svg += `<text x="${ix}" y="${iY+5}" text-anchor="middle"
+        font-family="var(--mono)" font-size="11" fill="var(--text)">${ITEM_LABELS[idx]}</text>`;
+    }
+  }
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+// =============================================================
+// RENDERING: FIT INDICES
+// =============================================================
+function computeFitIndices(lambdaVals, phi, S) {
+  const fml = mlFitFunction(lambdaVals, phi, S);
+  const p = N_ITEMS;
+  const nFree = N_ITEMS + 1; // 6 loadings + 1 phi (theta derived, diag constrained to 1)
+  const nObs = p * (p - 1) / 2; // off-diagonal correlations only (diag carries no information)
+  const df = nObs - nFree;
+  const chiSq = Math.max(0, (currentN - 1) * fml);
+
+  // RMSEA
+  const rmsea = Math.sqrt(Math.max(0, (chiSq - df) / (df * (currentN - 1))));
+
+  // SRMR (off-diagonal only — diagonal residuals are zero by construction
+  // in a correlation-structure model, so including them just deflates SRMR)
+  let sumSqResid = 0, count = 0;
+  const sigma = impliedMatrix(lambdaVals, phi);
+  for (let i=0; i<p; i++) {
+    for (let j=0; j<i; j++) {
+      const r = S[i][j] - sigma[i][j];
+      sumSqResid += r * r;
+      count++;
+    }
+  }
+  const srmr = Math.sqrt(sumSqResid / count);
+
+  // CFI: need baseline model (independence model)
+  // Independence: all off-diag = 0, only diagonal variances free
+  const fml_base = mlFitFunction_independence(S);
+  const df_base = p * (p - 1) / 2;
+  const chiSq_base = Math.max(0, (currentN - 1) * fml_base);
+  const cfi = Math.max(0, Math.min(1, 1 - (chiSq - df) / (chiSq_base - df_base)));
+
+  return { chiSq, df, rmsea, srmr, cfi, fml };
+}
+
+function mlFitFunction_independence(S) {
+  const p = S.length;
+  const sigma = matCreate(p, p);
+  for (let i=0; i<p; i++) sigma[i][i] = S[i][i];
+  const detSigma = sigma.reduce((acc, _, i) => acc * sigma[i][i], 1);
+  const detS = matDet(S);
+  if (detSigma <= 0 || detS <= 0) return 999;
+  // For diagonal Sigma: tr(S Sigma^-1) = sum_i S_{ii}/Sigma_{ii}
+  let tr = 0;
+  for (let i=0; i<p; i++) tr += S[i][i] / sigma[i][i];
+  return Math.log(detSigma) + tr - Math.log(detS) - p;
+}
+
+function fitQuality(name, value) {
+  if (name === 'rmsea') return value < 0.06 ? 'good' : value < 0.10 ? 'poor' : 'bad';
+  if (name === 'srmr') return value < 0.08 ? 'good' : value < 0.12 ? 'poor' : 'bad';
+  if (name === 'cfi') return value > 0.95 ? 'good' : value > 0.90 ? 'poor' : 'bad';
+  return '';
+}
+
+function renderFitIndices() {
+  const fi = computeFitIndices(params.lambda, params.phi, S_OBS);
+  const container = document.getElementById('fit-indices');
+
+  const items = [
+    { label: 'χ²', value: fi.chiSq.toFixed(2), qual: '' },
+    { label: 'df', value: fi.df, qual: '' },
+    { label: 'RMSEA', value: fi.rmsea.toFixed(3), qual: fitQuality('rmsea', fi.rmsea) },
+    { label: 'SRMR', value: fi.srmr.toFixed(3), qual: fitQuality('srmr', fi.srmr) },
+    { label: 'CFI', value: fi.cfi.toFixed(3), qual: fitQuality('cfi', fi.cfi) },
+  ];
+
+  container.innerHTML = items.map(it =>
+    `<div class="fit-stat">
+      <div class="fit-stat-label">${it.label}</div>
+      <div class="fit-stat-value ${it.qual}">${it.value}</div>
+    </div>`
+  ).join('');
+}
+
+// =============================================================
+// RENDERING: IDENTIFICATION DEMO
+// =============================================================
+
+// Implied matrix with explicit factor variances (for identification demo).
+// Psi is the factor COVARIANCE matrix (not correlation).
+// factorVar applies equally to both factors; phi is the correlation.
+// Theta is derived to keep total variance = 1.
+function impliedMatrixWithVar(lambdaVals, phiCorr, factorVar) {
+  const L = buildLambda(lambdaVals);
+  const sd = Math.sqrt(factorVar);
+  const Psi = [
+    [factorVar,          phiCorr * sd * sd],
+    [phiCorr * sd * sd,  factorVar]
+  ];
+  const LP = matMul(L, Psi);
+  const LPLt = matMul(LP, matTranspose(L));
+  // Theta: enforce Var(x_i) = 1, so theta_i = 1 - (LPL')_ii
+  const T = matCreate(N_ITEMS, N_ITEMS);
+  for (let i = 0; i < N_ITEMS; i++) {
+    T[i][i] = Math.max(0.01, 1 - LPLt[i][i]);
+  }
+  return matAdd(LPLt, T);
+}
+
+function renderIdentification() {
+  const c = parseFloat(document.getElementById('ident-slider').value);
+  document.getElementById('ident-c-val').textContent = c.toFixed(2);
+
+  const container = document.getElementById('ident-display');
+
+  // Reference solution: standardized (factor var = 1)
+  const refLam = TRUE_LAMBDA;
+  const refFVar = 1.0;
+
+  // Scaled solution: loadings * c, factor variance / c²
+  const scaledLam = refLam.map(l => l * c);
+  const scaledFVar = 1.0 / (c * c);
+
+  container.innerHTML = `
+    <div class="ident-col">
+      <h4>Solution A (c = 1, standardized)</h4>
+      ${refLam.map((l,i) => `<div class="ident-param"><span style="color:var(--teal)">λ${i+1}</span> = ${l.toFixed(3)}</div>`).join('')}
+      <div class="ident-param" style="margin-top:6px"><span style="color:var(--orange)">ψ (factor var)</span> = ${refFVar.toFixed(3)}</div>
+      <div class="ident-param"><span style="color:var(--orange)">φ₁₂</span> = ${TRUE_PHI.toFixed(3)}</div>
+    </div>
+    <div class="ident-col">
+      <h4>Solution B (c = ${c.toFixed(2)})</h4>
+      ${scaledLam.map((l,i) => `<div class="ident-param"><span style="color:var(--teal)">λ${i+1}</span> = ${l.toFixed(3)}</div>`).join('')}
+      <div class="ident-param" style="margin-top:6px"><span style="color:var(--orange)">ψ (factor var)</span> = ${scaledFVar.toFixed(3)}</div>
+      <div class="ident-param"><span style="color:var(--orange)">φ₁₂</span> = ${TRUE_PHI.toFixed(3)}</div>
+    </div>
+  `;
+
+  // Compute implied matrix from the SCALED parameters — should be identical to standardized
+  const sigmaScaled = impliedMatrixWithVar(scaledLam, TRUE_PHI, scaledFVar);
+  renderHeatmap('heatmap-ident', sigmaScaled, {cellSize:46, fontSize:10});
+}
+
+// =============================================================
+// SLIDER MANAGEMENT (two synced sets: section 3 and section 6)
+// =============================================================
+const SLIDER_SECTIONS = ['', '-s6', '-s8']; // suffixes for the three panels
+
+function createSlidersForSection(suffix) {
+  const f1 = document.getElementById('sliders-f1' + suffix);
+  for (let i=0; i<3; i++) {
+    f1.innerHTML += `
+      <div class="slider-row">
+        <span class="slider-label">λ${i+1}</span>
+        <input type="range" min="0.05" max="0.98" step="0.01" value="${params.lambda[i]}"
+          id="sl-l${i}${suffix}" oninput="onSlider(${i}, this.value)">
+        <span class="slider-val" id="sv-l${i}${suffix}">${params.lambda[i].toFixed(2)}</span>
+      </div>`;
+  }
+
+  const f2 = document.getElementById('sliders-f2' + suffix);
+  for (let i=3; i<6; i++) {
+    f2.innerHTML += `
+      <div class="slider-row">
+        <span class="slider-label">λ${i+1}</span>
+        <input type="range" min="0.05" max="0.98" step="0.01" value="${params.lambda[i]}"
+          id="sl-l${i}${suffix}" oninput="onSlider(${i}, this.value)">
+        <span class="slider-val" id="sv-l${i}${suffix}">${params.lambda[i].toFixed(2)}</span>
+      </div>`;
+  }
+
+  const ph = document.getElementById('slider-phi' + suffix);
+  ph.innerHTML = `
+    <div class="slider-row">
+      <span class="slider-label">φ</span>
+      <input type="range" class="phi-slider" min="-0.95" max="0.95" step="0.01" value="${params.phi}"
+        id="sl-phi${suffix}" oninput="onPhiSlider(this.value)">
+      <span class="slider-val" id="sv-phi${suffix}" style="color:var(--orange)">${params.phi.toFixed(2)}</span>
+    </div>`;
+}
+
+function createSliders() {
+  SLIDER_SECTIONS.forEach(s => createSlidersForSection(s));
+}
+
+function updateSliders() {
+  SLIDER_SECTIONS.forEach(suffix => {
+    for (let i=0; i<6; i++) {
+      const sl = document.getElementById(`sl-l${i}${suffix}`);
+      const sv = document.getElementById(`sv-l${i}${suffix}`);
+      if (sl) { sl.value = params.lambda[i]; }
+      if (sv) { sv.textContent = params.lambda[i].toFixed(2); }
+    }
+    const slPhi = document.getElementById(`sl-phi${suffix}`);
+    const svPhi = document.getElementById(`sv-phi${suffix}`);
+    if (slPhi) { slPhi.value = params.phi; }
+    if (svPhi) { svPhi.textContent = params.phi.toFixed(2); }
+  });
+}
+
+function onSlider(idx, val) {
+  params.lambda[idx] = parseFloat(val);
+  updateSliders();
+  updateAll();
+}
+
+function onPhiSlider(val) {
+  params.phi = parseFloat(val);
+  updateSliders();
+  updateAll();
+}
+
+const N_SLIDER_SECTIONS = ['-s6', '-s8'];
+
+function onSampleNSlider(val) {
+  currentN = parseInt(val);
+  // Sync all N sliders
+  N_SLIDER_SECTIONS.forEach(suffix => {
+    const sl = document.getElementById('sl-sample-n' + suffix);
+    const sv = document.getElementById('sv-sample-n' + suffix);
+    if (sl) sl.value = currentN;
+    if (sv) sv.textContent = currentN;
+  });
+  renderFitIndices();
+  updateScatterplots();
+  // Also update Section 7 misspec fit indices + MIs (they depend on N)
+  if (misspecFittedLambda) {
+    renderMisspecFitIndices(misspecFittedLambda, misspecFittedPhi, S_MISSPEC);
+    const miIndices = computeModificationIndices(misspecFittedLambda, misspecFittedPhi, S_MISSPEC);
+    renderModificationIndices(miIndices);
+  }
+}
+
+// =============================================================
+// UPDATE ALL VIEWS
+// =============================================================
+function updateAll() {
+  const sigma = impliedMatrix(params.lambda, params.phi);
+  const residual = matSub(S_OBS, sigma);
+
+  // Heatmaps
+  renderHeatmap('heatmap-obs-small', S_OBS, {cellSize:46, fontSize:10});
+  renderHeatmap('heatmap-implied', sigma, {cellSize:46, fontSize:10});
+  renderHeatmap('heatmap-residual', residual, {cellSize:46, fontSize:10, maxAbs:0.4, showDiag:true});
+
+  // Path diagram
+  renderPathDiagram('path-diagram');
+
+  // Theta display
+  const thetaDiv = document.getElementById('theta-display');
+  thetaDiv.innerHTML = params.lambda.map((l,i) =>
+    `<span class="theta-item">θ${i+1}=<span class="theta-val">${Math.max(0,1-l*l).toFixed(2)}</span></span>`
+  ).join('');
+
+  // Fit function
+  const fml = mlFitFunction(params.lambda, params.phi, S_OBS);
+  document.getElementById('fit-value').textContent = fml.toFixed(4);
+  const fmlColor = fml < 0.05 ? 'var(--teal)' : fml < 0.2 ? 'var(--orange)' : 'var(--red)';
+  document.getElementById('fit-value').style.color = fmlColor;
+
+  // Fit indices
+  renderFitIndices();
+
+  // Scatterplots
+  updateScatterplots();
+}
+
+// =============================================================
+// SECTION 7: FACTOR SCORES (data reused from generateObserved)
+// =============================================================
+
+// Compute regression factor scores: f = Phi * Lambda' * Sigma^-1 * x
+// Returns array of N rows, each with nFactors elements
+function computeFactorScores(data, lambdaVals, phi) {
+  const sigma = impliedMatrix(lambdaVals, phi);
+  const sigmaInv = matInverse(sigma);
+  if (!sigmaInv) return data.map(() => [0, 0]);
+
+  const L = buildLambda(lambdaVals);
+  const P = buildPhi(phi);
+  const Lt = matTranspose(L);
+
+  // W = P * L' * SigmaInv  (nFactors x nItems)
+  const PLt = matMul(P, Lt);
+  const W = matMul(PLt, sigmaInv);
+
+  // For each person, f = W * x
+  return data.map(x => {
+    const f = Array(N_FACTORS).fill(0);
+    for (let fIdx = 0; fIdx < N_FACTORS; fIdx++) {
+      for (let j = 0; j < N_ITEMS; j++) {
+        f[fIdx] += W[fIdx][j] * x[j];
+      }
+    }
+    return f;
+  });
+}
+
+// Pearson correlation between two arrays
+function pearsonR(a, b) {
+  const n = a.length;
+  let sumA = 0, sumB = 0, sumAB = 0, sumA2 = 0, sumB2 = 0;
+  for (let i = 0; i < n; i++) {
+    sumA += a[i]; sumB += b[i];
+    sumAB += a[i] * b[i];
+    sumA2 += a[i] * a[i]; sumB2 += b[i] * b[i];
+  }
+  const num = n * sumAB - sumA * sumB;
+  const den = Math.sqrt((n * sumA2 - sumA * sumA) * (n * sumB2 - sumB * sumB));
+  return den < 1e-12 ? 0 : num / den;
+}
+
+// Full pool of simulated observations for factor score scatterplots.
+// S_OBS is computed from the first SAMPLE_N; scatterplots show first currentN.
+const SIM_DATA = SIM_RAW_DATA;
+const TRUE_SCORES = computeFactorScores(SIM_DATA, TRUE_LAMBDA, TRUE_PHI);
+
+// Render scatterplot as SVG
+function renderScatterplot(containerId, statsId, trueScores, estScores, factorIdx) {
+  const container = document.getElementById(containerId);
+  const statsEl = document.getElementById(statsId);
+
+  const trueF = trueScores.map(s => s[factorIdx]);
+  const estF = estScores.map(s => s[factorIdx]);
+
+  const r = pearsonR(trueF, estF);
+
+  // Determine axis range (symmetric around 0)
+  let maxAbs = 0;
+  for (let i = 0; i < trueF.length; i++) {
+    maxAbs = Math.max(maxAbs, Math.abs(trueF[i]), Math.abs(estF[i]));
+  }
+  maxAbs = Math.max(2.5, Math.ceil(maxAbs * 10) / 10 + 0.2);
+  const range = [-maxAbs, maxAbs];
+
+  const w = 280, h = 280;
+  const pad = 36;
+  const plotW = w - pad * 2;
+  const plotH = h - pad * 2;
+
+  function scaleX(v) { return pad + (v - range[0]) / (range[1] - range[0]) * plotW; }
+  function scaleY(v) { return pad + plotH - (v - range[0]) / (range[1] - range[0]) * plotH; }
+
+  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Background
+  svg += `<rect x="${pad}" y="${pad}" width="${plotW}" height="${plotH}" fill="var(--bg-elevated)" rx="2"/>`;
+
+  // Grid lines at 0
+  const zeroX = scaleX(0), zeroY = scaleY(0);
+  svg += `<line x1="${pad}" y1="${zeroY}" x2="${pad+plotW}" y2="${zeroY}" stroke="var(--border)" stroke-width="1"/>`;
+  svg += `<line x1="${zeroX}" y1="${pad}" x2="${zeroX}" y2="${pad+plotH}" stroke="var(--border)" stroke-width="1"/>`;
+
+  // Diagonal reference line
+  svg += `<line x1="${scaleX(range[0])}" y1="${scaleY(range[0])}" x2="${scaleX(range[1])}" y2="${scaleY(range[1])}" 
+    stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>`;
+
+  // Dots
+  const rAbs = Math.abs(r);
+  const dotColor = rAbs > 0.95 ? 'var(--teal)' : rAbs > 0.80 ? 'var(--orange)' : 'var(--red)';
+
+  for (let i = 0; i < trueF.length; i++) {
+    const cx = scaleX(trueF[i]);
+    const cy = scaleY(estF[i]);
+    // Clip to plot area
+    if (cx >= pad && cx <= pad + plotW && cy >= pad && cy <= pad + plotH) {
+      svg += `<circle cx="${cx}" cy="${cy}" r="2.2" fill="${dotColor}" opacity="0.45"/>`;
+    }
+  }
+
+  // Axis labels
+  svg += `<text x="${pad + plotW/2}" y="${h - 4}" text-anchor="middle" 
+    font-family="var(--mono)" font-size="10" fill="var(--text-dim)">True Score</text>`;
+  svg += `<text x="10" y="${pad + plotH/2}" text-anchor="middle" 
+    font-family="var(--mono)" font-size="10" fill="var(--text-dim)" 
+    transform="rotate(-90, 10, ${pad + plotH/2})">Estimated Score</text>`;
+
+  // Tick labels at extremes
+  svg += `<text x="${pad}" y="${pad + plotH + 14}" text-anchor="middle" 
+    font-family="var(--mono)" font-size="9" fill="var(--text-dim)">${range[0].toFixed(1)}</text>`;
+  svg += `<text x="${pad + plotW}" y="${pad + plotH + 14}" text-anchor="middle" 
+    font-family="var(--mono)" font-size="9" fill="var(--text-dim)">${range[1].toFixed(1)}</text>`;
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+
+  // Stats
+  const rColor = rAbs > 0.95 ? 'var(--teal)' : rAbs > 0.80 ? 'var(--orange)' : 'var(--red)';
+  statsEl.innerHTML = `r = <span style="color:${rColor};font-weight:600;">${r.toFixed(3)}</span>`;
+}
+
+function updateScatterplots() {
+  const n = Math.min(currentN, POOL_N);
+  const dataSlice = SIM_DATA.slice(0, n);
+  const trueSlice = TRUE_SCORES.slice(0, n);
+  const estScores = computeFactorScores(dataSlice, params.lambda, params.phi);
+  renderScatterplot('scatter-f1', 'scatter-f1-stats', trueSlice, estScores, 0);
+  renderScatterplot('scatter-f2', 'scatter-f2-stats', trueSlice, estScores, 1);
+}
+
+// =============================================================
+// SECTION 7: MISSPECIFICATION DEMO + MODIFICATION INDICES
+// =============================================================
+
+const SCENARIOS = {
+  correct: {
+    label: 'Correct Model',
+    description: 'Data generated from the same 2-factor simple structure being fitted. The model should recover the true parameters and residuals should be small and unstructured.',
+    // 6 items, 2 factors — same as the fitted model
+    nFactors: 2,
+    lambdaMatrix: [
+      [0.75, 0.00],
+      [0.80, 0.00],
+      [0.65, 0.00],
+      [0.00, 0.70],
+      [0.00, 0.85],
+      [0.00, 0.60]
+    ],
+    phi: [[1, 0.35], [0.35, 1]]
+  },
+  missingFactor: {
+    label: 'Missing Factor',
+    description: 'Truth: 3 factors (x₁–x₂ on F₁, x₃–x₄ on F₂, x₅–x₆ on F₃). Fitted model has only 2 factors, forcing items from two distinct constructs onto one factor. Residuals will show structure in the x₃–x₆ block.',
+    nFactors: 3,
+    lambdaMatrix: [
+      [0.75, 0.00, 0.00],
+      [0.80, 0.00, 0.00],
+      [0.00, 0.75, 0.00],
+      [0.00, 0.70, 0.00],
+      [0.00, 0.00, 0.80],
+      [0.00, 0.00, 0.65]
+    ],
+    phi: [[1, 0.20, 0.15], [0.20, 1, 0.25], [0.15, 0.25, 1]]
+  },
+  crossLoading: {
+    label: 'Omitted Cross-Loading',
+    description: 'Truth: 2 factors, but x₃ loads on both F₁ (λ=0.55) and F₂ (λ=0.35). The fitted model constrains x₃ to load only on F₁, missing the cross-loading. Residuals will concentrate around x₃.',
+    nFactors: 2,
+    lambdaMatrix: [
+      [0.75, 0.00],
+      [0.80, 0.00],
+      [0.55, 0.35],  // cross-loading
+      [0.00, 0.70],
+      [0.00, 0.85],
+      [0.00, 0.60]
+    ],
+    phi: [[1, 0.35], [0.35, 1]]
+  }
+};
+
+let currentScenarioKey = 'correct';
+let S_MISSPEC = null;           // observed matrix for misspec section
+let misspecFittedLambda = null;  // fitted parameters for misspec
+let misspecFittedPhi = null;
+
+// Generate observed matrix from an arbitrary scenario
+function generateFromScenario(scenario) {
+  const p = N_ITEMS;
+  const k = scenario.nFactors;
+  const Lam = scenario.lambdaMatrix;  // p × k
+  const Phi = scenario.phi;           // k × k
+
+  // Sigma = Lambda * Phi * Lambda' + Theta
+  // Build Lambda * Phi
+  const LP = matCreate(p, k);
+  for (let i = 0; i < p; i++)
+    for (let j = 0; j < k; j++)
+      for (let m = 0; m < k; m++)
+        LP[i][j] += Lam[i][m] * Phi[m][j];
+
+  // Lambda * Phi * Lambda'
+  const LPLt = matCreate(p, p);
+  for (let i = 0; i < p; i++)
+    for (let j = 0; j < p; j++)
+      for (let m = 0; m < k; m++)
+        LPLt[i][j] += LP[i][m] * Lam[j][m];
+
+  // Theta: diagonal, theta_i = 1 - sum_f lambda_{if}^2 * phi_{ff} - cross terms
+  // More precisely: theta_i = 1 - (LPL')_{ii}
+  const sigma = matCreate(p, p);
+  for (let i = 0; i < p; i++)
+    for (let j = 0; j < p; j++)
+      sigma[i][j] = LPLt[i][j];
+  for (let i = 0; i < p; i++)
+    sigma[i][i] = 1.0; // standardized: total variance = 1
+
+  // Ensure positive definite by adding small diagonal if needed
+  const Theta = matCreate(p, p);
+  for (let i = 0; i < p; i++)
+    Theta[i][i] = Math.max(0.01, 1 - LPLt[i][i]);
+
+  const trueSigma = matAdd(LPLt, Theta);
+
+  // Generate sample data
+  const data = generateMVN(trueSigma, SAMPLE_N);
+  return sampleCorrelationMatrix(data);
+}
+
+// Fit 2-factor model to a given S matrix (synchronous, no animation)
+function fitModelToS(S) {
+  let lam = [0.50, 0.50, 0.50, 0.50, 0.50, 0.50];
+  let phi = 0.30;
+
+  for (let iter = 0; iter < 500; iter++) {
+    const { grad, f0 } = numericalGradient(lam, phi, S);
+    const gn = gradNorm(grad);
+    if (gn < 1e-7) break;
+
+    let alpha = 1.0;
+    const slopeProduct = gn * gn;
+    let accepted = false;
+    for (let ls = 0; ls < 30; ls++) {
+      const candidate = applyStep(lam, phi, grad, alpha);
+      const fNew = mlFitFunction(candidate.lam, candidate.phi, S);
+      if (fNew < f0 - 0.5 * alpha * slopeProduct) {
+        lam = candidate.lam;
+        phi = candidate.phi;
+        accepted = true;
+        break;
+      }
+      alpha *= 0.5;
+    }
+    if (!accepted) {
+      const tiny = applyStep(lam, phi, grad, 1e-4);
+      lam = tiny.lam;
+      phi = tiny.phi;
+    }
+  }
+
+  return { lambda: lam, phi: phi };
+}
+
+// Compute modification indices for fixed (zero) cross-loadings
+function computeModificationIndices(lambdaVals, phi, S) {
+  const eps = 1e-5;
+  const f0 = mlFitFunction(lambdaVals, phi, S);
+  const indices = [];
+
+  // For each item × factor combination that is fixed to zero
+  for (let i = 0; i < N_ITEMS; i++) {
+    for (let f = 0; f < N_FACTORS; f++) {
+      if (PATTERN[i][f] === 1) {
+        // This is a free parameter, skip
+        indices.push({ item: i, factor: f, mi: null, free: true });
+        continue;
+      }
+
+      // Compute score (first derivative) and information (second derivative)
+      const score = computeCrossLoadingDerivative(lambdaVals, phi, S, i, f, eps);
+      const info = computeCrossLoadingSecondDerivative(lambdaVals, phi, S, i, f, eps);
+
+      // MI = score^2 / information
+      const mi = info > 1e-12 ? (currentN - 1) * (score * score) / info : 0;
+      indices.push({ item: i, factor: f, mi: Math.max(0, mi), free: false });
+    }
+  }
+
+  return indices;
+}
+
+// First derivative of F_ML w.r.t. a cross-loading at position (item, factor)
+function computeCrossLoadingDerivative(lambdaVals, phi, S, item, factor, eps) {
+  const fPlus = mlWithCrossLoading(lambdaVals, phi, S, item, factor, eps);
+  const fMinus = mlWithCrossLoading(lambdaVals, phi, S, item, factor, -eps);
+  return (fPlus - fMinus) / (2 * eps);
+}
+
+// Second derivative of F_ML w.r.t. a cross-loading
+function computeCrossLoadingSecondDerivative(lambdaVals, phi, S, item, factor, eps) {
+  const f0 = mlWithCrossLoading(lambdaVals, phi, S, item, factor, 0);
+  const fPlus = mlWithCrossLoading(lambdaVals, phi, S, item, factor, eps);
+  const fMinus = mlWithCrossLoading(lambdaVals, phi, S, item, factor, -eps);
+  return (fPlus - 2 * f0 + fMinus) / (eps * eps);
+}
+
+// Evaluate F_ML with a temporary cross-loading added
+function mlWithCrossLoading(lambdaVals, phi, S, item, factor, crossVal) {
+  const L = buildLambda(lambdaVals);
+  L[item][factor] += crossVal;  // add cross-loading
+
+  const P = buildPhi(phi);
+  const LP = matMul(L, P);
+  const LPLt = matMul(LP, matTranspose(L));
+
+  // Theta: diagonal residuals, keeping total variance = 1
+  const T = matCreate(N_ITEMS, N_ITEMS);
+  for (let i = 0; i < N_ITEMS; i++) {
+    T[i][i] = Math.max(0.01, 1 - LPLt[i][i]);
+  }
+  const sigma = matAdd(LPLt, T);
+
+  const detSigma = matDet(sigma);
+  const detS = matDet(S);
+  if (detSigma <= 0 || detS <= 0) return 999;
+  const sigmaInv = matInverse(sigma);
+  if (!sigmaInv) return 999;
+  const SsigmaInv = matMul(S, sigmaInv);
+  const tr = matTrace(SsigmaInv);
+  return Math.log(detSigma) + tr - Math.log(detS) - N_ITEMS;
+}
+
+function renderModificationIndices(indices) {
+  const container = document.getElementById('mi-table');
+
+  let html = '<table class="mi-table"><thead><tr><th></th>';
+  for (let f = 0; f < N_FACTORS; f++) {
+    html += `<th>${FACTOR_LABELS[f]}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+
+  for (let i = 0; i < N_ITEMS; i++) {
+    html += `<tr><td style="text-align:right;color:var(--text-dim);font-weight:600;">${ITEM_LABELS[i]}</td>`;
+    for (let f = 0; f < N_FACTORS; f++) {
+      const idx = indices.find(d => d.item === i && d.factor === f);
+      if (idx.free) {
+        html += '<td class="mi-fixed">—</td>';
+      } else {
+        const val = idx.mi;
+        const cls = val > 10 ? 'mi-high' : val > 3.84 ? 'mi-mod' : 'mi-low';
+        html += `<td class="${cls}">${val.toFixed(1)}</td>`;
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function renderMisspecFitIndices(lambdaVals, phi, S) {
+  const fi = computeFitIndices(lambdaVals, phi, S);
+  const container = document.getElementById('misspec-fit-indices');
+
+  const items = [
+    { label: 'χ²', value: fi.chiSq.toFixed(2), qual: '' },
+    { label: 'df', value: fi.df, qual: '' },
+    { label: 'RMSEA', value: fi.rmsea.toFixed(3), qual: fitQuality('rmsea', fi.rmsea) },
+    { label: 'SRMR', value: fi.srmr.toFixed(3), qual: fitQuality('srmr', fi.srmr) },
+    { label: 'CFI', value: fi.cfi.toFixed(3), qual: fitQuality('cfi', fi.cfi) },
+  ];
+
+  container.innerHTML = items.map(it =>
+    `<div class="fit-stat">
+      <div class="fit-stat-label">${it.label}</div>
+      <div class="fit-stat-value ${it.qual}">${it.value}</div>
+    </div>`
+  ).join('');
+}
+
+function switchScenario(key) {
+  currentScenarioKey = key;
+
+  // Update button states
+  document.querySelectorAll('.scenario-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.scenario === key);
+  });
+
+  const scenario = SCENARIOS[key];
+  document.getElementById('scenario-description').textContent = scenario.description;
+
+  // Generate data from this scenario
+  S_MISSPEC = generateFromScenario(scenario);
+
+  // Fit 2-factor model to it
+  const counterEl = document.getElementById('misspec-iter-counter');
+  counterEl.textContent = 'Fitting model…';
+  counterEl.style.color = 'var(--text-dim)';
+
+  // Use requestAnimationFrame so the UI updates before blocking
+  requestAnimationFrame(() => {
+    const fitted = fitModelToS(S_MISSPEC);
+    misspecFittedLambda = fitted.lambda;
+    misspecFittedPhi = fitted.phi;
+
+    // Display results
+    updateMisspecDisplay();
+
+    const fml = mlFitFunction(misspecFittedLambda, misspecFittedPhi, S_MISSPEC);
+    counterEl.innerHTML = `Fitted — F<sub>ML</sub> = ${fml.toFixed(4)}`;
+    counterEl.style.color = 'var(--text)';
+  });
+}
+
+function updateMisspecDisplay() {
+  if (!S_MISSPEC || !misspecFittedLambda) return;
+
+  const sigma = impliedMatrix(misspecFittedLambda, misspecFittedPhi);
+  const residual = matSub(S_MISSPEC, sigma);
+
+  renderHeatmap('heatmap-misspec-residual', residual, {cellSize: 52, fontSize: 11, maxAbs: 0.15, showDiag: true});
+  renderMisspecFitIndices(misspecFittedLambda, misspecFittedPhi, S_MISSPEC);
+
+  const miIndices = computeModificationIndices(misspecFittedLambda, misspecFittedPhi, S_MISSPEC);
+  renderModificationIndices(miIndices);
+}
+
+// =============================================================
+// INITIALIZATION
+// =============================================================
+function init() {
+  // Section 1: static observed matrix
+  renderHeatmap('heatmap-observed', S_OBS, {cellSize:58, fontSize:12});
+
+  // Section 2: path diagram (initial)
+  renderPathDiagram('path-diagram');
+
+  // Section 3: create sliders
+  createSliders();
+
+  // Section 5: identification
+  renderIdentification();
+  document.getElementById('ident-slider').addEventListener('input', renderIdentification);
+
+  // Section 7: misspecification demo
+  switchScenario('correct');
+
+  // Full update
+  updateAll();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<!-- Info overlay -->
+<div class="info-overlay" id="info-overlay" onclick="if(event.target===this)closeInfo()">
+  <div class="info-modal">
+    <button class="info-close" onclick="closeInfo()">×</button>
+    <div id="info-modal-content"></div>
+  </div>
+</div>
+
+<script>
+// =============================================================
+// INFO POPUP CONTENT
+// =============================================================
+const infoContent = {
+  global: {
+    title: 'Why do a factor analysis at all?',
+    badge: 'the big picture',
+    body: `
+      <p>Items on a questionnaire tend to correlate with each other. Some of that correlation is because they measure the same underlying construct — but you can't observe the construct directly. It's <em>latent</em>.</p>
+      <p>Factor analysis formalizes this idea. It says: these observed correlations arise because a smaller number of latent variables are generating the responses. Items that share a factor correlate; items that don't, don't (or correlate less).</p>
+      <p>Why bother? Three reasons. First, the latent variable is <em>error-free</em>. Each observed item is a noisy reflection of the factor — it contains the true signal plus measurement error. By modeling this explicitly, factor analysis separates signal from noise. A sum score treats all items and all variance equally; a factor model does not.</p>
+      <p>Second, a factor model is a <em>testable hypothesis</em>. You are claiming that a specific structure generated the data, and the model fit tells you whether that claim is defensible. Summing items makes assumptions too — equal loadings, no cross-loadings — but never tests them.</p>
+      <p>Third, it forces you to be <em>explicit</em> about your measurement theory. Which items measure which construct? Are the constructs correlated? Is one item weaker than the others? These questions have answers in a factor model, and those answers are visible in the parameters.</p>
+    `
+  },
+  sec1: {
+    title: 'Why not just look at the correlations directly?',
+    badge: 'data reduction',
+    body: `
+      <p>You can, and in exploratory work people do exactly that. But the correlation matrix grows fast. Six items give you 15 unique correlations. Twenty items give you 190. Thirty items: 435. The human eye can't parse that into a coherent structure.</p>
+      <p>Factor analysis asks whether a much smaller set of parameters can <em>reproduce</em> those correlations. If six loadings and one factor correlation can account for 15 correlations, you've achieved substantial data reduction — and you've made a theoretical claim about <em>why</em> the items hang together.</p>
+      <p>That's the key distinction: a correlation matrix is a description, a factor model is an explanation.</p>
+    `
+  },
+  sec2: {
+    title: 'What is a latent variable, and what does it mean that it\'s error-free?',
+    badge: 'latent variables & measurement error',
+    body: `
+      <p>A latent variable is a theoretical quantity you can't observe directly. In CFA, it represents what the items <em>share</em> — the common signal stripped of each item's unique noise.</p>
+      <p>Each observed item can be decomposed: <em>observed = factor × loading + error</em>. The factor carries only the shared variance. The error term captures everything else — random measurement noise, item-specific content, method effects.</p>
+      <p>This matters practically. If you simply average or sum your items, every item contributes equally and all variance (signal and noise alike) gets folded in. A factor model weights items by their loadings and separates shared variance from error. The resulting factor score is a <em>cleaner</em> estimate of the construct than any single item or unweighted composite.</p>
+      <p>This is also why reliability matters. Coefficient alpha and its successors (like omega) are really asking: how much of the variance in your composite is shared/factor variance versus error? The factor model makes that question answerable.</p>
+    `
+  },
+  sec3: {
+    title: 'What does a loading actually mean?',
+    badge: 'interpreting λ',
+    body: `
+      <p>A loading has two complementary interpretations, both worth knowing.</p>
+      <p>First: in the standardized solution (which is what this page uses), <em>λ² is the proportion of the item's variance explained by the factor</em>. A loading of .70 means .70² = .49 — roughly half the item's variance is shared with the factor. The remaining .51 is residual (measurement error plus item-specific content).</p>
+      <p>Second: <em>the loading is the expected correlation between the item and the factor</em>. An item with λ = .70 would correlate .70 with the factor if you could measure the factor directly. People who've only seen the first interpretation often find this one more intuitive.</p>
+      <p>This also means that two items with loadings λ₁ and λ₂ on the same factor will have a model-implied correlation of λ₁ × λ₂. That's why you can see the implied matrix update when you drag a single slider — each loading affects every correlation involving that item.</p>
+    `
+  },
+  sec4: {
+    title: 'Why does fitting require iteration? Regression doesn\'t need this.',
+    badge: 'optimization',
+    body: `
+      <p>Good question. In ordinary least squares regression, the objective function (the sum of squared residuals) is <em>quadratic</em> in the parameters. That means you can take the derivative, set it equal to zero, and solve directly. The result is the famous closed-form solution: β = (X′X)⁻¹X′y. One step, done.</p>
+      <p>In CFA, the ML fit function involves log-determinants and matrix inverses of the model-implied covariance matrix Σ(θ). These are <em>nonlinear</em> functions of the parameters — there is no way to rearrange the equation F = 0 and solve for λ. The derivative exists, but setting it to zero gives you a system of equations that can't be solved algebraically.</p>
+      <p>So instead, estimation starts with initial values (often instrumental-variable estimates or user-specified starting points) and iteratively adjusts them downhill on the fit function surface. Each iteration evaluates the gradient (which direction is downhill?) and takes a step. The process repeats until the gradient is essentially zero — a minimum has been found.</p>
+      <p>The visualization in this section lets you watch this process. The sliders <em>are</em> the parameter vector, and "Fit the Model" runs the optimizer that nudges them toward the minimum. In real software (lavaan, Mplus), the same logic runs but with more sophisticated algorithms (Newton-Raphson, Fisher scoring) that converge faster by also using second-derivative information.</p>
+    `
+  },
+  sec5: {
+    title: 'Why does fixing the factor variance solve the problem?',
+    badge: 'identification',
+    body: `
+      <p>Latent variables have no inherent scale. Unlike observed variables, which come in specific units (points on a Likert scale, reaction times in milliseconds), a factor is a mathematical abstraction. Nothing in the data tells you whether the factor ranges from −1 to 1 or from −1000 to 1000.</p>
+      <p>This creates a problem: if you double all the loadings and halve the factor variance, the implied covariance matrix doesn't change. There are infinitely many parameter sets that fit equally well. The model is <em>underidentified</em> — the data can't distinguish between these solutions.</p>
+      <p>Fixing the factor variance to 1 says: "express the factor in standard deviation units." This is the <em>standardized solution</em>, and it's what this page uses throughout. Each loading then represents a correlation between item and factor.</p>
+      <p>The other common fix is the <em>marker variable</em> approach: fix one loading per factor to 1.0 and freely estimate the factor variance. This says "express the factor in the same units as that reference item." Both approaches give the same model fit and the same implied covariance matrix — they're just different parameterizations of the same model.</p>
+    `
+  },
+  sec6: {
+    title: 'Which fit index should I trust?',
+    badge: 'model evaluation',
+    body: `
+      <p>The honest answer: none of them individually, and all of them together. Each index summarizes the residual matrix through a different lens, sensitive to different things.</p>
+      <p><em>χ²</em> is the only one that's a formal statistical test, but it's notoriously sensitive to sample size — with enough data, trivial misfits become "significant." That's why approximate fit indices were developed.</p>
+      <p><em>RMSEA</em> estimates misfit per degree of freedom, penalizing model complexity. <em>SRMR</em> is in the metric of correlations, making it directly interpretable: an SRMR of .04 means residual correlations average about .04. <em>CFI</em> compares your model to a baseline where all items are uncorrelated — it asks how much better your model is than no model at all.</p>
+      <p>The conventional cutoffs (RMSEA < .06, CFI > .95, SRMR < .08) come from <a href="https://doi.org/10.1080/10705519909540118" target="_blank" rel="noopener" style="color:var(--teal);">Hu and Bentler (1999)</a> and are near-universally applied. But they were derived under specific simulation conditions — particular numbers of factors, items, and loading magnitudes — and may not generalize to all models.</p>
+      <p><a href="https://doi.org/10.1037/met0000425" target="_blank" rel="noopener" style="color:var(--teal);">McNeish and Wolf (2023)</a> made this point forcefully, showing that appropriate cutoffs depend on the specific model being evaluated (number of factors, number of items, expected loadings). Their <em>dynamic fit index</em> (DFI) approach simulates data from your particular model specification to derive tailored cutoffs rather than relying on the generic Hu & Bentler values. This means a model with 3 items per factor needs different thresholds than one with 10 items per factor.</p>
+      <p>In practice: look at the residual matrix first. Structured residuals (a cluster of cells that are consistently positive or negative) tell you <em>where</em> the model fails — something no single index can do. Fit indices tell you <em>how much</em> it fails, in aggregate.</p>
+    `
+  },
+  sec7: {
+    title: 'What do misspecification and modification indices actually tell you?',
+    badge: 'model diagnostics',
+    body: `
+      <p>A model can converge, produce standard errors, and pass conventional fit index cutoffs — and still be wrong in ways that matter. Misspecification means the fitted model doesn't match the data-generating process. The consequences range from biased parameter estimates to misleading factor scores.</p>
+      <p>The key diagnostic is the <em>residual matrix</em>. Under correct specification, residuals are small and random — they reflect sampling variability. Under misspecification, residuals show <em>structure</em>: systematic clusters of positive or negative values that the model can't account for. This structured pattern tells you <em>where</em> the model fails, not just <em>that</em> it fails.</p>
+      <p><em>Modification indices</em> formalize this intuition. For each currently fixed parameter (here, the cross-loadings constrained to zero), the MI estimates the expected drop in χ² if that parameter were freed. Technically, it is the squared score statistic divided by the expected information — essentially a one-degree-of-freedom Lagrange multiplier test.</p>
+      <p>A common rule of thumb is MI > 3.84 (the χ²(1) critical value at α = .05) as a threshold for "worth investigating." But modification indices should be interpreted substantively, not mechanically. A large MI might reflect a genuine cross-loading, or it might reflect a correlated residual, a method effect, or model misspecification elsewhere propagating through the system.</p>
+      <p>The two misspecification scenarios here illustrate different failure modes. "Missing Factor" shows what happens when dimensionality is wrong — the model can't separate constructs it doesn't know about. "Omitted Cross-Loading" shows a subtler problem where the structure is right but one item's relationship to a second factor is ignored. Both are common in practice, and both leave fingerprints in the residuals.</p>
+    `
+  },
+  sec8: {
+    title: 'How are factor scores computed, and why does misspecification hurt them?',
+    badge: 'factor score estimation',
+    body: `
+      <p>Factor scores are estimates of each person's standing on the latent variable. The most common method is <em>regression scoring</em> (also called Thomson scoring), which computes scores as:</p>
+      <div class="formula">f̂ = ΦΛ′Σ⁻¹x</div>
+      <p>where <em>x</em> is a person's observed item responses, <em>Λ</em> contains the loadings, <em>Φ</em> is the factor correlation matrix, and <em>Σ⁻¹</em> is the inverse of the model-implied covariance matrix. The scoring weight matrix W = ΦΛ′Σ⁻¹ determines how much each observed item contributes to the factor score estimate.</p>
+      <p>The key implication: <em>every</em> model parameter feeds into W. If any loading is wrong, or the factor correlation is wrong, the entire weight matrix shifts — and not just for the factor you misspecified. Because Σ⁻¹ couples all parameters together, misspecifying Factor 1's loadings changes the scoring weights for Factor 2 as well, especially when the factors are correlated.</p>
+      <p>This is why the scatterplots show cross-factor contamination. Drag an F1 loading and watch the F2 plot degrade — the effect is larger when φ is further from zero, because a strong factor correlation creates stronger coupling in Σ⁻¹.</p>
+      <p>An alternative method, <em>Bartlett scores</em>, minimizes a different criterion and produces scores that are unbiased but noisier. In practice both methods give similar results when the model is correct, but they can diverge under misspecification. The broader lesson: factor scores inherit every problem in your measurement model.</p>
+    `
+  }
+};
+
+function showInfo(key) {
+  const content = infoContent[key];
+  if (!content) return;
+  const modal = document.getElementById('info-modal-content');
+  modal.innerHTML = `
+    <div class="info-modal-badge">${content.badge}</div>
+    <h3>${content.title}</h3>
+    ${content.body}
+  `;
+  document.getElementById('info-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeInfo() {
+  document.getElementById('info-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeInfo();
+});
+</script>
+

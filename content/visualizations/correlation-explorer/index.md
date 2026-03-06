@@ -7,7 +7,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
   .ce-subtitle {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Source Serif 4', Georgia, serif;
     font-size: 1.0rem;
     color: var(--secondary);
     margin-bottom: 18px;
@@ -31,7 +31,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     font-size: 0.92rem;
   }
   .ce-control-group .val {
-    color: #0d8a74;
+    color: #2dd4bf;
     font-weight: 600;
   }
   .ce-controls input[type="range"] {
@@ -39,7 +39,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     appearance: none;
     width: 100%;
     height: 4px;
-    background: #e0e0ec;
+    background: #2a2d3a;
     border-radius: 2px;
     outline: none;
   }
@@ -49,14 +49,14 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: #0d8a74;
+    background: #2dd4bf;
     cursor: pointer;
   }
   .ce-controls input[type="range"]::-moz-range-thumb {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: #0d8a74;
+    background: #2dd4bf;
     cursor: pointer;
     border: none;
   }
@@ -80,8 +80,8 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     white-space: nowrap;
   }
   .ce-btn:hover {
-    border-color: #0d8a74;
-    color: #0d8a74;
+    border-color: #2dd4bf;
+    color: #2dd4bf;
   }
   .ce-btn.action {
     border-color: var(--border);
@@ -92,8 +92,8 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     color: #c2640a;
   }
   .ce-btn.destructive:hover {
-    border-color: #c83c5a;
-    color: #c83c5a;
+    border-color: #ef4444;
+    color: #ef4444;
   }
   .ce-info-btn {
     display: inline-flex;
@@ -115,8 +115,8 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     transition: border-color 0.2s, color 0.2s;
   }
   .ce-info-btn:hover {
-    border-color: #0d8a74;
-    color: #0d8a74;
+    border-color: #2dd4bf;
+    color: #2dd4bf;
   }
   .ce-main-area {
     display: grid;
@@ -133,7 +133,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     display: block;
     width: 100%;
     aspect-ratio: 1 / 1;
-    background: #f4f4f8;
+    background: #181a24;
     border-radius: 6px;
     cursor: crosshair;
   }
@@ -150,14 +150,14 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     gap: 10px;
   }
   .ce-stat-card {
-    background: #f4f4f8;
+    background: #181a24;
     border-radius: 6px;
     padding: 14px 16px;
-    border-left: 3px solid #e0e0ec;
+    border-left: 3px solid #2a2d3a;
     transition: border-color 0.3s;
   }
   .ce-stat-card.active {
-    border-left-color: #0d8a74;
+    border-left-color: #2dd4bf;
   }
   .ce-stat-label {
     font-family: 'IBM Plex Mono', monospace;
@@ -172,19 +172,19 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     font-size: 0.72rem;
     padding: 1px 5px;
     border-radius: 3px;
-    background: rgba(13, 138, 116, 0.1);
-    color: #0d8a74;
+    background: rgba(45, 212, 191, 0.1);
+    color: #2dd4bf;
   }
   .ce-stat-value {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 1.4rem;
     font-weight: 600;
-    color: #0d8a74;
+    color: #2dd4bf;
     margin: 4px 0;
     letter-spacing: -0.02em;
   }
   .ce-stat-value.na {
-    color: #c0c0d8;
+    color: #2a2d3a;
     font-size: 1.3rem;
   }
   .ce-stat-desc {
@@ -195,7 +195,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
   }
   .ce-stat-bar-wrap {
     height: 3px;
-    background: #e0e0ec;
+    background: #2a2d3a;
     border-radius: 2px;
     margin-top: 6px;
     overflow: hidden;
@@ -207,7 +207,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     width: 0%;
   }
   .ce-n-card {
-    background: #f4f4f8;
+    background: #181a24;
     border-radius: 6px;
     padding: 12px 16px;
     text-align: center;
@@ -273,8 +273,8 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     font-size: 0.82rem;
     padding: 2px 7px;
     border-radius: 3px;
-    background: rgba(13, 138, 116, 0.1);
-    color: #0d8a74;
+    background: rgba(45, 212, 191, 0.1);
+    color: #2dd4bf;
     display: inline-block;
     margin-bottom: 14px;
   }
@@ -288,8 +288,8 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
   .ce-modal .formula {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.76rem;
-    color: #0d8a74;
-    background: rgba(13, 138, 116, 0.06);
+    color: #2dd4bf;
+    background: rgba(45, 212, 191, 0.06);
     padding: 8px 12px;
     border-radius: 4px;
     margin: 10px 0;
@@ -606,7 +606,7 @@ function render() {
   const pw = plotW(W), ph = plotH(H);
 
   // Grid
-  ctx.strokeStyle = '#e4e4f0';
+  ctx.strokeStyle = '#1e2030';
   ctx.lineWidth = 0.5;
   for (let t = 0; t <= 1.001; t += 0.2) {
     const sx = toSx(t, W), sy = toSy(t, H);
@@ -615,14 +615,14 @@ function render() {
   }
 
   // Axes
-  ctx.strokeStyle = '#c0c0d8';
+  ctx.strokeStyle = '#2a2d3a';
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
   // Tick labels
   ctx.font = '14px IBM Plex Mono, monospace';
-  ctx.fillStyle = '#888899';
+  ctx.fillStyle = '#6b7084';
   ctx.textAlign = 'center';
   for (let t = 0; t <= 1.001; t += 0.2) {
     ctx.fillText(t.toFixed(1), toSx(t, W), PAD_T + ph + 16);
@@ -633,7 +633,7 @@ function render() {
   }
 
   // Axis labels
-  ctx.fillStyle = '#888899';
+  ctx.fillStyle = '#6b7084';
   ctx.font = '15px IBM Plex Mono, monospace';
   ctx.textAlign = 'center';
   ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 30);
@@ -657,7 +657,7 @@ function render() {
 
   // Empty state
   if (points.length === 0) {
-    ctx.fillStyle = '#c0c0d8';
+    ctx.fillStyle = '#2a2d3a';
     ctx.font = '14px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
     ctx.fillText('Click anywhere to add points', PAD_L + pw / 2, PAD_T + ph / 2);
@@ -932,7 +932,7 @@ function computeAndDisplay() {
       valEl.textContent = '—';
       valEl.className = 'ce-stat-value na';
       barEl.style.width = '0%';
-      barEl.style.background = '#e0e0ec';
+      barEl.style.background = '#2a2d3a';
       cardEl.classList.remove('active');
       continue;
     }
@@ -942,9 +942,9 @@ function computeAndDisplay() {
     valEl.className = 'ce-stat-value';
 
     if (m.signed) {
-      valEl.style.color = val > 0.05 ? '#0d8a74' : val < -0.05 ? '#c2640a' : '#888899';
+      valEl.style.color = val > 0.05 ? '#2dd4bf' : val < -0.05 ? '#c2640a' : '#6b7084';
     } else {
-      valEl.style.color = '#0d8a74';
+      valEl.style.color = '#2dd4bf';
     }
 
     let barPct;
@@ -957,7 +957,7 @@ function computeAndDisplay() {
       barPct = val * 100;
     }
     barEl.style.width = Math.min(100, barPct) + '%';
-    barEl.style.background = (m.signed && val < 0) ? '#c2640a' : '#0d8a74';
+    barEl.style.background = (m.signed && val < 0) ? '#c2640a' : '#2dd4bf';
   }
 }
 
@@ -1076,3 +1076,18 @@ window.addEventListener('resize', render);
 render();
 computeAndDisplay();
 </script>
+
+---
+
+##### Citation
+
+Persson, B. N. (2026). *Correlation explorer* [Interactive visualization]. https://bnpersson.github.io/visualizations/correlation-explorer/
+
+```BibTeX
+@misc{Persson2026correlation,
+  author = {Björn N. Persson},
+  year = {2026},
+  title = {Correlation Explorer},
+  note = {Interactive visualization},
+  url = {https://bnpersson.github.io/visualizations/correlation-explorer/}}
+```

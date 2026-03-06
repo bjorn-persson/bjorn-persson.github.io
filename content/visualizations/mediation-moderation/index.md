@@ -7,8 +7,9 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
 
-.mm-wrap { font-family: 'IBM Plex Mono', monospace; }
+.mm-wrap { font-family: 'IBM Plex Mono', monospace; max-width: 54rem; margin: 0 auto; }
 .mm-subtitle {
+  font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1.0rem;
   color: var(--secondary);
   margin-bottom: 18px;
@@ -23,13 +24,15 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   display: flex;
   flex-direction: column;
   gap: 10px;
+  height: 100%;
 }
 .mm-panel-header {
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--primary);
-  border-bottom: 2px solid #e0e0ec;
+  border-bottom: 2px solid #2a2d3a;
   padding-bottom: 6px;
+  white-space: nowrap;
 }
 .mm-panel-header span {
   font-size: 0.9rem;
@@ -40,8 +43,9 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
 .mm-canvas-wrap canvas {
   display: block;
   width: 100%;
+  height: 264px;
   border-radius: 6px;
-  background: #f4f4f8;
+  background: #181a24;
 }
 .mm-control-group {
   display: flex;
@@ -50,13 +54,13 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   font-size: 0.92rem;
 }
 .mm-control-group label { color: var(--secondary); }
-.mm-val { color: #0d8a74; font-weight: 600; }
+.mm-val { color: #2dd4bf; font-weight: 600; }
 .mm-panel input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #e0e0ec;
+  background: #2a2d3a;
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -66,13 +70,13 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   appearance: none;
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
 }
 .mm-panel input[type="range"]::-moz-range-thumb {
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: #0d8a74;
+  background: #2dd4bf;
   cursor: pointer;
   border: none;
 }
@@ -82,15 +86,16 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   display: flex;
   flex-direction: column;
   gap: 4px;
-  background: #f4f4f8;
+  background: #181a24;
   border-radius: 5px;
   padding: 10px 12px;
+  margin-top: auto;
 }
 .mm-readout .mm-row {
   display: flex;
   justify-content: space-between;
 }
-.mm-readout .mm-rval { color: #0d8a74; font-weight: 600; }
+.mm-readout .mm-rval { color: #2dd4bf; font-weight: 600; }
 .mm-readout .mm-rval.accent { color: #c2640a; }
 .mm-note {
   margin-top: 12px;
@@ -106,14 +111,14 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
 <div class="mm-wrap">
   <p class="mm-subtitle">
     <strong>Mediation</strong>: X affects Y <em>through</em> a third variable M (the mechanism).<br>
-    <strong>Moderation</strong>: the strength or direction of the X → Y relationship <em>depends on</em> a third variable W (the condition).<br>
+    <strong>Moderation</strong>: the strength or direction of the X → Y relationship <em>depends on</em> a third variable W (the condition).<br><br>
     Use the sliders to adjust effect sizes and watch the path diagrams and regression plots update.
   </p>
   <div class="mm-panels">
     <!-- MEDIATION -->
     <div class="mm-panel">
       <div class="mm-panel-header">Mediation <span>X → M → Y</span></div>
-      <div class="mm-canvas-wrap"><canvas id="med_canvas" height="240"></canvas></div>
+      <div class="mm-canvas-wrap"><canvas id="med_canvas" height="264"></canvas></div>
       <div class="mm-control-group">
         <label>a path  (X → M): <span class="mm-val" id="med_a_val">0.70</span></label>
         <input type="range" id="med_a" min="-1" max="1" step="0.01" value="0.70">
@@ -136,7 +141,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     <!-- MODERATION -->
     <div class="mm-panel">
       <div class="mm-panel-header">Moderation <span>Y = β₀ + β₁X + β₂W + β₃(X×W)</span></div>
-      <div class="mm-canvas-wrap"><canvas id="mod_canvas" height="240"></canvas></div>
+      <div class="mm-canvas-wrap"><canvas id="mod_canvas" height="264"></canvas></div>
       <div class="mm-control-group">
         <label>Main effect of X (β₁): <span class="mm-val" id="mod_b1_val">0.50</span></label>
         <input type="range" id="mod_b1" min="-1" max="1" step="0.01" value="0.50">
@@ -214,18 +219,18 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   function drawNode(ctx, x, y, label, sub, color) {
     ctx.beginPath();
     ctx.arc(x, y, 28, 0, Math.PI * 2);
-    ctx.fillStyle = color || '#f4f4f8';
+    ctx.fillStyle = color || '#181a24';
     ctx.fill();
-    ctx.strokeStyle = '#c0c0d8';
+    ctx.strokeStyle = '#2a2d3a';
     ctx.lineWidth = 1.5;
     ctx.stroke();
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#c9cdd8';
     ctx.textAlign = 'center';
     ctx.font = `bold 17px IBM Plex Mono, monospace`;
     ctx.fillText(label, x, y + 3);
     if (sub) {
       ctx.font = '15px IBM Plex Mono, monospace';
-      ctx.fillStyle = '#888899';
+      ctx.fillStyle = '#6b7084';
       ctx.fillText(sub, x, y + 18);
     }
   }
@@ -245,9 +250,9 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     const Yc_x = W * 0.85, Yc_y = H * 0.72;
 
     // Paths
-    const aColor = a >= 0 ? '#0d8a74' : '#c83c5a';
-    const bColor = b >= 0 ? '#0d8a74' : '#c83c5a';
-    const cpColor = Math.abs(cp) < 0.05 ? '#c0c0d8' : (cp >= 0 ? '#c2640a' : '#6d28d9');
+    const aColor = a >= 0 ? '#2dd4bf' : '#ef4444';
+    const bColor = b >= 0 ? '#2dd4bf' : '#ef4444';
+    const cpColor = Math.abs(cp) < 0.05 ? '#2a2d3a' : (cp >= 0 ? '#c2640a' : '#6d28d9');
 
     drawArrow(mCtx, Xc, Yc, Mc, Mc_y, a, aColor, false);
     drawArrow(mCtx, Mc, Mc_y, Yc_x, Yc_y, b, bColor, false);
@@ -267,9 +272,9 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     mCtx.fillText(`c′ = ${cp.toFixed(2)}`, W / 2, Yc + 22);
 
     // Nodes
-    drawNode(mCtx, Xc, Yc, 'X', 'predictor', '#eef8f5');
-    drawNode(mCtx, Mc, Mc_y, 'M', 'mediator', '#eef8f5');
-    drawNode(mCtx, Yc_x, Yc_y, 'Y', 'outcome', '#eef8f5');
+    drawNode(mCtx, Xc, Yc, 'X', 'predictor', '#1e2a28');
+    drawNode(mCtx, Mc, Mc_y, 'M', 'mediator', '#1e2a28');
+    drawNode(mCtx, Yc_x, Yc_y, 'Y', 'outcome', '#1e2a28');
 
     // Update readout
     const indirect = a * b;
@@ -318,7 +323,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     function toSy(v) { return PAD_T + (1 - (v - yMin) / (yMax - yMin)) * ph; }
 
     // Grid
-    rCtx.strokeStyle = '#e4e4f0'; rCtx.lineWidth = 0.5;
+    rCtx.strokeStyle = '#1e2030'; rCtx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const v = i / 4;
       rCtx.beginPath(); rCtx.moveTo(toSx(v), PAD_T); rCtx.lineTo(toSx(v), PAD_T + ph); rCtx.stroke();
@@ -328,20 +333,20 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     }
 
     // Axes
-    rCtx.strokeStyle = '#c0c0d8'; rCtx.lineWidth = 1;
+    rCtx.strokeStyle = '#2a2d3a'; rCtx.lineWidth = 1;
     rCtx.beginPath(); rCtx.moveTo(PAD_L, PAD_T + ph); rCtx.lineTo(PAD_L + pw, PAD_T + ph); rCtx.stroke();
     rCtx.beginPath(); rCtx.moveTo(PAD_L, PAD_T); rCtx.lineTo(PAD_L, PAD_T + ph); rCtx.stroke();
 
     // Y=0 line
     const y0line = toSy(0);
     rCtx.beginPath(); rCtx.moveTo(PAD_L, y0line); rCtx.lineTo(PAD_L + pw, y0line);
-    rCtx.strokeStyle = 'rgba(0,0,0,0.1)'; rCtx.lineWidth = 1; rCtx.stroke();
+    rCtx.strokeStyle = 'rgba(255,255,255,0.1)'; rCtx.lineWidth = 1; rCtx.stroke();
 
     // Reference lines W = -1, 0, +1 (thin, colored)
     const wLines = [
-      { w: -1, color: '#6d28d9', label: 'W=−1σ', dash: [4,4] },
-      { w:  0, color: '#888899', label: 'W=0',   dash: [4,4] },
-      { w:  1, color: '#c2640a', label: 'W=+1σ', dash: [4,4] },
+      { w: -1, color: '#a78bfa', label: 'W=−1σ', dash: [4,4] },
+      { w:  0, color: '#6b7084', label: 'W=0',   dash: [4,4] },
+      { w:  1, color: '#f59e0b', label: 'W=+1σ', dash: [4,4] },
     ];
     for (const wl of wLines) {
       const s = b1 + b3 * wl.w;
@@ -363,7 +368,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     {
       const y0 = 0.5 + b2 * wCur;
       const y1 = 0.5 + b2 * wCur + slopeCur * 1;
-      const lineColor = wCur > 0.1 ? '#c2640a' : wCur < -0.1 ? '#6d28d9' : '#0d8a74';
+      const lineColor = wCur > 0.1 ? '#c2640a' : wCur < -0.1 ? '#6d28d9' : '#2dd4bf';
       rCtx.beginPath();
       rCtx.moveTo(toSx(0), toSy(y0));
       rCtx.lineTo(toSx(1), toSy(y1));
@@ -375,14 +380,14 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
 
     // Slope = 0 annotation
     if (Math.abs(slopeCur) < 0.08) {
-      rCtx.fillStyle = '#c0c0d8';
+      rCtx.fillStyle = '#2a2d3a';
       rCtx.font = '13px IBM Plex Mono, monospace';
       rCtx.textAlign = 'center';
       rCtx.fillText('slope ≈ 0', toSx(0.5), toSy(0.5) - 10);
     }
 
     // X axis label
-    rCtx.fillStyle = '#888899';
+    rCtx.fillStyle = '#6b7084';
     rCtx.font = '14px IBM Plex Mono, monospace';
     rCtx.textAlign = 'center';
     rCtx.fillText('X (predictor)', PAD_L + pw / 2, PAD_T + ph + 30);
@@ -394,7 +399,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
 
     // X ticks
     rCtx.textAlign = 'center';
-    rCtx.fillStyle = '#888899';
+    rCtx.fillStyle = '#6b7084';
     rCtx.font = '13px IBM Plex Mono, monospace';
     for (let i = 0; i <= 4; i++) {
       rCtx.fillText(['Low','','','','High'][i] || '', toSx(i/4), PAD_T + ph + 17);
@@ -404,7 +409,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     rCtx.font = '12px IBM Plex Mono, monospace';
     const legEntries = [
       { label: 'W = −1σ', color: '#6d28d9' },
-      { label: 'W =  0',  color: '#888899' },
+      { label: 'W =  0',  color: '#6b7084' },
       { label: 'W = +1σ', color: '#c2640a' },
     ];
     const legX = PAD_L + 6;
@@ -458,3 +463,18 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
   resize();
 })();
 </script>
+
+---
+
+##### Citation
+
+Persson, B. N. (2026). *Mediation vs. moderation* [Interactive visualization]. https://bnpersson.github.io/visualizations/mediation-moderation/
+
+```BibTeX
+@misc{Persson2026medmod,
+  author = {Björn N. Persson},
+  year = {2026},
+  title = {Mediation vs. Moderation},
+  note = {Interactive visualization},
+  url = {https://bnpersson.github.io/visualizations/mediation-moderation/}}
+```
