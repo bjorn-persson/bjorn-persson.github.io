@@ -5,6 +5,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
 ---
 
 <style>
+:root { --text: #c9cdd8; }
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
 
 .rv-wrap {

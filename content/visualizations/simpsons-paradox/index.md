@@ -5,6 +5,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 ---
 
 <style>
+:root { --text: #c9cdd8; }
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
 
 .sp-wrap { font-family: 'IBM Plex Mono', monospace; }

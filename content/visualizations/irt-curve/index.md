@@ -5,6 +5,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
 ---
 
 <style>
+:root { --text: #c9cdd8; }
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 .viz-embed .irt-subtitle {

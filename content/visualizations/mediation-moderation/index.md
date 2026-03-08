@@ -1,10 +1,12 @@
 ---
+draft: true
 title: "Mediation vs. Moderation"
 description: "Side-by-side interactive diagrams contrasting mediation (X → M → Y path model) and moderation (the slope of X on Y changes as a function of a third variable). Sliders let you adjust path strengths and moderator level in real time."
 summary: "Clarify the classic confusion between mediation (mechanism: X affects Y through M) and moderation (condition: the X–Y relationship depends on W) with linked interactive diagrams."
 ---
 
 <style>
+:root { --text: #c9cdd8; }
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
 
 .mm-wrap { font-family: 'IBM Plex Mono', monospace; max-width: 54rem; margin: 0 auto; }

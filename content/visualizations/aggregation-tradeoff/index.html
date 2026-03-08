@@ -1,0 +1,1265 @@
+---
+title: "The Aggregation Tradeoff"
+description: "Interactive visualization exploring the tradeoff between aggregating items into composites versus keeping them separate: how aggregation increases reliability but can mask multidimensionality."
+summary: "Explore how aggregating questionnaire items into composite scores trades off reliability gains against the risk of obscuring distinct latent dimensions."
+---
+
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg-surface: #181a24;
+    --bg-elevated: #1e2030;
+    --text: #c9cdd8;
+    --text-bright: #e8ecf4;
+    --text-dim: #6b7084;
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.15);
+    --orange: #f97316;
+    --orange-dim: rgba(249,115,22,0.15);
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --yellow: #facc15;
+    --green: #4ade80;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --border: #2a2d3a;
+  }
+
+  /* Widen PaperMod content area for this page */
+  .post-content:has(.container) { max-width: 1000px; }
+  .main:has(.container) { --main-width: 1040px; }
+  .post-header .post-title { display: none; }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  /* Header */
+  .hero {
+    padding: 100px 0 60px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 60px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 2.4em;
+    color: var(--text-bright);
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .hero .subtitle {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 80px;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    font-weight: 600;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.5em;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+  }
+  .section p {
+    margin-bottom: 16px;
+    max-width: 680px;
+  }
+  .section p:last-of-type {
+    margin-bottom: 28px;
+  }
+
+  /* Math inline */
+  .m {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    color: var(--teal);
+    padding: 1px 4px;
+    background: var(--teal-dim);
+    border-radius: 3px;
+  }
+
+  /* Visualization containers */
+  .viz-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  /* Equation display */
+  .equation-box {
+    font-family: var(--mono);
+    font-size: 0.92em;
+    color: var(--text-bright);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: 14px 20px;
+    margin: 16px 0;
+    text-align: center;
+    border-radius: 6px;
+  }
+  .equation-box .eq-label {
+    font-size: 0.75em;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  /* Slider controls */
+  .controls {
+    margin: 20px 0;
+  }
+  .control-group {
+    margin-bottom: 16px;
+  }
+  .control-group label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .control-group label .lbl { white-space: nowrap; }
+  .control-group label .val {
+    color: var(--teal);
+    font-weight: 600;
+    font-size: 0.88em;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--teal);
+    cursor: pointer;
+    border: 2px solid var(--bg-surface);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--teal);
+    cursor: pointer;
+    border: 2px solid var(--bg-surface);
+  }
+  input[type="range"].orange-slider::-webkit-slider-thumb {
+    background: var(--orange);
+  }
+  input[type="range"].orange-slider::-moz-range-thumb {
+    background: var(--orange);
+  }
+
+  /* Metric displays */
+  .metrics-row {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .metric-card {
+    flex: 1;
+    min-width: 120px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 18px;
+    text-align: center;
+  }
+  .metric-card .metric-label {
+    font-family: var(--mono);
+    font-size: 0.7em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .metric-card .metric-value {
+    font-family: var(--mono);
+    font-size: 1.15em;
+    font-weight: 600;
+    color: var(--teal);
+  }
+  .metric-card .metric-value.orange {
+    color: var(--orange);
+  }
+  .metric-card .metric-sub {
+    font-family: var(--mono);
+    font-size: 0.7em;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Chart containers */
+  .chart-container {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    position: relative;
+  }
+  .chart-container .chart-title {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+  }
+
+  /* Note / try-it boxes */
+  .note {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--teal);
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 0.92em;
+    border-radius: 0 6px 6px 0;
+    max-width: 680px;
+  }
+  .note.warn {
+    border-left-color: var(--orange);
+  }
+  .try-it {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--teal);
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 0.88em;
+    border-radius: 0 6px 6px 0;
+    max-width: 680px;
+  }
+  .try-it strong {
+    color: var(--teal);
+  }
+
+  /* Domain table */
+  .domain-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+  .domain-table th {
+    text-align: left;
+    color: var(--text-dim);
+    font-weight: 600;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .domain-table td {
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(42,45,58,0.5);
+    color: var(--text);
+  }
+  .domain-table tr:hover td {
+    background: var(--teal-dim);
+  }
+
+  /* Buttons */
+  .btn {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    font-weight: 600;
+    padding: 10px 20px;
+    border: 1px solid var(--teal);
+    background: transparent;
+    color: var(--teal);
+    border-radius: 5px;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+    margin-right: 8px;
+    margin-top: 8px;
+  }
+  .btn:hover {
+    background: var(--teal-dim);
+  }
+  .btn.orange {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+  .btn.orange:hover {
+    background: var(--orange-dim);
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 16px;
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* Side-by-side control rows */
+  .control-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
+  }
+  @media (max-width: 600px) {
+    .control-row { grid-template-columns: 1fr; }
+  }
+
+  /* Chart annotation */
+  .chart-annotation {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  /* Footer */
+  .viz-footer {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+  }
+
+  /* Section em styling */
+  .section p em {
+    color: var(--teal);
+    font-style: italic;
+  }
+</style>
+
+<div class="container">
+
+<div class="hero">
+  <h1>The Aggregation Tradeoff</h1>
+  <div class="subtitle">Why scale scores sacrifice predictive validity — and what item-level models recover</div>
+</div>
+
+<!-- SECTION 1: The Core Equation -->
+<div class="section" id="s1">
+  <div class="section-label">Section 1</div>
+  <h2>Aggregation helps reliability. Does it help validity?</h2>
+
+  <p>When we average items into a scale score, the resulting composite becomes more <em>reliable</em> — random measurement error cancels out. This is the Spearman-Brown principle, and it's why we use multi-item scales in the first place.</p>
+
+  <p>But reliability and validity are different things. Eagly &amp; Revelle (2022) showed that the <em>validity</em> of a scale for predicting an external criterion (like sex) depends not only on the number of items and their individual validities, but also on how correlated the items are with each other. The relationship is captured by this equation:</p>
+
+  <div class="equation-box">
+    r<sub>yx</sub> = k · r̄<sub>iy</sub> / √(k + k(k−1) · r̄<sub>i</sub>)
+    <div class="eq-label">Scale validity as a function of items (k), average item validity (r̄<sub>iy</sub>), and average interitem correlation (r̄<sub>i</sub>)</div>
+  </div>
+
+  <p>The key insight: high interitem correlations <em>help</em> reliability but <em>limit</em> the validity gain from aggregation. Items from the same narrow domain (high r̄<sub>i</sub>) are partly redundant — averaging them recovers less new criterion-relevant information per item added.</p>
+
+  <p>Drag the sliders below to see this tradeoff in action.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Number of items (k) <span class="val" id="v_k1">10</span></label>
+      <input type="range" id="sl_k1" min="2" max="100" value="10" step="1">
+    </div>
+    <div class="control-group">
+      <label><span class="lbl">Avg item validity (r̄<sub>iy</sub>)</span> <span class="val" id="v_riy1">0.20</span></label>
+      <input type="range" id="sl_riy1" min="0.01" max="0.50" value="0.20" step="0.01" class="orange-slider">
+    </div>
+    <div class="control-group">
+      <label><span class="lbl">Avg interitem correlation (r̄<sub>i</sub>)</span> <span class="val" id="v_ri1">0.30</span></label>
+      <input type="range" id="sl_ri1" min="0.01" max="0.80" value="0.30" step="0.01">
+    </div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">Scale Reliability (α)</div>
+      <div class="metric-value" id="m_alpha">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Scale Validity (r<sub>yx</sub>)</div>
+      <div class="metric-value orange" id="m_ryx">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Implied d</div>
+      <div class="metric-value" id="m_d" style="color:var(--yellow)">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Validity Ceiling</div>
+      <div class="metric-value" id="m_ceil" style="color:var(--text-dim)">—</div>
+      <div class="metric-sub">r̄<sub>iy</sub> / √r̄<sub>i</sub></div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-title">Reliability vs Validity as items increase</div>
+    <canvas id="chart1" height="150"></canvas>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Reliability (α)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Validity (r<sub>yx</sub>)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim);opacity:0.5"></div> Validity ceiling</div>
+    </div>
+  </div>
+
+  <div class="try-it">
+    <strong>Try it:</strong> Set r̄<sub>i</sub> high (0.60+) and watch validity plateau quickly even as reliability climbs toward 1.00. Then lower r̄<sub>i</sub> to 0.10 — now validity keeps climbing with more items. This is why combining items from <em>different</em> domains (low r̄<sub>i</sub>) is so powerful for prediction.
+  </div>
+</div>
+
+<!-- SECTION 2: Within vs Across Domains -->
+<div class="section" id="s2">
+  <div class="section-label">Section 2</div>
+  <h2>One domain vs two: the M + F insight</h2>
+
+  <p>Eagly &amp; Revelle show that combining masculine and feminine items into a single composite (M + F) predicts sex far better than either subscale alone — even with the same total number of items. Why? Because M and F items are weakly correlated with each other, so the combined scale has a <em>lower average interitem correlation</em>, which pushes the validity ceiling higher.</p>
+
+  <p>Below, two domains are simulated side by side. Within each domain, items are correlated at r̄<sub>within</sub>. Across domains, items correlate at r̄<sub>across</sub>. Watch what happens to validity when the two domains are combined.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Items per domain <span class="val" id="v_kd">15</span></label>
+      <input type="range" id="sl_kd" min="3" max="40" value="15" step="1">
+    </div>
+    <div class="control-row">
+      <div class="control-group">
+        <label><span class="lbl">Avg item validity — Domain A (r̄<sub>iy</sub>)</span> <span class="val" id="v_riyA">0.25</span></label>
+        <input type="range" id="sl_riyA" min="0.05" max="0.50" value="0.25" step="0.01" class="orange-slider">
+      </div>
+      <div class="control-group">
+        <label><span class="lbl">Avg item validity — Domain B (r̄<sub>iy</sub>)</span> <span class="val" id="v_riyB">0.20</span></label>
+        <input type="range" id="sl_riyB" min="0.05" max="0.50" value="0.20" step="0.01" class="orange-slider">
+      </div>
+    </div>
+    <div class="control-row">
+      <div class="control-group">
+        <label><span class="lbl">Within-domain r̄<sub>i</sub></span> <span class="val" id="v_riW">0.35</span></label>
+        <input type="range" id="sl_riW" min="0.05" max="0.70" value="0.35" step="0.01">
+      </div>
+      <div class="control-group">
+        <label><span class="lbl">Across-domain r̄<sub>i</sub></span> <span class="val" id="v_riA">0.05</span></label>
+        <input type="range" id="sl_riA" min="-0.30" max="0.50" value="0.05" step="0.01">
+      </div>
+    </div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">Domain A validity</div>
+      <div class="metric-value" id="m_valA">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Domain B validity</div>
+      <div class="metric-value" id="m_valB">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Combined A+B validity</div>
+      <div class="metric-value orange" id="m_valAB">—</div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-title">Validity: Single domains vs Combined</div>
+    <canvas id="chart2" height="150"></canvas>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Domain A</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim)"></div> Domain B</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Combined A + B</div>
+    </div>
+  </div>
+
+  <div class="try-it">
+    <strong>Try it:</strong> Set the across-domain correlation to 0 or negative (as with M and F scales). The combined validity jumps above either domain alone. Now increase across-domain r̄<sub>i</sub> toward the within-domain value — the advantage of combining shrinks because the domains are no longer adding unique information.
+  </div>
+</div>
+
+<!-- SECTION 3: The classification connection -->
+<div class="section" id="s3">
+  <div class="section-label">Section 3</div>
+  <h2>From validity to classification accuracy</h2>
+
+  <p>Scale validity (a correlation) may feel abstract. But it translates directly to how well you can <em>classify</em> people — for example, predicting sex from a psychological composite. The relationship between the point-biserial r and the distributions of two groups is deterministic: a higher validity means the group distributions are pulled further apart, and fewer people are misclassified.</p>
+
+  <p>The implied Cohen's d is: d = 2r / √(1 − r²). Given d, the overlap of two normal distributions determines classification accuracy at the optimal threshold.</p>
+
+  <p>Drag the scale validity to see the distributions separate and accuracy change.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label><span class="lbl">Scale validity (r<sub>yx</sub>)</span> <span class="val" id="v_ryx3">0.40</span></label>
+      <input type="range" id="sl_ryx3" min="0.01" max="0.95" value="0.40" step="0.01" class="orange-slider">
+    </div>
+    <div class="control-group">
+      <label>Base rate (proportion group 1) <span class="val" id="v_base3">0.50</span></label>
+      <input type="range" id="sl_base3" min="0.20" max="0.80" value="0.50" step="0.01">
+    </div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">Cohen's d</div>
+      <div class="metric-value" id="m_d3" style="color:var(--yellow)">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Optimal Accuracy</div>
+      <div class="metric-value orange" id="m_acc3">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Overlap %</div>
+      <div class="metric-value" id="m_ovl3">—</div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-title">Group distributions on the composite score</div>
+    <canvas id="chart3" height="140"></canvas>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Group 1 (e.g. Men)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Group 2 (e.g. Women)</div>
+    </div>
+    <div class="chart-annotation">The dashed line shows the optimal classification threshold.</div>
+  </div>
+
+  <div class="try-it">
+    <strong>Try it:</strong> At r = 0.20, accuracy is barely above chance. At r = 0.40, you're around 65–70%. At r = 0.70, you're pushing 80%+. This is the psychometric machinery behind the jump from scale-level logistic regression (~80%) to item-level elastic net (~88%): the elastic net builds a higher-validity composite by weighting items individually rather than averaging within scales.
+  </div>
+</div>
+
+<!-- SECTION 4: What elastic net does differently -->
+<div class="section" id="s4">
+  <div class="section-label">Section 4</div>
+  <h2>What the elastic net does differently</h2>
+
+  <p>A traditional scale score assigns <em>equal weight</em> to every item in the scale. If 10 items measure agreeableness, each contributes 1/10 to the composite — regardless of whether some items strongly differentiate groups and others don't.</p>
+
+  <p>Penalized regression assigns each item its <em>own</em> weight, optimized for predicting the criterion. Items with high individual validity get large weights; irrelevant items get shrunk to zero. This is equivalent to building an optimal composite with maximal validity — it sidesteps the constraint that all items within a scale must be weighted equally.</p>
+
+  <p>Below, 20 items are simulated from two scales (10 each). Each item has a "true" validity for predicting group membership. The scale-score approach averages all items equally within each scale. The elastic net approach assigns optimal weights.</p>
+
+  <div style="margin:16px 0">
+    <button class="btn" id="btn_gen">Generate New Items</button>
+    <button class="btn orange" id="btn_preset1">Uniform Validity</button>
+    <button class="btn orange" id="btn_preset2">Mixed Validity</button>
+    <button class="btn orange" id="btn_preset3">Concentrated Signal</button>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-title">Item validities and weights</div>
+    <canvas id="chart4" height="120"></canvas>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim)"></div> True item validity (r<sub>iy</sub>)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Scale-score weight</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Optimal weight</div>
+    </div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">Scale-score validity</div>
+      <div class="metric-value" id="m_scale_val">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Optimal-weight validity</div>
+      <div class="metric-value orange" id="m_opt_val">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Validity gain</div>
+      <div class="metric-value" id="m_gain" style="color:var(--green)">—</div>
+    </div>
+  </div>
+
+  <div class="try-it">
+    <strong>Try it:</strong> Click "Uniform Validity" — when all items predict equally well, the scale-score approach is nearly optimal and the gain is small. Click "Concentrated Signal" — when a few items carry most of the predictive signal, the elastic net massively outperforms equal weighting because it can upweight the informative items and zero out the rest.
+  </div>
+
+  <p>This is precisely what happened in the empirical analysis: moving from 13 scale scores to ~240 item-level predictors with elastic net improved classification accuracy from ~80% to ~88%. The scale scores were averaging strong-signal items with weak-signal items, diluting the composite validity. The elastic net recovered the lost signal by letting each item speak for itself.</p>
+</div>
+
+<!-- SECTION 5: The tradeoff summarized -->
+<div class="section" id="s5">
+  <div class="section-label">Section 5</div>
+  <h2>The tradeoff: construct coherence vs prediction</h2>
+
+  <p>The table below summarizes the fundamental tension. Scale scores and item-level models optimize for different goals, and neither dominates the other in all respects.</p>
+
+  <table class="domain-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Scale Scores</th>
+        <th>Item-Level Model</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Weighting</td>
+        <td>Equal (1/k per item)</td>
+        <td>Optimized per item</td>
+      </tr>
+      <tr>
+        <td>Interpretability</td>
+        <td style="color:var(--green)">High — maps to constructs</td>
+        <td style="color:var(--red)">Low — item-level weights</td>
+      </tr>
+      <tr>
+        <td>Criterion validity</td>
+        <td style="color:var(--orange)">Bounded by r̄<sub>iy</sub>/√r̄<sub>i</sub></td>
+        <td style="color:var(--green)">Can approach ceiling</td>
+      </tr>
+      <tr>
+        <td>Stability across samples</td>
+        <td style="color:var(--green)">High</td>
+        <td style="color:var(--orange)">Depends on regularization</td>
+      </tr>
+      <tr>
+        <td>Theory-driven?</td>
+        <td style="color:var(--green)">Yes</td>
+        <td style="color:var(--red)">No (data-driven)</td>
+      </tr>
+      <tr>
+        <td>Handles item heterogeneity?</td>
+        <td style="color:var(--red)">No — all items equal</td>
+        <td style="color:var(--green)">Yes — differential weighting</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>The take-home: scale scores are <em>construct-validity</em> tools. They measure what they're designed to measure, and they do it reliably. But for <em>criterion prediction</em> — especially when item-level signal varies — they impose a constraint (equal weighting) that costs predictive power. Penalized regression relaxes that constraint, gaining prediction at the expense of theoretical coherence.</p>
+
+  <p>Recognizing this isn't a criticism of either approach. It's a recognition that measurement and prediction are different psychometric goals, and there is no free lunch.</p>
+</div>
+
+<div class="viz-footer">
+  <p>Built as a companion to Eagly, A. H. &amp; Revelle, W. (2022). Understanding the magnitude of psychological differences between women and men requires seeing the forest and the trees. <em>Perspectives on Psychological Science, 17</em>(5), 1339–1358.</p>
+  <p style="margin-top:8px">All computations run in your browser. No data are sent anywhere.</p>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ========================================
+// UTILITY FUNCTIONS
+// ========================================
+
+function scaleValidity(k, riy, ri) {
+  if (k <= 0 || ri < 0) return 0;
+  const denom = Math.sqrt(k + k * (k - 1) * ri);
+  return (k * riy) / denom;
+}
+
+function spearmanBrown(k, ri) {
+  if (ri <= 0) return 0;
+  return (k * ri) / (1 + (k - 1) * ri);
+}
+
+function rToD(r) {
+  const r2 = r * r;
+  if (r2 >= 1) return 20;
+  return (2 * r) / Math.sqrt(1 - r2);
+}
+
+function normalPDF(x, mu, sigma) {
+  const z = (x - mu) / sigma;
+  return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2 * Math.PI));
+}
+
+function normalCDF(x) {
+  const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
+  const a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+  const sign = x < 0 ? -1 : 1;
+  x = Math.abs(x) / Math.sqrt(2);
+  const t = 1.0 / (1.0 + p * x);
+  const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+  return 0.5 * (1.0 + sign * y);
+}
+
+function optimalAccuracy(d, baseRate) {
+  const p1 = baseRate;
+  const p2 = 1 - baseRate;
+  let bestAcc = 0;
+  for (let t = -3; t <= d + 3; t += 0.02) {
+    const acc = p1 * normalCDF(t) + p2 * (1 - normalCDF(t - d));
+    if (acc > bestAcc) bestAcc = acc;
+  }
+  return bestAcc;
+}
+
+function overlapCoeff(d) {
+  return 2 * normalCDF(-Math.abs(d) / 2);
+}
+
+// ========================================
+// DRAWING UTILITIES
+// ========================================
+
+function setupCanvas(canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, w: rect.width, h: rect.height };
+}
+
+const COLORS = {
+  teal: '#2dd4bf',
+  orange: '#f97316',
+  yellow: '#facc15',
+  dim: 'rgba(201,205,216,0.3)',
+  dimmer: 'rgba(201,205,216,0.15)',
+  text: '#6b7084',
+  bg: '#0f1117',
+  green: '#4ade80',
+  red: '#ef4444'
+};
+
+function drawAxes(ctx, w, h, pad, opts = {}) {
+  ctx.strokeStyle = COLORS.dim;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, h - pad.bottom);
+  ctx.lineTo(w - pad.right, h - pad.bottom);
+  ctx.stroke();
+
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '11px IBM Plex Mono';
+  ctx.textAlign = 'center';
+
+  if (opts.xTicks) {
+    opts.xTicks.forEach(t => {
+      const x = pad.left + (t.val - (opts.xMin || 0)) / ((opts.xMax || 1) - (opts.xMin || 0)) * (w - pad.left - pad.right);
+      ctx.fillText(t.label, x, h - pad.bottom + 16);
+      ctx.beginPath();
+      ctx.moveTo(x, h - pad.bottom);
+      ctx.lineTo(x, h - pad.bottom + 4);
+      ctx.stroke();
+    });
+  }
+  if (opts.yTicks) {
+    ctx.textAlign = 'right';
+    opts.yTicks.forEach(t => {
+      const y = h - pad.bottom - (t.val - (opts.yMin || 0)) / ((opts.yMax || 1) - (opts.yMin || 0)) * (h - pad.top - pad.bottom);
+      ctx.fillText(t.label, pad.left - 8, y + 4);
+      ctx.beginPath();
+      ctx.strokeStyle = COLORS.dimmer;
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(w - pad.right, y);
+      ctx.stroke();
+      ctx.strokeStyle = COLORS.dim;
+    });
+  }
+  if (opts.xLabel) {
+    ctx.textAlign = 'center';
+    ctx.fillText(opts.xLabel, pad.left + (w - pad.left - pad.right) / 2, h - 2);
+  }
+}
+
+function drawLine(ctx, points, w, h, pad, xMin, xMax, yMin, yMax, color, lineWidth = 2) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.beginPath();
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+  let first = true;
+  points.forEach(p => {
+    const x = pad.left + (p[0] - xMin) / (xMax - xMin) * plotW;
+    const y = h - pad.bottom - (p[1] - yMin) / (yMax - yMin) * plotH;
+    if (first) { ctx.moveTo(x, y); first = false; }
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+}
+
+function drawDashedLine(ctx, x1, y1, x2, y2, color) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+// ========================================
+// SECTION 1: Core equation
+// ========================================
+(function() {
+  const sl_k = document.getElementById('sl_k1');
+  const sl_riy = document.getElementById('sl_riy1');
+  const sl_ri = document.getElementById('sl_ri1');
+  const v_k = document.getElementById('v_k1');
+  const v_riy = document.getElementById('v_riy1');
+  const v_ri = document.getElementById('v_ri1');
+
+  function update() {
+    const k = +sl_k.value;
+    const riy = +sl_riy.value;
+    const ri = +sl_ri.value;
+
+    v_k.textContent = k;
+    v_riy.textContent = riy.toFixed(2);
+    v_ri.textContent = ri.toFixed(2);
+
+    const alpha = spearmanBrown(k, ri);
+    const ryx = scaleValidity(k, riy, ri);
+    const d = rToD(Math.min(ryx, 0.999));
+    const ceil = riy / Math.sqrt(ri);
+
+    document.getElementById('m_alpha').textContent = alpha.toFixed(3);
+    document.getElementById('m_ryx').textContent = ryx.toFixed(3);
+    document.getElementById('m_d').textContent = d.toFixed(2);
+    document.getElementById('m_ceil').textContent = ceil.toFixed(3);
+
+    const canvas = document.getElementById('chart1');
+    const { ctx, w, h } = setupCanvas(canvas);
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = { top: 20, right: 20, bottom: 35, left: 50 };
+    const maxK = 100;
+
+    const xTicks = [1, 10, 20, 40, 60, 80, 100].map(v => ({ val: v, label: v.toString() }));
+    const yTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0].map(v => ({ val: v, label: v.toFixed(1) }));
+    drawAxes(ctx, w, h, pad, { xTicks, yTicks, xMin: 1, xMax: maxK, yMin: 0, yMax: 1.05, xLabel: 'Number of items (k)' });
+
+    const relPoints = [];
+    const valPoints = [];
+    for (let ki = 1; ki <= maxK; ki++) {
+      relPoints.push([ki, spearmanBrown(ki, ri)]);
+      valPoints.push([ki, scaleValidity(ki, riy, ri)]);
+    }
+    drawLine(ctx, relPoints, w, h, pad, 1, maxK, 0, 1.05, COLORS.teal);
+    drawLine(ctx, valPoints, w, h, pad, 1, maxK, 0, 1.05, COLORS.orange);
+
+    const ceilVal = Math.min(ceil, 1.05);
+    const ceilY = h - pad.bottom - (ceilVal / 1.05) * (h - pad.top - pad.bottom);
+    drawDashedLine(ctx, pad.left, ceilY, w - pad.right, ceilY, 'rgba(201,205,216,0.25)');
+
+    const plotW = w - pad.left - pad.right;
+    const plotH = h - pad.top - pad.bottom;
+    const cx = pad.left + (k - 1) / (maxK - 1) * plotW;
+    const cyRel = h - pad.bottom - (alpha / 1.05) * plotH;
+    const cyVal = h - pad.bottom - (ryx / 1.05) * plotH;
+
+    [{ y: cyRel, color: COLORS.teal }, { y: cyVal, color: COLORS.orange }].forEach(dot => {
+      ctx.beginPath();
+      ctx.arc(cx, dot.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = dot.color;
+      ctx.fill();
+    });
+  }
+
+  sl_k.addEventListener('input', update);
+  sl_riy.addEventListener('input', update);
+  sl_ri.addEventListener('input', update);
+  update();
+})();
+
+// ========================================
+// SECTION 2: Cross-domain
+// ========================================
+(function() {
+  const sl_kd = document.getElementById('sl_kd');
+  const sl_riyA = document.getElementById('sl_riyA');
+  const sl_riyB = document.getElementById('sl_riyB');
+  const sl_riW = document.getElementById('sl_riW');
+  const sl_riA = document.getElementById('sl_riA');
+
+  function update() {
+    const kd = +sl_kd.value;
+    const riyA = +sl_riyA.value;
+    const riyB = +sl_riyB.value;
+    const riW = +sl_riW.value;
+    const riAcross = +sl_riA.value;
+
+    document.getElementById('v_kd').textContent = kd;
+    document.getElementById('v_riyA').textContent = riyA.toFixed(2);
+    document.getElementById('v_riyB').textContent = riyB.toFixed(2);
+    document.getElementById('v_riW').textContent = riW.toFixed(2);
+    document.getElementById('v_riA').textContent = riAcross.toFixed(2);
+
+    const valA = scaleValidity(kd, riyA, riW);
+    const valB = scaleValidity(kd, riyB, riW);
+
+    const totalItems = 2 * kd;
+    const totalPairs = totalItems * (totalItems - 1) / 2;
+    const withinPairs = 2 * (kd * (kd - 1) / 2);
+    const acrossPairs = kd * kd;
+    const avgRi_combined = (withinPairs * riW + acrossPairs * riAcross) / totalPairs;
+    const avgRiy_combined = (riyA + riyB) / 2;
+    const valAB = scaleValidity(totalItems, avgRiy_combined, Math.max(avgRi_combined, 0.001));
+
+    document.getElementById('m_valA').textContent = valA.toFixed(3);
+    document.getElementById('m_valB').textContent = valB.toFixed(3);
+    document.getElementById('m_valAB').textContent = valAB.toFixed(3);
+
+    const canvas = document.getElementById('chart2');
+    const { ctx, w, h } = setupCanvas(canvas);
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = { top: 20, right: 20, bottom: 35, left: 50 };
+    const maxK = 40;
+
+    const xTicks = [5, 10, 15, 20, 25, 30, 35, 40].map(v => ({ val: v, label: v.toString() }));
+    const yTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0].map(v => ({ val: v, label: v.toFixed(1) }));
+    drawAxes(ctx, w, h, pad, { xTicks, yTicks, xMin: 2, xMax: maxK, yMin: 0, yMax: 1.05, xLabel: 'Items per domain' });
+
+    const ptsA = [], ptsB = [], ptsAB = [];
+    for (let ki = 2; ki <= maxK; ki++) {
+      ptsA.push([ki, scaleValidity(ki, riyA, riW)]);
+      ptsB.push([ki, scaleValidity(ki, riyB, riW)]);
+      const ti = 2 * ki;
+      const wp = 2 * (ki * (ki - 1) / 2);
+      const ap = ki * ki;
+      const tp = ti * (ti - 1) / 2;
+      const ari = (wp * riW + ap * riAcross) / tp;
+      ptsAB.push([ki, scaleValidity(ti, avgRiy_combined, Math.max(ari, 0.001))]);
+    }
+
+    drawLine(ctx, ptsA, w, h, pad, 2, maxK, 0, 1.05, COLORS.teal);
+    drawLine(ctx, ptsB, w, h, pad, 2, maxK, 0, 1.05, COLORS.dim, 2);
+    drawLine(ctx, ptsAB, w, h, pad, 2, maxK, 0, 1.05, COLORS.orange);
+
+    const plotW = w - pad.left - pad.right;
+    const plotH = h - pad.top - pad.bottom;
+    const cx = pad.left + (kd - 2) / (maxK - 2) * plotW;
+    [{ v: valA, c: COLORS.teal }, { v: valB, c: COLORS.dim }, { v: valAB, c: COLORS.orange }].forEach(dot => {
+      const cy = h - pad.bottom - (dot.v / 1.05) * plotH;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+      ctx.fillStyle = dot.c;
+      ctx.fill();
+    });
+  }
+
+  [sl_kd, sl_riyA, sl_riyB, sl_riW, sl_riA].forEach(s => s.addEventListener('input', update));
+  update();
+})();
+
+// ========================================
+// SECTION 3: Classification
+// ========================================
+(function() {
+  const sl_ryx = document.getElementById('sl_ryx3');
+  const sl_base = document.getElementById('sl_base3');
+
+  function update() {
+    const ryx = +sl_ryx.value;
+    const base = +sl_base.value;
+
+    document.getElementById('v_ryx3').textContent = ryx.toFixed(2);
+    document.getElementById('v_base3').textContent = base.toFixed(2);
+
+    const d = rToD(Math.min(ryx, 0.999));
+    const acc = optimalAccuracy(d, base);
+    const ovl = overlapCoeff(d);
+
+    document.getElementById('m_d3').textContent = d.toFixed(2);
+    document.getElementById('m_acc3').textContent = (acc * 100).toFixed(1) + '%';
+    document.getElementById('m_ovl3').textContent = (ovl * 100).toFixed(1) + '%';
+
+    const canvas = document.getElementById('chart3');
+    const { ctx, w, h } = setupCanvas(canvas);
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = { top: 15, right: 20, bottom: 30, left: 20 };
+    const plotW = w - pad.left - pad.right;
+    const plotH = h - pad.top - pad.bottom;
+
+    const xMin = -3.5;
+    const xMax = d + 3.5;
+    const steps = 300;
+    const dx = (xMax - xMin) / steps;
+
+    let maxY = 0;
+    for (let i = 0; i <= steps; i++) {
+      const x = xMin + i * dx;
+      maxY = Math.max(maxY, normalPDF(x, 0, 1), normalPDF(x, d, 1));
+    }
+    maxY *= 1.1;
+
+    let bestT = d / 2, bestAcc = 0;
+    for (let t = xMin; t <= xMax; t += 0.02) {
+      const a = base * normalCDF(t) + (1 - base) * (1 - normalCDF(t - d));
+      if (a > bestAcc) { bestAcc = a; bestT = t; }
+    }
+
+    // Group 1
+    ctx.beginPath();
+    ctx.moveTo(pad.left, h - pad.bottom);
+    for (let i = 0; i <= steps; i++) {
+      const x = xMin + i * dx;
+      const px = pad.left + (x - xMin) / (xMax - xMin) * plotW;
+      const py = h - pad.bottom - (normalPDF(x, 0, 1) / maxY) * plotH;
+      ctx.lineTo(px, py);
+    }
+    ctx.lineTo(pad.left + plotW, h - pad.bottom);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(45,212,191,0.2)';
+    ctx.fill();
+    ctx.strokeStyle = COLORS.teal;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Group 2
+    ctx.beginPath();
+    ctx.moveTo(pad.left, h - pad.bottom);
+    for (let i = 0; i <= steps; i++) {
+      const x = xMin + i * dx;
+      const px = pad.left + (x - xMin) / (xMax - xMin) * plotW;
+      const py = h - pad.bottom - (normalPDF(x, d, 1) / maxY) * plotH;
+      ctx.lineTo(px, py);
+    }
+    ctx.lineTo(pad.left + plotW, h - pad.bottom);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(249,115,22,0.2)';
+    ctx.fill();
+    ctx.strokeStyle = COLORS.orange;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Threshold line
+    const tx = pad.left + (bestT - xMin) / (xMax - xMin) * plotW;
+    drawDashedLine(ctx, tx, pad.top, tx, h - pad.bottom, 'rgba(232,236,244,0.4)');
+
+    // Axis
+    ctx.strokeStyle = COLORS.dim;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, h - pad.bottom);
+    ctx.lineTo(pad.left + plotW, h - pad.bottom);
+    ctx.stroke();
+  }
+
+  sl_ryx.addEventListener('input', update);
+  sl_base.addEventListener('input', update);
+  update();
+})();
+
+// ========================================
+// SECTION 4: Elastic net weights
+// ========================================
+(function() {
+  let items = [];
+  const nItems = 20;
+  const kPerScale = 10;
+
+  function generateRandom() {
+    items = [];
+    for (let i = 0; i < nItems; i++) {
+      const val = Math.random() * 0.45 + 0.02;
+      items.push({ validity: val, scale: i < kPerScale ? 'A' : 'B' });
+    }
+    const a = items.filter(x => x.scale === 'A').sort((a, b) => b.validity - a.validity);
+    const b = items.filter(x => x.scale === 'B').sort((a, b) => b.validity - a.validity);
+    items = [...a, ...b];
+    update();
+  }
+
+  function setPreset(type) {
+    items = [];
+    if (type === 'uniform') {
+      for (let i = 0; i < nItems; i++) {
+        items.push({ validity: 0.20 + Math.random() * 0.04, scale: i < kPerScale ? 'A' : 'B' });
+      }
+    } else if (type === 'mixed') {
+      for (let i = 0; i < nItems; i++) {
+        const base = i < kPerScale ? 0.25 : 0.10;
+        items.push({ validity: base + Math.random() * 0.10, scale: i < kPerScale ? 'A' : 'B' });
+      }
+    } else if (type === 'concentrated') {
+      for (let i = 0; i < nItems; i++) {
+        let val;
+        if (i < 3) val = 0.35 + Math.random() * 0.10;
+        else if (i < kPerScale) val = 0.03 + Math.random() * 0.04;
+        else if (i >= kPerScale && i < kPerScale + 2) val = 0.30 + Math.random() * 0.10;
+        else val = 0.02 + Math.random() * 0.03;
+        items.push({ validity: val, scale: i < kPerScale ? 'A' : 'B' });
+      }
+    }
+    const a = items.filter(x => x.scale === 'A').sort((a, b) => b.validity - a.validity);
+    const b = items.filter(x => x.scale === 'B').sort((a, b) => b.validity - a.validity);
+    items = [...a, ...b];
+    update();
+  }
+
+  function update() {
+    if (items.length === 0) return;
+
+    const canvas = document.getElementById('chart4');
+    const { ctx, w, h } = setupCanvas(canvas);
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = { top: 20, right: 20, bottom: 50, left: 50 };
+    const plotW = w - pad.left - pad.right;
+    const plotH = h - pad.top - pad.bottom;
+
+    const barW = plotW / nItems * 0.7;
+    const gap = plotW / nItems * 0.3;
+    const groupW = barW + gap;
+
+    const scaleWeightA = 1 / kPerScale;
+    const scaleWeightB = 1 / kPerScale;
+
+    const totalVal = items.reduce((s, it) => s + it.validity, 0);
+    const optWeights = items.map(it => it.validity / totalVal);
+
+    const scaleWeights = items.map(it => it.scale === 'A' ? scaleWeightA : scaleWeightB);
+    const totalSW = scaleWeights.reduce((s, v) => s + v, 0);
+    const normSW = scaleWeights.map(v => v / totalSW);
+
+    const maxW = Math.max(...optWeights, ...normSW, ...items.map(it => it.validity)) * 1.15;
+
+    // Draw grid
+    ctx.strokeStyle = COLORS.dimmer;
+    ctx.lineWidth = 1;
+    for (let v = 0.05; v <= maxW; v += 0.05) {
+      const y = h - pad.bottom - (v / maxW) * plotH;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(w - pad.right, y);
+      ctx.stroke();
+      ctx.fillStyle = COLORS.text;
+      ctx.font = '10px IBM Plex Mono';
+      ctx.textAlign = 'right';
+      ctx.fillText(v.toFixed(2), pad.left - 6, y + 3);
+    }
+
+    // Axis
+    ctx.strokeStyle = COLORS.dim;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, h - pad.bottom);
+    ctx.lineTo(w - pad.right, h - pad.bottom);
+    ctx.stroke();
+
+    // Scale separator
+    const sepX = pad.left + kPerScale * groupW - gap / 2;
+    drawDashedLine(ctx, sepX, pad.top, sepX, h - pad.bottom, 'rgba(201,205,216,0.2)');
+
+    // Labels
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '11px IBM Plex Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('Scale A', pad.left + (kPerScale * groupW) / 2, h - pad.bottom + 40);
+    ctx.fillText('Scale B', pad.left + kPerScale * groupW + (kPerScale * groupW) / 2, h - pad.bottom + 40);
+
+    // Draw bars for each item
+    items.forEach((item, i) => {
+      const x = pad.left + i * groupW;
+
+      // Item validity (background bar)
+      const hVal = (item.validity / maxW) * plotH;
+      ctx.fillStyle = 'rgba(201,205,216,0.15)';
+      ctx.fillRect(x, h - pad.bottom - hVal, barW, hVal);
+
+      // Scale weight (teal line)
+      const yScale = h - pad.bottom - (normSW[i] / maxW) * plotH;
+      ctx.strokeStyle = COLORS.teal;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(x, yScale);
+      ctx.lineTo(x + barW, yScale);
+      ctx.stroke();
+
+      // Optimal weight (orange line)
+      const yOpt = h - pad.bottom - (optWeights[i] / maxW) * plotH;
+      ctx.strokeStyle = COLORS.orange;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(x, yOpt);
+      ctx.lineTo(x + barW, yOpt);
+      ctx.stroke();
+
+      // Item number
+      ctx.fillStyle = COLORS.text;
+      ctx.font = '9px IBM Plex Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText((i + 1).toString(), x + barW / 2, h - pad.bottom + 14);
+    });
+
+    const riWithin = 0.30;
+    const meanValA = items.filter(it => it.scale === 'A').reduce((s, it) => s + it.validity, 0) / kPerScale;
+    const meanValB = items.filter(it => it.scale === 'B').reduce((s, it) => s + it.validity, 0) / kPerScale;
+    const scaleVal = Math.sqrt(meanValA * meanValA + meanValB * meanValB);
+
+    let optValSum = 0;
+    items.forEach((it, i) => { optValSum += optWeights[i] * it.validity; });
+    const optValNorm = optValSum / Math.sqrt(items.reduce((s, it, i) => s + optWeights[i] * optWeights[i], 0));
+    const scaleValNorm = scaleVal;
+
+    document.getElementById('m_scale_val').textContent = Math.min(scaleValNorm, 0.99).toFixed(3);
+    document.getElementById('m_opt_val').textContent = Math.min(optValNorm, 0.99).toFixed(3);
+    const gain = ((optValNorm - scaleValNorm) / scaleValNorm * 100);
+    document.getElementById('m_gain').textContent = (gain > 0 ? '+' : '') + gain.toFixed(1) + '%';
+  }
+
+  document.getElementById('btn_gen').addEventListener('click', generateRandom);
+  document.getElementById('btn_preset1').addEventListener('click', () => setPreset('uniform'));
+  document.getElementById('btn_preset2').addEventListener('click', () => setPreset('mixed'));
+  document.getElementById('btn_preset3').addEventListener('click', () => setPreset('concentrated'));
+
+  setPreset('mixed');
+})();
+
+// ========================================
+// RESIZE HANDLER
+// ========================================
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    document.getElementById('sl_k1').dispatchEvent(new Event('input'));
+    document.getElementById('sl_kd').dispatchEvent(new Event('input'));
+    document.getElementById('sl_ryx3').dispatchEvent(new Event('input'));
+    document.getElementById('btn_preset2').click();
+  }, 200);
+});
+</script>

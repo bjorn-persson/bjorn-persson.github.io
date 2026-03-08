@@ -58,3 +58,52 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Ensure main text on visualization pages uses the requested serif font color */
+/*
+   Apply the color at the page level and to common text elements.
+   Avoid touching explicit UI colors (like .irt-value-display) so those
+   controls keep their accent hues.
+*/
+body.viz-page,
+body.viz-page p,
+body.viz-page label,
+body.viz-page h1,
+body.viz-page h2,
+body.viz-page h3,
+body.viz-page h4,
+body.viz-page h5,
+body.viz-page h6 {
+    color: #c9cdd8 !important;
+}
+
+/* keep value-display teal */
+body.viz-page .irt-value-display,
+body.viz-page .sp-val,
+body.viz-page .ce-control-group .val {
+    color: #2dd4bf !important;
+}
+
+/* also update CSS variable for any components that rely on --content */
+body.viz-page {
+    --content: #c9cdd8;
+}
+
+/* -------------------------------------------------------------
+   Restore normal colors for the citation section, which uses
+   a <h5 id="citation"> heading followed by <p> and <div.highlight>.
+   Without this, the main override turns them all #c9cdd8.
+   Links inside the citation should also revert to their original
+   theme color.
+*/
+body.viz-page #citation,
+body.viz-page #citation + p,
+body.viz-page #citation ~ p,
+body.viz-page #citation ~ .highlight {
+    /* use primary text color rather than overridden content color */
+    color: var(--primary) !important;
+}
+body.viz-page #citation ~ p a {
+    color: var(--primary) !important;
+    box-shadow: 0 2px 0 var(--darkcolor);
+}

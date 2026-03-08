@@ -1,17 +1,31 @@
 ---
 title: "Cronbach's Alpha and Measurement Reliability"
-description: "Interactive visualization of how Cronbach's alpha determines the Standard Error of Measurement, true-score confidence intervals, and the attenuation of correlations - with direct consequences for psychological assessment."
-summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement, the width of true-score confidence intervals, and how much reliability degrades observed correlations between constructs."
+description: "Interactive visualization of how Cronbach's alpha determines the Standard Error of Measurement and true-score confidence intervals — with direct consequences for psychological assessment."
+summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement and the width of true-score confidence intervals."
 ---
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
 
-.ca-wrap { font-family: 'IBM Plex Mono', monospace; }
+.ca-wrap {
+  font-family: 'IBM Plex Mono', monospace;
+  --text: #c9cdd8;
+  --text-bright: #e8ecf4;
+  --text-dim: #6b7084;
+}
+.post-title { display: none; }
+.ca-title {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 700;
+  font-size: 2.4em;
+  color: #e8ecf4;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
 .ca-subtitle {
   font-family: 'Source Serif 4', Georgia, serif;
   font-size: 1.0rem;
-  color: var(--secondary);
+  color: var(--text);
   margin-bottom: 21px;
   line-height: 1.6;
 }
@@ -31,7 +45,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   flex-direction: column;
   gap: 4px;
 }
-.ca-control-group label { color: var(--secondary); }
+.ca-control-group label { color: var(--text-dim); }
 .ca-val { color: #2dd4bf; font-weight: 600; }
 .ca-controls input[type="range"] {
   -webkit-appearance: none;
@@ -74,7 +88,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 .ca-stat.ok   { border-left-color: #2dd4bf; }
 .ca-stat-label {
   font-size: 0.82rem;
-  color: var(--secondary);
+  color: var(--text-dim);
   margin-bottom: 2px;
   line-height: 1.3;
   display: flex;
@@ -93,8 +107,8 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   font-size: 0.72rem;
   font-weight: 600;
   background: none;
-  border: 1px solid var(--border);
-  color: var(--secondary);
+  border: 1px solid #2a2d3a;
+  color: var(--text-dim);
   cursor: pointer;
   flex-shrink: 0;
   line-height: 1;
@@ -103,6 +117,16 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 .ca-info-btn:hover {
   border-color: #2dd4bf;
   color: #2dd4bf;
+}
+.ca-info-btn.ca-hero-info {
+  width: 32px;
+  height: 32px;
+  font-size: 0.45em;
+  border-width: 2px;
+  margin-left: 8px;
+  vertical-align: middle;
+  position: relative;
+  top: -4px;
 }
 .ca-modal-overlay {
   display: none;
@@ -118,8 +142,8 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   display: flex;
 }
 .ca-modal {
-  background: var(--theme);
-  border: 1px solid var(--border);
+  background: #181a24;
+  border: 1px solid #2a2d3a;
   border-radius: 8px;
   max-width: 480px;
   width: 100%;
@@ -131,7 +155,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 .ca-modal h2 {
   font-family: 'Source Serif 4', serif;
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--text-bright);
   margin-bottom: 4px;
   padding-right: 30px;
 }
@@ -148,7 +172,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 .ca-modal p {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.94rem;
-  color: var(--secondary);
+  color: var(--text-dim);
   line-height: 1.65;
   margin-bottom: 8px;
 }
@@ -166,7 +190,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 .ca-modal .section-label {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.83rem;
-  color: var(--secondary);
+  color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-top: 16px;
@@ -180,13 +204,13 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
   font-size: 1.3rem;
   background: none;
   border: none;
-  color: var(--secondary);
+  color: var(--text-dim);
   cursor: pointer;
   padding: 4px 8px;
   line-height: 1;
 }
 .ca-modal-close:hover {
-  color: var(--primary);
+  color: var(--text-bright);
 }
 .ca-stat-value {
   font-size: 1.25rem;
@@ -207,7 +231,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 }
 .ca-panel-label {
   font-size: 0.9rem;
-  color: var(--secondary);
+  color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   display: flex;
@@ -222,7 +246,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 }
 .ca-interp {
   font-size: 0.92rem;
-  color: var(--secondary);
+  color: var(--text-dim);
   line-height: 1.6;
   padding: 9px 12px;
   background: #181a24;
@@ -236,7 +260,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 .ca-interp span.ok { color: #2dd4bf; font-weight: 600; }
 .ca-note {
   font-size: 0.88rem;
-  color: var(--secondary);
+  color: var(--text-dim);
   line-height: 1.6;
   margin-top: 4px;
 }
@@ -253,9 +277,10 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
 </style>
 
 <div class="ca-wrap">
+  <h1 class="ca-title">Cronbach's Alpha and Measurement Reliability <button class="ca-info-btn ca-hero-info" onclick="caShowInfo('about')" title="About this visualization">?</button></h1>
   <p class="ca-subtitle">
-    Cronbach's α determines the <strong>Standard Error of Measurement (SEM)</strong>: how much a single observed score differs from a person's true score.
-    A score is not a point — it is an interval. Low α widens that interval, increases classification errors, and attenuates observed correlations between constructs.
+    Cronbach's α determines the <strong>Standard Error of Measurement (SEM)</strong>: how much a single observed score is expected to differ from a person's true score.
+    A score is not a point — it is an interval. Low α widens that interval and increases classification errors.
   </p>
   <div class="ca-layout">
     <div class="ca-controls">
@@ -264,7 +289,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement,
         <input type="range" id="ca_alpha" min="0.40" max="1.00" step="0.01" value="0.80">
       </div>
       <div class="ca-control-group">
-        <label>True score: <span class="ca-val" id="ca_true_val">100</span></label>
+        <label>Observed score: <span class="ca-val" id="ca_true_val">100</span></label>
         <input type="range" id="ca_true" min="40" max="160" step="1" value="100">
       </div>
       <div class="ca-control-group">
@@ -416,7 +441,7 @@ Persson, B. N. (2026). *Cronbach's alpha and measurement reliability* [Interacti
     sCtx.font = '13px IBM Plex Mono, monospace';
     sCtx.fillStyle = '#2dd4bf';
     sCtx.textAlign = 'center';
-    sCtx.fillText(`Score = ${trueScore}`, tsx, midY + bandH + 34);
+    sCtx.fillText(`Observed = ${trueScore}`, tsx, midY + bandH + 34);
 
     // CI annotation below axis
     sCtx.font = '13px IBM Plex Mono, monospace';
@@ -526,13 +551,13 @@ Persson, B. N. (2026). *Cronbach's alpha and measurement reliability* [Interacti
     dCtx.font = 'bold 13px IBM Plex Mono, monospace';
     dCtx.fillStyle = '#6b7084';
     dCtx.textAlign = 'center';
-    dCtx.fillText(`Observed scores if true score = ${trueScore}`, W / 2, 22);
+    dCtx.fillText(`Repeated testing (observed = ${trueScore})`, W / 2, 22);
 
     // Legend
     dCtx.font = '12px IBM Plex Mono, monospace';
     dCtx.textAlign = 'left';
     dCtx.fillStyle = '#2dd4bf';
-    dCtx.fillText(`true score = ${trueScore}`, toX(trueScore) + 6, PAD_T + 16);
+    dCtx.fillText(`observed = ${trueScore}`, toX(trueScore) + 6, PAD_T + 16);
 
     // 68%/95% labels
     const lo68x = Math.max(xMin, lo68);
@@ -570,11 +595,11 @@ Persson, B. N. (2026). *Cronbach's alpha and measurement reliability* [Interacti
     const hi95 = (trueScore + 1.96 * sem).toFixed(0);
     let msg = '';
     if (alpha >= 0.90) {
-      msg = `<span class="ok">Good reliability (α = ${alpha.toFixed(2)}).</span> A score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Suitable for individual high-stakes decisions.`;
+      msg = `<span class="ok">Good reliability (α = ${alpha.toFixed(2)}).</span> An observed score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Suitable for individual high-stakes decisions.`;
     } else if (alpha >= 0.70) {
-      msg = `<span style="color:#c2640a;font-weight:600">Acceptable for research (α = ${alpha.toFixed(2)}).</span> A score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Use caution for individual decisions.`;
+      msg = `<span style="color:#c2640a;font-weight:600">Acceptable for research (α = ${alpha.toFixed(2)}).</span> An observed score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Use caution for individual decisions.`;
     } else {
-      msg = `<span class="hl">Poor reliability (α = ${alpha.toFixed(2)}).</span> A score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Do not use for individual-level interpretation.`;
+      msg = `<span class="hl">Poor reliability (α = ${alpha.toFixed(2)}).</span> An observed score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Do not use for individual-level interpretation.`;
     }
     interpEl.innerHTML = msg;
     interpEl.classList.toggle('warn', alpha < 0.70);
@@ -619,6 +644,17 @@ Persson, B. N. (2026). *Cronbach's alpha and measurement reliability* [Interacti
 })();
 
 const caInfoContent = {
+  about: {
+    title: 'About This Visualization',
+    badge: 'Overview',
+    body: `
+      <p>This tool illustrates a core idea in psychometrics: any single test score contains measurement error. Cronbach's &alpha; quantifies a test's internal-consistency reliability, and that reliability directly controls how precise — or imprecise — individual scores are.</p>
+      <div class="section-label">What you can explore</div>
+      <p>Use the sliders to set a reliability level (&alpha;), an observed score, and a test's standard deviation. The visualization then shows the Standard Error of Measurement (SEM), the resulting confidence intervals around the observed score, and the distribution of scores you would expect on repeated testing.</p>
+      <div class="section-label">Key assumption</div>
+      <p>The confidence intervals use the classical formula X &plusmn; z &times; SEM, centered on the observed score. This is the standard textbook approach (Nunnally &amp; Bernstein, 1994). It does not incorporate regression to the mean — a more precise estimate would shrink extreme scores toward the population average. For most practical purposes the difference is small, but it is worth noting for scores far from the mean.</p>
+    `
+  },
   sem: {
     title: 'Standard Error of Measurement',
     badge: 'SEM',
@@ -662,9 +698,9 @@ const caInfoContent = {
     title: 'Observed Score → True-Score CI',
     badge: 'Score scale',
     body: `
-      <p>This panel shows a number line with the observed score marked as a point, surrounded by shaded bands representing the confidence intervals around it.</p>
+      <p>This panel shows a number line with the observed score marked as a point, surrounded by shaded bands representing the true-score confidence intervals.</p>
       <div class="section-label">What the bands mean</div>
-      <p>The darker inner band is the 68% CI (&plusmn;1 SEM). The lighter outer band is the 95% CI (&plusmn;1.96 SEM). These intervals represent the range of true scores that are plausible given the observed score and the test's reliability.</p>
+      <p>The darker inner band is the 68% CI (&plusmn;1 SEM). The lighter outer band is the 95% CI (&plusmn;1.96 SEM). These intervals represent the range within which the person's true score plausibly falls, given their observed score and the test's reliability.</p>
       <div class="section-label">How to read it</div>
       <p>A narrow band means the test is precise — the observed score is a good estimate of the true score. A wide band means there is substantial measurement error, and the person's true ability could be meaningfully different from what was observed.</p>
       <div class="section-label">Clinical use</div>
@@ -675,11 +711,11 @@ const caInfoContent = {
     title: 'Repeated Testing Distribution',
     badge: 'Error distribution',
     body: `
-      <p>This panel shows the distribution of observed scores you would expect if you tested the same person many times with parallel forms of the test. The curve is a normal distribution centered on the true score, with a standard deviation equal to the SEM.</p>
+      <p>This panel shows the distribution of scores you would expect if you tested the same person many times with parallel forms of the test. The curve is a normal distribution centered on the observed score, with a standard deviation equal to the SEM.</p>
       <div class="section-label">What the curve shows</div>
-      <p>The peak of the curve is at the true score. The spread is determined entirely by the SEM: lower reliability means a wider, flatter curve (more variable observed scores), while higher reliability produces a tall, narrow curve (observed scores cluster tightly around the truth).</p>
+      <p>The peak of the curve is at the observed score. The spread is determined entirely by the SEM: lower reliability means a wider, flatter curve (more variable scores across administrations), while higher reliability produces a tall, narrow curve (scores cluster tightly together).</p>
       <div class="section-label">The shaded regions</div>
-      <p>The darker shading covers the central 68% of the distribution — the range within which most observed scores would fall. The lighter shading extends to 95%. Scores outside the 95% region would occur fewer than 1 in 20 times.</p>
+      <p>The darker shading covers the central 68% of the distribution — the range within which most scores would fall on retesting. The lighter shading extends to 95%. Scores outside the 95% region would occur fewer than 1 in 20 times.</p>
       <div class="section-label">Intuition</div>
       <p>Think of this as the "noise" in the measurement process. Even if a person's true ability never changes, their observed scores will vary from one testing to the next. This panel makes that variability visible.</p>
     `

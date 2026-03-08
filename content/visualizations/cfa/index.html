@@ -26,6 +26,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
   /* Widen PaperMod content area for this page */
   .post-content:has(.container) { max-width: 1000px; }
   .main:has(.container) { --main-width: 1040px; }
+  .post-header .post-title { display: none; }
 
   .container {
     max-width: 1000px;
@@ -299,6 +300,46 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     letter-spacing: 0.01em;
   }
 
+  /* Equation hover tooltips */
+  .eq-sym {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dashed var(--text-dim);
+    padding: 0 1px;
+    transition: color 0.15s;
+  }
+  .eq-sym:hover { color: var(--teal); }
+  .eq-tip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    z-index: 100;
+    white-space: pre;
+    font-size: 0.82em;
+    line-height: 1.5;
+    color: var(--text);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    pointer-events: none;
+    min-width: max-content;
+  }
+  .eq-tip .tip-label {
+    color: var(--teal);
+    font-size: 0.9em;
+    margin-bottom: 6px;
+    display: block;
+    white-space: nowrap;
+  }
+  .eq-tip .tip-matrix {
+    color: var(--text-bright);
+  }
+  .eq-sym:hover .eq-tip { display: block; }
+
   /* Theta display */
   .theta-row {
     display: flex;
@@ -537,7 +578,11 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
 
 <div class="container">
 
-  <p class="subtitle" style="font-family: var(--mono); font-size: 0.82em; color: var(--text-dim); letter-spacing: 0.02em;">An interactive walkthrough of what CFA actually does</p>
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Inside Confirmatory Factor Analysis<button class="info-btn hero-info" onclick="showInfo('global')">?</button></h1>
+    <div class="subtitle">An interactive walkthrough of what CFA actually does</div>
+  </div>
 
   <!-- SECTION 1 -->
   <div class="section" id="sec1">
@@ -566,7 +611,31 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     </div>
 
     <p>This small set of parameters — 6 loadings, 1 factor correlation — fully determines a predicted correlation matrix. The central equation is:</p>
-    <div class="equation">Σ(θ) = ΛΦΛ′ + Θ</div>
+    <div class="equation"><span class="eq-sym">Σ(θ)<span class="eq-tip"><span class="tip-label">Model-implied correlation matrix (6 × 6)</span><span class="tip-matrix">       x₁    x₂    x₃    x₄    x₅    x₆
+x₁   1.00  .600  .488  .184  .223  .158
+x₂    ·    1.00  .520  .196  .238  .168
+x₃    ·      ·   1.00  .159  .194  .137
+x₄    ·      ·     ·   1.00  .595  .420
+x₅    ·      ·     ·     ·   1.00  .510
+x₆    ·      ·     ·     ·     ·   1.00</span></span></span> = <span class="eq-sym">Λ<span class="eq-tip"><span class="tip-label">Factor loading matrix (6 × 2)</span><span class="tip-matrix">       F₁    F₂
+x₁   .75     0
+x₂   .80     0
+x₃   .65     0
+x₄    0    .70
+x₅    0    .85
+x₆    0    .60</span></span></span><span class="eq-sym">Φ<span class="eq-tip"><span class="tip-label">Factor correlation matrix (2 × 2)</span><span class="tip-matrix">       F₁    F₂
+F₁   1.00  .35
+F₂    .35  1.00</span></span></span><span class="eq-sym">Λ′<span class="eq-tip"><span class="tip-label">Transpose of Λ (2 × 6)</span><span class="tip-matrix">       x₁    x₂    x₃    x₄    x₅    x₆
+F₁   .75   .80   .65    0     0     0
+F₂    0     0     0    .70   .85   .60</span></span></span> + <span class="eq-sym">Θ<span class="eq-tip"><span class="tip-label">Residual variance matrix (6 × 6 diagonal)</span><span class="tip-matrix">θᵢ = 1 − λᵢ²
+
+       x₁    x₂    x₃    x₄    x₅    x₆
+x₁   .438
+x₂     ·   .360
+x₃     ·     ·   .578
+x₄     ·     ·     ·   .510
+x₅     ·     ·     ·     ·   .278
+x₆     ·     ·     ·     ·     ·   .640</span></span></span></div>
     <p>where <span class="m">Λ</span> is the matrix of loadings, <span class="m">Φ</span> is the factor correlation matrix, and <span class="m">Θ</span> is the diagonal matrix of residual variances. In the standardized case, <span class="m">θᵢ = 1 − λᵢ²</span>, so the loadings are the only free parameters governing each item.</p>
   </div>
 
@@ -856,7 +925,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
   </div>
 
   <!-- Citation -->
-  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0;">
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
     <h5 id="citation">Citation</h5>
     <p>Persson, B. N. (2026). <em>Confirmatory factor analysis</em> [Interactive visualization]. <a href="https://bnpersson.github.io/visualizations/cfa/" target="_blank">https://bnpersson.github.io/visualizations/cfa/</a></p>
     <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026cfa,
@@ -2188,7 +2257,12 @@ const infoContent = {
       <p>A loading has two complementary interpretations, both worth knowing.</p>
       <p>First: in the standardized solution (which is what this page uses), <em>λ² is the proportion of the item's variance explained by the factor</em>. A loading of .70 means .70² = .49 — roughly half the item's variance is shared with the factor. The remaining .51 is residual (measurement error plus item-specific content).</p>
       <p>Second: <em>the loading is the expected correlation between the item and the factor</em>. An item with λ = .70 would correlate .70 with the factor if you could measure the factor directly. People who've only seen the first interpretation often find this one more intuitive.</p>
-      <p>This also means that two items with loadings λ₁ and λ₂ on the same factor will have a model-implied correlation of λ₁ × λ₂. That's why you can see the implied matrix update when you drag a single slider — each loading affects every correlation involving that item.</p>
+      <p>The model-implied correlations come from <em>path tracing rules</em> (<a href="https://www.jstor.org/stable/2957502" target="_blank" rel="noopener">Wright, 1934</a>). To find the implied correlation between two items, trace every path connecting them through the diagram and multiply the coefficients along each path:</p>
+      <ul style="margin:8px 0 8px 18px;">
+        <li><strong>Same factor</strong> — one path: item ← factor → item. The implied correlation is simply λᵢ × λⱼ. For example, if λ₁ = .75 and λ₂ = .80, the implied r₁₂ = .75 × .80 = .60.</li>
+        <li><strong>Different factors</strong> — one path: item ← F₁ ↔ F₂ → item. Now the factor correlation φ sits in the middle, so the implied correlation is λᵢ × φ × λⱼ. For example, if λ₁ = .75 (on F₁), λ₄ = .70 (on F₂), and φ = .35, the implied r₁₄ = .75 × .35 × .70 = .184.</li>
+      </ul>
+      <p>Every entry in the implied matrix is just the sum of these traced paths — which is exactly what the matrix equation Σ = ΛΦΛ′ + Θ computes. The matrix algebra is a compact way of tracing all paths simultaneously. That's why dragging a single slider updates every correlation involving that item: each loading sits on multiple paths.</p>
     `
   },
   sec4: {
