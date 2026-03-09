@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "The Aggregation Tradeoff"
 description: "Interactive visualization exploring the tradeoff between aggregating items into composites versus keeping them separate: how aggregation increases reliability but can mask multidimensionality."
 summary: "Explore how aggregating questionnaire items into composite scores trades off reliability gains against the risk of obscuring distinct latent dimensions."
@@ -376,13 +377,103 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     color: var(--teal);
     font-style: italic;
   }
+
+  /* Info button (?) */
+  .info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    border-radius: 50%;
+    font-family: var(--mono);
+    font-size: 0.68em;
+    font-weight: 600;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: border-color 0.2s, color 0.2s;
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+  .info-btn:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  /* Modal */
+  .info-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .info-modal-overlay.visible {
+    display: flex;
+  }
+  .info-modal {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 24px 28px;
+    position: relative;
+  }
+  .info-modal h3 {
+    font-family: var(--serif);
+    font-size: 1.15em;
+    color: var(--text-bright);
+    margin-bottom: 12px;
+    padding-right: 28px;
+  }
+  .info-modal p {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text);
+    line-height: 1.65;
+    margin-bottom: 8px;
+    max-width: none;
+  }
+  .info-modal .modal-formula {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--teal);
+    background: var(--teal-dim);
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 10px 0;
+  }
+  .info-modal-close {
+    position: absolute;
+    top: 12px; right: 14px;
+    font-family: var(--mono);
+    font-size: 1.1em;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+  }
+  .info-modal-close:hover { color: var(--text-bright); }
 </style>
 
 <div class="container">
 
 <div class="hero">
   <h1>The Aggregation Tradeoff</h1>
-  <div class="subtitle">Why scale scores sacrifice predictive validity — and what item-level models recover</div>
+  <div class="subtitle">How aggregating items gains reliability but constrains validity — and what item-level models can recover</div>
 </div>
 
 <!-- SECTION 1: The Core Equation -->
@@ -392,7 +483,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 
   <p>When we average items into a scale score, the resulting composite becomes more <em>reliable</em> — random measurement error cancels out. This is the Spearman-Brown principle, and it's why we use multi-item scales in the first place.</p>
 
-  <p>But reliability and validity are different things. Eagly &amp; Revelle (2022) showed that the <em>validity</em> of a scale for predicting an external criterion (like sex) depends not only on the number of items and their individual validities, but also on how correlated the items are with each other. The relationship is captured by this equation:</p>
+  <p>But reliability and validity are different things. The <em>validity</em> of a scale for predicting an external criterion depends not only on the number of items and their individual validities, but also on how correlated the items are with each other. The relationship is captured by this equation:</p>
 
   <div class="equation-box">
     r<sub>yx</sub> = k · r̄<sub>iy</sub> / √(k + k(k−1) · r̄<sub>i</sub>)
@@ -456,9 +547,9 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 <!-- SECTION 2: Within vs Across Domains -->
 <div class="section" id="s2">
   <div class="section-label">Section 2</div>
-  <h2>One domain vs two: the M + F insight</h2>
+  <h2>One domain vs two: the cross-domain advantage</h2>
 
-  <p>Eagly &amp; Revelle show that combining masculine and feminine items into a single composite (M + F) predicts sex far better than either subscale alone — even with the same total number of items. Why? Because M and F items are weakly correlated with each other, so the combined scale has a <em>lower average interitem correlation</em>, which pushes the validity ceiling higher.</p>
+  <p>Combining items from two distinct domains into a single composite can predict a criterion far better than either subscale alone — even with the same total number of items. Why? Because items from different domains are weakly correlated with each other, so the combined scale has a <em>lower average interitem correlation</em>, which pushes the validity ceiling higher.</p>
 
   <p>Below, two domains are simulated side by side. Within each domain, items are correlated at r̄<sub>within</sub>. Across domains, items correlate at r̄<sub>across</sub>. Watch what happens to validity when the two domains are combined.</p>
 
@@ -469,21 +560,21 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     </div>
     <div class="control-row">
       <div class="control-group">
-        <label><span class="lbl">Avg item validity — Domain A (r̄<sub>iy</sub>)</span> <span class="val" id="v_riyA">0.25</span></label>
+        <label><span class="lbl">Avg item validity — Domain A (r̄<sub>iy</sub>)<button class="info-btn" onclick="showInfoModal('riyA')">?</button></span> <span class="val" id="v_riyA">0.25</span></label>
         <input type="range" id="sl_riyA" min="0.05" max="0.50" value="0.25" step="0.01" class="orange-slider">
       </div>
       <div class="control-group">
-        <label><span class="lbl">Avg item validity — Domain B (r̄<sub>iy</sub>)</span> <span class="val" id="v_riyB">0.20</span></label>
+        <label><span class="lbl">Avg item validity — Domain B (r̄<sub>iy</sub>)<button class="info-btn" onclick="showInfoModal('riyB')">?</button></span> <span class="val" id="v_riyB">0.20</span></label>
         <input type="range" id="sl_riyB" min="0.05" max="0.50" value="0.20" step="0.01" class="orange-slider">
       </div>
     </div>
     <div class="control-row">
       <div class="control-group">
-        <label><span class="lbl">Within-domain r̄<sub>i</sub></span> <span class="val" id="v_riW">0.35</span></label>
+        <label><span class="lbl">Within-domain r̄<sub>i</sub><button class="info-btn" onclick="showInfoModal('riW')">?</button></span> <span class="val" id="v_riW">0.35</span></label>
         <input type="range" id="sl_riW" min="0.05" max="0.70" value="0.35" step="0.01">
       </div>
       <div class="control-group">
-        <label><span class="lbl">Across-domain r̄<sub>i</sub></span> <span class="val" id="v_riA">0.05</span></label>
+        <label><span class="lbl">Across-domain r̄<sub>i</sub><button class="info-btn" onclick="showInfoModal('riA')">?</button></span> <span class="val" id="v_riA">0.05</span></label>
         <input type="range" id="sl_riA" min="-0.30" max="0.50" value="0.05" step="0.01">
       </div>
     </div>
@@ -515,7 +606,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
   </div>
 
   <div class="try-it">
-    <strong>Try it:</strong> Set the across-domain correlation to 0 or negative (as with M and F scales). The combined validity jumps above either domain alone. Now increase across-domain r̄<sub>i</sub> toward the within-domain value — the advantage of combining shrinks because the domains are no longer adding unique information.
+    <strong>Try it:</strong> Set the across-domain correlation to 0 or negative. The combined validity jumps above either domain alone. Now increase across-domain r̄<sub>i</sub> toward the within-domain value — the advantage of combining shrinks because the domains are no longer adding unique information.
   </div>
 </div>
 
@@ -536,7 +627,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
       <input type="range" id="sl_ryx3" min="0.01" max="0.95" value="0.40" step="0.01" class="orange-slider">
     </div>
     <div class="control-group">
-      <label>Base rate (proportion group 1) <span class="val" id="v_base3">0.50</span></label>
+      <label><span class="lbl">Base rate (proportion group 1)<button class="info-btn" onclick="showInfoModal('baseRate')">?</button></span> <span class="val" id="v_base3">0.50</span></label>
       <input type="range" id="sl_base3" min="0.20" max="0.80" value="0.50" step="0.01">
     </div>
   </div>
@@ -560,27 +651,27 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     <div class="chart-title">Group distributions on the composite score</div>
     <canvas id="chart3" height="140"></canvas>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Group 1 (e.g. Men)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Group 2 (e.g. Women)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Group 1</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Group 2</div>
     </div>
     <div class="chart-annotation">The dashed line shows the optimal classification threshold.</div>
   </div>
 
   <div class="try-it">
-    <strong>Try it:</strong> At r = 0.20, accuracy is barely above chance. At r = 0.40, you're around 65–70%. At r = 0.70, you're pushing 80%+. This is the psychometric machinery behind the jump from scale-level logistic regression (~80%) to item-level elastic net (~88%): the elastic net builds a higher-validity composite by weighting items individually rather than averaging within scales.
+    <strong>Try it:</strong> At r = 0.20, accuracy is barely above chance. At r = 0.40, you're around 65–70%. At r = 0.70, you're pushing 80%+. This is the psychometric machinery behind the gain from scale-level models to item-level models: item-level approaches build a higher-validity composite by weighting items individually rather than averaging within scales.
   </div>
 </div>
 
-<!-- SECTION 4: What elastic net does differently -->
+<!-- SECTION 4: What item-level models do differently -->
 <div class="section" id="s4">
   <div class="section-label">Section 4</div>
-  <h2>What the elastic net does differently</h2>
+  <h2>What item-level models do differently</h2>
 
   <p>A traditional scale score assigns <em>equal weight</em> to every item in the scale. If 10 items measure agreeableness, each contributes 1/10 to the composite — regardless of whether some items strongly differentiate groups and others don't.</p>
 
-  <p>Penalized regression assigns each item its <em>own</em> weight, optimized for predicting the criterion. Items with high individual validity get large weights; irrelevant items get shrunk to zero. This is equivalent to building an optimal composite with maximal validity — it sidesteps the constraint that all items within a scale must be weighted equally.</p>
+  <p>Item-level predictive models — such as penalized regression (e.g. lasso, ridge, elastic net), random forests, or neural networks — assign each item its <em>own</em> weight, optimized for predicting the criterion. Items with high individual validity get large weights; irrelevant items get shrunk toward zero. This is equivalent to building an optimal composite with maximal validity — it sidesteps the constraint that all items within a scale must be weighted equally.</p>
 
-  <p>Below, 20 items are simulated from two scales (10 each). Each item has a "true" validity for predicting group membership. The scale-score approach averages all items equally within each scale. The elastic net approach assigns optimal weights.</p>
+  <p>Below, 20 items are simulated from two scales (10 each). Each item has a "true" validity for predicting the criterion. The scale-score approach averages all items equally within each scale. The optimal-weight approach assigns weights proportional to each item's validity.</p>
 
   <div style="margin:16px 0">
     <button class="btn" id="btn_gen">Generate New Items</button>
@@ -615,10 +706,12 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
   </div>
 
   <div class="try-it">
-    <strong>Try it:</strong> Click "Uniform Validity" — when all items predict equally well, the scale-score approach is nearly optimal and the gain is small. Click "Concentrated Signal" — when a few items carry most of the predictive signal, the elastic net massively outperforms equal weighting because it can upweight the informative items and zero out the rest.
+    <strong>Try it:</strong> Click "Uniform Validity" — when all items predict equally well, equal weighting is nearly optimal and the gain is small. Click "Concentrated Signal" — when a few items carry most of the predictive signal, optimal weighting massively outperforms equal weighting because it can upweight the informative items and ignore the rest.
   </div>
 
-  <p>This is precisely what happened in the empirical analysis: moving from 13 scale scores to ~240 item-level predictors with elastic net improved classification accuracy from ~80% to ~88%. The scale scores were averaging strong-signal items with weak-signal items, diluting the composite validity. The elastic net recovered the lost signal by letting each item speak for itself.</p>
+  <p>This pattern appears in many applied settings: when item-level signal varies, scale scores dilute the composite validity by averaging strong-signal items with weak-signal items. Item-level models recover that lost signal by letting each item speak for itself.</p>
+
+  <p><strong>A critical caveat:</strong> the optimal weights shown above are population-level (oracle) weights. In practice, these weights must be estimated from a finite sample, and with many items relative to participants, estimated weights will overfit — capturing sample-specific noise as if it were signal. This is why item-level models require regularization (e.g., lasso, ridge) and cross-validation to honestly assess their predictive gain. Without these safeguards, the apparent advantage of item-level models over scale scores can be entirely illusory. Scale scores, by contrast, are inherently regularized: equal weighting is a strong constraint that sacrifices flexibility but dramatically reduces variance across samples (<a href="https://doi.org/10.1177/1745691617693393" target="_blank" rel="noopener">Yarkoni &amp; Westfall, 2017</a>).</p>
 </div>
 
 <!-- SECTION 5: The tradeoff summarized -->
@@ -670,15 +763,36 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     </tbody>
   </table>
 
-  <p>The take-home: scale scores are <em>construct-validity</em> tools. They measure what they're designed to measure, and they do it reliably. But for <em>criterion prediction</em> — especially when item-level signal varies — they impose a constraint (equal weighting) that costs predictive power. Penalized regression relaxes that constraint, gaining prediction at the expense of theoretical coherence.</p>
+  <p>The take-home message: scale scores are <em>construct-validity</em> tools. They measure what they're designed to measure, and they do it reliably. But for <em>criterion prediction</em> — especially when item-level signal varies — they impose a constraint (equal weighting) that costs predictive power. Penalized regression relaxes that constraint, gaining prediction at the expense of theoretical coherence.</p>
 
-  <p>Recognizing this isn't a criticism of either approach. It's a recognition that measurement and prediction are different psychometric goals, and there is no free lunch.</p>
+  <p>Recognizing this isn't a criticism of either approach. It's a recognition that measurement and prediction are different psychometric goals, and there is no free lunch. The validity gains shown in Section 4 represent a theoretical ceiling; realizing those gains in practice requires enough data, proper regularization, and honest out-of-sample evaluation.</p>
 </div>
 
-<div class="viz-footer">
-  <p>Built as a companion to Eagly, A. H. &amp; Revelle, W. (2022). Understanding the magnitude of psychological differences between women and men requires seeing the forest and the trees. <em>Perspectives on Psychological Science, 17</em>(5), 1339–1358.</p>
-  <p style="margin-top:8px">All computations run in your browser. No data are sent anywhere.</p>
+<div class="note" style="border-left-color: #8b1a1a;">
+  All computations run in your browser. No data are sent anywhere.
 </div>
+
+<!-- Info modal -->
+<div class="info-modal-overlay" id="infoModalOverlay" onclick="if(event.target===this)closeInfoModal()">
+  <div class="info-modal">
+    <button class="info-modal-close" onclick="closeInfoModal()">×</button>
+    <h3 id="infoModalTitle"></h3>
+    <div id="infoModalBody"></div>
+  </div>
+</div>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>The aggregation–validity tradeoff</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/aggregation-tradeoff/" target="_blank">https://bjorn-persson.github.io/visualizations/aggregation-tradeoff/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026aggregation,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{The Aggregation--Validity Tradeoff}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/aggregation-tradeoff/}</span>}
+</span></span></code></pre></div>
+  </div>
 
 </div><!-- /container -->
 
@@ -1085,7 +1199,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
 })();
 
 // ========================================
-// SECTION 4: Elastic net weights
+// SECTION 4: Item-level weights
 // ========================================
 (function() {
   let items = [];
@@ -1248,6 +1362,69 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
 
   setPreset('mixed');
 })();
+
+// ========================================
+// INFO MODAL
+// ========================================
+const infoContent = {
+  riyA: {
+    title: 'Average item validity — Domain A (r̄ᵢᵧ)',
+    body: `
+      <p>The average correlation between each item in Domain A and the external criterion y (e.g. a group membership variable, a test score, or any outcome you want to predict).</p>
+      <p>This is sometimes called the <em>item-criterion correlation</em>. A higher value means each item individually carries more signal about the criterion.</p>
+      <div class="modal-formula">r̄ᵢᵧ = (1/k) · Σ rᵢᵧ</div>
+      <p>In practice, item-criterion correlations for psychological scales typically range from 0.10 to 0.40. Values above 0.50 would be unusually high for a single item and a distal criterion.</p>
+    `
+  },
+  riyB: {
+    title: 'Average item validity — Domain B (r̄ᵢᵧ)',
+    body: `
+      <p>The same as for Domain A, but for the items in Domain B. Domain B may represent a conceptually distinct construct — for example, a different personality trait, a different facet of wellbeing, or items worded in the opposite direction.</p>
+      <p>Domains A and B can have different average validities. If Domain B items are less predictive of the criterion, its r̄ᵢᵧ should be set lower. When the two domains are combined, the resulting composite uses the weighted average of both validities.</p>
+    `
+  },
+  riW: {
+    title: 'Within-domain interitem correlation (r̄ᵢ, within)',
+    body: `
+      <p>The average correlation among items <em>within</em> the same domain. This reflects how homogeneous a domain is — how much all its items tap the same underlying dimension.</p>
+      <p>A high within-domain r̄ᵢ means items are redundant with each other. Adding more items improves reliability (Spearman-Brown), but validity gains plateau quickly because each new item adds little new criterion-relevant information beyond what the first few items already captured.</p>
+      <div class="modal-formula">Validity ceiling = r̄ᵢᵧ / √r̄ᵢ</div>
+      <p>Typical values for well-constructed unidimensional scales range from 0.20 to 0.50. The slider minimum is 0.05 (near-unrelated items would not form a meaningful scale) and the maximum is 0.70 (very narrow, highly redundant content).</p>
+    `
+  },
+  baseRate: {
+    title: 'Base rate (proportion of group 1)',
+    body: `
+      <p>The proportion of cases belonging to Group 1 in the population. At 0.50, the two groups are equally sized. As the base rate deviates from 0.50, the optimal classification threshold shifts away from the midpoint between the two distributions.</p>
+      <p>Base rates matter because classification accuracy is not just a function of group separation (d) — it also depends on how many cases from each group you expect. With an unequal base rate, a classifier can improve overall accuracy by biasing toward the more common group, at the cost of more errors on the rarer group.</p>
+      <p>For example, if Group 1 makes up 80% of cases, predicting "Group 1" for everyone yields 80% accuracy with no model at all. A scale with modest validity may add little over this baseline. This is why raw classification accuracy can be misleading — it should always be interpreted relative to the base rate.</p>
+    `
+  },
+  riA: {
+    title: 'Across-domain interitem correlation (r̄ᵢ, across)',
+    body: `
+      <p>The average correlation between items in Domain A and items in Domain B. This reflects how related the two domains are to each other.</p>
+      <p>When combining the two domains into a single composite, the effective average interitem correlation is a weighted mix of within-domain and across-domain correlations. A low (or negative) across-domain r̄ᵢ pulls the combined average down — which raises the validity ceiling of the combined scale.</p>
+      <p>This is the key mechanism behind the cross-domain advantage: if two domains each predict a criterion but are weakly correlated with each other, combining them yields a composite whose effective interitem correlation is lower than either domain alone, allowing validity to climb higher.</p>
+      <p>The slider allows negative values (down to −0.30) because some pairs of domains genuinely anti-correlate — for example, items measuring introversion vs. extraversion, or approach vs. avoidance motivation. The maximum of 0.50 keeps the across-domain correlation clearly below the within-domain range, preserving a meaningful distinction between the two domains.</p>
+    `
+  }
+};
+
+function showInfoModal(key) {
+  const info = infoContent[key];
+  document.getElementById('infoModalTitle').textContent = info.title;
+  document.getElementById('infoModalBody').innerHTML = info.body;
+  document.getElementById('infoModalOverlay').classList.add('visible');
+}
+
+function closeInfoModal() {
+  document.getElementById('infoModalOverlay').classList.remove('visible');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeInfoModal();
+});
 
 // ========================================
 // RESIZE HANDLER
