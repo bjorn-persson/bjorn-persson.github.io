@@ -1,5 +1,5 @@
 ---
-draft: true
+draft: false
 title: "The Aggregation Tradeoff"
 description: "Interactive visualization exploring the tradeoff between aggregating items into composites versus keeping them separate: how aggregation increases reliability but can mask multidimensionality."
 summary: "Explore how aggregating questionnaire items into composite scores trades off reliability gains against the risk of obscuring distinct latent dimensions."
@@ -684,7 +684,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     <div class="chart-title">Item validities and weights</div>
     <canvas id="chart4" height="120"></canvas>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim)"></div> True item validity (r<sub>iy</sub>)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim)"></div> True item validity</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Scale-score weight</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Optimal weight</div>
     </div>
@@ -706,12 +706,12 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
   </div>
 
   <div class="try-it">
-    <strong>Try it:</strong> Click "Uniform Validity" — when all items predict equally well, equal weighting is nearly optimal and the gain is small. Click "Concentrated Signal" — when a few items carry most of the predictive signal, optimal weighting massively outperforms equal weighting because it can upweight the informative items and ignore the rest.
+    <strong>Try it:</strong> Click "Uniform Validity" — when all items predict equally well, equal weighting is already optimal and the gain is zero. Now click "Concentrated Signal" — when a few items carry most of the predictive signal, optimal weighting massively outperforms equal weighting because it upweights the informative items and downweights the rest. "Mixed Validity" falls in between: one scale is more predictive than the other, yielding a moderate gain. The validity values assume a within-scale inter-item correlation of 0.30 and zero correlation between scales.
   </div>
 
   <p>This pattern appears in many applied settings: when item-level signal varies, scale scores dilute the composite validity by averaging strong-signal items with weak-signal items. Item-level models recover that lost signal by letting each item speak for itself.</p>
 
-  <p><strong>A critical caveat:</strong> the optimal weights shown above are population-level (oracle) weights. In practice, these weights must be estimated from a finite sample, and with many items relative to participants, estimated weights will overfit — capturing sample-specific noise as if it were signal. This is why item-level models require regularization (e.g., lasso, ridge) and cross-validation to honestly assess their predictive gain. Without these safeguards, the apparent advantage of item-level models over scale scores can be entirely illusory. Scale scores, by contrast, are inherently regularized: equal weighting is a strong constraint that sacrifices flexibility but dramatically reduces variance across samples (<a href="https://doi.org/10.1177/1745691617693393" target="_blank" rel="noopener">Yarkoni &amp; Westfall, 2017</a>).</p>
+  <p><strong>A critical caveat:</strong> the optimal weights shown above are population-level (oracle) weights. In practice, these weights must be estimated from a finite sample, and with many items relative to participants, estimated weights will overfit — capturing sample-specific noise as if it were signal. This is why item-level models require regularization (e.g., Lasso, Ridge) and cross-validation to honestly assess their predictive gain. Without these safeguards, the apparent advantage of item-level models over scale scores can be entirely illusory. Scale scores, by contrast, are inherently regularized: equal weighting is a strong constraint that sacrifices flexibility but dramatically reduces variance across samples (<a href="https://doi.org/10.1177/1745691617693393" target="_blank" rel="noopener">Yarkoni &amp; Westfall, 2017</a>).</p>
 </div>
 
 <!-- SECTION 5: The tradeoff summarized -->
@@ -1339,15 +1339,26 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
       ctx.fillText((i + 1).toString(), x + barW / 2, h - pad.bottom + 14);
     });
 
-    const riWithin = 0.30;
-    const meanValA = items.filter(it => it.scale === 'A').reduce((s, it) => s + it.validity, 0) / kPerScale;
-    const meanValB = items.filter(it => it.scale === 'B').reduce((s, it) => s + it.validity, 0) / kPerScale;
-    const scaleVal = Math.sqrt(meanValA * meanValA + meanValB * meanValB);
+    // Composite validity under block compound symmetry
+    // (within-domain r̄ᵢ = 0.30, between-domain = 0)
+    const riW = 0.30;
+    const rVec = items.map(it => it.validity);
 
-    let optValSum = 0;
-    items.forEach((it, i) => { optValSum += optWeights[i] * it.validity; });
-    const optValNorm = optValSum / Math.sqrt(items.reduce((s, it, i) => s + optWeights[i] * optWeights[i], 0));
-    const scaleValNorm = scaleVal;
+    function blockValidity(w, r) {
+      const wR = w.reduce((s, wi, i) => s + wi * r[i], 0);
+      let wRxw = 0;
+      for (let b = 0; b < 2; b++) {
+        const lo = b * kPerScale, hi = lo + kPerScale;
+        let s2 = 0, s1 = 0;
+        for (let i = lo; i < hi; i++) { s2 += w[i] * w[i]; s1 += w[i]; }
+        wRxw += (1 - riW) * s2 + riW * s1 * s1;
+      }
+      return wR / Math.sqrt(wRxw);
+    }
+
+    const equalW = items.map(() => 1 / nItems);
+    const scaleValNorm = blockValidity(equalW, rVec);
+    const optValNorm = blockValidity(optWeights, rVec);
 
     document.getElementById('m_scale_val').textContent = Math.min(scaleValNorm, 0.99).toFixed(3);
     document.getElementById('m_opt_val').textContent = Math.min(optValNorm, 0.99).toFixed(3);
