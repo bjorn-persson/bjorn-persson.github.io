@@ -86,6 +86,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
 }
 .ca-stat.warn { border-left-color: #ef4444; }
 .ca-stat.ok   { border-left-color: #2dd4bf; }
+.ca-stat.acceptable { border-left-color: #c2640a; }
 .ca-stat-label {
   font-size: 0.82rem;
   color: var(--text-dim);
@@ -219,6 +220,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
   transition: color 0.3s;
 }
 .ca-stat-value.warn { color: #ef4444; }
+.ca-stat-value.acceptable { color: #c2640a; }
 .ca-panels {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -256,6 +258,8 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
   min-height: 2.8em;
 }
 .ca-interp.warn { border-left-color: #ef4444; }
+.ca-interp.acceptable { border-left-color: #c2640a; }
+.ca-interp.ok { border-left-color: #2dd4bf; }
 .ca-interp span.hl { color: #ef4444; font-weight: 600; }
 .ca-interp span.ok { color: #2dd4bf; font-weight: 600; }
 .ca-note {
@@ -263,6 +267,13 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
   color: var(--text-dim);
   line-height: 1.6;
   margin-top: 4px;
+}
+.ca-note-serif {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-top: 10px;
 }
 @media (max-width: 800px) {
   .ca-panels    { grid-template-columns: 1fr; }
@@ -325,9 +336,9 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
   </div>
   <p class="ca-note">
     <strong>SEM = SD × √(1 − α).</strong>
-    The 95% true-score CI for an observed score X is [X − 1.96·SEM, X + 1.96·SEM].<br>
-    Rules of thumb: α ≥ 0.90 for high-stakes individual decisions; α ≥ 0.70 for research/group comparisons.
+    The 95% true-score CI for an observed score X is [X − 1.96·SEM, X + 1.96·SEM]. Rules of thumb: α ≥ 0.90 for high-stakes individual decisions; α ≥ 0.70 for research/group comparisons.
   </p>
+  <p class="ca-note-serif" id="ca_clinical_note"></p>
 </div>
 
 ---
@@ -578,16 +589,20 @@ Persson, B. N. (2026). *Cronbach's alpha and measurement reliability* [Interacti
     document.getElementById('ca_ci95_val').textContent = ci95.toFixed(1);
 
     const warn = alpha < 0.7;
+    const acceptable = alpha >= 0.7 && alpha < 0.9;
     const ok   = alpha >= 0.9;
 
     for (const id of ['ca_sem_card', 'ca_ci68_card', 'ca_ci95_card']) {
       const el = document.getElementById(id);
       el.classList.toggle('warn', warn);
-      el.classList.toggle('ok', ok && !warn);
+      el.classList.toggle('acceptable', acceptable);
+      el.classList.toggle('ok', ok);
     }
     for (const id of ['ca_sem_val', 'ca_ci68_val', 'ca_ci95_val']) {
       const el = document.getElementById(id);
       el.classList.toggle('warn', warn);
+      el.classList.toggle('acceptable', acceptable);
+      el.classList.toggle('ok', ok);
     }
 
     const interpEl = document.getElementById('ca_interp');
@@ -603,6 +618,14 @@ Persson, B. N. (2026). *Cronbach's alpha and measurement reliability* [Interacti
     }
     interpEl.innerHTML = msg;
     interpEl.classList.toggle('warn', alpha < 0.70);
+    interpEl.classList.toggle('acceptable', alpha >= 0.70 && alpha < 0.90);
+    interpEl.classList.toggle('ok', alpha >= 0.90);
+
+    const clinicalEl = document.getElementById('ca_clinical_note');
+    const lo95c = (trueScore - 1.96 * sem).toFixed(0);
+    const hi95c = (trueScore + 1.96 * sem).toFixed(0);
+    const width95 = ci95.toFixed(1);
+    clinicalEl.innerHTML = `A psychologist interpreting this score should treat ${trueScore} as a point estimate surrounded by measurement uncertainty. If the same patient were administered many parallel versions of this test, 95% of those scores would be expected to fall between ${lo95c} and ${hi95c} — a range of ${width95} points. Diagnostic cut-offs and comparisons between patients should always be evaluated against this interval: two scores that differ on paper may not reflect a real difference if their confidence intervals overlap substantially.`;
   }
 
   // ── Resize + render ───────────────────────────────────────────────────────
