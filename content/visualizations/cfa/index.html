@@ -34,6 +34,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     padding: 0;
   }
 
+
   /* Header */
   .hero {
     padding: 100px 0 60px;
@@ -338,6 +339,16 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
   .eq-tip .tip-matrix {
     color: var(--text-bright);
     font-family: var(--mono);
+    white-space: pre;
+  }
+  .eq-tip .tip-matrix pre {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    font-family: inherit;
+    color: inherit;
+    white-space: pre;
+    line-height: 1.2;
   }
   .eq-sym:hover .eq-tip { display: block; }
 
@@ -612,23 +623,23 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     </div>
 
     <p>This small set of parameters — 6 loadings, 1 factor correlation — fully determines a predicted correlation matrix. The central equation is:</p>
-    <div class="equation"><span class="eq-sym">Σ(θ)<span class="eq-tip"><span class="tip-label">Model-implied correlation matrix (6 × 6)</span><span class="tip-matrix">       x₁    x₂    x₃    x₄    x₅    x₆
+    <div class="equation"><span class="eq-sym">Σ(θ)<span class="eq-tip"><span class="tip-label">Model-implied correlation matrix (6 × 6)</span><span class="tip-matrix"><pre>       x₁    x₂    x₃    x₄    x₅    x₆
 x₁   1.00  .600  .488  .184  .223  .158
 x₂    ·    1.00  .520  .196  .238  .168
 x₃    ·      ·   1.00  .159  .194  .137
 x₄    ·      ·     ·   1.00  .595  .420
 x₅    ·      ·     ·     ·   1.00  .510
-x₆    ·      ·     ·     ·     ·   1.00</span></span></span> = <span class="eq-sym">Λ<span class="eq-tip"><span class="tip-label">Factor loading matrix (6 × 2)</span><span class="tip-matrix">       F₁    F₂
+x₆    ·      ·     ·     ·     ·   1.00</pre></span></span></span> = <span class="eq-sym">Λ<span class="eq-tip"><span class="tip-label">Factor loading matrix (6 × 2)</span><span class="tip-matrix"><pre>       F₁    F₂
 x₁   .75     0
 x₂   .80     0
 x₃   .65     0
 x₄    0    .70
 x₅    0    .85
-x₆    0    .60</span></span></span><span class="eq-sym">Φ<span class="eq-tip"><span class="tip-label">Factor correlation matrix (2 × 2)</span><span class="tip-matrix">       F₁    F₂
+x₆    0    .60</pre></span></span></span><span class="eq-sym">Φ<span class="eq-tip"><span class="tip-label">Factor correlation matrix (2 × 2)</span><span class="tip-matrix"><pre>       F₁    F₂
 F₁   1.00  .35
-F₂    .35  1.00</span></span></span><span class="eq-sym">Λ′<span class="eq-tip"><span class="tip-label">Transpose of Λ (2 × 6)</span><span class="tip-matrix">       x₁    x₂    x₃    x₄    x₅    x₆
+F₂    .35  1.00</pre></span></span></span><span class="eq-sym">Λ′<span class="eq-tip"><span class="tip-label">Transpose of Λ (2 × 6)</span><span class="tip-matrix"><pre>       x₁    x₂    x₃    x₄    x₅    x₆
 F₁   .75   .80   .65    0     0     0
-F₂    0     0     0    .70   .85   .60</span></span></span> + <span class="eq-sym">Θ<span class="eq-tip"><span class="tip-label">Residual variance matrix (6 × 6 diagonal)</span><span class="tip-matrix">θᵢ = 1 − λᵢ²
+F₂    0     0     0    .70   .85   .60</pre></span></span></span> + <span class="eq-sym">Θ<span class="eq-tip"><span class="tip-label">Residual variance matrix (6 × 6 diagonal)</span><span class="tip-matrix"><pre>θᵢ = 1 − λᵢ²
 
        x₁    x₂    x₃    x₄    x₅    x₆
 x₁   .438
@@ -636,7 +647,7 @@ x₂     ·   .360
 x₃     ·     ·   .578
 x₄     ·     ·     ·   .510
 x₅     ·     ·     ·     ·   .278
-x₆     ·     ·     ·     ·     ·   .640</span></span></span></div>
+x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
     <p>where <span class="m">Λ</span> is the matrix of loadings, <span class="m">Φ</span> is the factor correlation matrix, and <span class="m">Θ</span> is the diagonal matrix of residual variances. In the standardized case, <span class="m">θᵢ = 1 − λᵢ²</span>, so the loadings are the only free parameters governing each item.</p>
   </div>
 
