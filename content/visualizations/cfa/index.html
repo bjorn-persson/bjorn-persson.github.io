@@ -337,9 +337,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
   }
   .eq-tip .tip-matrix {
     color: var(--text-bright);
-    /* ensure subscripts and digits stay monospaced even if the webfont
-       subset lacks them; fall back to common system monospace faces */
-    font-family: 'IBM Plex Mono', Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-family: var(--mono);
   }
   .eq-sym:hover .eq-tip { display: block; }
 
