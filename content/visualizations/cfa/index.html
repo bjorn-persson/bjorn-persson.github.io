@@ -578,6 +578,82 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     font-size: 0.85em;
   }
 
+  /* Sampling variability grid */
+  .sample-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 14px;
+  }
+  .sample-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+  }
+  .sample-card-title {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .sample-param {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    margin-right: 6px;
+  }
+
+  /* Omega display */
+  .omega-grid {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .omega-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    min-width: 180px;
+    flex: 1;
+  }
+  .omega-card h4 {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+  .omega-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .omega-label {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text-dim);
+  }
+  .omega-value {
+    font-family: var(--mono);
+    font-size: 1.1em;
+    font-weight: 600;
+  }
+
+  /* Model comparison */
+  .model-compare-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .model-compare-col {
+    flex: 1;
+    min-width: 280px;
+  }
+
   /* Responsive */
   @media (max-width: 640px) {
     .hero h1 { font-size: 1.7em; }
@@ -831,6 +907,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
           <button class="btn scenario-btn active" data-scenario="correct" onclick="switchScenario('correct')">Correct Model</button>
           <button class="btn scenario-btn" data-scenario="missingFactor" onclick="switchScenario('missingFactor')">Missing Factor</button>
           <button class="btn scenario-btn" data-scenario="crossLoading" onclick="switchScenario('crossLoading')">Omitted Cross-Loading</button>
+          <button class="btn scenario-btn" data-scenario="correlatedResidual" onclick="switchScenario('correlatedResidual')">Correlated Residual</button>
         </div>
         <div id="scenario-description" style="font-family:var(--mono);font-size:0.82em;color:var(--text-dim);margin-top:10px;min-height:2.8em;"></div>
       </div>
@@ -859,7 +936,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
     </div>
 
     <div class="note">
-      <strong>Try it:</strong> Select "Missing Factor" and notice the block of structured residuals — the model can't reproduce correlations between items that actually belong to separate factors it doesn't know about. Select "Omitted Cross-Loading" and notice the residuals concentrate around one item. Then look at the modification indices: they point directly at the missing parameter.
+      <strong>Try it:</strong> Select "Missing Factor" and notice the block of structured residuals — the model can't reproduce correlations between items that actually belong to separate factors it doesn't know about. Select "Omitted Cross-Loading" and notice the residuals concentrate around one item. Select "Correlated Residual" and notice how the extra covariance between x₃ and x₄ (which load on different factors) forces the optimizer to inflate φ, creating a pattern of positive and negative residuals across the cross-block. In each case, the modification indices point toward the missing parameter.
     </div>
     <div class="note warn">
       <strong>The lesson:</strong> Good fit indices do not mean the model is correct — they mean the model reproduces the covariance matrix reasonably well. Structured residuals and large modification indices are the diagnostic. A model that fits well by the numbers but shows patterned residuals is telling you something is missing.
@@ -928,6 +1005,99 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
     </div>
     <div class="note warn">
       <strong>Note:</strong> These are <em>regression factor scores</em> (W = ΦΛ′Σ⁻¹), the most common method. They are not the only method — Bartlett scores and others exist and would show somewhat different sensitivity patterns. The key lesson is general: wrong parameters yield wrong scores.
+    </div>
+  </div>
+
+  <!-- SECTION 9: Reliability -->
+  <div class="section" id="sec9">
+    <div class="section-label">Section 9</div>
+    <h2>Reliability from the factor model<button class="info-btn" onclick="showInfo('sec9')">?</button></h2>
+    <p>Factor loadings tell you how much of each item's variance is shared with the factor. This directly yields <em>reliability</em> — the proportion of subscale score variance that is true-score variance. Two coefficients are shown below: <span class="m">ω</span> (omega), which uses the actual loadings, and <span class="m">α</span> (alpha), which assumes all loadings are equal.</p>
+    <p>When loadings are roughly equal, the two agree. As you make them more unequal, alpha departs from omega. Note that reliability is computed <em>per factor</em> — each subscale gets its own coefficient. Computing a single reliability for all 6 items across both factors would conflate two distinct constructs and produce a number that is difficult to interpret.</p>
+
+    <div class="viz-box wide">
+      <div style="display:flex;gap:28px;flex-wrap:wrap;">
+        <div style="flex:0 0 220px;">
+          <div class="slider-group">
+            <div class="slider-group-title">Factor 1 Loadings</div>
+            <div id="sliders-f1-s9"></div>
+          </div>
+          <div class="slider-group">
+            <div class="slider-group-title">Factor 2 Loadings</div>
+            <div id="sliders-f2-s9"></div>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="btn-row">
+              <button class="btn" style="flex:1;" onclick="runOptimizer()">Fit the Model</button>
+              <button class="btn btn-orange" style="flex:1;" onclick="resetParams()">Reset</button>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div id="omega-display" class="omega-grid"></div>
+          <div style="font-size:0.88em;margin-top:20px;max-width:520px;">
+            <p style="margin-bottom:8px;"><span class="m">ω</span> — Computed from the actual loadings: (Σλ)² / [(Σλ)² + Σθ]. Uses the factor model directly.</p>
+            <p style="margin-bottom:0;"><span class="m">α</span> — Computed from the mean inter-item correlation. Equivalent to omega only when all loadings are equal (tau-equivalence).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Click "Fit the Model" so the loadings match the data — notice that omega and alpha are close when the true loadings are similar. Then drag one loading to its maximum and another to its minimum within the same factor. Alpha barely moves (it only sees the average inter-item correlation) while omega tracks the actual reliability. Note the absence of the factor correlation slider: per-factor reliability depends only on the loadings within that factor.
+    </div>
+  </div>
+
+  <!-- SECTION 10: Sampling Variability -->
+  <div class="section" id="sec10">
+    <div class="section-label">Section 10</div>
+    <h2>Sampling variability<button class="info-btn" onclick="showInfo('sec10')">?</button></h2>
+    <p>Everything on this page — the observed correlations, the fitted parameters, the fit indices — is estimated from a <em>sample</em>. Draw a different sample from the same population and you get different numbers. With small samples, parameter estimates can be wildly off even when the model is correct.</p>
+    <p>Click "Draw Samples" to generate 6 independent samples from the true model, fit the 2-factor model to each, and compare the recovered loadings to the true values.</p>
+
+    <div class="viz-box wide">
+      <div style="margin-bottom:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+        <div class="slider-row" style="margin:0;flex:0 0 auto;">
+          <span class="slider-label" style="width:auto;font-size:0.82em;color:var(--text-dim);">Sample size:</span>
+          <input type="range" min="30" max="1000" step="10" value="80" id="sl-sampling-n" style="max-width:200px;"
+            oninput="document.getElementById('sv-sampling-n').textContent=this.value">
+          <span class="slider-val" id="sv-sampling-n" style="width:42px;">80</span>
+        </div>
+        <button class="btn" id="btn-draw-samples" onclick="drawSamplingDemo()">Draw Samples</button>
+      </div>
+      <div id="sampling-grid" class="sample-grid"></div>
+      <div id="sampling-summary" style="font-family:var(--mono);font-size:0.82em;color:var(--text-dim);margin-top:12px;"></div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Draw samples at N = 50, then at N = 500. At small N, loadings bounce around substantially and some samples may produce poor fit even though the model is correct. At large N, the estimates cluster tightly around the true values.
+    </div>
+  </div>
+
+  <!-- SECTION 11: Model Comparison -->
+  <div class="section" id="sec11">
+    <div class="section-label">Section 11</div>
+    <h2>Comparing models<button class="info-btn" onclick="showInfo('sec11')">?</button></h2>
+    <p>A natural question: how do we know two factors are needed? Maybe one factor is enough. Below, both models are fitted to the same observed data. The 1-factor model forces all 6 items onto a single factor. Compare the residual matrices — the 1-factor model leaves structured residuals in the cross-block cells because it can't represent two distinct clusters of items.</p>
+
+    <div class="viz-box wide">
+      <div class="model-compare-row">
+        <div class="model-compare-col">
+          <div class="viz-title">1-Factor Model — Residuals (S − Σ̂)</div>
+          <div id="heatmap-1f-residual" class="heatmap-container"></div>
+          <div class="fit-stats" id="fit-1f" style="margin-top:12px;"></div>
+        </div>
+        <div class="model-compare-col">
+          <div class="viz-title">2-Factor Model — Residuals (S − Σ̂)</div>
+          <div id="heatmap-2f-residual" class="heatmap-container"></div>
+          <div class="fit-stats" id="fit-2f" style="margin-top:12px;"></div>
+        </div>
+      </div>
+      <div id="model-compare-test" style="margin-top:20px;"></div>
+    </div>
+
+    <div class="note">
+      <strong>Why AIC/BIC?</strong> The 1-factor model is not simply the 2-factor model with an added constraint — they have different loading patterns. So instead of a likelihood ratio test, we use information criteria. AIC and BIC both balance fit against complexity; lower values are better. When the difference is large, the conclusion is unambiguous.
     </div>
   </div>
 
@@ -1643,7 +1813,7 @@ function renderIdentification() {
 // =============================================================
 // SLIDER MANAGEMENT (two synced sets: section 3 and section 6)
 // =============================================================
-const SLIDER_SECTIONS = ['', '-s6', '-s8']; // suffixes for the three panels
+const SLIDER_SECTIONS = ['', '-s6', '-s8', '-s9']; // suffixes for the four panels
 
 function createSlidersForSection(suffix) {
   const f1 = document.getElementById('sliders-f1' + suffix);
@@ -1669,6 +1839,7 @@ function createSlidersForSection(suffix) {
   }
 
   const ph = document.getElementById('slider-phi' + suffix);
+  if (!ph) return;
   ph.innerHTML = `
     <div class="slider-row">
       <span class="slider-label">φ</span>
@@ -1759,6 +1930,9 @@ function updateAll() {
 
   // Fit indices
   renderFitIndices();
+
+  // Omega
+  renderOmega();
 
   // Scatterplots
   updateScatterplots();
@@ -1944,6 +2118,21 @@ const SCENARIOS = {
       [0.00, 0.60]
     ],
     phi: [[1, 0.35], [0.35, 1]]
+  },
+  correlatedResidual: {
+    label: 'Correlated Residual',
+    description: 'Truth: 2 factors with correct simple structure, but x₃ and x₄ share residual covariance (θ₃₄ = 0.25) — e.g., similar wording across subscales. These items load on different factors, so the model can only account for their extra correlation through φ. The optimizer inflates φ to compensate, distorting the entire cross-block and producing a distinctive residual pattern.',
+    nFactors: 2,
+    lambdaMatrix: [
+      [0.75, 0.00],
+      [0.80, 0.00],
+      [0.65, 0.00],
+      [0.00, 0.70],
+      [0.00, 0.85],
+      [0.00, 0.60]
+    ],
+    phi: [[1, 0.35], [0.35, 1]],
+    thetaCorr: [{i: 2, j: 3, value: 0.25}]
   }
 };
 
@@ -1989,6 +2178,14 @@ function generateFromScenario(scenario) {
     Theta[i][i] = Math.max(0.01, 1 - LPLt[i][i]);
 
   const trueSigma = matAdd(LPLt, Theta);
+
+  // Add correlated residuals if specified
+  if (scenario.thetaCorr) {
+    for (const {i, j, value} of scenario.thetaCorr) {
+      trueSigma[i][j] += value;
+      trueSigma[j][i] += value;
+    }
+  }
 
   // Generate sample data
   const data = generateMVN(trueSigma, SAMPLE_N);
@@ -2193,6 +2390,315 @@ function updateMisspecDisplay() {
 }
 
 // =============================================================
+// SECTION 9: RELIABILITY (OMEGA & ALPHA)
+// =============================================================
+function computeReliability(lambdaVals) {
+  const factorItems = [[0,1,2], [3,4,5]];
+  const results = [];
+
+  for (let f = 0; f < 2; f++) {
+    const items = factorItems[f];
+    const k = items.length;
+    const lams = items.map(i => lambdaVals[i]);
+    const thetas = lams.map(l => Math.max(0, 1 - l*l));
+
+    // Omega: (sum_lambda)^2 / [(sum_lambda)^2 + sum_theta]
+    const sumLam = lams.reduce((a,b) => a+b, 0);
+    const sumTheta = thetas.reduce((a,b) => a+b, 0);
+    const omega = (sumLam * sumLam) / (sumLam * sumLam + sumTheta);
+
+    // Standardized alpha from mean inter-item correlation
+    let sumR = 0, countR = 0;
+    for (let i = 0; i < k; i++) {
+      for (let j = i+1; j < k; j++) {
+        sumR += lams[i] * lams[j];
+        countR++;
+      }
+    }
+    const rBar = sumR / countR;
+    const alpha = (k * rBar) / (1 + (k-1) * rBar);
+
+    results.push({ factor: f+1, omega, alpha, lams });
+  }
+
+  return results;
+}
+
+function renderOmega() {
+  const rel = computeReliability(params.lambda);
+  const container = document.getElementById('omega-display');
+
+  container.innerHTML = rel.map(r => {
+    const diff = Math.abs(r.omega - r.alpha);
+    const diffColor = diff < 0.02 ? 'var(--teal)' : diff < 0.05 ? 'var(--orange)' : 'var(--red)';
+    // Show individual loadings for context
+    const lamStr = r.lams.map((l, i) => `λ${r.factor === 1 ? i+1 : i+4}=${l.toFixed(2)}`).join('  ');
+    const lamRange = Math.max(...r.lams) - Math.min(...r.lams);
+    const tauNote = lamRange < 0.08 ? 'near tau-equivalent' : lamRange < 0.20 ? 'moderately unequal' : 'substantially unequal';
+    return `<div class="omega-card">
+      <h4>Factor ${r.factor}</h4>
+      <div class="omega-row">
+        <span class="omega-label">ω</span>
+        <span class="omega-value" style="color:var(--teal)">${r.omega.toFixed(3)}</span>
+      </div>
+      <div class="omega-row">
+        <span class="omega-label">α</span>
+        <span class="omega-value" style="color:var(--orange)">${r.alpha.toFixed(3)}</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.72em;color:${diffColor};margin-top:6px;">
+        Δ = ${diff.toFixed(3)}
+      </div>
+      <div style="font-family:var(--mono);font-size:0.70em;color:var(--text-dim);margin-top:8px;">
+        ${lamStr}<br>${tauNote}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// =============================================================
+// SECTION 10: SAMPLING VARIABILITY
+// =============================================================
+function drawSamplingDemo() {
+  const n = parseInt(document.getElementById('sl-sampling-n').value);
+  const nSamples = 6;
+  const container = document.getElementById('sampling-grid');
+  const summary = document.getElementById('sampling-summary');
+
+  const trueSigma = impliedMatrix(TRUE_LAMBDA, TRUE_PHI);
+  const results = [];
+
+  for (let s = 0; s < nSamples; s++) {
+    const data = generateMVN(trueSigma, n);
+    const S = sampleCorrelationMatrix(data);
+    const fitted = fitModelToS(S);
+    const sigmaHat = impliedMatrix(fitted.lambda, fitted.phi);
+
+    // Compute fit indices at this sample's N
+    const fml = mlFitFunction(fitted.lambda, fitted.phi, S);
+    const nFree = N_ITEMS + 1;
+    const nObs = N_ITEMS * (N_ITEMS - 1) / 2;
+    const df = nObs - nFree;
+    const chiSq = Math.max(0, (n - 1) * fml);
+    const rmsea = Math.sqrt(Math.max(0, (chiSq - df) / (df * (n - 1))));
+
+    let srmrSum = 0, srmrCount = 0;
+    for (let i = 0; i < N_ITEMS; i++) {
+      for (let j = 0; j < i; j++) {
+        srmrSum += (S[i][j] - sigmaHat[i][j]) ** 2;
+        srmrCount++;
+      }
+    }
+    const srmr = Math.sqrt(srmrSum / srmrCount);
+
+    const fml_base = mlFitFunction_independence(S);
+    const df_base = N_ITEMS * (N_ITEMS - 1) / 2;
+    const chiSq_base = Math.max(0, (n - 1) * fml_base);
+    const cfi = Math.max(0, Math.min(1, 1 - (chiSq - df) / (chiSq_base - df_base)));
+
+    const residual = matSub(S, sigmaHat);
+    results.push({ S, fitted, residual, rmsea, srmr, cfi });
+  }
+
+  // Render cards
+  container.innerHTML = results.map((r, idx) => {
+    const lamStr = r.fitted.lambda.map((l, i) => {
+      const dev = Math.abs(l - TRUE_LAMBDA[i]);
+      const col = dev > 0.15 ? 'var(--red)' : dev > 0.08 ? 'var(--orange)' : 'var(--text)';
+      return `<span class="sample-param"><span style="color:var(--teal)">λ${i+1}</span>=<span style="color:${col}">${l.toFixed(2)}</span></span>`;
+    }).join('');
+    const phiDev = Math.abs(r.fitted.phi - TRUE_PHI);
+    const phiCol = phiDev > 0.15 ? 'var(--red)' : phiDev > 0.08 ? 'var(--orange)' : 'var(--text)';
+    return `<div class="sample-card">
+      <div class="sample-card-title">Sample ${idx+1}</div>
+      <div id="sampling-heatmap-${idx}" class="heatmap-container"></div>
+      <div style="margin-top:8px;">${lamStr}
+        <span class="sample-param"><span style="color:var(--orange)">φ</span>=<span style="color:${phiCol}">${r.fitted.phi.toFixed(2)}</span></span>
+      </div>
+      <div style="margin-top:4px;font-family:var(--mono);font-size:0.72em;color:var(--text-dim);">
+        RMSEA=${r.rmsea.toFixed(3)} · CFI=${r.cfi.toFixed(3)} · SRMR=${r.srmr.toFixed(3)}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Render small residual heatmaps
+  results.forEach((r, idx) => {
+    renderHeatmap(`sampling-heatmap-${idx}`, r.residual, {cellSize:36, fontSize:8, maxAbs:0.2, showDiag:true});
+  });
+
+  // Summary statistics
+  const lambdaSDs = [];
+  for (let i = 0; i < N_ITEMS; i++) {
+    const vals = results.map(r => r.fitted.lambda[i]);
+    const mean = vals.reduce((a,b) => a+b) / vals.length;
+    const sd = Math.sqrt(vals.reduce((a,v) => a + (v-mean)**2, 0) / (vals.length - 1));
+    lambdaSDs.push(sd);
+  }
+  const meanSD = lambdaSDs.reduce((a,b) => a+b) / lambdaSDs.length;
+  summary.innerHTML = `Average SD of loading estimates: <span style="color:${meanSD > 0.08 ? 'var(--red)' : meanSD > 0.04 ? 'var(--orange)' : 'var(--teal)'};font-weight:600;">${meanSD.toFixed(3)}</span> · True values: λ = [${TRUE_LAMBDA.join(', ')}], φ = ${TRUE_PHI}`;
+}
+
+// =============================================================
+// SECTION 11: MODEL COMPARISON (1-FACTOR vs 2-FACTOR)
+// =============================================================
+function impliedMatrix1F(lambdaVals) {
+  const p = lambdaVals.length;
+  const sigma = matCreate(p, p);
+  for (let i = 0; i < p; i++) {
+    for (let j = 0; j < p; j++) {
+      sigma[i][j] = lambdaVals[i] * lambdaVals[j];
+    }
+    sigma[i][i] = 1.0;
+  }
+  return sigma;
+}
+
+function mlFitFunction1F(lambdaVals, S) {
+  const sigma = impliedMatrix1F(lambdaVals);
+  const p = S.length;
+  const detSigma = matDet(sigma);
+  const detS = matDet(S);
+  if (detSigma <= 0 || detS <= 0) return 999;
+  const sigmaInv = matInverse(sigma);
+  if (!sigmaInv) return 999;
+  const SsigmaInv = matMul(S, sigmaInv);
+  const tr = matTrace(SsigmaInv);
+  return Math.log(detSigma) + tr - Math.log(detS) - p;
+}
+
+function fitOneFactorModel(S) {
+  let lam = Array(N_ITEMS).fill(0.5);
+  for (let iter = 0; iter < 500; iter++) {
+    const eps = 1e-6;
+    const f0 = mlFitFunction1F(lam, S);
+    const grad = lam.map((_, i) => {
+      const lp = [...lam]; lp[i] += eps;
+      const lm = [...lam]; lm[i] -= eps;
+      return (mlFitFunction1F(lp, S) - mlFitFunction1F(lm, S)) / (2 * eps);
+    });
+    const gn = Math.sqrt(grad.reduce((s, g) => s + g * g, 0));
+    if (gn < 1e-7) break;
+    let alpha = 1.0;
+    let accepted = false;
+    for (let ls = 0; ls < 30; ls++) {
+      const newLam = lam.map((l, i) => clampLambda(l - alpha * grad[i]));
+      if (mlFitFunction1F(newLam, S) < f0 - 0.5 * alpha * gn * gn) {
+        lam = newLam;
+        accepted = true;
+        break;
+      }
+      alpha *= 0.5;
+    }
+    if (!accepted) {
+      lam = lam.map((l, i) => clampLambda(l - 1e-4 * grad[i]));
+    }
+  }
+  return lam;
+}
+
+function computeFitIndicesGeneric(sigma, nFree, S, N) {
+  const p = S.length;
+  const detSigma = matDet(sigma);
+  const detS = matDet(S);
+  let fml = 999;
+  if (detSigma > 0 && detS > 0) {
+    const sigmaInv = matInverse(sigma);
+    if (sigmaInv) {
+      const SsigmaInv = matMul(S, sigmaInv);
+      fml = Math.log(detSigma) + matTrace(SsigmaInv) - Math.log(detS) - p;
+    }
+  }
+
+  const nObs = p * (p - 1) / 2;
+  const df = nObs - nFree;
+  const chiSq = Math.max(0, (N - 1) * fml);
+  const rmsea = df > 0 ? Math.sqrt(Math.max(0, (chiSq - df) / (df * (N - 1)))) : 0;
+
+  let srmrSum = 0, srmrCount = 0;
+  for (let i = 0; i < p; i++) {
+    for (let j = 0; j < i; j++) {
+      srmrSum += (S[i][j] - sigma[i][j]) ** 2;
+      srmrCount++;
+    }
+  }
+  const srmr = Math.sqrt(srmrSum / srmrCount);
+
+  const fml_base = mlFitFunction_independence(S);
+  const df_base = p * (p - 1) / 2;
+  const chiSq_base = Math.max(0, (N - 1) * fml_base);
+  const cfi = Math.max(0, Math.min(1, 1 - (chiSq - df) / (chiSq_base - df_base)));
+
+  // AIC and BIC (relative to saturated model)
+  const aic = chiSq - 2 * df;
+  const bic = chiSq - df * Math.log(N);
+
+  return { chiSq, df, rmsea, srmr, cfi, fml, aic, bic };
+}
+
+function renderModelComparison() {
+  // Fit 1-factor model
+  const lam1F = fitOneFactorModel(S_OBS);
+  const sigma1F = impliedMatrix1F(lam1F);
+  const residual1F = matSub(S_OBS, sigma1F);
+
+  // Fit 2-factor model
+  const fitted2F = fitModelToS(S_OBS);
+  const sigma2F = impliedMatrix(fitted2F.lambda, fitted2F.phi);
+  const residual2F = matSub(S_OBS, sigma2F);
+
+  // Render heatmaps
+  renderHeatmap('heatmap-1f-residual', residual1F, {cellSize:46, fontSize:10, maxAbs:0.2, showDiag:true});
+  renderHeatmap('heatmap-2f-residual', residual2F, {cellSize:46, fontSize:10, maxAbs:0.2, showDiag:true});
+
+  // Fit indices
+  const fi1F = computeFitIndicesGeneric(sigma1F, N_ITEMS, S_OBS, SAMPLE_N);
+  const fi2F = computeFitIndicesGeneric(sigma2F, N_ITEMS + 1, S_OBS, SAMPLE_N);
+
+  function renderFitRow(fi) {
+    return [
+      { label: 'χ²', value: fi.chiSq.toFixed(2), qual: '' },
+      { label: 'df', value: fi.df, qual: '' },
+      { label: 'RMSEA', value: fi.rmsea.toFixed(3), qual: fitQuality('rmsea', fi.rmsea) },
+      { label: 'SRMR', value: fi.srmr.toFixed(3), qual: fitQuality('srmr', fi.srmr) },
+      { label: 'CFI', value: fi.cfi.toFixed(3), qual: fitQuality('cfi', fi.cfi) },
+    ].map(it =>
+      `<div class="fit-stat"><div class="fit-stat-label">${it.label}</div><div class="fit-stat-value ${it.qual}">${it.value}</div></div>`
+    ).join('');
+  }
+
+  document.getElementById('fit-1f').innerHTML = renderFitRow(fi1F);
+  document.getElementById('fit-2f').innerHTML = renderFitRow(fi2F);
+
+  // AIC/BIC comparison
+  const aicBetter = fi2F.aic < fi1F.aic ? '2-factor' : '1-factor';
+  const bicBetter = fi2F.bic < fi1F.bic ? '2-factor' : '1-factor';
+
+  document.getElementById('model-compare-test').innerHTML = `
+    <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:6px;padding:16px 20px;max-width:560px;">
+      <div style="font-family:var(--mono);font-size:0.78em;color:var(--text-dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em;">Information Criteria</div>
+      <table style="font-family:var(--mono);font-size:0.88em;border-collapse:collapse;">
+        <tr>
+          <td style="padding:4px 16px 4px 0;color:var(--text-dim);"></td>
+          <td style="padding:4px 16px;color:var(--text-dim);font-size:0.85em;">1-Factor</td>
+          <td style="padding:4px 16px;color:var(--text-dim);font-size:0.85em;">2-Factor</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 16px 4px 0;color:var(--text-dim);">AIC</td>
+          <td style="padding:4px 16px;color:${aicBetter==='1-factor'?'var(--teal)':'var(--text)'};font-weight:${aicBetter==='1-factor'?'600':'400'}">${fi1F.aic.toFixed(1)}</td>
+          <td style="padding:4px 16px;color:${aicBetter==='2-factor'?'var(--teal)':'var(--text)'};font-weight:${aicBetter==='2-factor'?'600':'400'}">${fi2F.aic.toFixed(1)}</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 16px 4px 0;color:var(--text-dim);">BIC</td>
+          <td style="padding:4px 16px;color:${bicBetter==='1-factor'?'var(--teal)':'var(--text)'};font-weight:${bicBetter==='1-factor'?'600':'400'}">${fi1F.bic.toFixed(1)}</td>
+          <td style="padding:4px 16px;color:${bicBetter==='2-factor'?'var(--teal)':'var(--text)'};font-weight:${bicBetter==='2-factor'?'600':'400'}">${fi2F.bic.toFixed(1)}</td>
+        </tr>
+      </table>
+      <div style="font-family:var(--mono);font-size:0.82em;color:var(--teal);margin-top:10px;">
+        Both criteria favor the ${aicBetter === bicBetter ? aicBetter : aicBetter + ' (AIC) / ' + bicBetter + ' (BIC)'} model.
+      </div>
+    </div>`;
+}
+
+// =============================================================
 // INITIALIZATION
 // =============================================================
 function init() {
@@ -2211,6 +2717,9 @@ function init() {
 
   // Section 7: misspecification demo
   switchScenario('correct');
+
+  // Section 11: model comparison
+  renderModelComparison();
 
   // Full update
   updateAll();
@@ -2317,7 +2826,42 @@ const infoContent = {
       <p>The key diagnostic is the <em>residual matrix</em>. Under correct specification, residuals are small and random — they reflect sampling variability. Under misspecification, residuals show <em>structure</em>: systematic clusters of positive or negative values that the model can't account for. This structured pattern tells you <em>where</em> the model fails, not just <em>that</em> it fails.</p>
       <p><em>Modification indices</em> formalize this intuition. For each currently fixed parameter (here, the cross-loadings constrained to zero), the MI estimates the expected drop in χ² if that parameter were freed. Technically, it is the squared score statistic divided by the expected information — essentially a one-degree-of-freedom Lagrange multiplier test.</p>
       <p>A common rule of thumb is MI > 3.84 (the χ²(1) critical value at α = .05) as a threshold for "worth investigating." But modification indices should be interpreted substantively, not mechanically. A large MI might reflect a genuine cross-loading, or it might reflect a correlated residual, a method effect, or model misspecification elsewhere propagating through the system.</p>
-      <p>The two misspecification scenarios here illustrate different failure modes. "Missing Factor" shows what happens when dimensionality is wrong — the model can't separate constructs it doesn't know about. "Omitted Cross-Loading" shows a subtler problem where the structure is right but one item's relationship to a second factor is ignored. Both are common in practice, and both leave fingerprints in the residuals.</p>
+      <p>The misspecification scenarios illustrate different failure modes. "Missing Factor" shows what happens when dimensionality is wrong — the model can't separate constructs it doesn't know about. "Omitted Cross-Loading" shows a subtler problem where one item's relationship to a second factor is ignored. "Correlated Residual" shows what happens when two items on different factors share residual covariance — the model can only absorb the extra correlation by distorting φ and the loadings, creating a distinctive pattern of over- and under-predicted cross-block correlations. All are common in practice, and all leave fingerprints in the residuals.</p>
+    `
+  },
+  sec9: {
+    title: 'What is the difference between omega and alpha?',
+    badge: 'reliability',
+    body: `
+      <p>Both coefficients estimate the same thing: the proportion of composite score variance attributable to the latent factor(s). They differ in their assumptions.</p>
+      <p><em>Coefficient omega (ω)</em> uses the actual factor loadings. For a single factor with items indexed 1…k:</p>
+      <div class="formula">ω = (Σλᵢ)² / [(Σλᵢ)² + Σθᵢ]</div>
+      <p>This correctly accounts for the fact that items contribute unequally to the composite. Items with higher loadings contribute more true-score variance; items with lower loadings contribute more noise.</p>
+      <p><em>Coefficient alpha (α)</em> can be computed from inter-item correlations alone — no factor model required. Under the hood, it assumes <em>tau-equivalence</em>: that all items have equal loadings. When this holds, alpha equals omega. When it doesn't, alpha underestimates reliability (sometimes substantially).</p>
+      <p><em>Why per factor?</em> Reliability is a property of a unidimensional composite — a set of items measuring one construct. If your CFA says there are two factors, you have two subscales, each with its own reliability. Computing a single alpha or omega across all items would conflate two distinct constructs. The resulting number doesn't answer "how reliably am I measuring X" for any specific X. If you need a total score across factors, that requires a higher-order factor model or a bifactor model — a different specification, not just a different formula applied to the same parameters.</p>
+      <p>In practice, if you're running a CFA anyway, report omega per subscale. Alpha is fine as a quick summary when you have reason to believe items are roughly tau-equivalent, but omega is strictly more general.</p>
+    `
+  },
+  sec10: {
+    title: 'How much data do I need for stable estimates?',
+    badge: 'sample size',
+    body: `
+      <p>There is no single answer — it depends on the number of factors, the number of items per factor, the magnitude of loadings, and the complexity of the model. But some patterns are robust:</p>
+      <p><em>Loadings matter.</em> Models with high loadings (λ > .70) recover well even at modest N. Models with weak loadings (λ < .40) need much larger samples because the signal-to-noise ratio is lower.</p>
+      <p><em>More items help.</em> Three items per factor is the minimum for identification, but estimates are noisy. Five or more items per factor produces much more stable recovery.</p>
+      <p><em>Fit indices are noisy at small N.</em> RMSEA and CFI can fluctuate wildly when N < 100. A model that truly fits the population can easily show "poor fit" in a small sample — and a misspecified model can look adequate. This is one reason fit index cutoffs should not be applied rigidly.</p>
+      <p>Common rules of thumb range from N = 200 (a traditional minimum) to N:parameter ratios of 10:1 or 20:1. Simulation-based power analyses (e.g., via <a href="https://doi.org/10.1080/10705511.2014.859510" target="_blank" rel="noopener" style="color:var(--teal);">Monte Carlo methods in Mplus</a> or the <a href="https://cran.r-project.org/package=simsem" target="_blank" rel="noopener" style="color:var(--teal);">simsem R package</a>) are the gold standard: simulate data from your expected model and see what N gives acceptable recovery.</p>
+    `
+  },
+  sec11: {
+    title: 'How do information criteria compare models?',
+    badge: 'model selection',
+    body: `
+      <p>When two models are not nested — meaning neither is a special case of the other — the chi-square difference test doesn't apply. Instead, we use <em>information criteria</em> that balance fit against parsimony.</p>
+      <p><em>AIC</em> (Akaike Information Criterion) penalizes by the number of free parameters: AIC = χ² − 2·df. Lower is better. AIC tends to favor more complex models and is asymptotically equivalent to leave-one-out cross-validation.</p>
+      <p><em>BIC</em> (Bayesian Information Criterion) adds a heavier penalty that grows with sample size: BIC = χ² − df·ln(N). It is more conservative than AIC, especially at large N, and is consistent (it will select the true model as N → ∞, assuming the true model is among the candidates).</p>
+      <p>In the comparison here, the 1-factor and 2-factor models have different loading patterns — the 2-factor model isn't simply the 1-factor model with an added constraint. The 1-factor model says all items share one source of common variance. The 2-factor model says there are two distinct sources. The data clearly prefer two factors: the 1-factor model can't account for the weak cross-block correlations and leaves structured residuals.</p>
+      <p>Note that "lower AIC/BIC" doesn't mean "correct model" — it means "best among the candidates you tested." A model that fits better than alternatives could still be wrong in absolute terms.</p>
     `
   },
   sec8: {
