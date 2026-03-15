@@ -375,7 +375,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     </div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Reliability (α)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Validity (r<span style="font-size:0.7em;vertical-align:sub">yx</span>)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Validity (r<sub>yx</sub>)</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim);opacity:0.5"></div> Validity ceiling</div>
     </div>
   </div>
@@ -1080,86 +1080,43 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
   let items = [];
   const nItems = 20;
   const kPerScale = 10;
-  let mode = 'one'; // 'one' or 'two'
-
-  const btnTab1 = document.getElementById('btn_tab1');
-  const btnTab2 = document.getElementById('btn_tab2');
-  const tryit1 = document.getElementById('tryit_1scale');
-  const tryit2 = document.getElementById('tryit_2scale');
-
-  function setMode(m) {
-    mode = m;
-    btnTab1.classList.toggle('active', mode === 'one');
-    btnTab2.classList.toggle('active', mode === 'two');
-    tryit1.style.display = mode === 'one' ? '' : 'none';
-    tryit2.style.display = mode === 'two' ? '' : 'none';
-    setPreset('mixed');
-  }
-
-  btnTab1.addEventListener('click', () => setMode('one'));
-  btnTab2.addEventListener('click', () => setMode('two'));
 
   function generateRandom() {
     items = [];
-    if (mode === 'one') {
-      for (let i = 0; i < nItems; i++) {
-        items.push({ validity: Math.random() * 0.45 + 0.02, scale: 'A' });
-      }
-      items.sort((a, b) => b.validity - a.validity);
-    } else {
-      for (let i = 0; i < nItems; i++) {
-        items.push({ validity: Math.random() * 0.45 + 0.02, scale: i < kPerScale ? 'A' : 'B' });
-      }
-      const a = items.filter(x => x.scale === 'A').sort((a, b) => b.validity - a.validity);
-      const b = items.filter(x => x.scale === 'B').sort((a, b) => b.validity - a.validity);
-      items = [...a, ...b];
+    for (let i = 0; i < nItems; i++) {
+      const val = Math.random() * 0.45 + 0.02;
+      items.push({ validity: val, scale: i < kPerScale ? 'A' : 'B' });
     }
+    const a = items.filter(x => x.scale === 'A').sort((a, b) => b.validity - a.validity);
+    const b = items.filter(x => x.scale === 'B').sort((a, b) => b.validity - a.validity);
+    items = [...a, ...b];
     update();
   }
 
   function setPreset(type) {
     items = [];
-    if (mode === 'one') {
-      if (type === 'uniform') {
-        for (let i = 0; i < nItems; i++) {
-          items.push({ validity: 0.20 + Math.random() * 0.04, scale: 'A' });
-        }
-      } else if (type === 'mixed') {
-        for (let i = 0; i < nItems; i++) {
-          const val = i < 10 ? 0.25 + Math.random() * 0.10 : 0.08 + Math.random() * 0.06;
-          items.push({ validity: val, scale: 'A' });
-        }
-      } else if (type === 'concentrated') {
-        for (let i = 0; i < nItems; i++) {
-          const val = i < 3 ? 0.35 + Math.random() * 0.10 : 0.02 + Math.random() * 0.04;
-          items.push({ validity: val, scale: 'A' });
-        }
+    if (type === 'uniform') {
+      for (let i = 0; i < nItems; i++) {
+        items.push({ validity: 0.20 + Math.random() * 0.04, scale: i < kPerScale ? 'A' : 'B' });
       }
-      items.sort((a, b) => b.validity - a.validity);
-    } else {
-      if (type === 'uniform') {
-        for (let i = 0; i < nItems; i++) {
-          items.push({ validity: 0.20 + Math.random() * 0.04, scale: i < kPerScale ? 'A' : 'B' });
-        }
-      } else if (type === 'mixed') {
-        for (let i = 0; i < nItems; i++) {
-          const base = i < kPerScale ? 0.25 : 0.10;
-          items.push({ validity: base + Math.random() * 0.10, scale: i < kPerScale ? 'A' : 'B' });
-        }
-      } else if (type === 'concentrated') {
-        for (let i = 0; i < nItems; i++) {
-          let val;
-          if (i < 3) val = 0.35 + Math.random() * 0.10;
-          else if (i < kPerScale) val = 0.03 + Math.random() * 0.04;
-          else if (i < kPerScale + 2) val = 0.30 + Math.random() * 0.10;
-          else val = 0.02 + Math.random() * 0.03;
-          items.push({ validity: val, scale: i < kPerScale ? 'A' : 'B' });
-        }
+    } else if (type === 'mixed') {
+      for (let i = 0; i < nItems; i++) {
+        const base = i < kPerScale ? 0.25 : 0.10;
+        items.push({ validity: base + Math.random() * 0.10, scale: i < kPerScale ? 'A' : 'B' });
       }
-      const a = items.filter(x => x.scale === 'A').sort((a, b) => b.validity - a.validity);
-      const b = items.filter(x => x.scale === 'B').sort((a, b) => b.validity - a.validity);
-      items = [...a, ...b];
+    } else if (type === 'concentrated') {
+      for (let i = 0; i < nItems; i++) {
+        let val;
+        if (i < 3) val = 0.35 + Math.random() * 0.10;
+        else if (i < kPerScale) val = 0.03 + Math.random() * 0.04;
+        else if (i >= kPerScale && i < kPerScale + 2) val = 0.30 + Math.random() * 0.10;
+        else val = 0.02 + Math.random() * 0.03;
+        items.push({ validity: val, scale: i < kPerScale ? 'A' : 'B' });
+      }
     }
+    const a = items.filter(x => x.scale === 'A').sort((a, b) => b.validity - a.validity);
+    const b = items.filter(x => x.scale === 'B').sort((a, b) => b.validity - a.validity);
+    items = [...a, ...b];
     update();
   }
 
@@ -1178,19 +1135,15 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
     const gap = plotW / nItems * 0.3;
     const groupW = barW + gap;
 
+    const scaleWeightA = 1 / kPerScale;
+    const scaleWeightB = 1 / kPerScale;
+
     const totalVal = items.reduce((s, it) => s + it.validity, 0);
     const optWeights = items.map(it => it.validity / totalVal);
 
-    let normSW;
-    if (mode === 'one') {
-      // Single scale: equal weight for all items
-      normSW = items.map(() => 1 / nItems);
-    } else {
-      // Two scales: equal weight within each scale, then average
-      const scaleWeights = items.map(it => it.scale === 'A' ? 1 / kPerScale : 1 / kPerScale);
-      const totalSW = scaleWeights.reduce((s, v) => s + v, 0);
-      normSW = scaleWeights.map(v => v / totalSW);
-    }
+    const scaleWeights = items.map(it => it.scale === 'A' ? scaleWeightA : scaleWeightB);
+    const totalSW = scaleWeights.reduce((s, v) => s + v, 0);
+    const normSW = scaleWeights.map(v => v / totalSW);
 
     const maxW = Math.max(...optWeights, ...normSW, ...items.map(it => it.validity)) * 1.15;
 
@@ -1216,18 +1169,16 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
     ctx.lineTo(w - pad.right, h - pad.bottom);
     ctx.stroke();
 
-    if (mode === 'two') {
-      // Scale separator
-      const sepX = pad.left + kPerScale * groupW - gap / 2;
-      drawDashedLine(ctx, sepX, pad.top, sepX, h - pad.bottom, 'rgba(201,205,216,0.2)');
+    // Scale separator
+    const sepX = pad.left + kPerScale * groupW - gap / 2;
+    drawDashedLine(ctx, sepX, pad.top, sepX, h - pad.bottom, 'rgba(201,205,216,0.2)');
 
-      // Labels
-      ctx.fillStyle = COLORS.text;
-      ctx.font = '11px IBM Plex Mono';
-      ctx.textAlign = 'center';
-      ctx.fillText('Scale A', pad.left + (kPerScale * groupW) / 2, h - pad.bottom + 40);
-      ctx.fillText('Scale B', pad.left + kPerScale * groupW + (kPerScale * groupW) / 2, h - pad.bottom + 40);
-    }
+    // Labels
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '11px IBM Plex Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('Scale A', pad.left + (kPerScale * groupW) / 2, h - pad.bottom + 40);
+    ctx.fillText('Scale B', pad.left + kPerScale * groupW + (kPerScale * groupW) / 2, h - pad.bottom + 40);
 
     // Draw bars for each item
     items.forEach((item, i) => {
@@ -1263,33 +1214,26 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
       ctx.fillText((i + 1).toString(), x + barW / 2, h - pad.bottom + 14);
     });
 
-    // Compute composite validities
+    // Composite validity under block compound symmetry
+    // (within-domain r̄ᵢ = 0.30, between-domain = 0)
     const riW = 0.30;
     const rVec = items.map(it => it.validity);
 
-    function computeValidity(weights, r) {
-      const wR = weights.reduce((s, wi, i) => s + wi * r[i], 0);
+    function blockValidity(w, r) {
+      const wR = w.reduce((s, wi, i) => s + wi * r[i], 0);
       let wRxw = 0;
-      if (mode === 'one') {
-        // Single scale: compound symmetry
+      for (let b = 0; b < 2; b++) {
+        const lo = b * kPerScale, hi = lo + kPerScale;
         let s2 = 0, s1 = 0;
-        for (let i = 0; i < nItems; i++) { s2 += weights[i] * weights[i]; s1 += weights[i]; }
-        wRxw = (1 - riW) * s2 + riW * s1 * s1;
-      } else {
-        // Two scales: block compound symmetry (within r̄ᵢ = 0.30, between = 0)
-        for (let b = 0; b < 2; b++) {
-          const lo = b * kPerScale, hi = lo + kPerScale;
-          let s2 = 0, s1 = 0;
-          for (let i = lo; i < hi; i++) { s2 += weights[i] * weights[i]; s1 += weights[i]; }
-          wRxw += (1 - riW) * s2 + riW * s1 * s1;
-        }
+        for (let i = lo; i < hi; i++) { s2 += w[i] * w[i]; s1 += w[i]; }
+        wRxw += (1 - riW) * s2 + riW * s1 * s1;
       }
       return wR / Math.sqrt(wRxw);
     }
 
     const equalW = items.map(() => 1 / nItems);
-    const scaleValNorm = computeValidity(equalW, rVec);
-    const optValNorm = computeValidity(optWeights, rVec);
+    const scaleValNorm = blockValidity(equalW, rVec);
+    const optValNorm = blockValidity(optWeights, rVec);
 
     document.getElementById('m_scale_val').textContent = Math.min(scaleValNorm, 0.99).toFixed(3);
     document.getElementById('m_opt_val').textContent = Math.min(optValNorm, 0.99).toFixed(3);

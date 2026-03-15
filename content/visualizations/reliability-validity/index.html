@@ -5,155 +5,128 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
 ---
 
 <style>
-:root { --text: #c9cdd8; }
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
+  /* Reliability-validity — page-specific styles */
+  .hero .subtitle {
+    font-family: var(--serif);
+    font-size: 1.0rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
 
-.rv-wrap {
-  font-family: 'IBM Plex Mono', monospace;
-}
-.rv-subtitle {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 1.0rem;
-  color: var(--secondary);
-  margin-bottom: 21px;
-  line-height: 1.6;
-}
-.rv-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 24px;
-  margin-bottom: 21px;
-  font-size: 1.0rem;
-}
-.rv-control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.rv-control-group label {
-  color: var(--secondary);
-  font-size: 0.92rem;
-}
-.rv-control-group .rv-val {
-  color: #2dd4bf;
-  font-weight: 600;
-}
-.rv-controls input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 4px;
-  background: #2a2d3a;
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-}
-.rv-controls input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-}
-.rv-controls input[type="range"]::-moz-range-thumb {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-  border: none;
-}
-.rv-canvases {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 10px;
-}
-.rv-canvas-block {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.rv-canvas-label {
-  font-size: 0.9rem;
-  color: var(--secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-}
-.rv-canvas-block canvas {
-  display: block;
-  width: 100%;
-  border-radius: 6px;
-  background: #181a24;
-}
-.rv-badges {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-}
-.rv-badge {
-  font-size: 0.92rem;
-  padding: 4px 12px;
-  border-radius: 4px;
-  background: #181a24;
-  border: 1px solid #2a2d3a;
-  color: var(--secondary);
-}
-.rv-badge .rv-badge-val {
-  color: #2dd4bf;
-  font-weight: 600;
-}
-.rv-note {
-  font-size: 0.88rem;
-  color: var(--secondary);
-  line-height: 1.6;
-  margin-top: 12px;
-}
-@media (max-width: 600px) {
-  .rv-controls { grid-template-columns: 1fr; }
-  .rv-canvases { grid-template-columns: 1fr; }
-}
+  .rv-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+    margin-bottom: 21px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+  .rv-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rv-control-group label { color: var(--text-dim); }
+  .rv-control-group .rv-val { color: var(--teal); font-weight: 600; }
+
+  .rv-badges {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.78em;
+  }
+  .rv-badge {
+    padding: 4px 12px;
+    border-radius: 4px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .rv-badge .rv-badge-val { color: var(--teal); font-weight: 600; }
+
+  .rv-canvases {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .rv-canvas-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rv-canvas-block canvas {
+    display: block;
+    width: 100%;
+    border-radius: 6px;
+    background: var(--bg-surface);
+  }
+
+  .rv-note {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-top: 12px;
+  }
+
+  @media (max-width: 600px) {
+    .rv-controls { grid-template-columns: 1fr; }
+    .rv-canvases { grid-template-columns: 1fr; }
+  }
 </style>
 
-<div class="rv-wrap">
-  <p class="rv-subtitle">
-    Classical Test Theory: Observed Score = True Score + Error.<br>
-    <strong>Reliability</strong> concerns <em>random</em> error — how consistently a measure performs.<br>
-    <strong>Validity</strong> concerns <em>systematic</em> error — whether a measure hits its intended target.
-  </p>
-  <div class="rv-controls">
-    <div class="rv-control-group">
-      <label>Random Error (low reliability): <span class="rv-val" id="rv_rand_val">0.30</span></label>
-      <input type="range" id="rv_rand" min="0" max="1" step="0.01" value="0.30">
-    </div>
-    <div class="rv-control-group">
-      <label>Systematic Bias (±): <span class="rv-val" id="rv_sys_val">0.00</span></label>
-      <input type="range" id="rv_sys" min="-0.85" max="0.85" step="0.01" value="0.00">
+<div class="container">
+
+  <div class="hero">
+    <h1>Reliability, Validity &amp; Measurement Error</h1>
+    <div class="subtitle">
+      Classical Test Theory: Observed Score = True Score + Error.<br>
+      <strong>Reliability</strong> concerns <em>random</em> error — how consistently a measure performs.<br>
+      <strong>Validity</strong> concerns <em>systematic</em> error — whether a measure hits its intended target.
     </div>
   </div>
-  <div class="rv-badges">
-    <div class="rv-badge">Reliability (ρ): <span class="rv-badge-val" id="rv_rho">—</span></div>
-    <div class="rv-badge">Validity: <span class="rv-badge-val" id="rv_val_badge">—</span></div>
-    <div class="rv-badge" style="width:100%">Diagnosis: <span class="rv-badge-val" id="rv_diagnosis">—</span></div>
-  </div>
-  <div class="rv-canvases">
-    <div class="rv-canvas-block">
-      <div class="rv-canvas-label">Target (N = 40 arrows)</div>
-      <canvas id="rv_target" height="350"></canvas>
+
+  <div class="section">
+    <div class="rv-controls">
+      <div class="rv-control-group">
+        <label>Random Error (low reliability): <span class="rv-val" id="rv_rand_val">0.30</span></label>
+        <input type="range" id="rv_rand" min="0" max="1" step="0.01" value="0.30">
+      </div>
+      <div class="rv-control-group">
+        <label>Systematic Bias (&plusmn;): <span class="rv-val" id="rv_sys_val">0.00</span></label>
+        <input type="range" id="rv_sys" min="-0.85" max="0.85" step="0.01" value="0.00">
+      </div>
     </div>
-    <div class="rv-canvas-block">
-      <div class="rv-canvas-label">Observed Score Distribution</div>
-      <canvas id="rv_dist" height="350"></canvas>
+
+    <div class="rv-badges">
+      <div class="rv-badge">Reliability (&rho;): <span class="rv-badge-val" id="rv_rho">—</span></div>
+      <div class="rv-badge">Validity: <span class="rv-badge-val" id="rv_val_badge">—</span></div>
+      <div class="rv-badge" style="width:100%">Diagnosis: <span class="rv-badge-val" id="rv_diagnosis">—</span></div>
     </div>
+
+    <div class="rv-canvases">
+      <div class="rv-canvas-block">
+        <div class="viz-title">Target (N = 40 arrows)</div>
+        <canvas id="rv_target" height="350"></canvas>
+      </div>
+      <div class="rv-canvas-block">
+        <div class="viz-title">Observed Score Distribution</div>
+        <canvas id="rv_dist" height="350"></canvas>
+      </div>
+    </div>
+
+    <p class="rv-note">
+      Each "arrow" represents one measurement attempt. The bullseye is the true score.<br>
+      Random error scatters arrows around the cluster center (flattens and widens the distribution).<br>
+      Systematic bias shifts the entire cluster away from the bullseye (displaces the mean without changing spread); use negative values to shift in the opposite direction.<br>
+      High reliability + high validity = tight cluster on the bullseye. High reliability + low validity = tight cluster, wrong place.<br>
+      <strong>Note:</strong> maximum validity = &radic;reliability (CTT upper bound). A measure cannot correlate with any criterion more than the square root of its own reliability, so validity is bounded here accordingly.
+    </p>
   </div>
-  <p class="rv-note">
-    Each "arrow" represents one measurement attempt. The bullseye is the true score.<br>
-    Random error scatters arrows around the cluster center (flattens and widens the distribution).<br>
-    Systematic bias shifts the entire cluster away from the bullseye (displaces the mean without changing spread); use negative values to shift in the opposite direction.<br>
-    High reliability + high validity = tight cluster on the bullseye. High reliability + low validity = tight cluster, wrong place.<br>
-    <strong>Note:</strong> maximum validity = √reliability (CTT upper bound). A measure cannot correlate with any criterion more than the square root of its own reliability, so validity is bounded here accordingly.
-  </p>
+
 </div>
 
 <script>
@@ -161,7 +134,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   const N_ARROWS = 40;
   const SEED = 42;
 
-  // Seeded PRNG (Mulberry32)
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -173,14 +145,12 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     };
   }
 
-  // Box-Muller using our PRNG
   function randn(rng) {
     let u, v, s;
     do { u = rng() * 2 - 1; v = rng() * 2 - 1; s = u * u + v * v; } while (s >= 1 || s === 0);
     return u * Math.sqrt(-2 * Math.log(s) / s);
   }
 
-  // Normal PDF
   function normalPdf(x, mu, sigma) {
     const z = (x - mu) / sigma;
     return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2 * Math.PI));
@@ -210,15 +180,11 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   function generateArrows(randomError, sysOffset) {
     const rng = makeRng(SEED);
     const sigma = randomError * 0.42;
-    const arrows = [];
-    for (let i = 0; i < N_ARROWS; i++) {
-      const angle = rng() * Math.PI * 2;
-      const dx = randn(rng) * sigma + Math.cos(angle * 0.5) * sysOffset * 0.7;
-      const dy = randn(rng) * sigma + Math.sin(angle * 0.5 + 0.9) * sysOffset * 0.7;
-      arrows.push({ x: sysOffset * 0.7 + dx, y: sysOffset * 0.4 + dy });
-    }
-    // Recenter systematic offset to a consistent direction (right + up)
     const arrows2 = [];
+    // Skip first set
+    for (let i = 0; i < N_ARROWS; i++) {
+      rng(); randn(rng); randn(rng);
+    }
     for (let i = 0; i < N_ARROWS; i++) {
       const nx = randn(rng) * sigma + sysOffset * 0.65;
       const ny = randn(rng) * sigma + sysOffset * 0.38;
@@ -236,7 +202,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     const cx = W / 2, cy = H / 2;
     const maxR = Math.min(W, H) * 0.44;
 
-    // Rings
     const ringColors = ['#ef4444', '#e8a020', '#e8d820', '#4caf50', '#2196f3', '#2196f3', '#181a24', '#181a24', '#181a24', '#181a24'];
     for (let i = 10; i >= 1; i--) {
       const r = maxR * i / 10;
@@ -249,7 +214,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       tCtx.stroke();
     }
 
-    // Crosshairs
     tCtx.strokeStyle = 'rgba(0,0,0,0.15)';
     tCtx.lineWidth = 0.8;
     tCtx.setLineDash([3, 3]);
@@ -257,7 +221,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     tCtx.beginPath(); tCtx.moveTo(cx, cy - maxR); tCtx.lineTo(cx, cy + maxR); tCtx.stroke();
     tCtx.setLineDash([]);
 
-    // Arrows
     const arrows = generateArrows(randomError, sysOffset);
     for (const a of arrows) {
       const sx = cx + a.x * maxR;
@@ -273,7 +236,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       tCtx.stroke();
     }
 
-    // Cluster center marker
     const meanX = arrows.reduce((s, a) => s + a.x, 0) / N_ARROWS;
     const meanY = arrows.reduce((s, a) => s + a.y, 0) / N_ARROWS;
     const smx = cx + meanX * maxR;
@@ -283,8 +245,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     tCtx.fillStyle = 'rgba(194, 100, 10, 0.9)';
     tCtx.fill();
 
-    // Label
-    tCtx.font = `${14 * dpr / dpr}px IBM Plex Mono, monospace`;
+    tCtx.font = '14px IBM Plex Mono, monospace';
     tCtx.fillStyle = '#6b7084';
     tCtx.textAlign = 'center';
     tCtx.fillText('● = cluster mean', cx, H - 8);
@@ -300,21 +261,19 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     const pw = W - PAD_L - PAD_R;
     const ph = H - PAD_T - PAD_B;
 
-    const TRUE_SCORE = 0.5; // normalized to [0,1] scale
+    const TRUE_SCORE = 0.5;
     const sigma = 0.05 + randomError * 0.18;
     const mu = TRUE_SCORE + sysOffset * 0.35;
 
     const xMin = 0, xMax = 1;
     function toSx(v) { return PAD_L + (v - xMin) / (xMax - xMin) * pw; }
 
-    // True score curve (narrow, positioned at 0.5)
     const trueSD = 0.025;
     const maxTruePdf = normalPdf(TRUE_SCORE, TRUE_SCORE, trueSD);
     const maxObsPdf = normalPdf(mu, mu, sigma);
     const globalMax = Math.max(maxTruePdf, maxObsPdf) * 1.15;
     function toSy(density) { return PAD_T + ph - (density / globalMax) * ph; }
 
-    // Background grid
     dCtx.strokeStyle = '#1e2030';
     dCtx.lineWidth = 0.5;
     for (let t = 0; t <= 1.001; t += 0.25) {
@@ -322,7 +281,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       dCtx.beginPath(); dCtx.moveTo(sx, PAD_T); dCtx.lineTo(sx, PAD_T + ph); dCtx.stroke();
     }
 
-    // Shade under observed curve
     dCtx.beginPath();
     dCtx.moveTo(toSx(xMin), toSy(0));
     for (let i = 0; i <= 300; i++) {
@@ -337,7 +295,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.fillStyle = grad;
     dCtx.fill();
 
-    // Observed curve
     dCtx.beginPath();
     for (let i = 0; i <= 300; i++) {
       const x = xMin + (xMax - xMin) * i / 300;
@@ -348,7 +305,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.lineWidth = 2;
     dCtx.stroke();
 
-    // True score curve (dashed thin)
     dCtx.beginPath();
     for (let i = 0; i <= 300; i++) {
       const x = xMin + (xMax - xMin) * i / 300;
@@ -361,7 +317,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.stroke();
     dCtx.setLineDash([]);
 
-    // Bullseye line
     const bx = toSx(TRUE_SCORE);
     dCtx.beginPath(); dCtx.moveTo(bx, PAD_T); dCtx.lineTo(bx, PAD_T + ph);
     dCtx.strokeStyle = 'rgba(239,68,68,0.35)';
@@ -370,7 +325,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.stroke();
     dCtx.setLineDash([]);
 
-    // Observed mean line
     const omx = toSx(mu);
     dCtx.beginPath(); dCtx.moveTo(omx, PAD_T); dCtx.lineTo(omx, PAD_T + ph);
     dCtx.strokeStyle = 'rgba(45,212,191,0.5)';
@@ -379,13 +333,11 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.stroke();
     dCtx.setLineDash([]);
 
-    // Axes
     dCtx.strokeStyle = '#2a2d3a';
     dCtx.lineWidth = 1;
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T + ph); dCtx.lineTo(PAD_L + pw, PAD_T + ph); dCtx.stroke();
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T); dCtx.lineTo(PAD_L, PAD_T + ph); dCtx.stroke();
 
-    // X ticks
     dCtx.font = '13px IBM Plex Mono, monospace';
     dCtx.fillStyle = '#6b7084';
     dCtx.textAlign = 'center';
@@ -396,7 +348,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       dCtx.fillText(t.toFixed(2), sx, PAD_T + ph + 18);
     }
 
-    // Y axis label
     dCtx.save();
     dCtx.translate(15, PAD_T + ph / 2);
     dCtx.rotate(-Math.PI / 2);
@@ -406,7 +357,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.fillText('density', 0, 0);
     dCtx.restore();
 
-    // Legend
     const legX = PAD_L + pw - 4;
     dCtx.textAlign = 'right';
     dCtx.font = '13px IBM Plex Mono, monospace';
@@ -463,17 +413,16 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
 })();
 </script>
 
----
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Reliability, Validity & Measurement Error</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/reliability-validity/" target="_blank">https://bjorn-persson.github.io/visualizations/reliability-validity/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026reliabilityvalidity,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Reliability, Validity \& Measurement Error}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/reliability-validity/}</span>}
+</span></span></code></pre></div>
+  </div>
 
-##### Citation
-
-Persson, B. N. (2026). *Reliability, validity & measurement error* [Interactive visualization]. https://bnpersson.github.io/visualizations/reliability-validity/
-
-```BibTeX
-@misc{Persson2026relval,
-  author = {Björn N. Persson},
-  year = {2026},
-  title = {Reliability, Validity \& Measurement Error},
-  note = {Interactive visualization},
-  url = {https://bnpersson.github.io/visualizations/reliability-validity/}}
-```

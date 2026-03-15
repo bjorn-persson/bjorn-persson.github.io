@@ -5,117 +5,84 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
 ---
 
 <style>
-:root { --text: #c9cdd8; }
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  /* IRT Curve — page-specific styles */
+  .hero .subtitle {
+    font-family: var(--serif);
+    font-size: 1.0rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
 
-.viz-embed .irt-subtitle {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 1.0rem;
-  color: var(--secondary);
-  margin-bottom: 19px;
-  line-height: 1.5;
-}
+  .irt-chart-container {
+    position: relative;
+    height: max(280px, calc(100vh - 520px));
+    width: 100%;
+    margin-bottom: 24px;
+    background: var(--bg-surface);
+    border-radius: 6px;
+    overflow: hidden;
+  }
 
-.viz-embed .irt-chart-container {
-  position: relative;
-  height: max(280px, calc(100vh - 520px));
-  width: 100%;
-  margin-bottom: 24px;
-  background: #181a24;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.viz-embed .irt-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.viz-embed .irt-control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-family: 'IBM Plex Mono', monospace;
-}
-
-.viz-embed .irt-control-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.96rem;
-  color: var(--secondary);
-}
-
-.viz-embed .irt-value-display {
-  font-weight: 600;
-  color: #2dd4bf;
-}
-
-.viz-embed .irt-controls input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 4px;
-  background: #2a2d3a;
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-}
-
-.viz-embed .irt-controls input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-}
-
-.viz-embed .irt-controls input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-  border: none;
-}
+  .irt-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .irt-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: var(--mono);
+  }
+  .irt-control-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82em;
+    color: var(--text-dim);
+  }
+  .irt-value-display {
+    font-weight: 600;
+    color: var(--teal);
+  }
 </style>
 
-<div class="viz-embed">
 <div class="container">
 
-<p class="irt-subtitle">Adjust the parameters below to see how they influence the probability of endorsing an item across different levels of a latent trait (θ).</p>
-
-<div class="irt-chart-container">
-  <canvas id="irtChart"></canvas>
-</div>
-
-<div class="irt-controls">
-  <div class="irt-control-group">
-    <div class="irt-control-label">
-      <span>Discrimination (a): How well the item differentiates individuals.</span>
-      <span class="irt-value-display" id="aVal">1.00</span>
-    </div>
-    <input type="range" id="aSlider" min="0.1" max="3.0" step="0.1" value="1.0">
+  <div class="hero">
+    <h1>IRT Curve (3PL Model)</h1>
+    <div class="subtitle">Adjust the parameters below to see how they influence the probability of endorsing an item across different levels of a latent trait (&theta;).</div>
   </div>
-  <div class="irt-control-group">
-    <div class="irt-control-label">
-      <span>Difficulty (b): The inflection point of the curve. P(θ=b) = (1+c)/2 — midway between the guessing floor c and 1.</span>
-      <span class="irt-value-display" id="bVal">0.00</span>
-    </div>
-    <input type="range" id="bSlider" min="-3.0" max="3.0" step="0.1" value="0.0">
-  </div>
-  <div class="irt-control-group">
-    <div class="irt-control-label">
-      <span>Guessing/Pseudo-guessing (c): The lower asymptote.</span>
-      <span class="irt-value-display" id="cVal">0.00</span>
-    </div>
-    <input type="range" id="cSlider" min="0.0" max="0.5" step="0.01" value="0.0">
-  </div>
-</div>
 
-</div>
+  <div class="section">
+    <div class="irt-chart-container">
+      <canvas id="irtChart"></canvas>
+    </div>
+
+    <div class="irt-controls">
+      <div class="irt-control-group">
+        <div class="irt-control-label">
+          <span>Discrimination (a): How well the item differentiates individuals.</span>
+          <span class="irt-value-display" id="aVal">1.00</span>
+        </div>
+        <input type="range" id="aSlider" min="0.1" max="3.0" step="0.1" value="1.0">
+      </div>
+      <div class="irt-control-group">
+        <div class="irt-control-label">
+          <span>Difficulty (b): The inflection point of the curve. <br>P(&theta;=b) = (1+c)/2 — midway between the guessing floor c and 1.</span>
+          <span class="irt-value-display" id="bVal">0.00</span>
+        </div>
+        <input type="range" id="bSlider" min="-3.0" max="3.0" step="0.1" value="0.0">
+      </div>
+      <div class="irt-control-group">
+        <div class="irt-control-label">
+          <span>Guessing/Pseudo-guessing (c): The lower asymptote.</span>
+          <span class="irt-value-display" id="cVal">0.00</span>
+        </div>
+        <input type="range" id="cSlider" min="0.0" max="0.5" step="0.01" value="0.0">
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -217,17 +184,16 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
     });
 </script>
 
----
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>IRT Curve (3PL Model)</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/irt-curve/" target="_blank">https://bjorn-persson.github.io/visualizations/irt-curve/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026irtcurve,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{IRT Curve (3PL Model)}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/irt-curve/}</span>}
+</span></span></code></pre></div>
+  </div>
 
-##### Citation
-
-Persson, B. N. (2026). *IRT curve (3PL model)* [Interactive visualization]. https://bnpersson.github.io/visualizations/irt-curve/
-
-```BibTeX
-@misc{Persson2026irtcurve,
-  author = {Björn N. Persson},
-  year = {2026},
-  title = {IRT Curve (3PL Model)},
-  note = {Interactive visualization},
-  url = {https://bnpersson.github.io/visualizations/irt-curve/}}
-```

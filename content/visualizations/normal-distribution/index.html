@@ -4,100 +4,97 @@ description: "Interactive visualization of the standard normal density. Click th
 ---
 
 <style>
-:root { --text: #c9cdd8; }
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
+  /* Normal distribution — page-specific styles */
+  .hero .subtitle {
+    font-family: var(--serif);
+    font-size: 1.0rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
 
-.viz-embed .container {
-  width: 100%;
-  max-width: 780px;
-}
+  #c {
+    display: block;
+    width: 100%;
+    height: max(280px, calc(100vh - 460px));
+    background: var(--bg-surface);
+    border-radius: 6px;
+    cursor: crosshair;
+  }
 
-.viz-embed .subtitle {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 1.0rem;
-  color: var(--secondary);
-  margin-bottom: 21px;
-  line-height: 1.5;
-}
+  .readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 32px;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+  .readout .label { color: var(--text-dim); }
+  .readout .value { color: var(--text-bright); font-weight: 600; }
+  .readout .prob-val { color: var(--teal); }
+  .readout .accent2 { color: #6d28d9; }
+  .readout .hidden { display: none; }
 
-.viz-embed canvas {
-  display: block;
-  width: 100%;
-  height: max(280px, calc(100vh - 460px));
-  background: #181a24;
-  border-radius: 6px;
-  cursor: crosshair;
-}
+  .mode-indicator {
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--teal);
+    opacity: 0.8;
+  }
 
-.viz-embed .readout {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 32px;
-  margin-top: 16px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 1.05rem;
-}
+  .reset-btn {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 5px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .reset-btn:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+  }
 
-.viz-embed .readout .label { color: var(--secondary); }
-.viz-embed .readout .value { color: var(--primary); font-weight: 600; }
-.viz-embed .readout .prob-val { color: #2dd4bf; }
-.viz-embed .readout .accent2 { color: #6d28d9; }
-.viz-embed .readout .hidden { display: none; }
-
-.viz-embed .mode-indicator {
-  margin-top: 12px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.95rem;
-  color: #2dd4bf;
-  opacity: 0.8;
-}
-
-.viz-embed .note {
-  margin-top: 14px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.9rem;
-  color: var(--secondary);
-  line-height: 1.5;
-}
-
-.viz-embed .reset-btn {
-  margin-top: 10px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.92rem;
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--secondary);
-  padding: 5px 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
-}
-.viz-embed .reset-btn:hover {
-  border-color: #2dd4bf;
-  color: #2dd4bf;
-}
+  .nd-note {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
 </style>
 
-<div class="viz-embed">
 <div class="container">
-  <p class="subtitle">
-    One click: cumulative P(Z &le; z) from &minus;&infin;.<br>
-    Two clicks: proportion between two z-values. Hover to preview.
-  </p>
-  <canvas id="c" height="400"></canvas>
-  <div class="readout">
-    <div id="r_z1"><span class="label">z = </span><span class="value" id="z1Val">&mdash;</span></div>
-    <div id="r_z2" class="hidden"><span class="label">z&#x2082; = </span><span class="value" id="z2Val">&mdash;</span></div>
-    <div id="r_p"><span class="label" id="pLabel">P(Z &le; z) = </span><span class="value prob-val" id="pVal">&mdash;</span></div>
-    <div><span class="label">hover z = </span><span class="value accent2" id="hVal">&mdash;</span></div>
+
+  <div class="hero">
+    <h1>Normal Distribution</h1>
+    <div class="subtitle">
+      One click: cumulative P(Z &le; z) from &minus;&infin;.<br>
+      Two clicks: proportion between two z-values. Hover to preview.
+    </div>
   </div>
-  <div class="mode-indicator" id="modeText">Click to place a marker</div>
-  <button class="reset-btn" id="resetBtn">Reset</button>
-  <p class="note">
-    CDF via Abramowitz &amp; Stegun 26.2.17 (max error ~1.5&times;10&#x207B;&#x2077;).<br>
-    One marker: &Phi;(z). Two markers: &Phi;(z&#x2082;) &minus; &Phi;(z&#x2081;).
-  </p>
-</div>
+
+  <div class="section">
+    <canvas id="c" height="400"></canvas>
+    <div class="readout">
+      <div id="r_z1"><span class="label">z = </span><span class="value" id="z1Val">&mdash;</span></div>
+      <div id="r_z2" class="hidden"><span class="label">z&#x2082; = </span><span class="value" id="z2Val">&mdash;</span></div>
+      <div id="r_p"><span class="label" id="pLabel">P(Z &le; z) = </span><span class="value prob-val" id="pVal">&mdash;</span></div>
+      <div><span class="label">hover z = </span><span class="value accent2" id="hVal">&mdash;</span></div>
+    </div>
+    <div class="mode-indicator" id="modeText">Click to place a marker</div>
+    <button class="reset-btn" id="resetBtn">Reset</button>
+    <p class="nd-note">
+      CDF via Abramowitz &amp; Stegun 26.2.17 (max error ~1.5&times;10&#x207B;&#x2077;).<br>
+      One marker: &Phi;(z). Two markers: &Phi;(z&#x2082;) &minus; &Phi;(z&#x2081;).
+    </p>
+  </div>
+
 </div>
 
 <script>
@@ -358,17 +355,16 @@ window.addEventListener('resize', resize);
 resize();
 </script>
 
----
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Normal Distribution</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/normal-distribution/" target="_blank">https://bjorn-persson.github.io/visualizations/normal-distribution/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026normaldistribution,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Normal Distribution}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/normal-distribution/}</span>}
+</span></span></code></pre></div>
+  </div>
 
-##### Citation
-
-Persson, B. N. (2026). *Normal distribution* [Interactive visualization]. https://bnpersson.github.io/visualizations/normal-distribution/
-
-```BibTeX
-@misc{Persson2026normal,
-  author = {Björn N. Persson},
-  year = {2026},
-  title = {Normal Distribution},
-  note = {Interactive visualization},
-  url = {https://bnpersson.github.io/visualizations/normal-distribution/}}
-```

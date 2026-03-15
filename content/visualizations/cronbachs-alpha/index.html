@@ -5,362 +5,203 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
 ---
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
+  /* Cronbach's alpha — page-specific styles */
 
-.ca-wrap {
-  font-family: 'IBM Plex Mono', monospace;
-  --text: #c9cdd8;
-  --text-bright: #e8ecf4;
-  --text-dim: #6b7084;
-}
-.post-title { display: none; }
-.ca-title {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-weight: 700;
-  font-size: 2.4em;
-  color: #e8ecf4;
-  line-height: 1.2;
-  margin-bottom: 16px;
-}
-.ca-subtitle {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 1.0rem;
-  color: var(--text);
-  margin-bottom: 21px;
-  line-height: 1.6;
-}
-.ca-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-.ca-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px 20px;
-  font-size: 0.92rem;
-}
-.ca-control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.ca-control-group label { color: var(--text-dim); }
-.ca-val { color: #2dd4bf; font-weight: 600; }
-.ca-controls input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 4px;
-  background: #2a2d3a;
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-}
-.ca-controls input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-}
-.ca-controls input[type="range"]::-moz-range-thumb {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-  border: none;
-}
-.ca-stat-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-.ca-stat {
-  background: #181a24;
-  border-radius: 5px;
-  padding: 9px 12px;
-  border-left: 3px solid #2a2d3a;
-  transition: border-color 0.3s;
-}
-.ca-stat.warn { border-left-color: #ef4444; }
-.ca-stat.ok   { border-left-color: #2dd4bf; }
-.ca-stat.acceptable { border-left-color: #c2640a; }
-.ca-stat-label {
-  font-size: 0.82rem;
-  color: var(--text-dim);
-  margin-bottom: 2px;
-  line-height: 1.3;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.ca-info-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  padding: 0;
-  border-radius: 50%;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
-  font-weight: 600;
-  background: none;
-  border: 1px solid #2a2d3a;
-  color: var(--text-dim);
-  cursor: pointer;
-  flex-shrink: 0;
-  line-height: 1;
-  transition: border-color 0.2s, color 0.2s;
-}
-.ca-info-btn:hover {
-  border-color: #2dd4bf;
-  color: #2dd4bf;
-}
-.ca-info-btn.ca-hero-info {
-  width: 32px;
-  height: 32px;
-  font-size: 0.45em;
-  border-width: 2px;
-  margin-left: 8px;
-  vertical-align: middle;
-  position: relative;
-  top: -4px;
-}
-.ca-modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(60, 60, 80, 0.6);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-.ca-modal-overlay.visible {
-  display: flex;
-}
-.ca-modal {
-  background: #181a24;
-  border: 1px solid #2a2d3a;
-  border-radius: 8px;
-  max-width: 480px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: 24px 28px;
-  position: relative;
-}
-.ca-modal h2 {
-  font-family: 'Source Serif 4', serif;
-  font-size: 1.3rem;
-  color: var(--text-bright);
-  margin-bottom: 4px;
-  padding-right: 30px;
-}
-.ca-modal .ca-modal-badge {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.82rem;
-  padding: 2px 7px;
-  border-radius: 3px;
-  background: rgba(45, 212, 191, 0.1);
-  color: #2dd4bf;
-  display: inline-block;
-  margin-bottom: 14px;
-}
-.ca-modal p {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.94rem;
-  color: var(--text-dim);
-  line-height: 1.65;
-  margin-bottom: 8px;
-}
-.ca-modal .formula {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.96rem;
-  color: #2dd4bf;
-  background: rgba(45, 212, 191, 0.06);
-  padding: 8px 12px;
-  border-radius: 4px;
-  margin: 10px 0;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-.ca-modal .section-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.83rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-top: 16px;
-  margin-bottom: 4px;
-}
-.ca-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 1.3rem;
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  padding: 4px 8px;
-  line-height: 1;
-}
-.ca-modal-close:hover {
-  color: var(--text-bright);
-}
-.ca-stat-value {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #2dd4bf;
-  transition: color 0.3s;
-}
-.ca-stat-value.warn { color: #ef4444; }
-.ca-stat-value.acceptable { color: #c2640a; }
-.ca-panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-.ca-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.ca-panel-label {
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.ca-panel canvas {
-  display: block;
-  width: 100%;
-  border-radius: 6px;
-  background: #181a24;
-}
-.ca-interp {
-  font-size: 0.92rem;
-  color: var(--text-dim);
-  line-height: 1.6;
-  padding: 9px 12px;
-  background: #181a24;
-  border-radius: 5px;
-  border-left: 3px solid #2a2d3a;
-  transition: border-color 0.3s;
-  min-height: 2.8em;
-}
-.ca-interp.warn { border-left-color: #ef4444; }
-.ca-interp.acceptable { border-left-color: #c2640a; }
-.ca-interp.ok { border-left-color: #2dd4bf; }
-.ca-interp span.hl { color: #ef4444; font-weight: 600; }
-.ca-interp span.ok { color: #2dd4bf; font-weight: 600; }
-.ca-note {
-  font-size: 0.88rem;
-  color: var(--text-dim);
-  line-height: 1.6;
-  margin-top: 4px;
-}
-.ca-note-serif {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 0.95rem;
-  color: var(--text-dim);
-  line-height: 1.7;
-  margin-top: 10px;
-}
-@media (max-width: 800px) {
-  .ca-panels    { grid-template-columns: 1fr; }
-}
-@media (max-width: 600px) {
-  .ca-controls { grid-template-columns: 1fr 1fr; }
-  .ca-stat-row  { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 400px) {
-  .ca-controls { grid-template-columns: 1fr; }
-}
+  /* Hero subtitle is serif for this viz */
+  .hero .subtitle {
+    font-family: var(--serif);
+    font-size: 1.0rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* Controls grid (3-column layout) */
+  .ca-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px 20px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+  .ca-controls .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ca-controls .control-group label {
+    color: var(--text-dim);
+  }
+  .ca-controls .val {
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  /* Stat cards with left border instead of full border */
+  .ca-stat {
+    background: var(--bg-surface);
+    border-radius: 5px;
+    padding: 9px 12px;
+    border-left: 3px solid var(--border);
+    transition: border-color 0.3s;
+  }
+  .ca-stat.warn { border-left-color: var(--red); }
+  .ca-stat.ok   { border-left-color: var(--teal); }
+  .ca-stat.acceptable { border-left-color: #c2640a; }
+
+  .ca-stat-value {
+    font-family: var(--mono);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--teal);
+    transition: color 0.3s;
+  }
+  .ca-stat-value.warn { color: var(--red); }
+  .ca-stat-value.acceptable { color: #c2640a; }
+
+  /* Interpretation box */
+  .ca-interp {
+    font-family: var(--mono);
+    font-size: 0.92em;
+    color: var(--text-dim);
+    line-height: 1.6;
+    padding: 9px 12px;
+    background: var(--bg-surface);
+    border-radius: 5px;
+    border-left: 3px solid var(--border);
+    transition: border-color 0.3s;
+    min-height: 2.8em;
+  }
+  .ca-interp.warn { border-left-color: var(--red); }
+  .ca-interp.acceptable { border-left-color: #c2640a; }
+  .ca-interp.ok { border-left-color: var(--teal); }
+  .ca-interp span.hl { color: var(--red); font-weight: 600; }
+  .ca-interp span.ok { color: var(--teal); font-weight: 600; }
+
+  /* Canvas panels */
+  .ca-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .ca-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ca-panel canvas {
+    display: block;
+    width: 100%;
+    border-radius: 6px;
+    background: var(--bg-surface);
+  }
+
+  /* Clinical note */
+  .ca-note-serif {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-top: 10px;
+  }
+
+  /* Modal formula override */
+  .info-modal .formula {
+    color: var(--teal);
+    background: var(--teal-dim);
+  }
+
+  /* Modal section label */
+  .info-modal .section-label {
+    font-family: var(--mono);
+    font-size: 0.83rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 16px;
+    margin-bottom: 4px;
+  }
+
+  /* Responsive */
+  @media (max-width: 800px) {
+    .ca-panels { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .ca-controls { grid-template-columns: 1fr 1fr; }
+    .fit-stats { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 400px) {
+    .ca-controls { grid-template-columns: 1fr; }
+  }
 </style>
 
-<div class="ca-wrap">
-  <h1 class="ca-title">Cronbach's Alpha and Measurement Reliability <button class="ca-info-btn ca-hero-info" onclick="caShowInfo('about')" title="About this visualization">?</button></h1>
-  <p class="ca-subtitle">
-    Cronbach's α determines the <strong>Standard Error of Measurement (SEM)</strong>: how much a single observed score is expected to differ from a person's true score.
-    A score is not a point — it is an interval. Low α widens that interval and increases classification errors.
-  </p>
-  <div class="ca-layout">
+<div class="container">
+
+  <div class="hero">
+    <h1>Cronbach's Alpha and Measurement Reliability <button class="info-btn hero-info" onclick="caShowInfo('about')" title="About this visualization">?</button></h1>
+    <div class="subtitle">
+      Cronbach's &alpha; determines the <strong>Standard Error of Measurement (SEM)</strong>: how much a single observed score is expected to differ from a person's true score.
+      A score is not a point — it is an interval. Low &alpha; widens that interval and increases classification errors.
+    </div>
+  </div>
+
+  <div class="section">
     <div class="ca-controls">
-      <div class="ca-control-group">
-        <label>Cronbach's α: <span class="ca-val" id="ca_alpha_val">0.80</span></label>
+      <div class="control-group">
+        <label>Cronbach's &alpha;: <span class="val" id="ca_alpha_val">0.80</span></label>
         <input type="range" id="ca_alpha" min="0.40" max="1.00" step="0.01" value="0.80">
       </div>
-      <div class="ca-control-group">
-        <label>Observed score: <span class="ca-val" id="ca_true_val">100</span></label>
+      <div class="control-group">
+        <label>Observed score: <span class="val" id="ca_true_val">100</span></label>
         <input type="range" id="ca_true" min="40" max="160" step="1" value="100">
       </div>
-      <div class="ca-control-group">
-        <label>Test SD (score units): <span class="ca-val" id="ca_sd_val">15</span></label>
+      <div class="control-group">
+        <label>Test SD (score units): <span class="val" id="ca_sd_val">15</span></label>
         <input type="range" id="ca_sd" min="1" max="30" step="1" value="15">
       </div>
     </div>
-    <div class="ca-stat-row">
+
+    <div class="fit-stats" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
       <div class="ca-stat" id="ca_sem_card">
-        <div class="ca-stat-label">SEM (score units) <button class="ca-info-btn" onclick="caShowInfo('sem')" title="About SEM">?</button></div>
+        <div class="fit-stat-label">SEM (score units) <button class="info-btn" onclick="caShowInfo('sem')" title="About SEM">?</button></div>
         <div class="ca-stat-value" id="ca_sem_val">—</div>
       </div>
       <div class="ca-stat" id="ca_ci68_card">
-        <div class="ca-stat-label">68% true-score CI width <button class="ca-info-btn" onclick="caShowInfo('ci68')" title="About 68% CI">?</button></div>
+        <div class="fit-stat-label">68% true-score CI width <button class="info-btn" onclick="caShowInfo('ci68')" title="About 68% CI">?</button></div>
         <div class="ca-stat-value" id="ca_ci68_val">—</div>
       </div>
       <div class="ca-stat" id="ca_ci95_card">
-        <div class="ca-stat-label">95% true-score CI width <button class="ca-info-btn" onclick="caShowInfo('ci95')" title="About 95% CI">?</button></div>
+        <div class="fit-stat-label">95% true-score CI width <button class="info-btn" onclick="caShowInfo('ci95')" title="About 95% CI">?</button></div>
         <div class="ca-stat-value" id="ca_ci95_val">—</div>
       </div>
     </div>
+
     <div class="ca-interp" id="ca_interp">—</div>
+
     <div class="ca-panels">
       <div class="ca-panel">
-        <div class="ca-panel-label">Observed score → true-score CI <button class="ca-info-btn" onclick="caShowInfo('scorePanel')" title="About this panel">?</button></div>
+        <div class="viz-title">Observed score → true-score CI <button class="info-btn" onclick="caShowInfo('scorePanel')" title="About this panel">?</button></div>
         <canvas id="ca_score" height="420"></canvas>
       </div>
       <div class="ca-panel">
-        <div class="ca-panel-label">Repeated testing distribution <button class="ca-info-btn" onclick="caShowInfo('distPanel')" title="About this panel">?</button></div>
+        <div class="viz-title">Repeated testing distribution <button class="info-btn" onclick="caShowInfo('distPanel')" title="About this panel">?</button></div>
         <canvas id="ca_dist" height="420"></canvas>
       </div>
     </div>
+
+    <div class="note" style="margin-top:20px;">
+      <strong>SEM = SD × √(1 − α).</strong>
+      The 95% true-score CI for an observed score X is [X − 1.96·SEM, X + 1.96·SEM]. Rules of thumb: α ≥ 0.90 for high-stakes individual decisions; α ≥ 0.70 for research/group comparisons.
+    </div>
+    <p class="ca-note-serif" id="ca_clinical_note"></p>
   </div>
-  <p class="ca-note">
-    <strong>SEM = SD × √(1 − α).</strong>
-    The 95% true-score CI for an observed score X is [X − 1.96·SEM, X + 1.96·SEM]. Rules of thumb: α ≥ 0.90 for high-stakes individual decisions; α ≥ 0.70 for research/group comparisons.
-  </p>
-  <p class="ca-note-serif" id="ca_clinical_note"></p>
+
 </div>
 
----
-
-##### Citation
-
-Persson, B. N. (2026). *Cronbach's alpha and measurement reliability* [Interactive visualization]. https://bnpersson.github.io/visualizations/cronbachs-alpha/
-
-```BibTeX
-@misc{Persson2026alpha,
-  author = {Björn N. Persson},
-  year = {2026},
-  title = {Cronbach's Alpha and Measurement Reliability},
-  note = {Interactive visualization},
-  url = {https://bnpersson.github.io/visualizations/cronbachs-alpha/}}
-```
-
-<div class="ca-modal-overlay" id="caModalOverlay" onclick="if(event.target===this)caCloseInfo()">
-  <div class="ca-modal">
-    <button class="ca-modal-close" onclick="caCloseInfo()">&times;</button>
-    <h2 id="caModalTitle"></h2>
-    <span class="ca-modal-badge" id="caModalBadge"></span>
+<div class="info-overlay" id="caModalOverlay" onclick="if(event.target===this)caCloseInfo()">
+  <div class="info-modal">
+    <button class="info-close" onclick="caCloseInfo()">&times;</button>
+    <h3 id="caModalTitle"></h3>
+    <span class="info-modal-badge" id="caModalBadge"></span>
     <div id="caModalBody"></div>
   </div>
 </div>
@@ -750,14 +591,28 @@ function caShowInfo(key) {
   document.getElementById('caModalTitle').textContent = info.title;
   document.getElementById('caModalBadge').textContent = info.badge;
   document.getElementById('caModalBody').innerHTML = info.body;
-  document.getElementById('caModalOverlay').classList.add('visible');
+  document.getElementById('caModalOverlay').classList.add('active');
 }
 
 function caCloseInfo() {
-  document.getElementById('caModalOverlay').classList.remove('visible');
+  document.getElementById('caModalOverlay').classList.remove('active');
 }
 
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') caCloseInfo();
 });
 </script>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Cronbach's Alpha and Measurement Reliability</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/cronbachs-alpha/" target="_blank">https://bjorn-persson.github.io/visualizations/cronbachs-alpha/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026cronbachsalpha,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Cronbach's Alpha and Measurement Reliability}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/cronbachs-alpha/}</span>}
+</span></span></code></pre></div>
+  </div>
+

@@ -5,179 +5,156 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 ---
 
 <style>
-:root { --text: #c9cdd8; }
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
-
-.mc-wrap { font-family: 'IBM Plex Mono', monospace; }
-.mc-subtitle {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 1.0rem;
-  color: var(--secondary);
-  margin-bottom: 18px;
-  line-height: 1.6;
-}
-.mc-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  align-items: start;
-}
-.mc-canvas-wrap canvas {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 6px;
-  background: #181a24;
-}
-.mc-canvas-label {
-  font-size: 0.9rem;
-  color: #6b7084;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: 6px;
-  min-height: 2.4em;
-  display: flex;
-  align-items: flex-end;
-}
-.mc-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.mc-control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.92rem;
-}
-.mc-control-group label { color: var(--secondary); }
-.mc-val { color: #2dd4bf; font-weight: 600; }
-.mc-controls input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 4px;
-  background: #2a2d3a;
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-}
-.mc-controls input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-}
-.mc-controls input[type="range"]::-moz-range-thumb {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-  border: none;
-}
-.mc-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 4px;
-}
-.mc-stat-card {
-  background: #181a24;
-  border-radius: 5px;
-  padding: 10px 12px;
-  border-left: 3px solid #2a2d3a;
-  transition: border-color 0.3s;
-}
-.mc-stat-card.warn { border-left-color: #ef4444; }
-.mc-stat-label {
-  font-size: 0.84rem;
-  color: var(--secondary);
-  margin-bottom: 2px;
-}
-.mc-stat-value {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #2dd4bf;
-  transition: color 0.3s;
-}
-.mc-stat-value.warn { color: #ef4444; }
-.mc-wobble-label {
-  font-size: 0.92rem;
-  color: var(--secondary);
-  margin-top: 8px;
-  min-height: 1.4em;
-}
-.mc-wobble-label span { color: #ef4444; font-weight: 600; }
-.mc-note {
-  margin-top: 14px;
-  font-size: 0.88rem;
-  color: var(--secondary);
-  line-height: 1.6;
-  grid-column: 1 / -1;
-}
-@media (max-width: 580px) {
-  .mc-layout { grid-template-columns: 1fr; }
-  .mc-note { grid-column: 1; }
-}
+  .mc-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .mc-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: var(--bg-surface);
+  }
+  .mc-canvas-label {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 6px;
+    min-height: 2.4em;
+    display: flex;
+    align-items: flex-end;
+  }
+  .mc-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+  .mc-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mc-control-group label { color: var(--text-dim); }
+  .mc-val { color: var(--teal); font-weight: 600; }
+  .mc-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .mc-stat-card {
+    background: var(--bg-surface);
+    border-radius: 5px;
+    padding: 10px 12px;
+    border-left: 3px solid var(--border);
+    transition: border-color 0.3s;
+    font-family: var(--mono);
+  }
+  .mc-stat-card.warn { border-left-color: #ef4444; }
+  .mc-stat-label {
+    font-size: 0.78em;
+    color: var(--text-dim);
+    margin-bottom: 2px;
+  }
+  .mc-stat-value {
+    font-size: 1.15em;
+    font-weight: 600;
+    color: var(--teal);
+    transition: color 0.3s;
+  }
+  .mc-stat-value.warn { color: #ef4444; }
+  .mc-wobble-label {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text-dim);
+    margin-top: 8px;
+    min-height: 1.4em;
+  }
+  .mc-wobble-label span { color: #ef4444; font-weight: 600; }
+  .mc-note {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    line-height: 1.6;
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 580px) {
+    .mc-layout { grid-template-columns: 1fr; }
+    .mc-note { grid-column: 1; }
+  }
 </style>
 
-<div class="mc-wrap">
-  <p class="mc-subtitle">
-    Multicollinearity arises when two predictors (X₁, X₂) are highly correlated. Geometrically, the data cloud collapses onto a line — the regression plane loses its support and can "wobble" wildly while still fitting Y well. This inflates standard errors and makes coefficients unreliable.
-  </p>
-  <div class="mc-layout">
-    <div>
-      <div class="mc-canvas-label">X₁–X₂ Predictor Space (projection)</div>
-      <div class="mc-canvas-wrap"><canvas id="mc_scatter"></canvas></div>
+<div class="container">
+
+  <div class="hero">
+    <h1>Multicollinearity in Multiple Regression</h1>
+    <div class="subtitle">
+      Multicollinearity arises when two predictors (X₁, X₂) are highly correlated. Geometrically, the data cloud collapses onto a line — the regression plane loses its support and can "wobble" wildly while still fitting Y well. This inflates standard errors and makes coefficients unreliable.
     </div>
-    <div>
-      <div class="mc-canvas-label">Cross-section (Y on X₁)</div>
-      <div class="mc-canvas-wrap"><canvas id="mc_plane"></canvas></div>
-    </div>
-    <div class="mc-controls" style="grid-column:1/-1">
-      <div class="mc-control-group">
-        <label>Correlation between X₁ and X₂ (r): <span class="mc-val" id="mc_r_val">0.00</span></label>
-        <input type="range" id="mc_r" min="0" max="0.999" step="0.001" value="0">
-      </div>
-      <div class="mc-control-group">
-        <label>True β₁ (effect of X₁): <span class="mc-val" id="mc_b1_val">0.60</span></label>
-        <input type="range" id="mc_b1" min="-1" max="1" step="0.01" value="0.60">
-      </div>
-      <div class="mc-control-group">
-        <label>True β₂ (effect of X₂): <span class="mc-val" id="mc_b2_val">0.40</span></label>
-        <input type="range" id="mc_b2" min="-1" max="1" step="0.01" value="0.40">
-      </div>
-    </div>
-    <div class="mc-stats" style="grid-column:1/-1">
-      <div class="mc-stat-card" id="mc_vif_card">
-        <div class="mc-stat-label">VIF</div>
-        <div class="mc-stat-value" id="mc_vif">1.00</div>
-      </div>
-      <div class="mc-stat-card" id="mc_se_card">
-        <div class="mc-stat-label">SE inflation factor</div>
-        <div class="mc-stat-value" id="mc_se_inf">1.00×</div>
-      </div>
-      <div class="mc-stat-card" id="mc_b1est_card">
-        <div class="mc-stat-label">β̂₁ OLS 95% CI</div>
-        <div class="mc-stat-value" id="mc_b1est">—</div>
-      </div>
-      <div class="mc-stat-card" id="mc_b2est_card">
-        <div class="mc-stat-label">β̂₂ OLS 95% CI</div>
-        <div class="mc-stat-value" id="mc_b2est">—</div>
-      </div>
-    </div>
-    <div class="mc-wobble-label" id="mc_wobble_text" style="grid-column:1/-1">
-      The regression plane is well-supported. Coefficient estimates are stable.
-    </div>
-    <p class="mc-note">
-      VIF (Variance Inflation Factor) = 1/(1−r²). At r = 0.9, VIF = 5.3; at r = 0.99, VIF = 50.
-      The SE of each coefficient is inflated by √VIF. Rules of thumb: VIF > 5 is concerning, VIF > 10 is severe.<br>
-      Note: multicollinearity does <em>not</em> bias the regression coefficients — it only inflates their uncertainty.
-      The model still predicts Y well; it just cannot tell X₁ and X₂ apart.
-    </p>
   </div>
+
+  <div class="section">
+    <div class="mc-layout">
+      <div>
+        <div class="mc-canvas-label">X₁–X₂ Predictor Space (projection)</div>
+        <div class="mc-canvas-wrap"><canvas id="mc_scatter"></canvas></div>
+      </div>
+      <div>
+        <div class="mc-canvas-label">Cross-section (Y on X₁)</div>
+        <div class="mc-canvas-wrap"><canvas id="mc_plane"></canvas></div>
+      </div>
+      <div class="mc-controls" style="grid-column:1/-1">
+        <div class="mc-control-group">
+          <label>Correlation between X₁ and X₂ (r): <span class="mc-val" id="mc_r_val">0.00</span></label>
+          <input type="range" id="mc_r" min="0" max="0.999" step="0.001" value="0">
+        </div>
+        <div class="mc-control-group">
+          <label>True β₁ (effect of X₁): <span class="mc-val" id="mc_b1_val">0.60</span></label>
+          <input type="range" id="mc_b1" min="-1" max="1" step="0.01" value="0.60">
+        </div>
+        <div class="mc-control-group">
+          <label>True β₂ (effect of X₂): <span class="mc-val" id="mc_b2_val">0.40</span></label>
+          <input type="range" id="mc_b2" min="-1" max="1" step="0.01" value="0.40">
+        </div>
+      </div>
+      <div class="mc-stats" style="grid-column:1/-1">
+        <div class="mc-stat-card" id="mc_vif_card">
+          <div class="mc-stat-label">VIF</div>
+          <div class="mc-stat-value" id="mc_vif">1.00</div>
+        </div>
+        <div class="mc-stat-card" id="mc_se_card">
+          <div class="mc-stat-label">SE inflation factor</div>
+          <div class="mc-stat-value" id="mc_se_inf">1.00×</div>
+        </div>
+        <div class="mc-stat-card" id="mc_b1est_card">
+          <div class="mc-stat-label">β̂₁ OLS 95% CI</div>
+          <div class="mc-stat-value" id="mc_b1est">—</div>
+        </div>
+        <div class="mc-stat-card" id="mc_b2est_card">
+          <div class="mc-stat-label">β̂₂ OLS 95% CI</div>
+          <div class="mc-stat-value" id="mc_b2est">—</div>
+        </div>
+      </div>
+      <div class="mc-wobble-label" id="mc_wobble_text" style="grid-column:1/-1">
+        The regression plane is well-supported. Coefficient estimates are stable.
+      </div>
+      <p class="mc-note">
+        VIF (Variance Inflation Factor) = 1/(1−r²). At r = 0.9, VIF = 5.3; at r = 0.99, VIF = 50.
+        The SE of each coefficient is inflated by √VIF. Rules of thumb: VIF > 5 is concerning, VIF > 10 is severe.<br>
+        Note: multicollinearity does <em>not</em> bias the regression coefficients — it only inflates their uncertainty.
+        The model still predicts Y well; it just cannot tell X₁ and X₂ apart.
+      </p>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -207,7 +184,6 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     return u * Math.sqrt(-2 * Math.log(s) / s);
   }
 
-  // Base independent normals
   const rng0 = makeRng(SEED);
   const baseX1 = Array.from({ length: N }, () => randn(rng0));
   const baseX2 = Array.from({ length: N }, () => randn(rng0));
@@ -224,7 +200,6 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     return pts;
   }
 
-  // Rescale to [pad, 1-pad]
   function normalize(arr) {
     const mn = Math.min(...arr), mx = Math.max(...arr);
     const range = mx - mn || 1;
@@ -241,14 +216,12 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 
     const pw = W - PAD * 2, ph = H - PAD * 2;
 
-    // Normalize
     const x1n = normalize(pts.map(p => p.x1));
     const x2n = normalize(pts.map(p => p.x2));
 
     function sx(v) { return PAD + v * pw; }
     function sy(v) { return PAD + (1 - v) * ph; }
 
-    // Grid
     sCtx.strokeStyle = '#1e2030'; sCtx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const v = i / 4;
@@ -256,16 +229,13 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       sCtx.beginPath(); sCtx.moveTo(PAD, sy(v)); sCtx.lineTo(PAD + pw, sy(v)); sCtx.stroke();
     }
 
-    // Axes
     sCtx.strokeStyle = '#2a2d3a'; sCtx.lineWidth = 1;
     sCtx.beginPath(); sCtx.moveTo(PAD, PAD + ph); sCtx.lineTo(PAD + pw, PAD + ph); sCtx.stroke();
     sCtx.beginPath(); sCtx.moveTo(PAD, PAD); sCtx.lineTo(PAD, PAD + ph); sCtx.stroke();
 
-    // Color points by Y value
     const yn = normalize(pts.map(p => p.y));
     for (let i = 0; i < pts.length; i++) {
       const px = sx(x1n[i]), py = sy(x2n[i]);
-      // color: purple (low Y) → teal (high Y)
       const yv = yn[i];
       const r_c = Math.round(45 + (109-45)*yv);
       const g_c = Math.round(212 + (40-212)*yv);
@@ -276,14 +246,12 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       sCtx.fill();
     }
 
-    // Correlation annotation
     const rColor = r > 0.9 ? '#ef4444' : r > 0.7 ? '#f59e0b' : '#6b7084';
     sCtx.font = 'bold 16px IBM Plex Mono, monospace';
     sCtx.fillStyle = rColor;
     sCtx.textAlign = 'center';
     sCtx.fillText(`r(X₁,X₂) = ${r.toFixed(3)}`, W/2, PAD - 8);
 
-    // Axis labels
     sCtx.font = '14px IBM Plex Mono, monospace';
     sCtx.fillStyle = '#6b7084';
     sCtx.textAlign = 'center';
@@ -294,7 +262,6 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     sCtx.fillText('X₂', 0, 0);
     sCtx.restore();
 
-    // Color legend
     sCtx.font = '12px IBM Plex Mono, monospace';
     sCtx.textAlign = 'left';
     sCtx.fillStyle = 'rgba(45,212,191,0.8)';
@@ -318,7 +285,6 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     function sx(v) { return PAD_L + v * pw; }
     function sy_fn(v) { return PAD_T + (1 - v) * ph; }
 
-    // Grid
     pCtx.strokeStyle = '#1e2030'; pCtx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const v = i/4;
@@ -326,12 +292,10 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       pCtx.beginPath(); pCtx.moveTo(PAD_L, sy_fn(v)); pCtx.lineTo(PAD_L+pw, sy_fn(v)); pCtx.stroke();
     }
 
-    // Axes
     pCtx.strokeStyle = '#2a2d3a'; pCtx.lineWidth = 1;
     pCtx.beginPath(); pCtx.moveTo(PAD_L, PAD_T+ph); pCtx.lineTo(PAD_L+pw, PAD_T+ph); pCtx.stroke();
     pCtx.beginPath(); pCtx.moveTo(PAD_L, PAD_T); pCtx.lineTo(PAD_L, PAD_T+ph); pCtx.stroke();
 
-    // Points
     for (let i = 0; i < pts.length; i++) {
       pCtx.beginPath();
       pCtx.arc(sx(x1n[i]), sy_fn(yn[i]), 3.5, 0, Math.PI*2);
@@ -339,7 +303,6 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       pCtx.fill();
     }
 
-    // OLS line (Y on X1, simple)
     let sx1 = 0, sy1 = 0, sxx1 = 0, sxy1 = 0;
     for (let i = 0; i < pts.length; i++) {
       sx1 += x1n[i]; sy1 += yn[i];
@@ -357,7 +320,6 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     pCtx.lineWidth = 2.5;
     pCtx.stroke();
 
-    // Wobble lines: show alternative fits when r is high
     const vif = 1 / Math.max(1e-6, 1 - r*r);
     const seInflation = Math.sqrt(vif);
     const wobble = Math.min(2, seInflation - 1) * 0.35;
@@ -375,7 +337,6 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       }
     }
 
-    // SE band
     if (wobble > 0.01) {
       pCtx.beginPath();
       pCtx.moveTo(sx(0), sy_fn(intercept + wobble));
@@ -392,7 +353,6 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       pCtx.fill();
     }
 
-    // Axis labels
     pCtx.fillStyle = '#6b7084';
     pCtx.font = '14px IBM Plex Mono, monospace';
     pCtx.textAlign = 'center';
@@ -403,18 +363,14 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     pCtx.fillText('Y', 0, 0);
     pCtx.restore();
 
-    // VIF annotation
     const vifColor = vif > 10 ? '#ef4444' : vif > 5 ? '#c2640a' : '#6b7084';
     pCtx.font = 'bold 14px IBM Plex Mono, monospace';
     pCtx.fillStyle = vifColor;
     pCtx.textAlign = 'center';
     pCtx.fillText(`VIF = ${vif.toFixed(1)}`, PAD_L + pw/2, PAD_T - 8);
 
-    // Update stat cards
     const seInfStr = seInflation.toFixed(2) + '×';
 
-    // Compute actual OLS SE for β̂₁ and β̂₂ from the two-predictor model
-    // SE(β̂₁) = σ̂ / sqrt(SSX1 · (1 − r₁₂²))  where r₁₂ is the sample correlation
     const x1bar = pts.reduce((s, p) => s + p.x1, 0) / n;
     const x2bar = pts.reduce((s, p) => s + p.x2, 0) / n;
     const ybar  = pts.reduce((s, p) => s + p.y,  0) / n;
@@ -490,23 +446,20 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   }
 
   window.addEventListener('resize', resize);
-  // Defer initial draw until the browser has completed layout so
-  // getBoundingClientRect returns non-zero dimensions for the canvases.
   requestAnimationFrame(() => requestAnimationFrame(resize));
 })();
 </script>
 
----
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Multicollinearity in Multiple Regression</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/multicollinearity/" target="_blank">https://bjorn-persson.github.io/visualizations/multicollinearity/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026multicollinearity,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Multicollinearity in Multiple Regression}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/multicollinearity/}</span>}
+</span></span></code></pre></div>
+  </div>
 
-##### Citation
-
-Persson, B. N. (2026). *Multicollinearity in multiple regression* [Interactive visualization]. https://bnpersson.github.io/visualizations/multicollinearity/
-
-```BibTeX
-@misc{Persson2026multicollinearity,
-  author = {Björn N. Persson},
-  year = {2026},
-  title = {Multicollinearity in Multiple Regression},
-  note = {Interactive visualization},
-  url = {https://bnpersson.github.io/visualizations/multicollinearity/}}
-```

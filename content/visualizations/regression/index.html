@@ -1,191 +1,107 @@
 ---
 title: "Regression Models"
 description: "Interactive visualization for fitting linear, quadratic, cubic, and logistic regression models. Set population parameters, generate synthetic data, and compare the fitted curve to the true population curve."
+summary: "Set population parameters, generate synthetic data, and compare OLS/MLE fitted curves to the true population curve across linear, quadratic, cubic, and logistic models."
 ---
 
 <style>
-:root { --text: #c9cdd8; }
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
+  .reg-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 10px 16px;
+    margin-bottom: 14px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+  .reg-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .reg-control-group label { color: var(--text-dim); }
+  .reg-val { color: var(--teal); font-weight: 600; }
 
-.viz-embed .container {
-  width: 100%;
-  max-width: 860px;
-}
+  .reg-button-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
 
-.viz-embed .subtitle {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 1.0rem;
-  color: var(--secondary);
-  margin-bottom: 18px;
-  line-height: 1.5;
-}
+  /* Make the "Generate" button match the fitted regression color */
+  .reg-button-row .btn.orange {
+    border-color: #c2640a;
+    color: #c2640a;
+  }
+  .reg-button-row .btn.orange:hover {
+    background: rgba(194,100,10,0.15);
+  }
 
-.viz-embed .controls {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
-  gap: 10px 16px;
-  margin-bottom: 14px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 1.0rem;
-}
+  #reg_canvas {
+    display: block;
+    width: 100%;
+    height: max(280px, calc(100vh - 560px));
+    background: var(--bg-surface);
+    border-radius: 6px;
+  }
 
-.viz-embed .control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
+  .reg-equation {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .reg-equation .coef { color: var(--teal); font-weight: 600; }
+  .reg-equation .fit-coef { color: #c2640a; font-weight: 600; }
 
-.viz-embed .control-group label {
-  color: var(--secondary);
-  font-size: 0.92rem;
-}
+  .reg-stats {
+    margin-top: 4px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+  }
 
-.viz-embed .control-group .val {
-  color: #2dd4bf;
-  font-weight: 600;
-}
-
-.viz-embed input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 4px;
-  background: #2a2d3a;
-  border-radius: 2px;
-  outline: none;
-}
-
-.viz-embed input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-}
-
-.viz-embed input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-  border: none;
-}
-
-.viz-embed .button-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-}
-
-.viz-embed .btn {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.92rem;
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--secondary);
-  padding: 6px 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
-  white-space: nowrap;
-}
-
-.viz-embed .btn:hover {
-  border-color: #2dd4bf;
-  color: #2dd4bf;
-}
-
-.viz-embed .btn.active {
-  border-color: #2dd4bf;
-  color: #2dd4bf;
-  background: rgba(45, 212, 191, 0.08);
-}
-
-.viz-embed .btn.action {
-  border-color: var(--tertiary);
-  color: var(--secondary);
-}
-
-.viz-embed .btn.action:hover {
-  border-color: #c2640a;
-  color: #c2640a;
-}
-
-.viz-embed canvas {
-  display: block;
-  width: 100%;
-  height: max(280px, calc(100vh - 560px));
-  background: #181a24;
-  border-radius: 6px;
-}
-
-.viz-embed .equation {
-  margin-top: 10px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 1.0rem;
-  color: var(--primary);
-  line-height: 1.6;
-}
-
-.viz-embed .equation .coef { color: #2dd4bf; font-weight: 600; }
-.viz-embed .equation .fit-coef { color: #c2640a; font-weight: 600; }
-
-.viz-embed .stats {
-  margin-top: 4px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.95rem;
-  color: var(--secondary);
-}
-
-.viz-embed .note {
-  margin-top: 14px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.9rem;
-  color: var(--secondary);
-  line-height: 1.5;
-}
-
-.viz-embed .hidden { display: none !important; }
+  .reg-hidden { display: none !important; }
 </style>
 
-<div class="viz-embed">
 <div class="container">
-  <p class="subtitle">
-    Choose a model type, set population coefficients, generate data, and fit via OLS or MLE.
-  </p>
 
-  <div class="button-row">
-    <button class="btn active" id="btnLinear" onclick="setType('linear')">Linear</button>
-    <button class="btn" id="btnQuad" onclick="setType('quadratic')">Quadratic</button>
-    <button class="btn" id="btnCubic" onclick="setType('cubic')">Cubic</button>
-    <button class="btn" id="btnLogistic" onclick="setType('logistic')">Logistic</button>
-    <button class="btn action" onclick="generateData()">Generate</button>
-    <button class="btn action" onclick="fitModel()">Fit</button>
+  <div class="hero">
+    <h1>Regression Models</h1>
+    <div class="subtitle">
+      Choose a model type, set population coefficients, generate data, and fit via OLS or MLE.
+    </div>
   </div>
 
-  <div class="controls" id="paramControls"></div>
+  <div class="section">
+    <div class="reg-button-row">
+      <button class="btn active" id="btnLinear" onclick="setType('linear')">Linear</button>
+      <button class="btn" id="btnQuad" onclick="setType('quadratic')">Quadratic</button>
+      <button class="btn" id="btnCubic" onclick="setType('cubic')">Cubic</button>
+      <button class="btn" id="btnLogistic" onclick="setType('logistic')">Logistic</button>
+      <button class="btn orange" onclick="generateData()">Generate</button>
+      <button class="btn" onclick="fitModel()" style="border-color:#1565c0;color:#1565c0;">Fit</button>
+    </div>
 
-  <canvas id="canvas"></canvas>
+    <div class="reg-controls" id="paramControls"></div>
 
-  <div class="equation" id="eqPopulation"></div>
-  <div class="equation" id="eqFitted"></div>
-  <div class="stats" id="statsText"></div>
+    <canvas id="reg_canvas"></canvas>
 
-  <p class="note" id="noteText"></p>
-</div>
+    <div class="reg-equation" id="eqPopulation"></div>
+    <div class="reg-equation" id="eqFitted"></div>
+    <div class="reg-stats" id="statsText"></div>
+
+    <p class="note" id="noteText"></p>
+  </div>
+
 </div>
 
 <script>
-// ── State ──
 let modelType = 'linear';
 let data = [];
 let fitResult = null;
 
-// ── RNG ──
 function randn() {
   let u, v, s;
   do { u = Math.random()*2-1; v = Math.random()*2-1; s = u*u+v*v; } while (s >= 1 || s === 0);
@@ -194,7 +110,6 @@ function randn() {
 
 function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
 
-// ── Model definitions ──
 const models = {
   linear: {
     params: [
@@ -277,16 +192,15 @@ const models = {
 function f(v) { return v.toFixed(1); }
 function f3(v) { return v.toFixed(3); }
 
-// ── Build parameter controls ──
 function buildControls() {
   const m = models[modelType];
   const container = document.getElementById('paramControls');
   container.innerHTML = '';
   for (const p of m.params) {
     const div = document.createElement('div');
-    div.className = 'control-group';
+    div.className = 'reg-control-group';
     div.innerHTML = `
-      <label>${p.label}: <span class="val" id="v_${p.id}">${p.id === 'n' ? p.def : p.def.toFixed(1)}</span></label>
+      <label>${p.label}: <span class="reg-val" id="v_${p.id}">${p.id === 'n' ? p.def : p.def.toFixed(1)}</span></label>
       <input type="range" id="s_${p.id}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.def}" oninput="onSlider()">
     `;
     container.appendChild(div);
@@ -315,7 +229,6 @@ function onSlider() {
   render();
 }
 
-// ── Type switching ──
 function setType(t) {
   modelType = t;
   data = [];
@@ -330,7 +243,6 @@ function setType(t) {
   render();
 }
 
-// ── Equations ──
 function updateEquation() {
   const m = models[modelType];
   const p = getParams();
@@ -356,7 +268,6 @@ function updateEquation() {
   }
 }
 
-// ── Data generation ──
 function generateData() {
   const m = models[modelType];
   const p = getParams();
@@ -369,7 +280,6 @@ function generateData() {
   render();
 }
 
-// ── OLS for polynomial models ──
 function olsFit(designRowFn, k) {
   const n = data.length;
   if (n < k) return null;
@@ -418,7 +328,6 @@ function olsFit(designRowFn, k) {
   return { b, r2: sstot > 0 ? 1 - ssres / sstot : 0 };
 }
 
-// ── Logistic regression via IRLS ──
 function logisticFit() {
   const n = data.length;
   const k = 2;
@@ -474,7 +383,6 @@ function pseudoR2(data, b, ll) {
   return { mcfadden, nagelkerke, ll0 };
 }
 
-// ── Fit dispatcher ──
 function fitModel() {
   if (data.length === 0) return;
   const m = models[modelType];
@@ -489,9 +397,8 @@ function fitModel() {
   render();
 }
 
-// ── Rendering ──
 function render() {
-  const canvas = document.getElementById('canvas');
+  const canvas = document.getElementById('reg_canvas');
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
   canvas.width = rect.width * dpr;
@@ -509,7 +416,6 @@ function render() {
   const p = getParams();
   const isLogistic = modelType === 'logistic';
 
-  // ── Axis ranges ──
   let xmin = -4, xmax = 4;
   let ymin, ymax;
 
@@ -549,7 +455,6 @@ function render() {
   function toSx(v) { return PAD_L + (v - xmin) / (xmax - xmin) * pw; }
   function toSy(v) { return PAD_T + ph - (v - ymin) / (ymax - ymin) * ph; }
 
-  // ── Grid ──
   ctx.strokeStyle = '#1e2030';
   ctx.lineWidth = 0.5;
   const xStep = niceStep(xmax - xmin, 8);
@@ -561,13 +466,11 @@ function render() {
     ctx.beginPath(); ctx.moveTo(PAD_L, toSy(t)); ctx.lineTo(PAD_L + pw, toSy(t)); ctx.stroke();
   }
 
-  // ── Axes ──
   ctx.strokeStyle = '#2a2d3a';
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
-  // ── Tick labels ──
   ctx.font = '14px IBM Plex Mono, monospace';
   ctx.fillStyle = '#6b7084';
   ctx.textAlign = 'center';
@@ -579,7 +482,6 @@ function render() {
     ctx.fillText(fmtTick(t, yStep), PAD_L - 6, toSy(t) + 4);
   }
 
-  // ── Axis labels ──
   ctx.fillStyle = '#6b7084';
   ctx.font = '15px IBM Plex Mono, monospace';
   ctx.textAlign = 'center';
@@ -590,7 +492,6 @@ function render() {
   ctx.fillText(isLogistic ? 'P(Y=1)' : 'Y', 0, 0);
   ctx.restore();
 
-  // ── Population curve ──
   const curveSteps = 500;
   ctx.beginPath();
   let started = false;
@@ -607,7 +508,6 @@ function render() {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // ── Fitted curve ──
   if (fitResult) {
     ctx.beginPath();
     started = false;
@@ -623,7 +523,6 @@ function render() {
     ctx.stroke();
   }
 
-  // ── Data points ──
   if (isLogistic) {
     for (const d of data) {
       const sx = toSx(d.x);
@@ -646,7 +545,6 @@ function render() {
     }
   }
 
-  // ── Legend ──
   const lx = PAD_L + 12, ly = PAD_T + 14;
   ctx.font = '14px IBM Plex Mono, monospace';
 
@@ -680,7 +578,6 @@ function render() {
   }
 }
 
-// ── Utility: nice tick steps ──
 function niceStep(range, maxTicks) {
   const rough = range / maxTicks;
   const mag = Math.pow(10, Math.floor(Math.log10(rough)));
@@ -698,24 +595,22 @@ function fmtTick(v, step) {
   return v.toFixed(decimals);
 }
 
-// ── Init ──
 window.addEventListener('resize', render);
 buildControls();
 updateEquation();
 render();
 </script>
 
----
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Regression Models</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/regression/" target="_blank">https://bjorn-persson.github.io/visualizations/regression/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026regression,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Regression Models}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/regression/}</span>}
+</span></span></code></pre></div>
+  </div>
 
-##### Citation
-
-Persson, B. N. (2026). *Regression models* [Interactive visualization]. https://bnpersson.github.io/visualizations/regression/
-
-```BibTeX
-@misc{Persson2026regression,
-  author = {Björn N. Persson},
-  year = {2026},
-  title = {Regression Models},
-  note = {Interactive visualization},
-  url = {https://bnpersson.github.io/visualizations/regression/}}
-```

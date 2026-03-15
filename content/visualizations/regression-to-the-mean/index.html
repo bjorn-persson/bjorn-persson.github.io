@@ -5,147 +5,131 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 ---
 
 <style>
-:root { --text: #c9cdd8; }
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
+  /* Regression to the mean — page-specific styles */
+  .hero .subtitle {
+    font-family: var(--serif);
+    font-size: 1.0rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
 
-.rtm-wrap { font-family: 'IBM Plex Mono', monospace; }
-.rtm-subtitle {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 1.0rem;
-  color: var(--secondary);
-  margin-bottom: 18px;
-  line-height: 1.6;
-}
-.rtm-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 24px;
-  margin-bottom: 16px;
-  font-size: 1.0rem;
-}
-.rtm-control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.rtm-control-group label { color: var(--secondary); font-size: 0.92rem; }
-.rtm-val { color: #2dd4bf; font-weight: 600; }
-.rtm-controls input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 4px;
-  background: #2a2d3a;
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-}
-.rtm-controls input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-}
-.rtm-controls input[type="range"]::-moz-range-thumb {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-  border: none;
-}
-.rtm-btn-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-.rtm-btn {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.92rem;
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--secondary);
-  padding: 6px 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
-}
-.rtm-btn:hover { border-color: #2dd4bf; color: #2dd4bf; }
-.rtm-btn.active-top { border-color: #ef4444; color: #ef4444; }
-.rtm-btn.active-bot { border-color: #6d28d9; color: #6d28d9; }
-.rtm-canvas-wrap canvas {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 6px;
-  background: #181a24;
-}
-.rtm-readout {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 20px;
-  margin-top: 12px;
-  font-size: 0.92rem;
-}
-.rtm-badge {
-  padding: 4px 12px;
-  border-radius: 4px;
-  background: #181a24;
-  border: 1px solid #2a2d3a;
-  color: var(--secondary);
-}
-.rtm-badge .rtm-bval { font-weight: 600; color: #2dd4bf; }
-.rtm-badge .rtm-bval.hi { color: #ef4444; }
-.rtm-badge .rtm-bval.lo { color: #6d28d9; }
-.rtm-note {
-  margin-top: 12px;
-  font-size: 0.88rem;
-  color: var(--secondary);
-  line-height: 1.6;
-}
-@media (max-width: 500px) {
-  .rtm-controls { grid-template-columns: 1fr; }
-}
+  .rtm-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+  .rtm-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rtm-control-group label { color: var(--text-dim); }
+  .rtm-val { color: var(--teal); font-weight: 600; }
+
+  .rtm-btn {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .rtm-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .rtm-btn.active-top { border-color: var(--red); color: var(--red); }
+  .rtm-btn.active-bot { border-color: #6d28d9; color: #6d28d9; }
+
+  #rtm_canvas {
+    display: block;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: var(--bg-surface);
+  }
+
+  .rtm-readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+  }
+  .rtm-badge {
+    padding: 4px 12px;
+    border-radius: 4px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .rtm-badge .rtm-bval { font-weight: 600; color: var(--teal); }
+  .rtm-badge .rtm-bval.hi { color: var(--red); }
+  .rtm-badge .rtm-bval.lo { color: #6d28d9; }
+
+  .rtm-note {
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 500px) {
+    .rtm-controls { grid-template-columns: 1fr; }
+  }
 </style>
 
-<div class="rtm-wrap">
-  <p class="rtm-subtitle">
-    Students take the same test twice. The test-retest reliability slider controls how much random error affects scores.
-    At low reliability, extreme Time-1 scorers regress strongly toward the mean at Time-2 — not because they changed, but because their extreme score partly reflected luck.
-    Highlight the top or bottom performers to see the regression effect in action.
-  </p>
-  <div class="rtm-controls">
-    <div class="rtm-control-group">
-      <label>Test-retest reliability (ρ): <span class="rtm-val" id="rtm_rho_val">0.80</span></label>
-      <input type="range" id="rtm_rho" min="0.01" max="0.99" step="0.01" value="0.80">
-    </div>
-    <div class="rtm-control-group">
-      <label>Extreme group threshold: top/bottom <span class="rtm-val" id="rtm_pct_val">15</span>%</label>
-      <input type="range" id="rtm_pct" min="5" max="40" step="1" value="15">
+<div class="container">
+
+  <div class="hero">
+    <h1>Regression to the Mean</h1>
+    <div class="subtitle">
+      Students take the same test twice. The test-retest reliability slider controls how much random error affects scores.
+      At low reliability, extreme Time-1 scorers regress strongly toward the mean at Time-2 — not because they changed, but because their extreme score partly reflected luck.
+      Highlight the top or bottom performers to see the regression effect in action.
     </div>
   </div>
-  <div class="rtm-btn-row">
-    <button class="rtm-btn" id="rtm_btn_top" onclick="rtmHighlight('top')">Highlight top performers</button>
-    <button class="rtm-btn" id="rtm_btn_bot" onclick="rtmHighlight('bot')">Highlight bottom performers</button>
-    <button class="rtm-btn" onclick="rtmHighlight('none')">Clear highlight</button>
-    <button class="rtm-btn" onclick="rtmReseed()">New sample</button>
-  </div>
-  <div class="rtm-canvas-wrap">
+
+  <div class="section">
+    <div class="rtm-controls">
+      <div class="rtm-control-group">
+        <label>Test-retest reliability (&rho;): <span class="rtm-val" id="rtm_rho_val">0.80</span></label>
+        <input type="range" id="rtm_rho" min="0.01" max="0.99" step="0.01" value="0.80">
+      </div>
+      <div class="rtm-control-group">
+        <label>Extreme group threshold: top/bottom <span class="rtm-val" id="rtm_pct_val">15</span>%</label>
+        <input type="range" id="rtm_pct" min="5" max="40" step="1" value="15">
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:0; margin-bottom:12px;">
+      <button class="rtm-btn" id="rtm_btn_top" onclick="rtmHighlight('top')">Highlight top performers</button>
+      <button class="rtm-btn" id="rtm_btn_bot" onclick="rtmHighlight('bot')">Highlight bottom performers</button>
+      <button class="rtm-btn" onclick="rtmHighlight('none')">Clear highlight</button>
+      <button class="rtm-btn" onclick="rtmReseed()">New sample</button>
+    </div>
+
     <canvas id="rtm_canvas"></canvas>
+
+    <div class="rtm-readout">
+      <div class="rtm-badge">Test-retest r: <span class="rtm-bval" id="rtm_obs_r">—</span></div>
+      <div class="rtm-badge">Top group: T1 mean = <span class="rtm-bval hi" id="rtm_top_t1">—</span>, T2 mean = <span class="rtm-bval" id="rtm_top_t2">—</span></div>
+      <div class="rtm-badge">Bot group: T1 mean = <span class="rtm-bval lo" id="rtm_bot_t1">—</span>, T2 mean = <span class="rtm-bval" id="rtm_bot_t2">—</span></div>
+      <div class="rtm-badge">Expected regression: <span class="rtm-bval" id="rtm_expected">—</span></div>
+    </div>
+
+    <p class="rtm-note">
+      The diagonal dashed line is the identity (T1 = T2). The solid line is the OLS regression of T2 on T1 — its slope equals the test-retest reliability &rho;.<br>
+      When &rho; &lt; 1, the regression line is less steep than the identity. This means: if you scored 2 SD above the mean at T1, your expected T2 score is only 2&rho; SD above the mean.<br>
+      This has real-world consequences: top scorers who receive an intervention appear to "improve" the control group, and bottom scorers appear to "improve" after treatment — even if the treatment does nothing. Always include a control group.
+    </p>
   </div>
-  <div class="rtm-readout">
-    <div class="rtm-badge">Test-retest r: <span class="rtm-bval" id="rtm_obs_r">—</span></div>
-    <div class="rtm-badge">Top group: T1 mean = <span class="rtm-bval hi" id="rtm_top_t1">—</span>, T2 mean = <span class="rtm-bval" id="rtm_top_t2">—</span></div>
-    <div class="rtm-badge">Bot group: T1 mean = <span class="rtm-bval lo" id="rtm_bot_t1">—</span>, T2 mean = <span class="rtm-bval" id="rtm_bot_t2">—</span></div>
-    <div class="rtm-badge">Expected regression: <span class="rtm-bval" id="rtm_expected">—</span></div>
-  </div>
-  <p class="rtm-note">
-    The diagonal dashed line is the identity (T1 = T2). The solid line is the OLS regression of T2 on T1 — its slope equals the test-retest reliability ρ.<br>
-    When ρ &lt; 1, the regression line is less steep than the identity. This means: if you scored 2 SD above the mean at T1, your expected T2 score is only 2ρ SD above the mean.<br>
-    This has real-world consequences: top scorers who receive an intervention appear to "improve" the control group, and bottom scorers appear to "improve" after treatment — even if the treatment does nothing. Always include a control group.
-  </p>
+
 </div>
 
 <script>
@@ -180,7 +164,6 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
     for (let i = 0; i < N; i++) {
       const trueScore = randn(rng);
       const e1 = randn(rng), e2 = randn(rng);
-      // Observed = sqrt(rho)*trueScore + sqrt(1-rho)*error
       const t1 = Math.sqrt(rho) * trueScore + Math.sqrt(1 - rho) * e1;
       const t2 = Math.sqrt(rho) * trueScore + Math.sqrt(1 - rho) * e2;
       pts.push({ t1, t2 });
@@ -210,19 +193,14 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
     const pct = parseInt(document.getElementById('rtm_pct').value) / 100;
     const pts = generateData(rho);
 
-    // Rescale to percentile-like display range
     const allT1 = pts.map(p => p.t1);
     const allT2 = pts.map(p => p.t2);
     const mn = Math.min(...allT1, ...allT2) - 0.2;
     const mx = Math.max(...allT1, ...allT2) + 0.2;
 
-    // Determine extremes by T1
     const sorted = [...pts].sort((a, b) => a.t1 - b.t1);
     const cutK = Math.max(1, Math.round(N * pct));
-    const topT1set = new Set(sorted.slice(N - cutK).map((_, i) => pts.indexOf(sorted[N - cutK + i])));
-    const botT1set = new Set(sorted.slice(0, cutK).map((_, i) => pts.indexOf(sorted[i])));
 
-    // Actually easier to just mark by value threshold
     const t1sorted = [...allT1].sort((a, b) => a - b);
     const topThresh = t1sorted[N - cutK];
     const botThresh = t1sorted[cutK - 1];
@@ -274,7 +252,6 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
       ctx.lineWidth = 2.5;
       ctx.stroke();
 
-      // Slope annotation
       ctx.font = '13px IBM Plex Mono, monospace';
       ctx.fillStyle = '#2dd4bf';
       ctx.textAlign = 'left';
@@ -316,14 +293,11 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
         const t2mean = mean(grp.map(p => p.t2));
         const t1mean = mean(grp.map(p => p.t1));
         const lineColor = highlight === 'top' ? 'rgba(239,68,68,0.7)' : 'rgba(109,40,217,0.7)';
-        // Vertical mean T1 line
         ctx.beginPath(); ctx.moveTo(sx(t1mean), PAD_T); ctx.lineTo(sx(t1mean), PAD_T+ph);
         ctx.strokeStyle = lineColor; ctx.lineWidth = 1.2; ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
-        // Horizontal mean T2 line
         ctx.beginPath(); ctx.moveTo(PAD_L, sy(t2mean)); ctx.lineTo(PAD_L+pw, sy(t2mean));
         ctx.strokeStyle = lineColor; ctx.lineWidth = 1.2; ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
 
-        // Arrow from T1 mean to T2 mean (regression effect)
         const ax = sx(t1mean), ay1 = sy(t1mean), ay2 = sy(t2mean);
         ctx.beginPath(); ctx.moveTo(ax, ay1); ctx.lineTo(ax, ay2);
         ctx.strokeStyle = lineColor; ctx.lineWidth = 2; ctx.setLineDash([]); ctx.stroke();
@@ -335,7 +309,6 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
         ctx.closePath();
         ctx.fillStyle = lineColor; ctx.fill();
 
-        // Update badges
         document.getElementById('rtm_top_t1').textContent =
           highlight === 'top' ? t1mean.toFixed(2) : document.getElementById('rtm_top_t1').textContent;
         document.getElementById('rtm_top_t2').textContent =
@@ -385,7 +358,6 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
       document.getElementById('rtm_bot_t2').textContent = mean(botPts.map(p => p.t2)).toFixed(2);
     }
 
-    // Expected regression
     document.getElementById('rtm_expected').textContent =
       `T2 | extreme T1 ≈ ρ × T1 mean ≈ ${(rho).toFixed(2)} × T1`;
 
@@ -422,17 +394,16 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 })();
 </script>
 
----
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Regression to the Mean</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/regression-to-the-mean/" target="_blank">https://bjorn-persson.github.io/visualizations/regression-to-the-mean/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026regressiontothemean,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Regression to the Mean}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/regression-to-the-mean/}</span>}
+</span></span></code></pre></div>
+  </div>
 
-##### Citation
-
-Persson, B. N. (2026). *Regression to the mean* [Interactive visualization]. https://bnpersson.github.io/visualizations/regression-to-the-mean/
-
-```BibTeX
-@misc{Persson2026rtm,
-  author = {Björn N. Persson},
-  year = {2026},
-  title = {Regression to the Mean},
-  note = {Interactive visualization},
-  url = {https://bnpersson.github.io/visualizations/regression-to-the-mean/}}
-```
