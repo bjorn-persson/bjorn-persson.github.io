@@ -27,8 +27,8 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   }
   .irt-controls {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px 23px;
+    grid-template-columns: 0.9fr 1fr 1fr 1fr;
+    gap: 12px 18px;
     font-family: var(--mono);
     font-size: 0.82em;
   }
@@ -38,6 +38,13 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     gap: 4px;
   }
   .irt-control-group label { color: var(--text-dim); }
+  .irt-control-group input[type="range"] {
+    width: 100%;
+    box-sizing: border-box;
+    height: 20px;
+    padding: 0;
+    margin: 0;
+  }
   .irt-val { color: var(--teal); font-weight: 600; }
   .irt-stat-row {
     display: grid;
@@ -64,13 +71,12 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     gap: 5px;
   }
   .irt-stat-value {
-    font-size: 1.15em;
+    font-size: 0.85em;
     font-weight: 600;
     color: var(--teal);
     transition: color 0.3s;
   }
   .irt-stat-value.warn { color: #ef4444; }
-  .irt-right-spacer { flex-shrink: 0; }
   .irt-panel {
     display: flex;
     flex-direction: column;
@@ -115,7 +121,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     .irt-layout { flex-direction: column; }
   }
   @media (max-width: 600px) {
-    .irt-controls { grid-template-columns: 1fr; }
+    .irt-controls { grid-template-columns: 1fr 1fr; }
     .irt-stat-row  { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 400px) {
@@ -127,17 +133,12 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 
   <div class="hero">
     <h1>IRT Precision</h1>
-    <div class="subtitle">
-      In IRT, measurement precision is <strong>not constant</strong> — it depends on where a person falls on the latent trait.
-      The <strong>Test Information Function</strong> I(&theta;) determines the local Standard Error: SE(&theta;) = 1/&radic;I(&theta;).
-      A test can be highly reliable at one trait level and nearly useless at another.
-    </div>
+    <div class="subtitle">Unlike classical reliability, IRT measurement precision varies across the latent trait continuum</div>
   </div>
 
   <div class="section">
-    <div class="irt-layout">
-      <div class="irt-left">
-        <div class="irt-controls">
+    <p>In IRT, measurement precision is <strong>not constant</strong> — it depends on where a person falls on the latent trait. The <strong>Test Information Function</strong> I(&theta;) determines the local Standard Error: $SE(\theta) = 1/\sqrt{I(\theta)}$. A test can be highly reliable at one trait level and nearly useless at another.</p>
+    <div class="irt-controls">
           <div class="irt-control-group">
             <label>Number of items: <span class="irt-val" id="irt_nitems_val">10</span></label>
             <input type="range" id="irt_nitems" min="5" max="30" step="1" value="10">
@@ -158,18 +159,21 @@ summary: "Explore how item discrimination, difficulty, and response categories s
             <label>Response categories: <span class="irt-val" id="irt_ncat_val">5</span></label>
             <input type="range" id="irt_ncat" min="2" max="7" step="1" value="5">
           </div>
-        </div>
+    </div>
+    <div style="height: 18px;"></div>
+    <div class="irt-layout">
+      <div class="irt-left">
         <div class="irt-stat-row">
           <div class="irt-stat" id="irt_se_card">
             <div class="irt-stat-label">SE(&theta;) <button class="info-btn" onclick="irtShowInfo('seTheta')" title="About SE(θ)">?</button></div>
             <div class="irt-stat-value" id="irt_se_val">&mdash;</div>
           </div>
           <div class="irt-stat" id="irt_ci68_card">
-            <div class="irt-stat-label">68% CI width <button class="info-btn" onclick="irtShowInfo('ci68')" title="About 68% CI">?</button></div>
+            <div class="irt-stat-label">68% CI <button class="info-btn" onclick="irtShowInfo('ci68')" title="About 68% CI">?</button></div>
             <div class="irt-stat-value" id="irt_ci68_val">&mdash;</div>
           </div>
           <div class="irt-stat" id="irt_ci95_card">
-            <div class="irt-stat-label">95% CI width <button class="info-btn" onclick="irtShowInfo('ci95')" title="About 95% CI">?</button></div>
+            <div class="irt-stat-label">95% CI <button class="info-btn" onclick="irtShowInfo('ci95')" title="About 95% CI">?</button></div>
             <div class="irt-stat-value" id="irt_ci95_val">&mdash;</div>
           </div>
         </div>
@@ -179,19 +183,20 @@ summary: "Explore how item discrimination, difficulty, and response categories s
         <div class="irt-interp" id="irt_interp">&mdash;</div>
       </div>
       <div class="irt-right">
-        <div class="irt-right-spacer" id="irt_right_spacer"></div>
         <div class="irt-panel">
           <div class="irt-panel-label">Test information function <button class="info-btn" onclick="irtShowInfo('tifPanel')" title="About this panel">?</button></div>
           <canvas id="irt_info"></canvas>
         </div>
       </div>
     </div>
-    <p class="note">
-      <strong>I(&theta;) = &sum; a<sub>i</sub>&sup2; P<sub>i</sub>(&theta;) Q<sub>i</sub>(&theta;)</strong> (2PL). &ensp;
-      <strong>SE(&theta;) = 1 / &radic;I(&theta;).</strong> &ensp;
-      Local reliability &rho;(&theta;) = 1 &minus; 1/I(&theta;) when &sigma;&sup2; = 1.<br>
-      Unlike Cronbach's &alpha;, IRT precision varies across the trait continuum: a test is most precise where information peaks.
-    </p>
+    <div class="note">
+      <strong>$I(\theta) = \sum a_i^2 P_i(\theta) Q_i(\theta)$</strong> (2PL). &ensp;
+      <strong>$SE(\theta) = 1 / \sqrt{I(\theta)}$.</strong> &ensp;
+      Local reliability $\rho(\theta) = 1 - 1/I(\theta)$ when $\sigma^2 = 1$.
+    </div>
+    <div class="note warn">
+      <strong>The key insight:</strong> Unlike Cronbach's $\alpha$, IRT precision varies across the trait continuum. A test is most precise where information peaks — and can be nearly useless at the extremes, which is exactly where clinical decisions are often made. Move &theta; to the tails to see this for yourself.
+    </div>
   </div>
 
 </div>
@@ -570,18 +575,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     drawInfoPanel(theta, items, currentModel);
   }
 
-  function syncSpacer() {
-    const controls = document.querySelector('.irt-controls');
-    const spacer = document.getElementById('irt_right_spacer');
-    const panelLabel = document.querySelector('.irt-panel-label');
-    if (controls && spacer && panelLabel) {
-      const labelOffset = panelLabel.offsetHeight + 6;
-      spacer.style.height = Math.max(0, controls.offsetHeight - labelOffset + 5) + 'px';
-    }
-  }
-
   function resize() {
-    syncSpacer();
     resizeCanvases();
     update();
   }
@@ -599,10 +593,10 @@ const irtInfoContent = {
     title: 'Standard Error SE(\u03B8)',
     badge: 'SE',
     body: '<p>In IRT, the Standard Error at a given trait level \u03B8 is determined by the Test Information Function:</p>' +
-      '<div class="eq-formula">SE(\u03B8) = 1 / \u221AI(\u03B8)</div>' +
+      '<div class="eq-formula">$$SE(\theta) = \frac{1}{\sqrt{I(\theta)}}$$</div>' +
       '<p>Unlike the SEM in Classical Test Theory, which is a single number for the entire test, SE(\u03B8) <strong>varies across the trait continuum</strong>.</p>' +
       '<p class="info-section-label">Comparison to CTT</p>' +
-      '<p>In CTT, SEM = SD \u00D7 \u221A(1 \u2212 \u03B1) is constant for all examinees. IRT reveals that this "average" hides systematic variation.</p>' +
+      '<p>In CTT, $SEM = SD \times \sqrt{1 - \alpha}$ is constant for all examinees. IRT reveals that this "average" hides systematic variation.</p>' +
       '<p class="info-section-label">Interpretation</p>' +
       '<p>An SE of 0.30 means that if you tested the same person many times, their estimated \u03B8 values would have a standard deviation of about 0.30 around the true value.</p>'
   },
@@ -610,7 +604,7 @@ const irtInfoContent = {
     title: '68% Confidence Interval',
     badge: '68% CI',
     body: '<p>The 68% CI gives the range within which the true \u03B8 falls with roughly 68% probability. Its width equals two SEs.</p>' +
-      '<div class="eq-formula">68% CI width = 2 \u00D7 SE(\u03B8)</div>' +
+      '<div class="eq-formula">$$68\%\ \text{CI width} = 2 \times SE(\theta)$$</div>' +
       '<p class="info-section-label">Key IRT insight</p>' +
       '<p>Because SE varies with \u03B8, the CI width is <strong>different at different trait levels</strong>. In CTT, the CI is the same width everywhere.</p>'
   },
@@ -618,7 +612,7 @@ const irtInfoContent = {
     title: '95% Confidence Interval',
     badge: '95% CI',
     body: '<p>The 95% CI extends \u00B11.96 SEs around the estimated \u03B8.</p>' +
-      '<div class="eq-formula">95% CI width = 2 \u00D7 1.96 \u00D7 SE(\u03B8) \u2248 3.92 \u00D7 SE(\u03B8)</div>' +
+      '<div class="eq-formula">$$95\%\ \text{CI width} = 2 \times 1.96 \times SE(\theta) \approx 3.92 \times SE(\theta)$$</div>' +
       '<p class="info-section-label">When to worry</p>' +
       '<p>Move \u03B8 to the tails (e.g., \u03B8 = \u00B12.5) and notice how the CI balloons. Most psychological scales lose precision at the extremes, which is exactly where clinical decisions are often made.</p>'
   },
@@ -626,7 +620,7 @@ const irtInfoContent = {
     title: 'Test Information Function',
     badge: 'I(\u03B8) & SE(\u03B8)',
     body: '<p><strong>Solid teal curve (left axis):</strong> The Test Information Function I(\u03B8). Higher values mean more precision.</p>' +
-      '<p><strong>Dashed red curve (right axis):</strong> SE(\u03B8) = 1/\u221AI(\u03B8). Where information is high, SE is low.</p>' +
+      '<p><strong>Dashed red curve (right axis):</strong> $SE(\theta) = 1/\sqrt{I(\theta)}$. Where information is high, SE is low.</p>' +
       '<p class="info-section-label">What shapes the curve</p>' +
       '<p><strong>Discrimination (a):</strong> Higher a values produce taller, narrower information peaks.</p>' +
       '<p><strong>Difficulty (b):</strong> Each item contributes most information near its difficulty parameter.</p>' +

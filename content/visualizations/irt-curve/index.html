@@ -6,12 +6,6 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
 
 <style>
   /* IRT Curve — page-specific styles */
-  .hero .subtitle {
-    font-family: var(--serif);
-    font-size: 1.0rem;
-    color: var(--text);
-    line-height: 1.5;
-  }
 
   .irt-chart-container {
     position: relative;
@@ -80,6 +74,13 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
         </div>
         <input type="range" id="cSlider" min="0.0" max="0.5" step="0.01" value="0.0">
       </div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Set c = 0 and increase a — the curve steepens into a near-step function, meaning the item sharply discriminates around the difficulty point. Now raise c to 0.25 and notice the curve never reaches 0: even very low-ability respondents have a 25% chance of a correct response (guessing floor). Move b to see how difficulty shifts the inflection point along the trait axis.
+    </div>
+    <div class="note caveat">
+      The 3PL model assumes unidimensionality (a single latent trait drives responses) and local independence (items are independent given θ). When c = 0 this reduces to the 2PL; when a is also fixed across items, it reduces to the Rasch (1PL) model. In practice, the c parameter is difficult to estimate reliably and is often constrained or set to zero.
     </div>
   </div>
 

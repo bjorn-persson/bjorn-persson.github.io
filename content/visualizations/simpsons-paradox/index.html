@@ -6,12 +6,6 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
 <style>
   /* Simpson's paradox — page-specific styles */
-  .hero .subtitle {
-    font-family: var(--serif);
-    font-size: 1.0rem;
-    color: var(--text);
-    line-height: 1.6;
-  }
 
   .sp-controls {
     display: flex;
@@ -54,13 +48,6 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   }
   .sp-badge .sp-badge-val { font-weight: 600; }
 
-  .sp-note {
-    margin-top: 14px;
-    font-family: var(--mono);
-    font-size: 0.78em;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
   .sp-phase-label {
     margin-bottom: 10px;
     font-family: var(--mono);
@@ -75,12 +62,11 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
   <div class="hero">
     <h1>Simpson's Paradox</h1>
-    <div class="subtitle">
-      A dataset shows a clear <em>negative</em> overall correlation between study hours and exam score — until you account for academic major. Drag the slider to reveal the hidden group structure. Each major shows a <em>positive</em> within-group correlation, reversing the overall trend.
-    </div>
+    <div class="subtitle">When a trend in the aggregate disappears — or reverses — once you account for a grouping variable</div>
   </div>
 
   <div class="section">
+    <p>A dataset shows a clear <em>negative</em> overall correlation between study hours and exam score — until you account for academic major. Each major shows a <em>positive</em> within-group correlation, reversing the overall trend. Drag the slider to reveal the hidden group structure.</p>
     <div class="sp-controls">
       <div class="sp-control-group">
         <label>Group by Academic Major: <span class="sp-val" id="sp_mix_val">0%</span></label>
@@ -97,11 +83,13 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       <div class="sp-badge" id="sp_g4_badge" style="display:none">Major D r: <span class="sp-badge-val" id="sp_g4_r"></span></div>
       <div class="sp-badge" id="sp_g5_badge" style="display:none">Major E r: <span class="sp-badge-val" id="sp_g5_r"></span></div>
     </div>
-    <p class="sp-note">
-      This is Simpson's Paradox: an association that holds in each subgroup can reverse (or vanish) in the aggregate.<br>
-      The mechanism here: harder majors require more study hours yet produce lower average scores (confound). Within each major, more studying does improve scores — but the major-level confound overwhelms this within-group effect in the aggregate.<br>
+    <div class="note warn">
+      <strong>The lesson:</strong> An association that holds in each subgroup can reverse (or vanish) in the aggregate.
+      The mechanism here: harder majors require more study hours yet produce lower average scores (confound). Within each major, more studying does improve scores — but the major-level confound overwhelms this within-group effect in the aggregate.
+    </div>
+    <div class="note caveat">
       Named after Edward H. Simpson (1951), though the phenomenon was noted earlier by Yule (1903).
-    </p>
+    </div>
   </div>
 
 </div>

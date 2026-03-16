@@ -92,7 +92,10 @@ summary: "Set population parameters, generate synthetic data, and compare OLS/ML
     <div class="reg-equation" id="eqFitted"></div>
     <div class="reg-stats" id="statsText"></div>
 
-    <p class="note" id="noteText"></p>
+    <div class="note">
+      <strong>Try it:</strong> Set the population parameters, click "Generate" to draw a sample, then "Fit" to estimate the model. Try small N (e.g., 20) vs large N (e.g., 500) — notice how the fitted curve (orange) tracks the population curve (teal dashed) more closely with more data. Increase σ to see how noise obscures the signal.
+    </div>
+    <p class="note caveat" id="noteText"></p>
   </div>
 
 </div>
@@ -127,7 +130,7 @@ const models = {
     fitEq(r) { return `Ŷ = <span class="fit-coef">${f3(r.b[0])}</span> + <span class="fit-coef">${f3(r.b[1])}</span>X`; },
     designRow(x) { return [1, x]; },
     fitFn(x, r) { return r.b[0] + r.b[1]*x; },
-    note: 'DGP: Y = β₀ + β₁X + ε, X ~ N(0,1), ε ~ N(0,σ²). OLS via normal equations.',
+    note: 'DGP: $Y = \\beta_0 + \\beta_1 X + \\epsilon$, $X \\sim \\mathcal{N}(0,1)$, $\\epsilon \\sim \\mathcal{N}(0,\\sigma^2)$. OLS via normal equations.',
   },
   quadratic: {
     params: [
@@ -146,7 +149,7 @@ const models = {
     fitEq(r) { return `Ŷ = <span class="fit-coef">${f3(r.b[0])}</span> + <span class="fit-coef">${f3(r.b[1])}</span>X + <span class="fit-coef">${f3(r.b[2])}</span>X²`; },
     designRow(x) { return [1, x, x*x]; },
     fitFn(x, r) { return r.b[0] + r.b[1]*x + r.b[2]*x*x; },
-    note: 'DGP: Y = β₀ + β₁X + β₂X² + ε, X ~ N(0,1), ε ~ N(0,σ²). OLS on design matrix [1, X, X²].',
+    note: 'DGP: $Y = \\beta_0 + \\beta_1 X + \\beta_2 X^2 + \\epsilon$, $X \\sim \\mathcal{N}(0,1)$, $\\epsilon \\sim \\mathcal{N}(0,\\sigma^2)$. OLS on design matrix $[1, X, X^2]$.',
   },
   cubic: {
     params: [
@@ -166,7 +169,7 @@ const models = {
     fitEq(r) { return `Ŷ = <span class="fit-coef">${f3(r.b[0])}</span> + <span class="fit-coef">${f3(r.b[1])}</span>X + <span class="fit-coef">${f3(r.b[2])}</span>X² + <span class="fit-coef">${f3(r.b[3])}</span>X³`; },
     designRow(x) { return [1, x, x*x, x*x*x]; },
     fitFn(x, r) { return r.b[0] + r.b[1]*x + r.b[2]*x*x + r.b[3]*x*x*x; },
-    note: 'DGP: Y = β₀ + β₁X + β₂X² + β₃X³ + ε, X ~ N(0,1), ε ~ N(0,σ²). OLS on design matrix [1, X, X², X³].',
+    note: 'DGP: $Y = \\beta_0 + \\beta_1 X + \\beta_2 X^2 + \\beta_3 X^3 + \\epsilon$, $X \\sim \\mathcal{N}(0,1)$, $\\epsilon \\sim \\mathcal{N}(0,\\sigma^2)$. OLS on design matrix $[1, X, X^2, X^3]$.',
   },
   logistic: {
     params: [
@@ -185,7 +188,7 @@ const models = {
     fitEq(r) { return `P̂(Y=1|X) = σ(<span class="fit-coef">${f3(r.b[0])}</span> + <span class="fit-coef">${f3(r.b[1])}</span>X)`; },
     designRow(x) { return [1, x]; },
     fitFn(x, r) { return sigmoid(r.b[0] + r.b[1]*x); },
-    note: 'DGP: Y ~ Bernoulli(σ(β₀ + β₁X)), X ~ N(0,1). Fit via IRLS. McFadden R² = 1 − LL/LL₀. Nagelkerke R² = (1 − exp(2(LL₀−LL)/N)) / (1 − exp(2·LL₀/N)). LL₀ is the null model (intercept-only) log-likelihood.',
+    note: 'DGP: $Y \\sim \\text{Bernoulli}(\\sigma(\\beta_0 + \\beta_1 X))$, $X \\sim \\mathcal{N}(0,1)$. Fit via IRLS. McFadden $R^2 = 1 - \\frac{LL}{LL_0}$. Nagelkerke $R^2 = \\frac{1 - \\exp(2(LL_0 - LL)/N)}{1 - \\exp(2 \\cdot LL_0/N)}$. $LL_0$ is the null model (intercept-only) log-likelihood.',
   },
 };
 

@@ -312,11 +312,11 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
         </div>
       </div>
     </div>
-    <p class="note" style="margin-top: 40px;">
-      Pearson, Spearman, and Kendall range [−1, 1]. MI ≥ 0 (nats); bar uses heuristic cap.
-      dCor ∈ [0, 1]. MI uses Kraskov et al. (2004) KNN with k=3 — noisy and upward-biased at small N.
-      Points live in [0, 1]². Click the <strong>?</strong> buttons for detailed descriptions.
-    </p>
+    <div class="note caveat" style="margin-top: 40px;">
+      Pearson, Spearman, and Kendall range $[-1, 1]$. $MI \geq 0$ (nats); bar uses heuristic cap.
+      $dCor \in [0, 1]$. MI uses Kraskov et al. (2004) KNN with $k=3$ — noisy and upward-biased at small $N$.
+      Points live in $[0, 1]^2$. Click the <strong>?</strong> buttons for detailed descriptions.
+    </div>
   </div>
 
   <!-- ==================== STABILITY ==================== -->
@@ -423,7 +423,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       </table>
     </div>
 
-    <div class="note">
+    <div class="note warn">
       <strong>Bottom line:</strong> For typical effect sizes in personality psychology (<span class="m">r &asymp; .21</span>), with a corridor of <span class="m">&plusmn;.10</span> and 80% confidence, you need roughly <strong>N &asymp; 250</strong> for a stable correlation estimate. There are few scenarios where going below <strong>N = 150</strong> is justifiable.
     </div>
   </div>

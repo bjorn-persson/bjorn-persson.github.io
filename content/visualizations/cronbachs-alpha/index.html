@@ -7,14 +7,6 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
 <style>
   /* Cronbach's alpha — page-specific styles */
 
-  /* Hero subtitle is serif for this viz */
-  .hero .subtitle {
-    font-family: var(--serif);
-    font-size: 1.0rem;
-    color: var(--text);
-    line-height: 1.6;
-  }
-
   /* Controls grid (3-column layout) */
   .ca-controls {
     display: grid;
@@ -95,15 +87,6 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     background: var(--bg-surface);
   }
 
-  /* Clinical note */
-  .ca-note-serif {
-    font-family: var(--serif);
-    font-size: 0.95rem;
-    color: var(--text-dim);
-    line-height: 1.7;
-    margin-top: 10px;
-  }
-
   /* Modal formula override */
   .info-modal .formula {
     color: var(--teal);
@@ -138,13 +121,11 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
 
   <div class="hero">
     <h1>Cronbach's Alpha and Measurement Reliability <button class="info-btn hero-info" onclick="caShowInfo('about')" title="About this visualization">?</button></h1>
-    <div class="subtitle">
-      Cronbach's &alpha; determines the <strong>Standard Error of Measurement (SEM)</strong>: how much a single observed score is expected to differ from a person's true score.
-      A score is not a point — it is an interval. Low &alpha; widens that interval and increases classification errors.
-    </div>
+    <div class="subtitle">How internal consistency determines measurement precision and the width of confidence intervals around observed scores</div>
   </div>
 
   <div class="section">
+    <p>Cronbach's &alpha; determines the <strong>Standard Error of Measurement (SEM)</strong>: how much a single observed score is expected to differ from a person's true score. A score is not a point — it is an interval. Low &alpha; widens that interval and increases classification errors.</p>
     <div class="ca-controls">
       <div class="control-group">
         <label>Cronbach's &alpha;: <span class="val" id="ca_alpha_val">0.80</span></label>
@@ -176,7 +157,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     </div>
 
     <div class="ca-interp" id="ca_interp">—</div>
-
+    <br>
     <div class="ca-panels">
       <div class="ca-panel">
         <div class="viz-title">Observed score → true-score CI <button class="info-btn" onclick="caShowInfo('scorePanel')" title="About this panel">?</button></div>
@@ -188,11 +169,11 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
       </div>
     </div>
 
-    <div class="note" style="margin-top:20px;">
+    <div class="note">
       <strong>SEM = SD × √(1 − α).</strong>
       The 95% true-score CI for an observed score X is [X − 1.96·SEM, X + 1.96·SEM]. Rules of thumb: α ≥ 0.90 for high-stakes individual decisions; α ≥ 0.70 for research/group comparisons.
     </div>
-    <p class="ca-note-serif" id="ca_clinical_note"></p>
+    <div class="note warn" id="ca_clinical_note"></div>
   </div>
 
 </div>

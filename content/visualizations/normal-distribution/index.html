@@ -5,12 +5,6 @@ description: "Interactive visualization of the standard normal density. Click th
 
 <style>
   /* Normal distribution — page-specific styles */
-  .hero .subtitle {
-    font-family: var(--serif);
-    font-size: 1.0rem;
-    color: var(--text);
-    line-height: 1.5;
-  }
 
   #c {
     display: block;
@@ -60,13 +54,6 @@ description: "Interactive visualization of the standard normal density. Click th
     color: var(--teal);
   }
 
-  .nd-note {
-    margin-top: 14px;
-    font-family: var(--mono);
-    font-size: 0.78em;
-    color: var(--text-dim);
-    line-height: 1.5;
-  }
 </style>
 
 <div class="container">
@@ -74,12 +61,12 @@ description: "Interactive visualization of the standard normal density. Click th
   <div class="hero">
     <h1>Normal Distribution</h1>
     <div class="subtitle">
-      One click: cumulative P(Z &le; z) from &minus;&infin;.<br>
-      Two clicks: proportion between two z-values. Hover to preview.
+      Interactive exploration of probabilities under the standard normal curve
     </div>
   </div>
 
   <div class="section">
+    <p>The normal distribution, also known as the bell curve, is the most common probability distribution in statistics. This interactive visualization lets you explore probabilities under the standard normal curve by clicking to place markers.</p>
     <canvas id="c" height="400"></canvas>
     <div class="readout">
       <div id="r_z1"><span class="label">z = </span><span class="value" id="z1Val">&mdash;</span></div>
@@ -89,10 +76,14 @@ description: "Interactive visualization of the standard normal density. Click th
     </div>
     <div class="mode-indicator" id="modeText">Click to place a marker</div>
     <button class="reset-btn" id="resetBtn">Reset</button>
-    <p class="nd-note">
+    <div class="note">
+      One click: cumulative P(Z &le; z) from &minus;&infin;.<br>
+      Two clicks: proportion between two z-values. Hover to preview.
+    </div>
+    <div class="note caveat">
       CDF via Abramowitz &amp; Stegun 26.2.17 (max error ~1.5&times;10&#x207B;&#x2077;).<br>
       One marker: &Phi;(z). Two markers: &Phi;(z&#x2082;) &minus; &Phi;(z&#x2081;).
-    </p>
+    </div>
   </div>
 
 </div>

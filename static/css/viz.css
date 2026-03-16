@@ -50,9 +50,9 @@
 }
 .hero .subtitle {
   font-family: var(--mono);
-  font-size: 0.82em;
-  color: var(--text-dim);
-  letter-spacing: 0.02em;
+  font-size: 1.0rem;
+  color: var(--text);
+  line-height: 1.6;
 }
 
 /* Sections */
@@ -290,6 +290,9 @@ select:focus {
 }
 .note.warn {
   border-left-color: var(--orange);
+}
+.note.caveat {
+  border-left-color: #8b1a1a;
 }
 
 /* Equation display */

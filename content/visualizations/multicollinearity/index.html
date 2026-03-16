@@ -78,17 +78,8 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     min-height: 1.4em;
   }
   .mc-wobble-label span { color: #ef4444; font-weight: 600; }
-  .mc-note {
-    margin-top: 14px;
-    font-family: var(--mono);
-    font-size: 0.78em;
-    color: var(--text-dim);
-    line-height: 1.6;
-    grid-column: 1 / -1;
-  }
   @media (max-width: 580px) {
     .mc-layout { grid-template-columns: 1fr; }
-    .mc-note { grid-column: 1; }
   }
 </style>
 
@@ -96,12 +87,11 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 
   <div class="hero">
     <h1>Multicollinearity in Multiple Regression</h1>
-    <div class="subtitle">
-      Multicollinearity arises when two predictors (X₁, X₂) are highly correlated. Geometrically, the data cloud collapses onto a line — the regression plane loses its support and can "wobble" wildly while still fitting Y well. This inflates standard errors and makes coefficients unreliable.
-    </div>
+    <div class="subtitle">How correlated predictors destabilize regression coefficients and inflate standard errors</div>
   </div>
 
   <div class="section">
+    <p>Multicollinearity arises when two predictors (X₁, X₂) are highly correlated. Geometrically, the data cloud collapses onto a line — the regression plane loses its support and can "wobble" wildly while still fitting Y well. This inflates standard errors and makes coefficients unreliable.</p>
     <div class="mc-layout">
       <div>
         <div class="mc-canvas-label">X₁–X₂ Predictor Space (projection)</div>
@@ -146,12 +136,14 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       <div class="mc-wobble-label" id="mc_wobble_text" style="grid-column:1/-1">
         The regression plane is well-supported. Coefficient estimates are stable.
       </div>
-      <p class="mc-note">
+      <div class="note" style="grid-column:1/-1">
         VIF (Variance Inflation Factor) = 1/(1−r²). At r = 0.9, VIF = 5.3; at r = 0.99, VIF = 50.
-        The SE of each coefficient is inflated by √VIF. Rules of thumb: VIF > 5 is concerning, VIF > 10 is severe.<br>
-        Note: multicollinearity does <em>not</em> bias the regression coefficients — it only inflates their uncertainty.
+        The SE of each coefficient is inflated by √VIF. Rules of thumb: VIF > 5 is concerning, VIF > 10 is severe.
+      </div>
+      <div class="note caveat" style="grid-column:1/-1">
+        Multicollinearity does <em>not</em> bias the regression coefficients — it only inflates their uncertainty.
         The model still predicts Y well; it just cannot tell X₁ and X₂ apart.
-      </p>
+      </div>
     </div>
   </div>
 

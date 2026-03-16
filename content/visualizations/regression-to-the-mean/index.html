@@ -6,12 +6,6 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 
 <style>
   /* Regression to the mean — page-specific styles */
-  .hero .subtitle {
-    font-family: var(--serif);
-    font-size: 1.0rem;
-    color: var(--text);
-    line-height: 1.6;
-  }
 
   .rtm-controls {
     display: grid;
@@ -71,14 +65,6 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
   .rtm-badge .rtm-bval.hi { color: var(--red); }
   .rtm-badge .rtm-bval.lo { color: #6d28d9; }
 
-  .rtm-note {
-    margin-top: 12px;
-    font-family: var(--mono);
-    font-size: 0.78em;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
-
   @media (max-width: 500px) {
     .rtm-controls { grid-template-columns: 1fr; }
   }
@@ -88,14 +74,11 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 
   <div class="hero">
     <h1>Regression to the Mean</h1>
-    <div class="subtitle">
-      Students take the same test twice. The test-retest reliability slider controls how much random error affects scores.
-      At low reliability, extreme Time-1 scorers regress strongly toward the mean at Time-2 — not because they changed, but because their extreme score partly reflected luck.
-      Highlight the top or bottom performers to see the regression effect in action.
-    </div>
+    <div class="subtitle">Why extreme scores tend to move toward the average on retest — a consequence of measurement error, not real change</div>
   </div>
 
   <div class="section">
+    <p>Students take the same test twice. The test-retest reliability slider controls how much random error affects scores. At low reliability, extreme Time-1 scorers regress strongly toward the mean at Time-2 — not because they changed, but because their extreme score partly reflected luck. Highlight the top or bottom performers to see the regression effect in action.</p>
     <div class="rtm-controls">
       <div class="rtm-control-group">
         <label>Test-retest reliability (&rho;): <span class="rtm-val" id="rtm_rho_val">0.80</span></label>
@@ -123,11 +106,13 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
       <div class="rtm-badge">Expected regression: <span class="rtm-bval" id="rtm_expected">—</span></div>
     </div>
 
-    <p class="rtm-note">
-      The diagonal dashed line is the identity (T1 = T2). The solid line is the OLS regression of T2 on T1 — its slope equals the test-retest reliability &rho;.<br>
-      When &rho; &lt; 1, the regression line is less steep than the identity. This means: if you scored 2 SD above the mean at T1, your expected T2 score is only 2&rho; SD above the mean.<br>
-      This has real-world consequences: top scorers who receive an intervention appear to "improve" the control group, and bottom scorers appear to "improve" after treatment — even if the treatment does nothing. Always include a control group.
-    </p>
+    <div class="note">
+      The diagonal dashed line is the identity (T1 = T2). The solid line is the OLS regression of T2 on T1 — its slope equals the test-retest reliability &rho;.
+      When &rho; &lt; 1, the regression line is less steep than the identity. This means: if you scored 2 SD above the mean at T1, your expected T2 score is only 2&rho; SD above the mean.
+    </div>
+    <div class="note warn">
+      <strong>Real-world consequences:</strong> Top scorers who receive an intervention appear to "improve" relative to the control group, and bottom scorers appear to "improve" after treatment — even if the treatment does nothing. Without a control group, regression to the mean masquerades as a treatment effect. Always include a control group.
+    </div>
   </div>
 
 </div>

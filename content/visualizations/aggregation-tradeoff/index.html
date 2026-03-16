@@ -342,9 +342,9 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 
   <p>But reliability and validity are different things. The <em>validity</em> of a scale for predicting an external criterion depends not only on the number of items and their individual validities, but also on how correlated the items are with each other. The relationship is captured by this equation:</p>
 
-  <div class="equation-box">
-    r<sub>yx</sub> = k · r̄<sub>iy</sub> / √(k + k(k−1) · r̄<sub>i</sub>)
-    <div class="eq-label">Scale validity as a function of items (k), average item validity (r̄<sub>iy</sub>), and average interitem correlation (r̄<sub>i</sub>)</div>
+  <div class="equation-box" style="font-size: 1.1em;">
+    $r_{yx} = \frac{k \cdot \bar{r}_{iy}}{\sqrt{k + k(k-1) \cdot \bar{r}_i}}$
+    <div class="eq-label" style="font-size: 0.8em;">Scale validity as a function of items (k), average item validity ($\bar{r}_{iy}$), and average interitem correlation ($\bar{r}_i$)</div>
   </div>
 
   <p>The key insight: high interitem correlations <em>help</em> reliability but <em>limit</em> the validity gain from aggregation. Items from the same narrow domain (high r̄<sub>i</sub>) are partly redundant — averaging them recovers less new criterion-relevant information per item added.</p>
@@ -374,7 +374,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
       <canvas id="chart1" height="120"></canvas>
     </div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Reliability (α)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Reliability ($\alpha$)</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Validity (rᵧₓ)</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim);opacity:0.5"></div> Validity ceiling</div>
     </div>
@@ -382,7 +382,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 
   <div class="metrics-row">
     <div class="metric-card">
-      <div class="metric-label">Scale Reliability (α)</div>
+      <div class="metric-label">Scale Reliability ($\alpha$)</div>
       <div class="metric-value" id="m_alpha">—</div>
     </div>
     <div class="metric-card">
@@ -480,7 +480,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 
   <p>Scale validity (a correlation) may feel abstract. But it translates directly to how well you can <em>classify</em> people — for example, predicting sex from a psychological composite. The relationship between the point-biserial r and the distributions of two groups is deterministic: a higher validity means the group distributions are pulled further apart, and fewer people are misclassified.</p>
 
-  <p>The implied Cohen's d is: d = 2r / √(1 − r²). Given d, the overlap of two normal distributions determines classification accuracy at the optimal threshold.</p>
+  <p>The implied Cohen's d is: $d = \frac{2r}{\sqrt{1 - r^2}}$. Given d, the overlap of two normal distributions determines classification accuracy at the optimal threshold.</p>
 
   <p>Drag the scale validity to see the distributions separate and accuracy change.</p>
 
@@ -638,12 +638,16 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     </tbody>
   </table>
 
-  <p>The take-home message: scale scores are <em>construct-validity</em> tools. They measure what they're designed to measure, and they do it reliably. But for <em>criterion prediction</em> — especially when item-level signal varies — they impose a constraint (equal weighting) that costs predictive power. Penalized regression relaxes that constraint, gaining prediction at the expense of theoretical coherence.</p>
+  <div class="note warn">
+    <strong>The take-home message:</strong> Scale scores are <em>construct-validity</em> tools. They measure what they're designed to measure, and they do it reliably. But for <em>criterion prediction</em> — especially when item-level signal varies — they impose a constraint (equal weighting) that costs predictive power. Penalized regression relaxes that constraint, gaining prediction at the expense of theoretical coherence.
+  </div>
 
-  <p>Recognizing this isn't a criticism of either approach. It's a recognition that measurement and prediction are different psychometric goals, and there is no free lunch. The validity gains shown in Section 4 represent a theoretical ceiling; realizing those gains in practice requires enough data, proper regularization, and honest out-of-sample evaluation.</p>
+  <div class="note caveat">
+    Recognizing this isn't a criticism of either approach. It's a recognition that measurement and prediction are different psychometric goals, and there is no free lunch. The validity gains shown in Section 4 represent a theoretical ceiling; realizing those gains in practice requires enough data, proper regularization, and honest out-of-sample evaluation.
+  </div>
 </div>
 
-<div class="note" style="border-left-color: #8b1a1a;">
+<div class="note caveat">
   All computations run in your browser. No data are sent anywhere.
 </div>
 
@@ -1340,7 +1344,7 @@ const infoContent = {
     body: `
       <p>The average correlation between each item in Domain A and the external criterion y (e.g. a group membership variable, a test score, or any outcome you want to predict).</p>
       <p>This is sometimes called the <em>item-criterion correlation</em>. A higher value means each item individually carries more signal about the criterion.</p>
-      <div class="modal-formula">r̄ᵢᵧ = (1/k) · Σ rᵢᵧ</div>
+      <div class="modal-formula">$\bar{r}_{iy} = \frac{1}{k} \cdot \sum r_{iy}$</div>
       <p>In practice, item-criterion correlations for psychological scales typically range from 0.10 to 0.40. Values above 0.50 would be unusually high for a single item and a distal criterion.</p>
     `
   },
@@ -1356,7 +1360,7 @@ const infoContent = {
     body: `
       <p>The average correlation among items <em>within</em> the same domain. This reflects how homogeneous a domain is — how much all its items tap the same underlying dimension.</p>
       <p>A high within-domain r̄ᵢ means items are redundant with each other. Adding more items improves reliability (Spearman-Brown), but validity gains plateau quickly because each new item adds little new criterion-relevant information beyond what the first few items already captured.</p>
-      <div class="modal-formula">Validity ceiling = r̄ᵢᵧ / √r̄ᵢ</div>
+      <div class="modal-formula">Validity ceiling = $\frac{\bar{r}_{iy}}{\sqrt{\bar{r}_i}}$</div>
       <p>Typical values for well-constructed unidimensional scales range from 0.20 to 0.50. The slider minimum is 0.05 (near-unrelated items would not form a meaningful scale) and the maximum is 0.70 (very narrow, highly redundant content).</p>
     `
   },

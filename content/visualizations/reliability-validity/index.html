@@ -6,12 +6,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
 
 <style>
   /* Reliability-validity — page-specific styles */
-  .hero .subtitle {
-    font-family: var(--serif);
-    font-size: 1.0rem;
-    color: var(--text);
-    line-height: 1.6;
-  }
 
   .rv-controls {
     display: grid;
@@ -64,14 +58,6 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     background: var(--bg-surface);
   }
 
-  .rv-note {
-    font-family: var(--mono);
-    font-size: 0.78em;
-    color: var(--text-dim);
-    line-height: 1.6;
-    margin-top: 12px;
-  }
-
   @media (max-width: 600px) {
     .rv-controls { grid-template-columns: 1fr; }
     .rv-canvases { grid-template-columns: 1fr; }
@@ -82,14 +68,11 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
 
   <div class="hero">
     <h1>Reliability, Validity &amp; Measurement Error</h1>
-    <div class="subtitle">
-      Classical Test Theory: Observed Score = True Score + Error.<br>
-      <strong>Reliability</strong> concerns <em>random</em> error — how consistently a measure performs.<br>
-      <strong>Validity</strong> concerns <em>systematic</em> error — whether a measure hits its intended target.
-    </div>
+    <div class="subtitle">An interactive archery-target metaphor for random error (reliability) and systematic error (validity)</div>
   </div>
 
   <div class="section">
+    <p>Classical Test Theory: Observed Score = True Score + Error. <strong>Reliability</strong> concerns <em>random</em> error — how consistently a measure performs. <strong>Validity</strong> concerns <em>systematic</em> error — whether a measure hits its intended target.</p>
     <div class="rv-controls">
       <div class="rv-control-group">
         <label>Random Error (low reliability): <span class="rv-val" id="rv_rand_val">0.30</span></label>
@@ -118,13 +101,15 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       </div>
     </div>
 
-    <p class="rv-note">
-      Each "arrow" represents one measurement attempt. The bullseye is the true score.<br>
-      Random error scatters arrows around the cluster center (flattens and widens the distribution).<br>
-      Systematic bias shifts the entire cluster away from the bullseye (displaces the mean without changing spread); use negative values to shift in the opposite direction.<br>
-      High reliability + high validity = tight cluster on the bullseye. High reliability + low validity = tight cluster, wrong place.<br>
+    <div class="note">
+      Each "arrow" represents one measurement attempt. The bullseye is the true score.
+      Random error scatters arrows around the cluster center (flattens and widens the distribution).
+      Systematic bias shifts the entire cluster away from the bullseye (displaces the mean without changing spread); use negative values to shift in the opposite direction.
+      High reliability + high validity = tight cluster on the bullseye. High reliability + low validity = tight cluster, wrong place.
+    </div>
+    <div class="note caveat">
       <strong>Note:</strong> maximum validity = &radic;reliability (CTT upper bound). A measure cannot correlate with any criterion more than the square root of its own reliability, so validity is bounded here accordingly.
-    </p>
+    </div>
   </div>
 
 </div>
