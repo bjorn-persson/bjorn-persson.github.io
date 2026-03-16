@@ -1,0 +1,772 @@
+---
+title: "Range Restriction"
+description: "See how restricting the range of a variable attenuates correlations and reduces statistical power."
+summary: "Interactively explore how selecting on a variable — like studying GRE–GPA only among admitted students — shrinks correlations and misleads researchers."
+---
+
+<style>
+  .rr-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .rr-canvas-wrap canvas {
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--bg-surface);
+    border-radius: 6px;
+  }
+  .rr-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .rr-stat {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 6px 10px;
+    border-left: 3px solid var(--border);
+  }
+  .rr-stat.full { border-left-color: var(--teal); }
+  .rr-stat.rest { border-left-color: var(--orange); }
+  .rr-stat.corr { border-left-color: #a78bfa; }
+  .rr-stat-label {
+    font-family: var(--mono);
+    font-size: 0.68em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 2px;
+  }
+  .rr-stat-value {
+    font-family: var(--mono);
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--text-bright);
+  }
+  .rr-stat-value.teal { color: var(--teal); }
+  .rr-stat-value.orange { color: var(--orange); }
+  .rr-stat-value.purple { color: #a78bfa; }
+  .rr-stat-value.red { color: var(--red); }
+  .controls-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .controls-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .rr-mode-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .power-bar-wrap { margin-top: 20px; }
+  .power-bar-label {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .power-bar-track {
+    height: 18px;
+    background: var(--bg-surface);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .power-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+  .power-bar-fill.full { background: var(--teal); }
+  .power-bar-fill.rest { background: var(--orange); }
+  .power-bar-marker {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: var(--red);
+    left: 80%;
+  }
+  #z-controls {
+    display: none;
+    margin-bottom: 12px;
+  }
+  #z-controls.visible {
+    display: block;
+  }
+  .equation-box {
+    font-family: var(--mono);
+    font-size: 0.92em;
+    color: var(--text-bright);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: 14px 20px;
+    margin: 16px 0;
+    text-align: center;
+    border-radius: 6px;
+  }
+  .equation-box .eq-label {
+    font-size: 0.75em;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+  @media (max-width: 700px) {
+    .rr-layout { grid-template-columns: 1fr; }
+    .rr-stats { grid-template-columns: 1fr 1fr; }
+    .controls-row, .controls-row-3 { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="container">
+  <div class="hero">
+    <h1>Range Restriction</h1>
+    <div class="subtitle">When you can only observe a subset of the full range — such as studying admitted students instead of all applicants — correlations shrink, power drops, and effects look weaker than they really are.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">The scenario</div>
+    <h2>Do GRE scores predict graduate-school GPA?</h2>
+
+    <p>Suppose GRE quantitative scores correlate ρ = 0.40 with first-year graduate GPA across <em>all applicants</em>. A university wants to validate its admissions process, so it correlates GRE scores with GPA among its enrolled students. The problem: only applicants above a certain GRE threshold were admitted. The university never observes the GPA of rejected applicants.</p>
+
+    <p>Among admitted students the variance in GRE scores is compressed — most cluster near the top of the scale. With less spread in the predictor, the regression slope flattens, and the observed correlation drops. The university might conclude that "GRE scores barely predict performance" when in fact the relationship is substantial in the full range. This is <em>range restriction</em>, and it is ubiquitous: employee selection, clinical cutoffs, gifted-education research, and any study that conditions on a variable correlated with the outcome.</p>
+
+    <p>In the simulation below, X represents GRE scores and Y represents GPA. Adjust the sliders to see how restricting the observable range attenuates the correlation — and how the Thorndike correction can recover the full-range estimate.</p>
+
+    <div class="note">
+      <strong>Why does restriction attenuate correlations?</strong> A correlation measures the degree to which two variables co-vary <em>relative to their individual variances</em>. When you truncate the range of one variable, its variance shrinks, but the conditional variance of the other variable (the scatter around the regression line) stays roughly the same. The signal-to-noise ratio drops, and so does <em>r</em>. Visually, the elliptical cloud of points gets compressed along one axis, making the tilt — the linear trend — harder to detect.
+    </div>
+    <div class="note warn">
+      <strong>Where this happens in practice.</strong> Range restriction is not a rare edge case. It appears whenever a study's sample was filtered on something correlated with the variables of interest. Classic examples: employee selection studies (correlating test scores with performance, but only among those hired), clinical trials with severity cutoffs (excluding mild cases), educational research in gifted programs, and income studies restricted to employed individuals. In each case the observed correlation underestimates the true population relationship — sometimes dramatically.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="viz-title">Controls</div>
+
+    <div class="controls-row">
+      <div>
+        <div class="slider-row">
+          <span class="slider-label">ρ</span>
+          <input type="range" id="sl-rho" min="0.05" max="0.90" step="0.01" value="0.40">
+          <span class="slider-val" id="val-rho">0.40</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:0.72em;color:var(--text-dim);margin-top:2px;margin-left:38px;">Population correlation</div>
+      </div>
+      <div>
+        <div class="slider-row">
+          <span class="slider-label">N</span>
+          <input type="range" id="sl-n" min="50" max="500" step="5" value="200">
+          <span class="slider-val" id="val-n">200</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:0.72em;color:var(--text-dim);margin-top:2px;margin-left:38px;">Full sample size</div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <div>
+        <div class="slider-row">
+          <span class="slider-label">Lo</span>
+          <input type="range" class="orange-slider" id="sl-lo" min="0" max="0.85" step="0.01" value="0.00">
+          <span class="slider-val" id="val-lo" style="color:var(--orange);">0%</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:0.72em;color:var(--text-dim);margin-top:2px;margin-left:38px;">Lower bound (percentile on selection variable)</div>
+      </div>
+      <div>
+        <div class="slider-row">
+          <span class="slider-label">Hi</span>
+          <input type="range" class="orange-slider" id="sl-hi" min="0.15" max="1.00" step="0.01" value="0.70">
+          <span class="slider-val" id="val-hi" style="color:var(--orange);">70%</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:0.72em;color:var(--text-dim);margin-top:2px;margin-left:38px;">Upper bound (percentile on selection variable)</div>
+      </div>
+    </div>
+
+    <div id="z-controls">
+      <div class="controls-row">
+        <div>
+          <div class="slider-row">
+            <span class="slider-label">ρ<sub>xz</sub></span>
+            <input type="range" id="sl-rho-xz" min="0.20" max="0.95" step="0.01" value="0.70">
+            <span class="slider-val" id="val-rho-xz">0.70</span>
+          </div>
+          <div style="font-family:var(--mono);font-size:0.72em;color:var(--text-dim);margin-top:2px;margin-left:38px;">Correlation between X and the selection variable Z</div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+
+    <div class="rr-mode-row">
+      <button class="btn scenario-btn active" data-mode="x">Select on X (direct)</button>
+      <button class="btn scenario-btn" data-mode="y">Select on Y</button>
+      <button class="btn scenario-btn" data-mode="z">Select on Z (indirect)</button>
+      <button class="btn btn-orange" id="btn-resample">New Sample</button>
+    </div>
+
+    <div class="rr-layout">
+      <div class="rr-canvas-wrap">
+        <div class="viz-title">Full Sample</div>
+        <canvas id="cv-full"></canvas>
+      </div>
+      <div class="rr-canvas-wrap">
+        <div class="viz-title">Restricted Sample</div>
+        <canvas id="cv-rest"></canvas>
+      </div>
+    </div>
+
+    <div class="rr-stats">
+      <div class="rr-stat full">
+        <div class="rr-stat-label">r (full range)</div>
+        <div class="rr-stat-value teal" id="stat-r-full">r = .40</div>
+      </div>
+      <div class="rr-stat rest">
+        <div class="rr-stat-label">r (restricted)</div>
+        <div class="rr-stat-value orange" id="stat-r-rest">r = .22</div>
+      </div>
+      <div class="rr-stat corr">
+        <div class="rr-stat-label">r (Thorndike corrected)</div>
+        <div class="rr-stat-value purple" id="stat-r-corr">r = .39</div>
+      </div>
+      <div class="rr-stat rest">
+        <div class="rr-stat-label">Variance explained lost</div>
+        <div class="rr-stat-value red" id="stat-r2-loss">−11.2%</div>
+      </div>
+    </div>
+
+    <div class="power-bar-wrap">
+      <div class="power-bar-label">
+        <span>Statistical Power</span>
+        <span style="color:var(--red);font-size:0.9em;">&#9660; 80% threshold</span>
+      </div>
+      <div class="power-bar-track">
+        <div class="power-bar-fill full" id="bar-full" style="width:50%"></div>
+        <div class="power-bar-marker"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.78em;">
+        <span style="color:var(--teal);" id="power-full-label">Full range: 95%</span>
+        <span></span>
+      </div>
+      <div class="power-bar-track" style="margin-top:6px;">
+        <div class="power-bar-fill rest" id="bar-rest" style="width:35%"></div>
+        <div class="power-bar-marker"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.78em;">
+        <span style="color:var(--orange);" id="power-rest-label">Restricted: 62%</span>
+        <span style="color:var(--text-dim);" id="power-loss-label">−33 percentage points</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">The correction</div>
+    <h2>Thorndike's Case II Formula</h2>
+
+    <p>When the full-range standard deviation of the selection variable is known (e.g., from normative data or the full applicant pool), the restricted correlation can be corrected back to an estimate of the unrestricted value:</p>
+
+    <div class="equation-box" style="font-size: 1.1em;">
+      $r_c = \dfrac{r_r \cdot \dfrac{S_X}{s_x}}{\sqrt{1 - r_r^2 + r_r^2 \cdot \dfrac{S_X^2}{s_x^2}}}$
+      <div class="eq-label" style="font-size: 0.8em;">Thorndike Case II: corrected correlation from restricted $r_r$, unrestricted SD ($S_X$), and restricted SD ($s_x$)</div>
+    </div>
+
+    <p>Here $r_r$ is the restricted correlation, $S_X$ is the unrestricted standard deviation, $s_x$ is the restricted standard deviation, and $r_c$ is the corrected estimate. The purple stat card above shows this correction applied to the observed restricted $r$. The formula works by inflating the correlation in proportion to how much variance was lost — the ratio $S_X / s_x$ captures the degree of compression.</p>
+
+    <div class="note warn">
+      <strong>Direct vs. indirect restriction.</strong> "Select on X" is <em>direct</em> restriction — the selection variable is the predictor itself. "Select on Z" is <em>indirect</em> restriction — selection occurs on a third variable correlated with X but not directly in the model. Indirect restriction is harder to detect and correct because the researcher may not realize selection has occurred. For instance, restricting a clinical sample by diagnosis severity (Z) compresses both the predictor (X) and outcome (Y) ranges simultaneously, attenuating their correlation even though neither was directly truncated. The correction requires knowing ρ(X,Z) — often unavailable.
+    </div>
+    <div class="note caveat">
+      <strong>The correction has limits.</strong> Thorndike's formula assumes linearity (the regression of Y on X is linear across the full range) and homoscedasticity (the spread of Y is constant across levels of X). When these assumptions fail — for example, with ceiling effects or nonlinear relationships — the correction can over- or under-shoot. It also requires knowing the unrestricted SD, which may only be available from normative data or prior studies. Treat corrected correlations as estimates, not ground truth.
+    </div>
+  </div>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Range restriction</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/range-restriction/" target="_blank">https://bjorn-persson.github.io/visualizations/range-restriction/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026rangerestriction,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Range Restriction}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/range-restriction/}</span>}
+</span></span></code></pre></div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  // === Seeded RNG ===
+  function mulberry32(a) {
+    return function() {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  let rng = mulberry32(Date.now());
+
+  function randn() {
+    let u, v;
+    do { u = rng(); } while (u === 0);
+    v = rng();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  function generateBivariate(n, rho) {
+    const data = [];
+    for (let i = 0; i < n; i++) {
+      const z1 = randn(), z2 = randn();
+      data.push({ x: z1, y: rho * z1 + Math.sqrt(1 - rho * rho) * z2 });
+    }
+    return data;
+  }
+
+  function generateTrivariate(n, rhoXY, rhoXZ) {
+    // Cholesky for [X, Y, Z] with corr matrix:
+    // [1,     rhoXY, rhoXZ]
+    // [rhoXY, 1,     rhoXY*rhoXZ]  (Y-Z derived for simplicity)
+    // [rhoXZ, rhoXY*rhoXZ, 1]
+    const rhoYZ = rhoXY * rhoXZ;
+    // Cholesky L:
+    const l11 = 1;
+    const l21 = rhoXY, l22 = Math.sqrt(Math.max(1e-10, 1 - rhoXY * rhoXY));
+    const l31 = rhoXZ;
+    const l32 = (rhoYZ - l31 * l21) / l22;
+    const l33sq = 1 - l31 * l31 - l32 * l32;
+    const l33 = Math.sqrt(Math.max(1e-10, l33sq));
+    const data = [];
+    for (let i = 0; i < n; i++) {
+      const z1 = randn(), z2 = randn(), z3 = randn();
+      data.push({
+        x: l11 * z1,
+        y: l21 * z1 + l22 * z2,
+        z: l31 * z1 + l32 * z2 + l33 * z3
+      });
+    }
+    return data;
+  }
+
+  // === Stats ===
+  function mean(arr) { return arr.reduce((a, b) => a + b, 0) / arr.length; }
+  function sdFunc(arr) { const m = mean(arr); return Math.sqrt(arr.reduce((s, v) => s + (v - m) * (v - m), 0) / (arr.length - 1)); }
+
+  function pearsonR(xs, ys) {
+    const mx = mean(xs), my = mean(ys);
+    let num = 0, dx2 = 0, dy2 = 0;
+    for (let i = 0; i < xs.length; i++) {
+      const dx = xs[i] - mx, dy = ys[i] - my;
+      num += dx * dy; dx2 += dx * dx; dy2 += dy * dy;
+    }
+    return dx2 === 0 || dy2 === 0 ? 0 : num / Math.sqrt(dx2 * dy2);
+  }
+
+  function thorndikeCorrection(rr, sdFull, sdRestricted) {
+    if (sdRestricted < 1e-10) return rr;
+    const u = sdFull / sdRestricted;
+    const num = rr * u;
+    const den = Math.sqrt(1 - rr * rr + rr * rr * u * u);
+    return Math.max(-1, Math.min(1, num / den));
+  }
+
+  function percentile(arr, p) {
+    const sorted = [...arr].sort((a, b) => a - b);
+    const i = p * (sorted.length - 1);
+    const lo = Math.floor(i), hi = Math.ceil(i);
+    return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+  }
+
+  // === p-value and power (reused from dichotomization) ===
+  function lgamma(x) {
+    const c = [76.18009172947146, -86.50532032941677, 24.01409824083091,
+      -1.231739572450155, 0.001208650973866179, -0.000005395239384953];
+    let y = x, tmp = x + 5.5;
+    tmp -= (x + 0.5) * Math.log(tmp);
+    let ser = 1.000000000190015;
+    for (let j = 0; j < 6; j++) ser += c[j] / ++y;
+    return -tmp + Math.log(2.5066282746310005 * ser / x);
+  }
+
+  function regBetaI(x, a, b) {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    if (x > (a + 1) / (a + b + 2)) return 1 - regBetaI(1 - x, b, a);
+    const lnBeta = lgamma(a) + lgamma(b) - lgamma(a + b);
+    const front = Math.exp(a * Math.log(x) + b * Math.log(1 - x) - lnBeta) / a;
+    let f = 1, c = 1, d = 1 - (a + b) * x / (a + 1);
+    if (Math.abs(d) < 1e-30) d = 1e-30;
+    d = 1 / d; f = d;
+    for (let m = 1; m <= 200; m++) {
+      let num = m * (b - m) * x / ((a + 2 * m - 1) * (a + 2 * m));
+      d = 1 + num * d; if (Math.abs(d) < 1e-30) d = 1e-30; d = 1 / d;
+      c = 1 + num / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+      f *= d * c;
+      num = -(a + m) * (a + b + m) * x / ((a + 2 * m) * (a + 2 * m + 1));
+      d = 1 + num * d; if (Math.abs(d) < 1e-30) d = 1e-30; d = 1 / d;
+      c = 1 + num / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+      f *= d * c;
+      if (Math.abs(d * c - 1) < 1e-10) break;
+    }
+    return front * f;
+  }
+
+  function normCDF(x) {
+    const t = 1 / (1 + 0.2316419 * Math.abs(x));
+    const d = 0.3989422804014327;
+    const p = d * Math.exp(-x * x / 2) * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+    return x > 0 ? 1 - p : p;
+  }
+  function normQuantile(p) {
+    if (p <= 0) return -Infinity;
+    if (p >= 1) return Infinity;
+    if (p < 0.5) return -normQuantile(1 - p);
+    const t = Math.sqrt(-2 * Math.log(1 - p));
+    return t - (2.515517 + 0.802853 * t + 0.010328 * t * t) / (1 + 1.432788 * t + 0.189269 * t * t + 0.001308 * t * t * t);
+  }
+
+  function tQuantile(p, df) {
+    let t = normQuantile(p);
+    for (let i = 0; i < 15; i++) {
+      let cdf;
+      if (t >= 0) cdf = 1 - 0.5 * regBetaI(df / (df + t * t), df / 2, 0.5);
+      else cdf = 0.5 * regBetaI(df / (df + t * t), df / 2, 0.5);
+      const pdf = Math.exp(lgamma((df + 1) / 2) - lgamma(df / 2) - 0.5 * Math.log(Math.PI * df) - (df + 1) / 2 * Math.log(1 + t * t / df));
+      if (pdf < 1e-30) break;
+      const delta = (p - cdf) / pdf;
+      t += delta;
+      if (Math.abs(delta) < 1e-8) break;
+    }
+    return t;
+  }
+
+  function noncentralTCDF(t, df, nc) {
+    const z = (t * Math.sqrt(1 - 1 / (4 * df)) - nc) / Math.sqrt(1 + t * t / (2 * df));
+    return normCDF(z);
+  }
+
+  function powerCorr(rho, n, alpha) {
+    if (n < 4) return 0;
+    const nc = Math.abs(rho) * Math.sqrt(n - 2) / Math.sqrt(1 - rho * rho + 1e-15);
+    const df = n - 2;
+    const tCrit = tQuantile(1 - alpha / 2, df);
+    return 1 - noncentralTCDF(tCrit, df, nc) + noncentralTCDF(-tCrit, df, nc);
+  }
+
+  // === DOM ===
+  const cvFull = document.getElementById('cv-full');
+  const cvRest = document.getElementById('cv-rest');
+  const ctxFull = cvFull.getContext('2d');
+  const ctxRest = cvRest.getContext('2d');
+  const slRho = document.getElementById('sl-rho');
+  const slN = document.getElementById('sl-n');
+  const slLo = document.getElementById('sl-lo');
+  const slHi = document.getElementById('sl-hi');
+  const slRhoXZ = document.getElementById('sl-rho-xz');
+
+  let data = [];
+  let mode = 'x';
+
+  function getParams() {
+    return {
+      rho: +slRho.value,
+      n: +slN.value,
+      lo: +slLo.value,
+      hi: +slHi.value,
+      rhoXZ: +slRhoXZ.value
+    };
+  }
+
+  function resample() {
+    rng = mulberry32(Date.now() ^ (Math.random() * 1e9));
+    const p = getParams();
+    if (mode === 'z') {
+      data = generateTrivariate(p.n, p.rho, p.rhoXZ);
+    } else {
+      data = generateBivariate(p.n, p.rho);
+    }
+    data._rho = p.rho;
+    data._rhoXZ = p.rhoXZ;
+    data._mode = mode;
+    update();
+  }
+
+  function ensureData() {
+    const p = getParams();
+    const needsRegen = data.length !== p.n ||
+      Math.abs((data._rho || 0) - p.rho) > 0.001 ||
+      data._mode !== mode ||
+      (mode === 'z' && Math.abs((data._rhoXZ || 0) - p.rhoXZ) > 0.001);
+    if (needsRegen) {
+      rng = mulberry32(42);
+      if (mode === 'z') {
+        data = generateTrivariate(p.n, p.rho, p.rhoXZ);
+      } else {
+        data = generateBivariate(p.n, p.rho);
+      }
+      data._rho = p.rho;
+      data._rhoXZ = p.rhoXZ;
+      data._mode = mode;
+    }
+  }
+
+  function update() {
+    const p = getParams();
+    // Enforce lo < hi
+    if (p.lo >= p.hi - 0.05) {
+      slLo.value = Math.max(0, p.hi - 0.05);
+      p.lo = +slLo.value;
+    }
+
+    document.getElementById('val-rho').textContent = p.rho.toFixed(2);
+    document.getElementById('val-n').textContent = p.n;
+    document.getElementById('val-lo').textContent = Math.round(p.lo * 100) + '%';
+    document.getElementById('val-hi').textContent = Math.round(p.hi * 100) + '%';
+    document.getElementById('val-rho-xz').textContent = p.rhoXZ.toFixed(2);
+
+    ensureData();
+
+    const xs = data.map(d => d.x);
+    const ys = data.map(d => d.y);
+
+    // Selection variable
+    let selVar;
+    if (mode === 'x') selVar = data.map(d => d.x);
+    else if (mode === 'y') selVar = data.map(d => d.y);
+    else selVar = data.map(d => d.z);
+
+    const cutLo = percentile(selVar, p.lo);
+    const cutHi = percentile(selVar, p.hi);
+
+    // Restricted subset
+    const restricted = data.filter((d, i) => selVar[i] >= cutLo && selVar[i] <= cutHi);
+    const nRest = restricted.length;
+
+    if (nRest < 4) {
+      // Not enough points — show dashes
+      document.getElementById('stat-r-full').textContent = 'r = ' + pearsonR(xs, ys).toFixed(3);
+      document.getElementById('stat-r-rest').textContent = 'r = —';
+      document.getElementById('stat-r-corr').textContent = 'r = —';
+      document.getElementById('stat-r2-loss').textContent = '—';
+      drawScatter(ctxFull, cvFull, data, selVar, cutLo, cutHi, false);
+      drawScatter(ctxRest, cvRest, restricted.length > 0 ? restricted : data, null, null, null, true);
+      return;
+    }
+
+    const rFull = pearsonR(xs, ys);
+    const rxRest = restricted.map(d => d.x);
+    const ryRest = restricted.map(d => d.y);
+    const rRest = pearsonR(rxRest, ryRest);
+
+    // Thorndike correction: correct on X (the predictor)
+    const sdXFull = sdFunc(xs);
+    const sdXRest = sdFunc(rxRest);
+    const rCorrected = thorndikeCorrection(rRest, sdXFull, sdXRest);
+
+    // Variance explained
+    const r2Full = rFull * rFull;
+    const r2Rest = rRest * rRest;
+    const r2Loss = r2Rest - r2Full;
+
+    // Power
+    const powFull = powerCorr(p.rho, p.n, 0.05);
+    // For restricted power, use the theoretical attenuated rho and the restricted n
+    // Theoretical attenuated rho based on variance ratio
+    const powRest = powerCorr(Math.abs(rRest), nRest, 0.05);
+
+    // Update DOM
+    document.getElementById('stat-r-full').textContent = 'r = ' + rFull.toFixed(3);
+    document.getElementById('stat-r-rest').textContent = 'r = ' + rRest.toFixed(3);
+    document.getElementById('stat-r-corr').textContent = 'r = ' + rCorrected.toFixed(3);
+    document.getElementById('stat-r2-loss').textContent = (r2Loss >= 0 ? '+' : '') + (r2Loss * 100).toFixed(1) + '%';
+
+    const pc = Math.max(0, Math.min(100, powFull * 100));
+    const pr = Math.max(0, Math.min(100, powRest * 100));
+    document.getElementById('bar-full').style.width = pc + '%';
+    document.getElementById('bar-rest').style.width = pr + '%';
+    document.getElementById('power-full-label').textContent = 'Full range: ' + Math.round(pc) + '%';
+    document.getElementById('power-rest-label').textContent = 'Restricted: ' + Math.round(pr) + '%';
+    const loss = Math.round(pr - pc);
+    document.getElementById('power-loss-label').textContent = (loss >= 0 ? '+' : '') + loss + ' percentage points';
+
+    drawScatter(ctxFull, cvFull, data, selVar, cutLo, cutHi, false);
+    drawScatter(ctxRest, cvRest, restricted, null, null, null, true);
+  }
+
+  function drawScatter(ctx, cv, pts, selVar, cutLo, cutHi, isRestricted) {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = cv.getBoundingClientRect();
+    cv.width = rect.width * dpr;
+    cv.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const w = rect.width, h = rect.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = 40;
+    const pw = w - 2 * pad, ph = h - 2 * pad;
+
+    // Determine axis range
+    let allXs, allYs;
+    if (isRestricted) {
+      // Use full data range for consistency
+      allXs = data.map(d => d.x);
+      allYs = data.map(d => d.y);
+    } else {
+      allXs = pts.map(d => d.x);
+      allYs = pts.map(d => d.y);
+    }
+    const allVals = [...allXs, ...allYs];
+    const rangeVal = Math.max(Math.abs(Math.min(...allVals)), Math.abs(Math.max(...allVals)), 2.5);
+    const r = rangeVal * 1.15;
+
+    function tx(v) { return pad + (v + r) / (2 * r) * pw; }
+    function ty(v) { return pad + ph - (v + r) / (2 * r) * ph; }
+
+    // Axes
+    ctx.strokeStyle = '#2a2d3a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(tx(-r), ty(0)); ctx.lineTo(tx(r), ty(0));
+    ctx.moveTo(tx(0), ty(-r)); ctx.lineTo(tx(0), ty(r));
+    ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle = '#b0b4c0';
+    ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('GRE Score (X)', w / 2, h - 6);
+    ctx.save();
+    ctx.translate(12, h / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('GPA (Y)', 0, 0);
+    ctx.restore();
+
+    // Restriction band on full panel
+    if (selVar !== null && cutLo !== null && cutHi !== null) {
+      // Determine band orientation
+      if (mode === 'x') {
+        // Vertical band
+        const xL = tx(cutLo), xR = tx(cutHi);
+        ctx.fillStyle = 'rgba(249, 115, 22, 0.08)';
+        ctx.fillRect(xL, pad, xR - xL, ph);
+        // Band borders
+        ctx.strokeStyle = 'rgba(249, 115, 22, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(xL, pad); ctx.lineTo(xL, pad + ph);
+        ctx.moveTo(xR, pad); ctx.lineTo(xR, pad + ph);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      } else if (mode === 'y') {
+        // Horizontal band
+        const yB = ty(cutLo), yT = ty(cutHi);
+        ctx.fillStyle = 'rgba(249, 115, 22, 0.08)';
+        ctx.fillRect(pad, yT, pw, yB - yT);
+        ctx.strokeStyle = 'rgba(249, 115, 22, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(pad, yB); ctx.lineTo(pad + pw, yB);
+        ctx.moveTo(pad, yT); ctx.lineTo(pad + pw, yT);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      } else {
+        // Z mode: highlight selected points, no band (Z not on axis)
+        // We just color points differently below
+      }
+    }
+
+    // Points
+    for (let i = 0; i < pts.length; i++) {
+      const d = pts[i];
+      if (selVar !== null) {
+        const sv = selVar[i];
+        const inside = sv >= cutLo && sv <= cutHi;
+        ctx.fillStyle = inside ? 'rgba(45, 212, 191, 0.55)' : 'rgba(107, 112, 132, 0.25)';
+      } else {
+        ctx.fillStyle = isRestricted ? 'rgba(249, 115, 22, 0.55)' : 'rgba(45, 212, 191, 0.45)';
+      }
+      ctx.beginPath();
+      ctx.arc(tx(d.x), ty(d.y), 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Regression line
+    const pxs = pts.map(d => d.x), pys = pts.map(d => d.y);
+    if (pxs.length >= 3) {
+      const mx = mean(pxs), my = mean(pys), sx = sdFunc(pxs), sy = sdFunc(pys);
+      const rr = pearsonR(pxs, pys);
+      if (sx > 1e-10) {
+        const slope = rr * sy / sx;
+        const intercept = my - slope * mx;
+        ctx.strokeStyle = isRestricted ? 'rgba(249, 115, 22, 0.8)' : 'rgba(45, 212, 191, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(tx(-r), ty(intercept + slope * (-r)));
+        ctx.lineTo(tx(r), ty(intercept + slope * r));
+        ctx.stroke();
+      }
+    }
+
+    // On restricted panel, also show the full-range regression line (dashed teal) for comparison
+    if (isRestricted && data.length >= 3) {
+      const fxs = data.map(d => d.x), fys = data.map(d => d.y);
+      const fmx = mean(fxs), fmy = mean(fys), fsx = sdFunc(fxs), fsy = sdFunc(fys);
+      const fr = pearsonR(fxs, fys);
+      if (fsx > 1e-10) {
+        const slope = fr * fsy / fsx;
+        const intercept = fmy - slope * fmx;
+        ctx.strokeStyle = 'rgba(45, 212, 191, 0.35)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(tx(-r), ty(intercept + slope * (-r)));
+        ctx.lineTo(tx(r), ty(intercept + slope * r));
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+  }
+
+  // === Events ===
+  slRho.addEventListener('input', update);
+  slN.addEventListener('input', resample);
+  slLo.addEventListener('input', update);
+  slHi.addEventListener('input', update);
+  slRhoXZ.addEventListener('input', function() {
+    ensureData();
+    resample();
+  });
+
+  document.getElementById('btn-resample').addEventListener('click', resample);
+
+  document.querySelectorAll('.scenario-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      mode = btn.dataset.mode;
+      document.getElementById('z-controls').className = mode === 'z' ? 'visible' : '';
+      resample();
+    });
+  });
+
+  window.addEventListener('resize', update);
+  resample();
+})();
+</script>

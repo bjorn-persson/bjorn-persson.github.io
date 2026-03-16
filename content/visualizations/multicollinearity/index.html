@@ -238,14 +238,14 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       sCtx.fill();
     }
 
-    const rColor = r > 0.9 ? '#ef4444' : r > 0.7 ? '#f59e0b' : '#6b7084';
+    const rColor = r > 0.9 ? '#ef4444' : r > 0.7 ? '#f59e0b' : '#b0b4c0';
     sCtx.font = 'bold 16px IBM Plex Mono, monospace';
     sCtx.fillStyle = rColor;
     sCtx.textAlign = 'center';
     sCtx.fillText(`r(X₁,X₂) = ${r.toFixed(3)}`, W/2, PAD - 8);
 
     sCtx.font = '14px IBM Plex Mono, monospace';
-    sCtx.fillStyle = '#6b7084';
+    sCtx.fillStyle = '#b0b4c0';
     sCtx.textAlign = 'center';
     sCtx.fillText('X₁', W/2, PAD + ph + 24);
     sCtx.save();
@@ -345,7 +345,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       pCtx.fill();
     }
 
-    pCtx.fillStyle = '#6b7084';
+    pCtx.fillStyle = '#b0b4c0';
     pCtx.font = '14px IBM Plex Mono, monospace';
     pCtx.textAlign = 'center';
     pCtx.fillText('X₁', PAD_L + pw/2, PAD_T + ph + 24);
@@ -355,7 +355,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     pCtx.fillText('Y', 0, 0);
     pCtx.restore();
 
-    const vifColor = vif > 10 ? '#ef4444' : vif > 5 ? '#c2640a' : '#6b7084';
+    const vifColor = vif > 10 ? '#ef4444' : vif > 5 ? '#c2640a' : '#b0b4c0';
     pCtx.font = 'bold 14px IBM Plex Mono, monospace';
     pCtx.fillStyle = vifColor;
     pCtx.textAlign = 'center';

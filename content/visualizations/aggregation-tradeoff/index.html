@@ -44,7 +44,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     justify-content: space-between;
     align-items: baseline;
     font-family: var(--mono);
-    font-size: 0.82em;
+    font-size: 1.1em;
     color: var(--text);
     margin-bottom: 6px;
   }
@@ -52,7 +52,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
   .control-group label .val {
     color: var(--teal);
     font-weight: 600;
-    font-size: 0.88em;
+    font-size: 1.1em;
   }
 
   /* Metric displays */
@@ -139,6 +139,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     flex-shrink: 0;
     width: 100%;
     margin-bottom: -2px;
+    font-size: 0.95em;
   }
   .chart-controls input[type="range"] {
     flex: 1;
@@ -147,6 +148,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
   .chart-controls .slider-val {
     min-width: 30px;
     text-align: right;
+    font-size: 0.95em;
   }
 
   /* Try-it boxes */
@@ -347,7 +349,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     <div class="eq-label" style="font-size: 0.8em;">Scale validity as a function of items (k), average item validity ($\bar{r}_{iy}$), and average interitem correlation ($\bar{r}_i$)</div>
   </div>
 
-  <p>The key insight: high interitem correlations <em>help</em> reliability but <em>limit</em> the validity gain from aggregation. Items from the same narrow domain (high r̄<sub>i</sub>) are partly redundant — averaging them recovers less new criterion-relevant information per item added.</p>
+  <p>The key insight: high interitem correlations <em>help</em> reliability but <em>limit</em> the validity gain from aggregation. Items from the same narrow domain (high $\bar{r}_i$) are partly redundant — averaging them recovers less new criterion-relevant information per item added.</p>
 
   <p>Drag the sliders to see this tradeoff in action.</p>
 
@@ -356,17 +358,17 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     <div class="chart-wrapper">
       <div class="chart-controls">
         <div class="slider-row">
-          <span class="slider-label">Items (k)</span>
+          <span class="slider-label">Items (\(k\))</span>
           <input type="range" id="sl_k1" min="2" max="100" value="10" step="1">
           <span class="slider-val" id="v_k1">10</span>
         </div>
         <div class="slider-row">
-          <span class="slider-label">Item validity (r̄<sub>iy</sub>)</span>
+          <span class="slider-label">Item validity (\(\bar{r}_{iy}\))</span>
           <input type="range" id="sl_riy1" min="0.01" max="0.50" value="0.20" step="0.01" class="orange-slider">
           <span class="slider-val" id="v_riy1">.20</span>
         </div>
         <div class="slider-row">
-          <span class="slider-label">Interitem r̄<sub>i</sub></span>
+          <span class="slider-label">Interitem \(\bar{r}_i\)</span>
           <input type="range" id="sl_ri1" min="0.01" max="0.80" value="0.30" step="0.01">
           <span class="slider-val" id="v_ri1">.30</span>
         </div>
@@ -375,7 +377,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     </div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Reliability ($\alpha$)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Validity (rᵧₓ)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Validity ($r_{yx}$)</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim);opacity:0.5"></div> Validity ceiling</div>
     </div>
   </div>
@@ -386,7 +388,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
       <div class="metric-value" id="m_alpha">—</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">Scale Validity (r<sub>yx</sub>)</div>
+      <div class="metric-label">Scale Validity ($r_{yx}$)</div>
       <div class="metric-value orange" id="m_ryx">—</div>
     </div>
     <div class="metric-card">
@@ -396,12 +398,12 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     <div class="metric-card">
       <div class="metric-label">Validity Ceiling</div>
       <div class="metric-value" id="m_ceil" style="color:var(--text-dim)">—</div>
-      <div class="metric-sub">r̄<sub>iy</sub> / √r̄<sub>i</sub></div>
+      <div class="metric-sub">$\bar{r}_{iy} / \sqrt{\bar{r}_i}$</div>
     </div>
   </div>
 
   <div class="try-it">
-    <strong>Try it:</strong> Set r̄<sub>i</sub> high (0.60+) and watch validity plateau quickly even as reliability climbs toward 1.00. Then lower r̄<sub>i</sub> to 0.10 — now validity keeps climbing with more items. This is why combining items from <em>different</em> domains (low r̄<sub>i</sub>) is so powerful for prediction.
+    <strong>Try it:</strong> Set $\bar{r}_i$ high (0.60+) and watch validity plateau quickly even as reliability climbs toward 1.00. Then lower $\bar{r}_i$ to 0.10 — now validity keeps climbing with more items. This is why combining items from <em>different</em> domains (low $\bar{r}_i$) is so powerful for prediction.
   </div>
 </div>
 
@@ -412,7 +414,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 
   <p>Combining items from two distinct domains into a single composite can predict a criterion far better than either subscale alone — even with the same total number of items. Why? Because items from different domains are weakly correlated with each other, so the combined scale has a <em>lower average interitem correlation</em>, which pushes the validity ceiling higher.</p>
 
-  <p>Below, two domains are simulated side by side. Within each domain, items are correlated at r̄<sub>within</sub>. Across domains, items correlate at r̄<sub>across</sub>. Watch what happens to validity when the two domains are combined.</p>
+  <p>Below, two domains are simulated side by side. Within each domain, items are correlated at $\bar{r}_\text{within}$. Across domains, items correlate at $\bar{r}_\text{across}$. Watch what happens to validity when the two domains are combined.</p>
 
   <div class="chart-container">
     <div class="chart-title">Validity: Single domains vs Combined</div>
@@ -424,22 +426,22 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
           <span class="slider-val" id="v_kd">15</span>
         </div>
         <div class="slider-row">
-          <span class="slider-label">Validity A (r̄<sub>iy</sub>)</span>
+          <span class="slider-label">Validity A (\(\bar{r}_{iy}\))</span>
           <input type="range" id="sl_riyA" min="0.05" max="0.50" value="0.25" step="0.01" class="orange-slider">
           <span class="slider-val" id="v_riyA">.25</span>
         </div>
         <div class="slider-row">
-          <span class="slider-label">Validity B (r̄<sub>iy</sub>)</span>
+          <span class="slider-label">Validity B (\(\bar{r}_{iy}\))</span>
           <input type="range" id="sl_riyB" min="0.05" max="0.50" value="0.20" step="0.01" class="orange-slider">
           <span class="slider-val" id="v_riyB">.20</span>
         </div>
         <div class="slider-row" style="grid-column: 1">
-          <span class="slider-label">Within r̄<sub>i</sub> <button class="info-btn" onclick="showInfoModal('riW')">?</button></span>
+          <span class="slider-label">Within \(\bar{r}_i\) <button class="info-btn" onclick="showInfoModal('riW')">?</button></span>
           <input type="range" id="sl_riW" min="0.05" max="0.70" value="0.35" step="0.01">
           <span class="slider-val" id="v_riW">.35</span>
         </div>
         <div class="slider-row" style="grid-column: 2">
-          <span class="slider-label">Across r̄<sub>i</sub> <button class="info-btn" onclick="showInfoModal('riA')">?</button></span>
+          <span class="slider-label">Across \(\bar{r}_i\) <button class="info-btn" onclick="showInfoModal('riA')">?</button></span>
           <input type="range" id="sl_riA" min="-0.30" max="0.50" value="0.05" step="0.01">
           <span class="slider-val" id="v_riA">.05</span>
         </div>
@@ -469,7 +471,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
   </div>
 
   <div class="try-it">
-    <strong>Try it:</strong> Set the across-domain correlation to 0 or negative. The combined validity jumps above either domain alone. Now increase across-domain r̄<sub>i</sub> toward the within-domain value — the advantage of combining shrinks because the domains are no longer adding unique information.
+    <strong>Try it:</strong> Set the across-domain correlation to 0 or negative. The combined validity jumps above either domain alone. Now increase across-domain $\bar{r}_i$ toward the within-domain value — the advantage of combining shrinks because the domains are no longer adding unique information.
   </div>
 </div>
 
@@ -489,7 +491,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     <div class="chart-wrapper">
       <div class="chart-controls">
         <div class="slider-row">
-          <span class="slider-label">Validity (r<sub>yx</sub>)</span>
+          <span class="slider-label">Validity (\(r_{yx}\))</span>
           <input type="range" id="sl_ryx3" min="0.01" max="0.95" value="0.40" step="0.01" class="orange-slider">
           <span class="slider-val" id="v_ryx3">.40</span>
         </div>
@@ -617,7 +619,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
       </tr>
       <tr>
         <td>Criterion validity</td>
-        <td style="color:var(--orange)">Bounded by r̄<sub>iy</sub>/√r̄<sub>i</sub></td>
+        <td style="color:var(--orange)">Bounded by $\bar{r}_{iy}/\sqrt{\bar{r}_i}$</td>
         <td style="color:var(--green)">Can approach ceiling</td>
       </tr>
       <tr>
@@ -642,7 +644,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     <strong>The take-home message:</strong> Scale scores are <em>construct-validity</em> tools. They measure what they're designed to measure, and they do it reliably. But for <em>criterion prediction</em> — especially when item-level signal varies — they impose a constraint (equal weighting) that costs predictive power. Penalized regression relaxes that constraint, gaining prediction at the expense of theoretical coherence.
   </div>
 
-  <div class="note caveat">
+  <div class="note warn">
     Recognizing this isn't a criticism of either approach. It's a recognition that measurement and prediction are different psychometric goals, and there is no free lunch. The validity gains shown in Section 4 represent a theoretical ceiling; realizing those gains in practice requires enough data, proper regularization, and honest out-of-sample evaluation.
   </div>
 </div>
@@ -747,7 +749,7 @@ const COLORS = {
   yellow: '#facc15',
   dim: 'rgba(201,205,216,0.3)',
   dimmer: 'rgba(201,205,216,0.15)',
-  text: '#6b7084',
+  text: '#b0b4c0',
   bg: '#0f1117',
   green: '#4ade80',
   red: '#ef4444'
@@ -763,7 +765,7 @@ function drawAxes(ctx, w, h, pad, opts = {}) {
   ctx.stroke();
 
   ctx.fillStyle = COLORS.text;
-  ctx.font = '11px IBM Plex Mono';
+  ctx.font = '13px IBM Plex Mono';
   ctx.textAlign = 'center';
 
   if (opts.xTicks) {
@@ -1218,7 +1220,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
       ctx.lineTo(w - pad.right, y);
       ctx.stroke();
       ctx.fillStyle = COLORS.text;
-      ctx.font = '10px IBM Plex Mono';
+      ctx.font = '12px IBM Plex Mono';
       ctx.textAlign = 'right';
       ctx.fillText(v.toFixed(2), pad.left - 6, y + 3);
     }
@@ -1239,10 +1241,10 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
     // Y-axis label
     ctx.save();
     ctx.textAlign = 'center';
-    ctx.translate(12, pad.top + plotH / 2);
+    ctx.translate(6, pad.top + plotH / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillStyle = COLORS.text;
-    ctx.font = '11px IBM Plex Mono';
+    ctx.font = '13px IBM Plex Mono';
     ctx.fillText('Weight / Validity', 0, 0);
     ctx.restore();
 
@@ -1253,7 +1255,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
 
       // Labels
       ctx.fillStyle = COLORS.text;
-      ctx.font = '11px IBM Plex Mono';
+      ctx.font = '13px IBM Plex Mono';
       ctx.textAlign = 'center';
       ctx.fillText('Scale A', pad.left + (kPerScale * groupW) / 2, h - pad.bottom + 40);
       ctx.fillText('Scale B', pad.left + kPerScale * groupW + (kPerScale * groupW) / 2, h - pad.bottom + 40);
@@ -1288,7 +1290,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
 
       // Item number
       ctx.fillStyle = COLORS.text;
-      ctx.font = '9px IBM Plex Mono';
+      ctx.font = '11px IBM Plex Mono';
       ctx.textAlign = 'center';
       ctx.fillText((i + 1).toString(), x + barW / 2, h - pad.bottom + 14);
     });
@@ -1352,14 +1354,14 @@ const infoContent = {
     title: 'Average item validity — Domain B (r̄ᵢᵧ)',
     body: `
       <p>The same as for Domain A, but for the items in Domain B. Domain B may represent a conceptually distinct construct — for example, a different personality trait, a different facet of wellbeing, or items worded in the opposite direction.</p>
-      <p>Domains A and B can have different average validities. If Domain B items are less predictive of the criterion, its r̄ᵢᵧ should be set lower. When the two domains are combined, the resulting composite uses the weighted average of both validities.</p>
+      <p>Domains A and B can have different average validities. If Domain B items are less predictive of the criterion, its $\bar{r}_{iy}$ should be set lower. When the two domains are combined, the resulting composite uses the weighted average of both validities.</p>
     `
   },
   riW: {
     title: 'Within-domain interitem correlation (r̄ᵢ, within)',
     body: `
       <p>The average correlation among items <em>within</em> the same domain. This reflects how homogeneous a domain is — how much all its items tap the same underlying dimension.</p>
-      <p>A high within-domain r̄ᵢ means items are redundant with each other. Adding more items improves reliability (Spearman-Brown), but validity gains plateau quickly because each new item adds little new criterion-relevant information beyond what the first few items already captured.</p>
+      <p>A high within-domain $\bar{r}_i$ means items are redundant with each other. Adding more items improves reliability (Spearman-Brown), but validity gains plateau quickly because each new item adds little new criterion-relevant information beyond what the first few items already captured.</p>
       <div class="modal-formula">Validity ceiling = $\frac{\bar{r}_{iy}}{\sqrt{\bar{r}_i}}$</div>
       <p>Typical values for well-constructed unidimensional scales range from 0.20 to 0.50. The slider minimum is 0.05 (near-unrelated items would not form a meaningful scale) and the maximum is 0.70 (very narrow, highly redundant content).</p>
     `
@@ -1376,7 +1378,7 @@ const infoContent = {
     title: 'Across-domain interitem correlation (r̄ᵢ, across)',
     body: `
       <p>The average correlation between items in Domain A and items in Domain B. This reflects how related the two domains are to each other.</p>
-      <p>When combining the two domains into a single composite, the effective average interitem correlation is a weighted mix of within-domain and across-domain correlations. A low (or negative) across-domain r̄ᵢ pulls the combined average down — which raises the validity ceiling of the combined scale.</p>
+      <p>When combining the two domains into a single composite, the effective average interitem correlation is a weighted mix of within-domain and across-domain correlations. A low (or negative) across-domain $\bar{r}_i$ pulls the combined average down — which raises the validity ceiling of the combined scale.</p>
       <p>This is the key mechanism behind the cross-domain advantage: if two domains each predict a criterion but are weakly correlated with each other, combining them yields a composite whose effective interitem correlation is lower than either domain alone, allowing validity to climb higher.</p>
       <p>The slider allows negative values (down to −0.30) because some pairs of domains genuinely anti-correlate — for example, items measuring introversion vs. extraversion, or approach vs. avoidance motivation. The maximum of 0.50 keeps the across-domain correlation clearly below the within-domain range, preserving a meaningful distinction between the two domains.</p>
     `
@@ -1386,7 +1388,14 @@ const infoContent = {
 function showInfoModal(key) {
   const info = infoContent[key];
   document.getElementById('infoModalTitle').textContent = info.title;
-  document.getElementById('infoModalBody').innerHTML = info.body;
+  const bodyEl = document.getElementById('infoModalBody');
+  bodyEl.innerHTML = info.body;
+  if (typeof renderMathInElement !== 'undefined') {
+    renderMathInElement(bodyEl, { delimiters: [
+      { left: '$$', right: '$$', display: true },
+      { left: '$', right: '$', display: false }
+    ]});
+  }
   document.getElementById('infoModalOverlay').classList.add('visible');
 }
 

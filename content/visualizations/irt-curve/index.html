@@ -32,7 +32,7 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
     display: flex;
     justify-content: space-between;
     font-size: 0.82em;
-    color: var(--text-dim);
+    color: #b0b4c0;
   }
   .irt-value-display {
     font-weight: 600;
@@ -45,6 +45,11 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
   <div class="hero">
     <h1>IRT Curve (3PL Model)</h1>
     <div class="subtitle">Adjust the parameters below to see how they influence the probability of endorsing an item across different levels of a latent trait (&theta;).</div>
+  </div>
+
+  <div class="section">
+    <p>In Classical Test Theory, every item is treated the same — a correct answer is worth one point regardless of who answered or how hard the question was. Item Response Theory (IRT) replaces this with a probabilistic model: each item has its own characteristic curve that describes the probability of a correct (or endorsed) response as a function of an underlying latent trait, &theta;.</p>
+    <p>The three-parameter logistic (3PL) model is the most general of the standard unidimensional IRT models. It describes each item with three parameters: <em>discrimination</em> (a) controls the steepness of the curve — how sharply the item distinguishes between respondents near the difficulty threshold; <em>difficulty</em> (b) locates the curve along the trait axis — higher values mean more of the trait is needed for a correct response; and <em>pseudo-guessing</em> (c) sets a lower asymptote, acknowledging that even very low-ability respondents may endorse the item by chance. Setting c&nbsp;=&nbsp;0 recovers the 2PL model, and further fixing a to be equal across items gives the Rasch (1PL) model.</p>
   </div>
 
   <div class="section">
@@ -129,14 +134,14 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
                         display: true,
                         text: 'Latent Trait Level (θ)',
                         font: { size: 15, family: 'IBM Plex Mono, monospace' },
-                        color: '#6b7084'
+                        color: '#b0b4c0'
                     },
                     min: -4,
                     max: 4,
                     ticks: {
                         stepSize: 1,
                         font: { size: 14, family: 'IBM Plex Mono, monospace' },
-                        color: '#6b7084'
+                        color: '#b0b4c0'
                     },
                     grid: { color: '#1e2030' },
                     border: { color: '#2a2d3a' }
@@ -146,14 +151,14 @@ summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c
                         display: true,
                         text: 'Probability P(θ)',
                         font: { size: 15, family: 'IBM Plex Mono, monospace' },
-                        color: '#6b7084'
+                        color: '#b0b4c0'
                     },
                     min: 0,
                     max: 1,
                     ticks: {
                         stepSize: 0.2,
                         font: { size: 14, family: 'IBM Plex Mono, monospace' },
-                        color: '#6b7084'
+                        color: '#b0b4c0'
                     },
                     grid: { color: '#1e2030' },
                     border: { color: '#2a2d3a' }

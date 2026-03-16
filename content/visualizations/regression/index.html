@@ -475,7 +475,7 @@ function render() {
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
   ctx.font = '14px IBM Plex Mono, monospace';
-  ctx.fillStyle = '#6b7084';
+  ctx.fillStyle = '#b0b4c0';
   ctx.textAlign = 'center';
   for (let t = Math.ceil(xmin / xStep) * xStep; t <= xmax; t += xStep) {
     ctx.fillText(fmtTick(t, xStep), toSx(t), PAD_T + ph + 18);
@@ -485,7 +485,7 @@ function render() {
     ctx.fillText(fmtTick(t, yStep), PAD_L - 6, toSy(t) + 4);
   }
 
-  ctx.fillStyle = '#6b7084';
+  ctx.fillStyle = '#b0b4c0';
   ctx.font = '15px IBM Plex Mono, monospace';
   ctx.textAlign = 'center';
   ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 38);
@@ -556,7 +556,7 @@ function render() {
   ctx.setLineDash([7, 5]);
   ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx + 22, ly); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = '#6b7084';
+  ctx.fillStyle = '#b0b4c0';
   ctx.textAlign = 'left';
   ctx.fillText('Population', lx + 28, ly + 4);
 
@@ -564,19 +564,19 @@ function render() {
     ctx.strokeStyle = '#c2640a';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(lx, ly + 16); ctx.lineTo(lx + 22, ly + 16); ctx.stroke();
-    ctx.fillStyle = '#6b7084';
+    ctx.fillStyle = '#b0b4c0';
     ctx.fillText('Fitted', lx + 28, ly + 20);
   }
 
   if (isLogistic && data.length > 0) {
     ctx.beginPath(); ctx.arc(lx + 6, ly + 32, 3, 0, Math.PI*2);
     ctx.fillStyle = 'rgba(109, 40, 217, 0.65)'; ctx.fill();
-    ctx.fillStyle = '#6b7084';
+    ctx.fillStyle = '#b0b4c0';
     ctx.fillText('Y = 1', lx + 28, ly + 36);
 
     ctx.beginPath(); ctx.arc(lx + 6, ly + 48, 3, 0, Math.PI*2);
     ctx.fillStyle = 'rgba(239, 68, 68, 0.65)'; ctx.fill();
-    ctx.fillStyle = '#6b7084';
+    ctx.fillStyle = '#b0b4c0';
     ctx.fillText('Y = 0', lx + 28, ly + 52);
   }
 }

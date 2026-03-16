@@ -580,7 +580,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
     ctx.stroke();
 
     // Axis labels
-    ctx.fillStyle = '#6b7084';
+    ctx.fillStyle = '#b0b4c0';
     ctx.font = '11px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
     ctx.fillText('Stress (X)', w/2, h - 6);
@@ -658,7 +658,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
         ctx.moveTo(tx(cutX), ty(mHi)); ctx.lineTo(tx(r), ty(mHi));
         ctx.stroke();
         // Mean markers
-        for (const [mx2, my2, col] of [[mean(lo.map(d=>d[0])), mLo, '#6b7084'], [mean(hi.map(d=>d[0])), mHi, '#2dd4bf']]) {
+        for (const [mx2, my2, col] of [[mean(lo.map(d=>d[0])), mLo, '#b0b4c0'], [mean(hi.map(d=>d[0])), mHi, '#2dd4bf']]) {
           ctx.fillStyle = col;
           ctx.beginPath();
           ctx.arc(tx(mx2), ty(my2), 6, 0, Math.PI*2);

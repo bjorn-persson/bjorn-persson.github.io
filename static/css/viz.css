@@ -10,7 +10,7 @@
   --bg-elevated: #1e2030;
   --text: #c9cdd8;
   --text-bright: #e8ecf4;
-  --text-dim: #6b7084;
+  --text-dim: #b0b4c0;
   --teal: #2dd4bf;
   --teal-dim: rgba(45,212,191,0.15);
   --orange: #f97316;
@@ -364,14 +364,14 @@ select:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: 1.5px solid var(--text-dim);
   background: transparent;
   color: var(--text-dim);
   font-family: var(--serif);
-  font-size: 0.55em;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   margin-left: 8px;

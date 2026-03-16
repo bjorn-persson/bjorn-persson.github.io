@@ -206,7 +206,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     ctx.fillText(label, x, y + 3);
     if (sub) {
       ctx.font = '15px IBM Plex Mono, monospace';
-      ctx.fillStyle = '#6b7084';
+      ctx.fillStyle = '#b0b4c0';
       ctx.fillText(sub, x, y + 18);
     }
   }
@@ -309,7 +309,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
 
     const wLines = [
       { w: -1, color: '#a78bfa', label: 'W=−1σ', dash: [4,4] },
-      { w:  0, color: '#6b7084', label: 'W=0',   dash: [4,4] },
+      { w:  0, color: '#b0b4c0', label: 'W=0',   dash: [4,4] },
       { w:  1, color: '#f59e0b', label: 'W=+1σ', dash: [4,4] },
     ];
     for (const wl of wLines) {
@@ -348,7 +348,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
       rCtx.fillText('slope ≈ 0', toSx(0.5), toSy(0.5) - 10);
     }
 
-    rCtx.fillStyle = '#6b7084';
+    rCtx.fillStyle = '#b0b4c0';
     rCtx.font = '14px IBM Plex Mono, monospace';
     rCtx.textAlign = 'center';
     rCtx.fillText('X (predictor)', PAD_L + pw / 2, PAD_T + ph + 30);
@@ -359,7 +359,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     rCtx.restore();
 
     rCtx.textAlign = 'center';
-    rCtx.fillStyle = '#6b7084';
+    rCtx.fillStyle = '#b0b4c0';
     rCtx.font = '13px IBM Plex Mono, monospace';
     for (let i = 0; i <= 4; i++) {
       rCtx.fillText(['Low','','','','High'][i] || '', toSx(i/4), PAD_T + ph + 17);
@@ -368,7 +368,7 @@ summary: "Clarify the classic confusion between mediation (mechanism: X affects 
     rCtx.font = '12px IBM Plex Mono, monospace';
     const legEntries = [
       { label: 'W = −1σ', color: '#6d28d9' },
-      { label: 'W =  0',  color: '#6b7084' },
+      { label: 'W =  0',  color: '#b0b4c0' },
       { label: 'W = +1σ', color: '#c2640a' },
     ];
     const legX = PAD_L + 6;

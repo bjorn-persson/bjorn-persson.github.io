@@ -551,12 +551,12 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
-    ctx.font = '14px IBM Plex Mono, monospace'; ctx.fillStyle = '#6b7084'; ctx.textAlign = 'center';
+    ctx.font = '14px IBM Plex Mono, monospace'; ctx.fillStyle = '#b0b4c0'; ctx.textAlign = 'center';
     for (let t = 0; t <= 1.001; t += 0.2) ctx.fillText(t.toFixed(1), toSx(t, W), PAD_T + ph + 16);
     ctx.textAlign = 'right';
     for (let t = 0; t <= 1.001; t += 0.2) ctx.fillText(t.toFixed(1), PAD_L - 6, toSy(t, H) + 4);
 
-    ctx.fillStyle = '#6b7084'; ctx.font = '15px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#b0b4c0'; ctx.font = '15px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
     ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 30);
     ctx.save(); ctx.translate(13, PAD_T + ph / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Y', 0, 0); ctx.restore();
 
@@ -759,7 +759,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       }
       cardEl.classList.add('active');
       valEl.textContent = val.toFixed(4); valEl.className = 'ce-stat-value';
-      if (m.signed) valEl.style.color = val > 0.05 ? '#2dd4bf' : val < -0.05 ? '#c2640a' : '#6b7084';
+      if (m.signed) valEl.style.color = val > 0.05 ? '#2dd4bf' : val < -0.05 ? '#c2640a' : '#b0b4c0';
       else valEl.style.color = '#2dd4bf';
       let barPct;
       if (m.signed) barPct = Math.abs(val)*100;
@@ -947,18 +947,18 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     for (let y=Math.ceil(yMin/0.1)*0.1;y<=yMax+0.001;y+=0.1) {
       const py=yPx(y);
       ctx.beginPath(); ctx.moveTo(pad.left,py); ctx.lineTo(W-pad.right,py); ctx.stroke();
-      ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='right'; ctx.textBaseline='middle';
+      ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='right'; ctx.textBaseline='middle';
       ctx.fillText(y.toFixed(1),pad.left-8,py);
     }
     for (const n of [50,100,150,200,250,300,350,400,450,500]) {
       if (n<N_MIN||n>N_MAX) continue;
       const px=xPx(n);
       ctx.beginPath(); ctx.moveTo(px,pad.top); ctx.lineTo(px,H-pad.bottom); ctx.stroke();
-      ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
       ctx.fillText(n,px,H-pad.bottom+10);
     }
 
-    ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
     ctx.fillText('Sample size (n)',pad.left+pw/2,H-16);
     ctx.save(); ctx.translate(12,pad.top+ph/2); ctx.rotate(-Math.PI/2); ctx.fillText('Correlation (r)',0,0); ctx.restore();
 
@@ -1003,7 +1003,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     for (const n of [50,100,150,200,250,300,350,400,450,500]) {
       const px=xPx(n);
       ctx.beginPath(); ctx.moveTo(px,pad.top); ctx.lineTo(px,H-pad.bottom); ctx.stroke();
-      ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
       ctx.fillText(n,px,H-pad.bottom+10);
     }
 
@@ -1021,7 +1021,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     ctx.fillStyle='#f97316'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='left';
     ctx.fillText(`80th pctl: n=${p80}`,p80x+6,pad.top+12);
 
-    ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
     ctx.fillText('Point of stability (n)',pad.left+pw/2,H-16);
   }
 

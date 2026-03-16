@@ -1097,17 +1097,19 @@ function renderHeatmap(containerId, matrix, opts={}) {
   let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
 
   // Column labels
+  const lblSize = opts.labelSize || 14;
+  const lblColor = opts.labelColor || '#c9cdd8';
   for (let j=0; j<n; j++) {
     const x = labelSpace + j * cellSize + cellSize/2;
     svg += `<text x="${x}" y="${labelSpace-6}" text-anchor="middle"
-      font-family="var(--mono)" font-size="11" fill="#6b7084">${ITEM_LABELS[j]}</text>`;
+      font-family="var(--mono)" font-size="${lblSize}" fill="${lblColor}">${ITEM_LABELS[j]}</text>`;
   }
 
   // Row labels + cells
   for (let i=0; i<n; i++) {
     const y = labelSpace + i * cellSize;
     svg += `<text x="${labelSpace-6}" y="${y + cellSize/2 + 4}" text-anchor="end"
-      font-family="var(--mono)" font-size="11" fill="#6b7084">${ITEM_LABELS[i]}</text>`;
+      font-family="var(--mono)" font-size="${lblSize}" fill="${lblColor}">${ITEM_LABELS[i]}</text>`;
 
     for (let j=0; j<n; j++) {
       const x = labelSpace + j * cellSize;
@@ -1140,13 +1142,13 @@ function renderPathDiagram(containerId) {
     [350, 430, 510]   // F2 items
   ];
 
-  let svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
+  let svg = `<svg viewBox="0 0 ${w} ${h}" width="100%" xmlns="http://www.w3.org/2000/svg">`;
 
   // Defs for arrowheads
   svg += `<defs>
     <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5"
       markerWidth="8" markerHeight="6" orient="auto-start-reverse">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#6b7084"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#b0b4c0"/>
     </marker>
   </defs>`;
 
@@ -1154,11 +1156,11 @@ function renderPathDiagram(containerId) {
   const midX = (fX[0] + fX[1]) / 2;
   const arcY = fY - 40;
   svg += `<path d="M ${fX[0]+20} ${fY-10} Q ${midX} ${arcY} ${fX[1]-20} ${fY-10}"
-    fill="none" stroke="${params.phi >= 0 ? '#f97316' : '#2dd4bf'}" stroke-width="2"
+    fill="none" stroke="${TRUE_PHI >= 0 ? '#f97316' : '#2dd4bf'}" stroke-width="2"
     marker-end="url(#arrow)" marker-start="url(#arrow)"/>`;
   svg += `<text x="${midX}" y="${arcY + 2}" text-anchor="middle"
     font-family="var(--mono)" font-size="12" font-weight="600"
-    fill="${params.phi >= 0 ? '#f97316' : '#2dd4bf'}">${params.phi.toFixed(2)}</text>`;
+    fill="${TRUE_PHI >= 0 ? '#f97316' : '#2dd4bf'}">${TRUE_PHI.toFixed(2)}</text>`;
 
   // Factors (circles)
   for (let f=0; f<2; f++) {
@@ -1180,11 +1182,11 @@ function renderPathDiagram(containerId) {
         stroke="var(--teal)" stroke-width="1.5" marker-end="url(#arrow)"/>`;
 
       // Loading label
-      const mx = (fX[f] + ix) / 2 + (k === 1 ? 14 : k === 0 ? -6 : 16);
+      const mx = (fX[f] + ix) / 2 + (k === 1 ? 2 : k === 0 ? -18 : 4);
       const my = (fY + 24 + iY - 16) / 2;
       svg += `<text x="${mx}" y="${my}" text-anchor="middle"
         font-family="var(--mono)" font-size="11" font-weight="600"
-        fill="var(--teal)">${params.lambda[idx].toFixed(2)}</text>`;
+        fill="var(--teal)">${TRUE_LAMBDA[idx].toFixed(2)}</text>`;
 
       // Item rectangle
       svg += `<rect x="${ix-20}" y="${iY-14}" width="40" height="28" rx="4"
@@ -1331,7 +1333,7 @@ function renderIdentification() {
 
   // Compute implied matrix from the SCALED parameters — should be identical to standardized
   const sigmaScaled = impliedMatrixWithVar(scaledLam, TRUE_PHI, scaledFVar);
-  renderHeatmap('heatmap-ident', sigmaScaled, {cellSize:46, fontSize:10});
+  renderHeatmap('heatmap-ident', sigmaScaled, {cellSize:52, fontSize:13, labelSize:14});
 }
 
 // =============================================================
@@ -1433,9 +1435,9 @@ function updateAll() {
   const residual = matSub(S_OBS, sigma);
 
   // Heatmaps
-  renderHeatmap('heatmap-obs-small', S_OBS, {cellSize:46, fontSize:10});
-  renderHeatmap('heatmap-implied', sigma, {cellSize:46, fontSize:10});
-  renderHeatmap('heatmap-residual', residual, {cellSize:46, fontSize:10, maxAbs:0.4, showDiag:true});
+  renderHeatmap('heatmap-obs-small', S_OBS, {cellSize:52, fontSize:13, labelSize:14});
+  renderHeatmap('heatmap-implied', sigma, {cellSize:52, fontSize:13, labelSize:14});
+  renderHeatmap('heatmap-residual', residual, {cellSize:52, fontSize:13, labelSize:14, maxAbs:0.4, showDiag:true});
 
   // Path diagram
   renderPathDiagram('path-diagram');
@@ -1906,7 +1908,7 @@ function updateMisspecDisplay() {
   const sigma = impliedMatrix(misspecFittedLambda, misspecFittedPhi);
   const residual = matSub(S_MISSPEC, sigma);
 
-  renderHeatmap('heatmap-misspec-residual', residual, {cellSize: 52, fontSize: 11, maxAbs: 0.15, showDiag: true});
+  renderHeatmap('heatmap-misspec-residual', residual, {cellSize: 52, fontSize: 13, labelSize: 14, maxAbs: 0.15, showDiag: true});
   renderMisspecFitIndices(misspecFittedLambda, misspecFittedPhi, S_MISSPEC);
 
   const miIndices = computeModificationIndices(misspecFittedLambda, misspecFittedPhi, S_MISSPEC);
@@ -2046,7 +2048,7 @@ function drawSamplingDemo() {
 
   // Render small residual heatmaps
   results.forEach((r, idx) => {
-    renderHeatmap(`sampling-heatmap-${idx}`, r.residual, {cellSize:44, fontSize:10, maxAbs:0.2, showDiag:true});
+    renderHeatmap(`sampling-heatmap-${idx}`, r.residual, {cellSize:52, fontSize:13, labelSize:14, maxAbs:0.2, showDiag:true});
   });
 
   // Summary statistics
@@ -2170,8 +2172,8 @@ function renderModelComparison() {
   const residual2F = matSub(S_OBS, sigma2F);
 
   // Render heatmaps
-  renderHeatmap('heatmap-1f-residual', residual1F, {cellSize:46, fontSize:10, maxAbs:0.2, showDiag:true});
-  renderHeatmap('heatmap-2f-residual', residual2F, {cellSize:46, fontSize:10, maxAbs:0.2, showDiag:true});
+  renderHeatmap('heatmap-1f-residual', residual1F, {cellSize:52, fontSize:13, labelSize:14, maxAbs:0.2, showDiag:true});
+  renderHeatmap('heatmap-2f-residual', residual2F, {cellSize:52, fontSize:13, labelSize:14, maxAbs:0.2, showDiag:true});
 
   // Fit indices
   const fi1F = computeFitIndicesGeneric(sigma1F, N_ITEMS, S_OBS, SAMPLE_N);
@@ -2227,7 +2229,7 @@ function renderModelComparison() {
 // =============================================================
 function init() {
   // Section 1: static observed matrix
-  renderHeatmap('heatmap-observed', S_OBS, {cellSize:58, fontSize:12});
+  renderHeatmap('heatmap-observed', S_OBS, {cellSize:52, fontSize:13, labelSize:14});
 
   // Section 2: path diagram (initial)
   renderPathDiagram('path-diagram');

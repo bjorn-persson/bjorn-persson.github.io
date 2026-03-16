@@ -19,7 +19,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   .me-canvas-wrap canvas {
     display: block;
     width: 100%;
-    aspect-ratio: 1 / 0.7;
+    aspect-ratio: 1 / 0.6;
     background: #181a24;
     border-radius: 6px;
     cursor: crosshair;
@@ -244,7 +244,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
     // tick marks and labels
-    ctx.fillStyle = '#6b7084';
+    ctx.fillStyle = '#b0b4c0';
     ctx.font = '11px IBM Plex Mono, monospace';
     const decimals = step < 0.1 ? 2 : step < 1 ? 1 : 0;
     for (let v = tickStart; v <= mx + 1e-9; v += step) {
@@ -267,7 +267,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
       ctx.beginPath();
       ctx.moveTo(sx(mn), sy(true_slope * mn));
       ctx.lineTo(sx(mx), sy(true_slope * mx));
-      ctx.strokeStyle = '#6b7084';
+      ctx.strokeStyle = '#b0b4c0';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
     }
@@ -485,7 +485,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
     // X-axis ticks
-    ctx.fillStyle = '#6b7084';
+    ctx.fillStyle = '#b0b4c0';
     ctx.font = '11px IBM Plex Mono, monospace';
     const range = hi - lo;
     const rough = range / 5;
@@ -498,7 +498,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
       ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(sx(v), PAD_T + ph); ctx.lineTo(sx(v), PAD_T + ph + 5); ctx.stroke();
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      ctx.fillStyle = '#6b7084';
+      ctx.fillStyle = '#b0b4c0';
       ctx.fillText(v.toFixed(dec), sx(v), PAD_T + ph + 8);
     }
 
@@ -507,7 +507,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     ctx.translate(14, PAD_T + ph / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#6b7084'; ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.fillStyle = '#b0b4c0'; ctx.font = '11px IBM Plex Mono, monospace';
     ctx.fillText('Count', 0, 0);
     ctx.restore();
 
@@ -756,7 +756,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     // Grid
     ctx.strokeStyle = '#1e2030'; ctx.lineWidth = 0.5;
     const yStep = 0.2;
-    ctx.fillStyle = '#6b7084'; ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.fillStyle = '#b0b4c0'; ctx.font = '11px IBM Plex Mono, monospace';
     for (let y = Math.ceil(yMin / yStep) * yStep; y <= yMax + 0.001; y += yStep) {
       const py = sy(y);
       ctx.beginPath(); ctx.moveTo(PAD.left, py); ctx.lineTo(W - PAD.right, py); ctx.stroke();
@@ -777,7 +777,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     ctx.beginPath(); ctx.moveTo(PAD.left, PAD.top); ctx.lineTo(PAD.left, H - PAD.bottom); ctx.stroke();
 
     // Axis labels
-    ctx.fillStyle = '#6b7084'; ctx.font = '11px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#b0b4c0'; ctx.font = '11px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
     ctx.fillText('Sample size (n)', PAD.left + pw / 2, H - 18);
 
     // Target line (what trajectories converge to)

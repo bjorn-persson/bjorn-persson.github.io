@@ -232,7 +232,7 @@ function draw() {
 
   // Ticks
   ctx.font = '14px IBM Plex Mono, monospace';
-  ctx.fillStyle = '#6b7084';
+  ctx.fillStyle = '#b0b4c0';
   ctx.textAlign = 'center';
   for (let t = Z_MIN; t <= Z_MAX; t++) {
     const tx = zToX(t);
@@ -249,7 +249,7 @@ function draw() {
   ctx.translate(14, PAD_T + plotH / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#6b7084';
+  ctx.fillStyle = '#b0b4c0';
   ctx.font = '14px IBM Plex Mono, monospace';
   ctx.fillText('\u03C6(z)', 0, 0);
   ctx.restore();

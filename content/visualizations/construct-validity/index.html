@@ -1,0 +1,1614 @@
+---
+title: "Construct Validity"
+description: "Interactive comparison of six frameworks for construct validity: Cronbach & Meehl's nomological network, Campbell & Fiske's MTMM matrix, Messick's unified framework, Borsboom's causal realism, Kane's argument-based approach, and network psychometrics."
+summary: "Compare six influential frameworks for construct validity and see how each asks different questions about whether a test measures what it claims to measure."
+---
+
+<style>
+  /* Framework selector */
+  .fw-select {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .fw-select .btn {
+    font-size: 0.78em;
+    padding: 8px 16px;
+  }
+  .fw-select .btn.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+  .fw-panel { display: none; }
+  .fw-panel.active { display: block; }
+
+  .fw-intro {
+    font-size: 0.92em;
+    color: var(--text);
+    margin-bottom: 24px;
+    max-width: 680px;
+    line-height: 1.65;
+  }
+  .fw-intro strong { color: var(--text-bright); }
+
+  .fw-period {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  /* Network SVG */
+  .network-svg {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    display: block;
+  }
+  .network-wrap {
+    background: var(--bg-surface);
+    border-radius: 6px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .net-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+  .net-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .net-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* Density / completeness readout (shared) */
+  .density-readout {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .density-bar-bg {
+    flex: 1;
+    min-width: 200px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .density-bar-fill {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+  .density-label {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .density-val {
+    color: var(--teal);
+    font-weight: 600;
+  }
+  .density-status {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    min-height: 1.5em;
+    line-height: 1.5;
+  }
+
+  /* Messick facets */
+  .facets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .facet-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid var(--border);
+  }
+  .facet-card:hover { background: var(--bg-elevated); }
+  .facet-card.active {
+    border-left-color: var(--teal);
+    background: var(--bg-elevated);
+  }
+  .facet-card.consequential.active { border-left-color: var(--orange); }
+  .facet-name {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .facet-card.active .facet-name { color: var(--teal); }
+  .facet-card.consequential.active .facet-name { color: var(--orange); }
+  .facet-desc {
+    font-size: 0.82em;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .facet-card.active .facet-desc { color: var(--text); }
+  .facet-example {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    margin-top: 8px;
+    font-style: italic;
+  }
+  .completeness-section {
+    margin-bottom: 16px;
+  }
+  .completeness-bar-bg {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .completeness-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s, background 0.3s;
+  }
+  .preset-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .preset-row .btn { font-size: 0.75em; padding: 6px 12px; }
+
+  /* Borsboom diagram */
+  .bb-scenarios {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .bb-scenarios .btn { font-size: 0.75em; padding: 8px 14px; }
+  .bb-scenarios .btn.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+  .bb-diagram {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 32px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .bb-nodes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+  .bb-node {
+    width: 150px;
+    height: 90px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text);
+    text-align: center;
+    background: var(--bg-elevated);
+    transition: all 0.3s;
+    line-height: 1.3;
+    flex-shrink: 0;
+  }
+  .bb-node.exists { border-color: var(--teal); color: var(--teal); }
+  .bb-node.missing { border-color: var(--red); color: var(--red); border-style: dashed; opacity: 0.5; }
+  .bb-node.neutral { border-color: var(--text-dim); }
+  .bb-arrow {
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .bb-arrow-line {
+    height: 2px;
+    width: 100%;
+    background: var(--text-dim);
+    position: relative;
+  }
+  .bb-arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -5px;
+    border: 6px solid transparent;
+    border-left-color: var(--text-dim);
+  }
+  .bb-arrow.causal .bb-arrow-line { background: var(--teal); }
+  .bb-arrow.causal .bb-arrow-line::after { border-left-color: var(--teal); }
+  .bb-arrow.broken .bb-arrow-line { background: var(--red); height: 2px; }
+  .bb-arrow.broken .bb-arrow-line::after { border-left-color: var(--red); }
+  .bb-arrow.none { opacity: 0.15; }
+  .bb-arrow-label {
+    position: absolute;
+    top: -18px;
+    font-family: var(--mono);
+    font-size: 0.68em;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .bb-verdict {
+    margin-top: 24px;
+    font-family: var(--mono);
+    font-size: 0.92em;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  .bb-verdict.valid { color: var(--teal); background: var(--teal-dim); }
+  .bb-verdict.invalid { color: var(--red); background: rgba(239,68,68,0.12); }
+  .bb-explanation {
+    font-size: 0.82em;
+    color: var(--text-dim);
+    margin-top: 16px;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    line-height: 1.6;
+  }
+  .bb-alt-cause {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px dashed var(--orange);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--orange);
+  }
+
+  /* Kane chain */
+  .kane-chain {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 20px;
+  }
+  .kane-link {
+    flex: 1;
+    min-width: 0;
+  }
+  .kane-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    border-top: 3px solid var(--teal);
+    transition: border-top-color 0.3s, opacity 0.3s;
+  }
+  .kane-box.weak { border-top-color: var(--orange); }
+  .kane-box.broken { border-top-color: var(--red); }
+  .kane-box.downstream { opacity: 0.3; }
+  .kane-inference {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .kane-desc {
+    font-size: 0.72em;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .kane-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .kane-slider-val {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--teal);
+    font-weight: 600;
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .kane-connector {
+    width: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+  .kane-overall { margin-bottom: 16px; }
+  .kane-overall-label {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  /* MTMM matrix */
+  .mtmm-controls {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .mtmm-control {
+    flex: 1;
+    min-width: 200px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text-dim);
+  }
+  .mtmm-control label { display: block; margin-bottom: 4px; }
+  .mtmm-control .mtmm-val { font-weight: 600; }
+  .mtmm-control .mtmm-val.teal { color: var(--teal); }
+  .mtmm-control .mtmm-val.orange { color: var(--orange); }
+  .mtmm-control .mtmm-val.dim { color: var(--text-dim); }
+  .mtmm-wrap {
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+  .mtmm-table {
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 0.78em;
+    margin: 0 auto;
+  }
+  .mtmm-table th {
+    padding: 6px 10px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-align: center;
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+  .mtmm-table th.method-header {
+    color: var(--text);
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+  }
+  .mtmm-table td {
+    padding: 6px 10px;
+    text-align: center;
+    color: var(--text);
+    border: 1px solid var(--border);
+    min-width: 52px;
+    transition: background 0.2s;
+  }
+  .mtmm-table td.cell-conv { background: rgba(45,212,191,0.12); color: var(--teal); font-weight: 600; }
+  .mtmm-table td.cell-mono { background: rgba(249,115,22,0.08); }
+  .mtmm-table td.cell-mono.warn { background: rgba(249,115,22,0.18); color: var(--orange); font-weight: 600; }
+  .mtmm-table td.cell-hetero { color: var(--text-dim); }
+  .mtmm-table td.cell-diag { background: var(--bg-elevated); color: var(--text-dim); }
+  .mtmm-table td.cell-empty { border: none; background: transparent; }
+  .mtmm-table th.row-label { text-align: right; border: none; padding-right: 12px; }
+  .mtmm-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  .mtmm-legend-item { display: flex; align-items: center; gap: 5px; }
+  .mtmm-legend-swatch {
+    width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border);
+  }
+  .mtmm-criteria {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .mtmm-criterion {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    line-height: 1.4;
+    flex: 1;
+    min-width: 200px;
+  }
+  .mtmm-criterion .crit-icon { margin-right: 4px; }
+  .mtmm-criterion .crit-icon.pass { color: var(--teal); }
+  .mtmm-criterion .crit-icon.fail { color: var(--red); }
+
+  /* Network psychometrics */
+  .np-toggle {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .np-toggle .btn { font-size: 0.75em; padding: 8px 14px; }
+  .np-toggle .btn.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+  .np-wrap {
+    background: var(--bg-surface);
+    border-radius: 6px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .np-svg {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    display: block;
+  }
+  .np-instructions {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+  .np-status-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .np-status-item {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+  }
+  .np-status-item .np-stat-val { color: var(--teal); font-weight: 600; }
+
+  /* Comparison section */
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .comparison-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+  }
+  .comparison-card .facet-name { margin-bottom: 8px; }
+  .comparison-who {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--teal);
+    margin-bottom: 6px;
+  }
+  .comparison-answer {
+    font-size: 0.82em;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* Contextual aside */
+  .ctx-aside {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    background: var(--bg-elevated);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    line-height: 1.55;
+    max-width: 680px;
+  }
+  .ctx-aside strong { color: var(--text); }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .fw-select { gap: 6px; }
+    .fw-select .btn { font-size: 0.72em; padding: 6px 10px; }
+    .facets-grid { grid-template-columns: 1fr; }
+    .kane-chain { flex-direction: column; }
+    .kane-connector { transform: rotate(90deg); width: auto; height: 24px; }
+    .kane-link { min-width: auto; }
+    .bb-nodes { flex-direction: column; gap: 12px; }
+    .bb-arrow { width: auto; height: 40px; transform: rotate(90deg); }
+    .bb-node { width: 160px; }
+    .comparison-grid { grid-template-columns: 1fr 1fr; }
+    .mtmm-controls { flex-direction: column; gap: 12px; }
+  }
+</style>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>Construct Validity</h1>
+    <div class="subtitle">Six frameworks for understanding whether a test measures what it claims to measure</div>
+  </div>
+
+  <div class="section">
+    <p>Construct validity is the central question in psychological measurement: does a test actually measure the theoretical construct it's intended to measure? Over 70 years, several influential frameworks have emerged &mdash; each asking this question differently. Explore each below, applied to the same running example: <strong>a depression screening questionnaire (the PHQ-9)</strong>.</p>
+
+    <div class="fw-select">
+      <button class="btn active" data-fw="cm">Cronbach &amp; Meehl</button>
+      <button class="btn" data-fw="mtmm">Campbell &amp; Fiske</button>
+      <button class="btn" data-fw="messick">Messick</button>
+      <button class="btn" data-fw="borsboom">Borsboom</button>
+      <button class="btn" data-fw="kane">Kane</button>
+      <button class="btn" data-fw="network">Network</button>
+    </div>
+  </div>
+
+  <!-- ============ CRONBACH & MEEHL ============ -->
+  <div id="fw-cm" class="fw-panel active">
+    <div class="section">
+      <div class="fw-period"><a href="https://doi.org/10.1037/h0040957" target="_blank">Cronbach &amp; Meehl (1955)</a> &middot; The Nomological Network</div>
+      <div class="fw-intro">
+        A construct derives its scientific meaning from its place in a <strong>nomological network</strong> &mdash; a system of lawful relationships connecting theoretical constructs to each other and to observable indicators. A construct with no such connections is scientifically meaningless: it cannot be tested, confirmed, or refuted.<br><br>
+        <em>Click on any connection to toggle it. Watch what happens to the construct's scientific status as you strip away its nomological embedding.</em>
+      </div>
+
+      <div class="net-legend">
+        <div class="net-legend-item"><div class="net-legend-dot" style="background:var(--teal)"></div> Target construct</div>
+        <div class="net-legend-item"><div class="net-legend-dot" style="background:var(--blue)"></div> Related construct</div>
+        <div class="net-legend-item"><div class="net-legend-dot" style="background:var(--orange)"></div> Observable indicator</div>
+        <div class="net-legend-item" style="color:var(--text-dim)">click lines to toggle</div>
+      </div>
+
+      <div class="network-wrap">
+        <svg id="net-svg" class="network-svg" viewBox="0 0 600 480"></svg>
+      </div>
+
+      <div class="density-readout">
+        <span class="density-label">Nomological embedding: <span class="density-val" id="density-val">100%</span></span>
+        <div class="density-bar-bg"><div class="density-bar-fill" id="density-bar"></div></div>
+      </div>
+      <div class="density-status" id="density-status"></div>
+
+      <div class="note">
+        <strong>Key idea:</strong> Validity is not a property of a test alone &mdash; it is a property of a construct's place in theory. Without a nomological network, there is nothing to validate against. The construct's meaning <em>is</em> its web of lawful relationships.
+      </div>
+
+      <div class="ctx-aside">
+        <strong><a href="https://doi.org/10.1037/0033-2909.93.1.179" target="_blank">Embretson (1983)</a></strong> later refined this approach by splitting the nomological network into two components: <em>construct representation</em> (the cognitive processes underlying test performance) and <em>nomothetic span</em> (external correlates). This distinguished the internal "how does the test work?" question from the external "what does it predict?" question &mdash; a distinction the original framework left implicit.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CAMPBELL & FISKE MTMM ============ -->
+  <div id="fw-mtmm" class="fw-panel">
+    <div class="section">
+      <div class="fw-period"><a href="https://doi.org/10.1037/h0046016" target="_blank">Campbell &amp; Fiske (1959)</a> &middot; Multitrait-Multimethod Matrix</div>
+      <div class="fw-intro">
+        Campbell and Fiske operationalized validation by measuring <strong>multiple traits</strong> using <strong>multiple methods</strong>. This established two core principles: <strong>convergent validity</strong> (different methods measuring the same trait should agree) and <strong>discriminant validity</strong> (measures of different traits should diverge, even when sharing a method). Method variance &mdash; artificial correlation inflated by shared measurement method &mdash; is the key threat.<br><br>
+        <em>Adjust the three parameters to see how convergent validity, trait similarity, and method effects shape the MTMM matrix. Watch what happens when method variance exceeds convergent validity.</em>
+      </div>
+
+      <div class="mtmm-controls">
+        <div class="mtmm-control">
+          <label>Convergent validity: <span class="mtmm-val teal" id="mtmm-conv-val">0.65</span></label>
+          <input type="range" id="mtmm-conv" min="0" max="90" value="65">
+        </div>
+        <div class="mtmm-control">
+          <label>Trait similarity: <span class="mtmm-val dim" id="mtmm-disc-val">0.30</span></label>
+          <input type="range" id="mtmm-disc" min="0" max="80" value="30">
+        </div>
+        <div class="mtmm-control">
+          <label>Method effect: <span class="mtmm-val orange" id="mtmm-meth-val">0.10</span></label>
+          <input type="range" id="mtmm-meth" min="0" max="45" value="10">
+        </div>
+      </div>
+
+      <div class="mtmm-legend">
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(45,212,191,0.15)"></div> Convergent (same trait, diff method)</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(249,115,22,0.12)"></div> Heterotrait-monomethod</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:transparent"></div> Heterotrait-heteromethod</div>
+      </div>
+
+      <div class="mtmm-wrap">
+        <table class="mtmm-table" id="mtmm-table"></table>
+      </div>
+
+      <div class="mtmm-criteria" id="mtmm-criteria"></div>
+
+      <div class="density-status" id="mtmm-status"></div>
+
+      <div class="note warn">
+        <strong>Key idea:</strong> High correlations between a test and a criterion are not sufficient evidence of validity. If a self-report depression scale correlates .60 with a self-report anxiety scale, is that convergent validity or method variance? Only by crossing traits with methods can you tell.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MESSICK ============ -->
+  <div id="fw-messick" class="fw-panel">
+    <div class="section">
+      <div class="fw-period"><a href="https://doi.org/10.3102/0013189X018002005" target="_blank">Messick (1989</a>; <a href="https://doi.org/10.1037/0003-066X.50.9.741" target="_blank">1995)</a> &middot; Unified Validity</div>
+      <div class="fw-intro">
+        Messick argued that validity is a <strong>single, unified concept</strong> &mdash; not divisible into separate "types" (content validity, criterion validity, construct validity). Instead, construct validity subsumes all other forms, and it is evaluated through six distinguishable but interrelated facets of evidence. Crucially, Messick insisted that the <strong>consequences</strong> of test use are part of the validity argument &mdash; a position that remains controversial.<br><br>
+        <em>Click each facet to toggle whether that evidence has been gathered. Try the presets to see what typical versus comprehensive validation looks like.</em>
+      </div>
+
+      <div class="preset-row">
+        <button class="btn" id="preset-typical">Typical Study</button>
+        <button class="btn" id="preset-comprehensive">Comprehensive</button>
+        <button class="btn" id="preset-none">Clear All</button>
+      </div>
+
+      <div class="facets-grid" id="facets-grid"></div>
+
+      <div class="completeness-section">
+        <span class="density-label">Validity argument completeness: <span class="density-val" id="completeness-val">0/6</span></span>
+        <div class="completeness-bar-bg"><div class="completeness-bar-fill" id="completeness-bar"></div></div>
+      </div>
+
+      <div class="density-status" id="messick-status"></div>
+
+      <div class="note warn">
+        <strong>Key idea:</strong> Most validation studies address only content and external (criterion-related) evidence, ignoring consequences entirely. For Messick, this is an incomplete argument &mdash; you cannot claim a test is valid without considering how its use affects people.
+      </div>
+
+      <div class="ctx-aside">
+        <strong><a href="https://doi.org/10.2466/pr0.1957.3.3.635" target="_blank">Loevinger (1957)</a></strong> anticipated much of Messick's framework, arguing that construct validity subsumes all other forms. Her three components &mdash; substantive, structural, and external &mdash; directly prefigure Messick's more elaborated six facets. &mdash; <strong><a href="https://doi.org/10.3102/0013189X07311286" target="_blank">Lissitz &amp; Samuelsen (2007)</a></strong> pushed back in the other direction, arguing that consequences belong to a test's <em>utility</em>, not its validity. In their view, construct validity should rest strictly on internal evidence: content, reliability, and the cognitive processes items elicit.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BORSBOOM ============ -->
+  <div id="fw-borsboom" class="fw-panel">
+    <div class="section">
+      <div class="fw-period"><a href="https://doi.org/10.1037/0033-295X.111.4.1061" target="_blank">Borsboom, Mellenbergh &amp; van Heerden (2004)</a> &middot; Causal Realism</div>
+      <div class="fw-intro">
+        Borsboom and colleagues proposed a radically simple definition: a test is valid if and only if <strong>(1) the attribute exists</strong> and <strong>(2) variation in the attribute causally produces variation in test scores</strong>. This strips away the epistemic complexity of earlier frameworks and anchors validity in ontology. A test can predict outcomes perfectly and still fail to be valid if the causal link is missing.<br><br>
+        <em>Select a scenario to see how Borsboom's two conditions apply.</em>
+      </div>
+
+      <div class="bb-scenarios">
+        <button class="btn active" data-sc="valid">Causal Link Present</button>
+        <button class="btn" data-sc="irrelevant">Construct-Irrelevant Variance</button>
+        <button class="btn" data-sc="noexist">Attribute Doesn't Exist</button>
+      </div>
+
+      <div class="bb-diagram" id="bb-diagram">
+        <div class="bb-nodes">
+          <div class="bb-node" id="bb-attr">Depression<br><span style="font-size:0.8em;color:var(--text-dim)">(attribute)</span></div>
+          <div class="bb-arrow" id="bb-arrow1"><div class="bb-arrow-line"></div><span class="bb-arrow-label" id="bb-arrow-label"></span></div>
+          <div class="bb-node" id="bb-test">PHQ-9<br>Scores<br><span style="font-size:0.8em;color:var(--text-dim)">(test)</span></div>
+        </div>
+        <div id="bb-alt" style="margin-top:16px"></div>
+        <div style="margin-top:20px">
+          <div class="bb-verdict" id="bb-verdict">VALID</div>
+        </div>
+        <div class="bb-explanation" id="bb-explanation"></div>
+      </div>
+
+      <div class="note">
+        <strong>Key idea:</strong> Validity is about the world, not about evidence. A test is valid because the attribute it measures exists and causally drives the scores &mdash; regardless of whether we have gathered evidence for this. Conversely, no amount of correlational evidence can make a test valid if the causal link is absent.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ KANE ============ -->
+  <div id="fw-kane" class="fw-panel">
+    <div class="section">
+      <div class="fw-period"><a href="https://doi.org/10.1037/0033-2909.112.3.527" target="_blank">Kane (1992</a>, <a href="https://psycnet.apa.org/record/2006-01815-007" target="_blank">2006</a>) &middot; Argument-Based Validity</div>
+      <div class="fw-intro">
+        Kane reframed validity as the evaluation of an <strong>interpretive/use argument</strong> (IUA): a chain of inferences connecting observed test performance to real-world decisions. Each inference must be explicitly stated and supported with evidence and warrants. The overall validity of the argument equals the strength of its <strong>weakest link</strong>.<br><br>
+        <em>Adjust the warrant strength for each inference. Notice how a single weak link undermines the entire argument.</em>
+      </div>
+
+      <div class="kane-chain" id="kane-chain"></div>
+
+      <div class="kane-overall">
+        <div class="kane-overall-label">Overall argument strength</div>
+        <div class="density-readout">
+          <span class="density-label">Weakest link: <span class="density-val" id="kane-overall-val">Strong</span></span>
+          <div class="density-bar-bg"><div class="density-bar-fill" id="kane-overall-bar"></div></div>
+        </div>
+      </div>
+
+      <div class="density-status" id="kane-status"></div>
+
+      <div class="note warn">
+        <strong>Key idea:</strong> Validity is not about a test &mdash; it is about an argument. A strong scoring inference cannot compensate for a weak extrapolation inference. This shifts the burden: instead of asking "is this test valid?", we ask "is this interpretation and use of test scores justified?"
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ NETWORK PSYCHOMETRICS ============ -->
+  <div id="fw-network" class="fw-panel">
+    <div class="section">
+      <div class="fw-period"><a href="https://doi.org/10.1146/annurev-clinpsy-050212-185608" target="_blank">Borsboom &amp; Cramer (2013</a>; <a href="https://doi.org/10.1002/wps.20375" target="_blank">Borsboom, 2017)</a> &middot; Network Psychometrics</div>
+      <div class="fw-intro">
+        Network psychometrics challenges a foundational assumption of all the frameworks above: that a psychological construct is a <strong>single latent variable</strong> that causes observed scores. Instead, constructs like depression may be <strong>networks of mutually reinforcing symptoms</strong> &mdash; sadness causes insomnia, insomnia causes fatigue, fatigue causes loss of interest, and so on. The "construct" is an emergent property of the network, not a hidden common cause.<br><br>
+        <em>Toggle between the latent variable view and the network view to see the same symptoms under radically different ontologies. In network view, click symptoms to activate them and trace the causal pathways.</em>
+      </div>
+
+      <div class="np-toggle">
+        <button class="btn active" data-view="latent">Latent Variable View</button>
+        <button class="btn" data-view="network">Network View</button>
+        <button class="btn" id="np-reset" style="margin-left:auto">Reset</button>
+      </div>
+
+      <div class="np-instructions" id="np-instructions">Hub-and-spoke: a single latent variable "Depression" causes all observed symptoms.</div>
+
+      <div class="np-wrap">
+        <svg id="np-svg" class="np-svg network-svg" viewBox="0 0 600 420"></svg>
+      </div>
+
+      <div class="np-status-row" id="np-status-row">
+        <div class="np-status-item">Active symptoms: <span class="np-stat-val" id="np-active-count">0</span> / 7</div>
+        <div class="np-status-item">View: <span class="np-stat-val" id="np-view-label">Latent Variable</span></div>
+      </div>
+
+      <div class="density-status" id="np-status">In the latent variable model, depression is a single hidden cause. All symptom correlations arise because they share this common cause.</div>
+
+      <div class="note">
+        <strong>Key idea:</strong> If constructs are networks rather than latent variables, then "construct validity" in the traditional sense may not apply. There is no single attribute to measure &mdash; instead, the question becomes whether the test adequately captures the network's structure and dynamics.
+      </div>
+
+      <div class="ctx-aside">
+        This framework raises a deep challenge for Borsboom's causal realism: if the attribute doesn't exist as a unitary entity (his first condition fails), his framework declares the test invalid. But the network perspective suggests the test might still be useful and meaningful &mdash; just not in the way latent variable models assume. The debate remains active.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ COMPARISON ============ -->
+  <div class="section" style="border-top:1px solid var(--border);padding-top:40px">
+    <div class="viz-title">Where Does Validity Live?</div>
+
+    <div class="comparison-grid">
+      <div class="comparison-card">
+        <div class="comparison-who">Cronbach &amp; Meehl</div>
+        <div class="comparison-answer">In the <strong>theory</strong>. Validity is about the construct's place in a nomological network of lawful relationships.</div>
+      </div>
+      <div class="comparison-card">
+        <div class="comparison-who">Campbell &amp; Fiske</div>
+        <div class="comparison-answer">In the <strong>method</strong>. Validity requires disentangling trait variance from method variance through systematic design.</div>
+      </div>
+      <div class="comparison-card">
+        <div class="comparison-who">Messick</div>
+        <div class="comparison-answer">In the <strong>evidence</strong> and its consequences. Validity is a judgment based on the completeness of the evidentiary argument.</div>
+      </div>
+      <div class="comparison-card">
+        <div class="comparison-who">Borsboom</div>
+        <div class="comparison-answer">In the <strong>world</strong>. Validity is an ontological property &mdash; does the attribute exist and causally produce scores?</div>
+      </div>
+      <div class="comparison-card">
+        <div class="comparison-who">Kane</div>
+        <div class="comparison-answer">In the <strong>argument</strong>. Validity is the degree to which the interpretive/use argument is coherent and well-supported.</div>
+      </div>
+      <div class="comparison-card">
+        <div class="comparison-who">Network</div>
+        <div class="comparison-answer">In the <strong>structure</strong>. If constructs are emergent networks, validity is about capturing the system's topology, not measuring a hidden cause.</div>
+      </div>
+    </div>
+
+    <div class="note caveat">
+      <strong>These are not just academic distinctions.</strong> Applied to the same test, these frameworks can reach different conclusions. A test can be ontologically valid (Borsboom) but lack consequential evidence (Messick). It can have a strong interpretive argument (Kane) while the construct itself is poorly embedded in theory (Cronbach &amp; Meehl). The network view may question whether the construct is even the right unit of analysis. Choosing a framework shapes which questions you ask &mdash; and which evidence you gather.
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== Framework switching ===== */
+const fwBtns = document.querySelectorAll('.fw-select .btn');
+const fwPanels = document.querySelectorAll('.fw-panel');
+fwBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    fwBtns.forEach(b => b.classList.remove('active'));
+    fwPanels.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('fw-' + btn.dataset.fw).classList.add('active');
+  });
+});
+
+/* ===== CRONBACH & MEEHL: Nomological Network ===== */
+(function() {
+  const svg = document.getElementById('net-svg');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const nodes = [
+    { id: 'dep',  label: 'Depression',   x: 300, y: 215, r: 36, type: 'target' },
+    { id: 'na',   label: 'Neg. Affect',  x: 120, y: 90,  r: 28, type: 'construct' },
+    { id: 'anx',  label: 'Anxiety',      x: 480, y: 90,  r: 28, type: 'construct' },
+    { id: 'fat',  label: 'Fatigue',      x: 510, y: 330, r: 28, type: 'construct' },
+    { id: 'sw',   label: 'Withdrawal',   x: 90,  y: 330, r: 28, type: 'construct' },
+    { id: 'phq',  label: 'PHQ-9',        x: 155, y: 440, r: 25, type: 'observable' },
+    { id: 'clin', label: 'Clinician Dx', x: 300, y: 450, r: 25, type: 'observable' },
+    { id: 'cort', label: 'Cortisol',     x: 445, y: 440, r: 25, type: 'observable' },
+  ];
+
+  const edges = [
+    { from: 'dep', to: 'na',   active: true },
+    { from: 'dep', to: 'anx',  active: true },
+    { from: 'dep', to: 'fat',  active: true },
+    { from: 'dep', to: 'sw',   active: true },
+    { from: 'dep', to: 'phq',  active: true },
+    { from: 'dep', to: 'clin', active: true },
+    { from: 'dep', to: 'cort', active: true },
+    { from: 'na',  to: 'anx',  active: true },
+    { from: 'na',  to: 'sw',   active: true },
+    { from: 'anx', to: 'cort', active: true },
+    { from: 'fat', to: 'cort', active: true },
+  ];
+
+  const nodeMap = {};
+  nodes.forEach(n => nodeMap[n.id] = n);
+
+  const colors = {
+    target:    { stroke: '#2dd4bf', fill: 'rgba(45,212,191,0.10)' },
+    construct: { stroke: '#3b82f6', fill: 'rgba(59,130,246,0.08)' },
+    observable:{ stroke: '#f97316', fill: 'rgba(249,115,22,0.08)' },
+  };
+
+  const edgeG = document.createElementNS(ns, 'g');
+  const hitG  = document.createElementNS(ns, 'g');
+  const nodeG = document.createElementNS(ns, 'g');
+  svg.appendChild(edgeG);
+  svg.appendChild(hitG);
+  svg.appendChild(nodeG);
+
+  edges.forEach(e => {
+    const n1 = nodeMap[e.from], n2 = nodeMap[e.to];
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', n1.x); line.setAttribute('y1', n1.y);
+    line.setAttribute('x2', n2.x); line.setAttribute('y2', n2.y);
+    line.setAttribute('stroke', '#4a4d5e');
+    line.setAttribute('stroke-width', '1.5');
+    line.style.transition = 'opacity 0.25s, stroke 0.25s';
+    e.lineEl = line;
+    edgeG.appendChild(line);
+
+    const hit = document.createElementNS(ns, 'line');
+    hit.setAttribute('x1', n1.x); hit.setAttribute('y1', n1.y);
+    hit.setAttribute('x2', n2.x); hit.setAttribute('y2', n2.y);
+    hit.setAttribute('stroke', 'transparent');
+    hit.setAttribute('stroke-width', '18');
+    hit.style.cursor = 'pointer';
+    hit.addEventListener('click', () => { e.active = !e.active; updateNetwork(); });
+    hit.addEventListener('mouseenter', () => {
+      line.setAttribute('stroke', e.active ? '#7a7d8e' : '#3a3d50');
+      line.setAttribute('stroke-width', '2.5');
+    });
+    hit.addEventListener('mouseleave', () => updateEdge(e));
+    hitG.appendChild(hit);
+  });
+
+  nodes.forEach(n => {
+    const g = document.createElementNS(ns, 'g');
+    g.style.transition = 'opacity 0.3s';
+    n.groupEl = g;
+
+    const circle = document.createElementNS(ns, 'circle');
+    circle.setAttribute('cx', n.x); circle.setAttribute('cy', n.y);
+    circle.setAttribute('r', n.r);
+    circle.setAttribute('fill', colors[n.type].fill);
+    circle.setAttribute('stroke', colors[n.type].stroke);
+    circle.setAttribute('stroke-width', n.type === 'target' ? '2.5' : '1.5');
+    g.appendChild(circle);
+
+    const text = document.createElementNS(ns, 'text');
+    text.setAttribute('x', n.x); text.setAttribute('y', n.y + 1);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('fill', colors[n.type].stroke);
+    text.setAttribute('font-family', 'IBM Plex Mono, monospace');
+    text.setAttribute('font-size', n.type === 'target' ? '13' : '10');
+    text.setAttribute('font-weight', n.type === 'target' ? '600' : '400');
+    text.style.pointerEvents = 'none';
+    text.textContent = n.label;
+    g.appendChild(text);
+
+    nodeG.appendChild(g);
+  });
+
+  function updateEdge(e) {
+    e.lineEl.setAttribute('stroke', e.active ? '#4a4d5e' : '#1e2030');
+    e.lineEl.setAttribute('stroke-width', '1.5');
+    e.lineEl.setAttribute('stroke-dasharray', e.active ? 'none' : '4,4');
+    e.lineEl.setAttribute('opacity', e.active ? '1' : '0.25');
+  }
+
+  function updateNetwork() {
+    edges.forEach(updateEdge);
+    const depEdges = edges.filter(e => e.from === 'dep' || e.to === 'dep');
+    const activeDep = depEdges.filter(e => e.active).length;
+    const density = depEdges.length > 0 ? activeDep / depEdges.length : 0;
+
+    document.getElementById('density-val').textContent = Math.round(density * 100) + '%';
+    const bar = document.getElementById('density-bar');
+    bar.style.width = (density * 100) + '%';
+    bar.style.background = density > 0.5 ? 'var(--teal)' : density > 0.15 ? 'var(--orange)' : 'var(--red)';
+
+    const status = document.getElementById('density-status');
+    if (density === 1)        status.textContent = 'The construct is richly embedded in a network of lawful relationships \u2014 well-defined and scientifically meaningful.';
+    else if (density > 0.7)   status.textContent = 'Strong nomological embedding. Most theoretical and observational connections remain intact.';
+    else if (density > 0.4)   status.textContent = 'Embedding is weakening. The construct\'s meaning becomes less precise as relationships are lost.';
+    else if (density > 0.15)  status.textContent = 'Sparse embedding. The construct is poorly defined \u2014 few lawful relationships anchor its meaning.';
+    else if (density > 0)     status.textContent = 'Nearly isolated. The construct is barely connected to the network \u2014 its scientific status is precarious.';
+    else                      status.textContent = 'Scientifically vacuous. With no nomological connections, the construct has no empirical meaning \u2014 there is nothing to validate.';
+
+    const depOp = density === 0 ? 0.15 : density < 0.3 ? 0.45 : 1;
+    nodeMap['dep'].groupEl.style.opacity = depOp;
+
+    nodes.forEach(n => {
+      if (n.id === 'dep') return;
+      const connected = edges.some(e => (e.from === n.id || e.to === n.id) && e.active);
+      n.groupEl.style.opacity = connected ? 1 : 0.2;
+    });
+  }
+
+  updateNetwork();
+})();
+
+/* ===== CAMPBELL & FISKE: MTMM Matrix ===== */
+(function() {
+  const traits = ['Depression', 'Anxiety', 'Fatigue'];
+  const methods = ['Self-Report', 'Clinician'];
+  const vars = [];
+  methods.forEach((m, mi) => {
+    traits.forEach((t, ti) => {
+      vars.push({ trait: ti, method: mi, label: t.charAt(0) + '-' + (mi === 0 ? 'SR' : 'CR') });
+    });
+  });
+  /* vars: D-SR, A-SR, F-SR, D-CR, A-CR, F-CR */
+
+  const convSlider = document.getElementById('mtmm-conv');
+  const discSlider = document.getElementById('mtmm-disc');
+  const methSlider = document.getElementById('mtmm-meth');
+
+  function getParams() {
+    return {
+      conv: parseInt(convSlider.value) / 100,
+      disc: parseInt(discSlider.value) / 100,
+      meth: parseInt(methSlider.value) / 100,
+    };
+  }
+
+  function cellType(i, j) {
+    if (i === j) return 'diag';
+    const vi = vars[i], vj = vars[j];
+    if (vi.trait === vj.trait && vi.method !== vj.method) return 'conv';
+    if (vi.trait !== vj.trait && vi.method === vj.method) return 'mono';
+    return 'hetero';
+  }
+
+  function cellValue(type, p) {
+    if (type === 'diag') return null;
+    if (type === 'conv') return p.conv;
+    if (type === 'mono') return Math.min(p.disc + p.meth, 0.99);
+    return p.disc;
+  }
+
+  function renderTable() {
+    const p = getParams();
+    document.getElementById('mtmm-conv-val').textContent = p.conv.toFixed(2);
+    document.getElementById('mtmm-disc-val').textContent = p.disc.toFixed(2);
+    document.getElementById('mtmm-meth-val').textContent = p.meth.toFixed(2);
+
+    const monoVal = Math.min(p.disc + p.meth, 0.99);
+    const warnMono = monoVal >= p.conv;
+
+    /* Build table */
+    let html = '<tr><th></th>';
+    /* Method group headers */
+    html += '<th class="method-header" colspan="3">' + methods[0] + '</th>';
+    html += '<th class="method-header" colspan="3">' + methods[1] + '</th>';
+    html += '</tr>';
+    /* Variable headers */
+    html += '<tr><th></th>';
+    vars.forEach(v => { html += '<th>' + v.label + '</th>'; });
+    html += '</tr>';
+
+    for (let i = 0; i < vars.length; i++) {
+      html += '<tr><th class="row-label">' + vars[i].label + '</th>';
+      for (let j = 0; j < vars.length; j++) {
+        if (j > i) {
+          html += '<td class="cell-empty"></td>';
+        } else {
+          const type = cellType(i, j);
+          const val = cellValue(type, p);
+          let cls = 'cell-' + type;
+          if (type === 'mono' && warnMono) cls += ' warn';
+          const display = val === null ? '\u2014' : val.toFixed(2);
+          html += '<td class="' + cls + '">' + display + '</td>';
+        }
+      }
+      html += '</tr>';
+    }
+
+    document.getElementById('mtmm-table').innerHTML = html;
+
+    /* Criteria */
+    const crit1 = p.conv > 0.3;
+    const crit2 = p.conv > monoVal;
+    const crit3 = p.conv > p.disc;
+    const icon = (pass) => '<span class="crit-icon ' + (pass ? 'pass' : 'fail') + '">' + (pass ? '\u2713' : '\u2717') + '</span>';
+
+    document.getElementById('mtmm-criteria').innerHTML =
+      '<div class="mtmm-criterion">' + icon(crit1) + ' Convergent coefficients are meaningfully large (>' + ' .30)</div>' +
+      '<div class="mtmm-criterion">' + icon(crit2) + ' Convergent > heterotrait-monomethod (' + p.conv.toFixed(2) + ' vs ' + monoVal.toFixed(2) + ')</div>' +
+      '<div class="mtmm-criterion">' + icon(crit3) + ' Convergent > heterotrait-heteromethod (' + p.conv.toFixed(2) + ' vs ' + p.disc.toFixed(2) + ')</div>';
+
+    /* Status */
+    const status = document.getElementById('mtmm-status');
+    if (crit1 && crit2 && crit3)
+      status.textContent = 'All Campbell & Fiske criteria met \u2014 both convergent and discriminant validity are supported.';
+    else if (crit1 && crit3 && !crit2)
+      status.textContent = 'Method variance problem: shared method inflates heterotrait correlations beyond convergent validity. The method is partly measuring itself.';
+    else if (!crit1)
+      status.textContent = 'Convergent validity coefficients are too low \u2014 different methods do not agree on the same trait.';
+    else
+      status.textContent = 'Discriminant validity is questionable \u2014 different traits are not sufficiently distinct.';
+  }
+
+  convSlider.addEventListener('input', renderTable);
+  discSlider.addEventListener('input', renderTable);
+  methSlider.addEventListener('input', renderTable);
+  renderTable();
+})();
+
+/* ===== MESSICK: Unified Framework ===== */
+(function() {
+  const facets = [
+    { id: 'content', name: 'Content', active: false,
+      desc: 'Do test items representatively sample the construct domain?',
+      example: 'PHQ-9 items cover mood, sleep, appetite, energy, concentration \u2014 key DSM-5 depression criteria.' },
+    { id: 'substantive', name: 'Substantive', active: false,
+      desc: 'Do theoretical rationales and empirical response processes match the construct?',
+      example: 'Do respondents actually reflect on their recent mood, or respond based on general negativity or social desirability?' },
+    { id: 'structural', name: 'Structural', active: false,
+      desc: 'Does the scoring structure match the internal structure of the construct?',
+      example: 'Does a single-factor model fit the PHQ-9, consistent with depression as a unidimensional construct?' },
+    { id: 'generalizability', name: 'Generalizability', active: false,
+      desc: 'Do scores generalize across populations, settings, and occasions?',
+      example: 'Does the PHQ-9 function comparably across age groups, cultures, and clinical settings?' },
+    { id: 'external', name: 'External', active: false,
+      desc: 'Do scores relate to external criteria and other measures as theory predicts?',
+      example: 'Does PHQ-9 correlate with clinician diagnosis, predict treatment response, and diverge from unrelated constructs?' },
+    { id: 'consequential', name: 'Consequential', active: false, isConsequential: true,
+      desc: 'Are there unintended consequences of test interpretation and use?',
+      example: 'Does routine PHQ-9 screening lead to over-diagnosis, over-medication, or systematic disadvantage for some groups?' },
+  ];
+
+  const grid = document.getElementById('facets-grid');
+  facets.forEach(f => {
+    const card = document.createElement('div');
+    card.className = 'facet-card' + (f.isConsequential ? ' consequential' : '');
+    card.innerHTML =
+      '<div class="facet-name">' + f.name + '</div>' +
+      '<div class="facet-desc">' + f.desc + '</div>' +
+      '<div class="facet-example">' + f.example + '</div>';
+    card.addEventListener('click', () => { f.active = !f.active; updateMessick(); });
+    f.cardEl = card;
+    grid.appendChild(card);
+  });
+
+  function setFacets(ids) {
+    facets.forEach(f => f.active = ids.includes(f.id));
+    updateMessick();
+  }
+
+  document.getElementById('preset-typical').addEventListener('click', () => setFacets(['content', 'external']));
+  document.getElementById('preset-comprehensive').addEventListener('click', () => setFacets(facets.map(f => f.id)));
+  document.getElementById('preset-none').addEventListener('click', () => setFacets([]));
+
+  function updateMessick() {
+    const active = facets.filter(f => f.active).length;
+    facets.forEach(f => f.cardEl.classList.toggle('active', f.active));
+
+    document.getElementById('completeness-val').textContent = active + '/6';
+    const pct = (active / 6) * 100;
+    const bar = document.getElementById('completeness-bar');
+    bar.style.width = pct + '%';
+    bar.style.background = active >= 5 ? 'var(--teal)' : active >= 3 ? 'var(--orange)' : 'var(--red)';
+
+    const hasCon = facets.find(f => f.id === 'consequential').active;
+    const hasCont = facets.find(f => f.id === 'content').active;
+    const hasExt = facets.find(f => f.id === 'external').active;
+    const status = document.getElementById('messick-status');
+
+    if (active === 0)
+      status.textContent = 'No facets evaluated \u2014 no validity argument.';
+    else if (active === 6)
+      status.textContent = 'Comprehensive validation \u2014 all six facets addressed, including consequences of test use.';
+    else if (active >= 4 && hasCon)
+      status.textContent = 'Strong argument with ' + active + ' facets addressed. Consequential evidence included \u2014 Messick would approve.';
+    else if (active >= 4)
+      status.textContent = 'Broad evidence base (' + active + ' facets), but missing consequential validity \u2014 a critical gap in Messick\'s view.';
+    else if (active === 2 && hasCont && hasExt)
+      status.textContent = 'The "typical" validation study: only content and external evidence. Messick would consider this insufficient.';
+    else
+      status.textContent = active + ' of 6 facets addressed \u2014 the validity argument has significant gaps.';
+  }
+
+  updateMessick();
+})();
+
+/* ===== BORSBOOM: Causal Realism ===== */
+(function() {
+  const scenarios = {
+    valid: {
+      attrClass: 'exists', attrLabel: 'Depression', attrSub: '(exists)',
+      arrowClass: 'causal', arrowLabel: 'causes',
+      verdictText: 'VALID', verdictClass: 'valid',
+      explanation: 'Depression exists as a real psychological attribute, and variation in depression severity causally produces variation in PHQ-9 item responses. Both conditions are satisfied.',
+      alt: ''
+    },
+    irrelevant: {
+      attrClass: 'exists', attrLabel: 'Depression', attrSub: '(exists)',
+      arrowClass: 'broken', arrowLabel: 'does not cause',
+      verdictText: 'INVALID', verdictClass: 'invalid',
+      explanation: 'Depression exists, but PHQ-9 scores are actually driven by something else \u2014 for example, somatic symptoms of physical illness or acquiescent response style. The test may predict depression (correlation), but it doesn\'t measure it (no causal link from construct to scores).',
+      alt: '<div class="bb-alt-cause">Somatic illness \u2192 PHQ-9 Scores (actual cause)</div>'
+    },
+    noexist: {
+      attrClass: 'missing', attrLabel: 'Depression', attrSub: '(does not exist as\na unitary construct)',
+      arrowClass: 'none', arrowLabel: '',
+      verdictText: 'INVALID', verdictClass: 'invalid',
+      explanation: 'If "depression" is not a real unitary attribute \u2014 if it is instead a heterogeneous cluster of loosely related symptoms with no common cause \u2014 then no test can be valid for measuring it. The first condition (existence) fails.',
+      alt: ''
+    }
+  };
+
+  const btns = document.querySelectorAll('.bb-scenarios .btn');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render(btn.dataset.sc);
+    });
+  });
+
+  function render(sc) {
+    const s = scenarios[sc];
+    const attr = document.getElementById('bb-attr');
+    attr.className = 'bb-node ' + s.attrClass;
+    attr.innerHTML = s.attrLabel + '<br><span style="font-size:0.75em;color:var(--text-dim);white-space:pre-line">' + s.attrSub + '</span>';
+
+    document.getElementById('bb-arrow1').className = 'bb-arrow ' + s.arrowClass;
+    document.getElementById('bb-arrow-label').textContent = s.arrowLabel;
+
+    const v = document.getElementById('bb-verdict');
+    v.textContent = s.verdictText;
+    v.className = 'bb-verdict ' + s.verdictClass;
+
+    document.getElementById('bb-explanation').textContent = s.explanation;
+    document.getElementById('bb-alt').innerHTML = s.alt;
+  }
+
+  render('valid');
+})();
+
+/* ===== KANE: Argument-Based Validity ===== */
+(function() {
+  const inferences = [
+    { id: 'scoring',        name: 'Scoring',         value: 85,
+      desc: 'Observed responses \u2192 score' },
+    { id: 'generalization',  name: 'Generalization',  value: 85,
+      desc: 'Score \u2192 universe score' },
+    { id: 'extrapolation',   name: 'Extrapolation',   value: 85,
+      desc: 'Universe score \u2192 target domain' },
+    { id: 'implication',     name: 'Decision',        value: 85,
+      desc: 'Target domain \u2192 action' },
+  ];
+
+  const chain = document.getElementById('kane-chain');
+  inferences.forEach((inf, i) => {
+    if (i > 0) {
+      const conn = document.createElement('div');
+      conn.className = 'kane-connector';
+      conn.textContent = '\u2192';
+      chain.appendChild(conn);
+    }
+
+    const link = document.createElement('div');
+    link.className = 'kane-link';
+    link.innerHTML =
+      '<div class="kane-box" id="kane-box-' + inf.id + '">' +
+        '<div class="kane-inference">' + inf.name + '</div>' +
+        '<div class="kane-desc">' + inf.desc + '</div>' +
+        '<div class="kane-slider-row">' +
+          '<input type="range" id="kane-sl-' + inf.id + '" min="0" max="100" value="' + inf.value + '" style="flex:1">' +
+          '<span class="kane-slider-val" id="kane-val-' + inf.id + '">' + inf.value + '</span>' +
+        '</div>' +
+      '</div>';
+    chain.appendChild(link);
+
+    link.querySelector('input[type="range"]').addEventListener('input', function() {
+      inf.value = parseInt(this.value);
+      updateKane();
+    });
+  });
+
+  function updateKane() {
+    const vals = inferences.map(inf => inf.value);
+    const minVal = Math.min(...vals);
+    const minInf = inferences.find(inf => inf.value === minVal);
+
+    let broken = false;
+    inferences.forEach(inf => {
+      const box = document.getElementById('kane-box-' + inf.id);
+      const val = document.getElementById('kane-val-' + inf.id);
+      val.textContent = inf.value;
+
+      box.classList.remove('weak', 'broken', 'downstream');
+      if (broken) {
+        box.classList.add('downstream');
+      } else if (inf.value < 20) {
+        box.classList.add('broken');
+        broken = true;
+      } else if (inf.value < 50) {
+        box.classList.add('weak');
+      }
+
+      val.style.color = inf.value >= 65 ? 'var(--teal)' : inf.value >= 35 ? 'var(--orange)' : 'var(--red)';
+    });
+
+    const bar = document.getElementById('kane-overall-bar');
+    bar.style.width = minVal + '%';
+    bar.style.background = minVal >= 65 ? 'var(--teal)' : minVal >= 35 ? 'var(--orange)' : 'var(--red)';
+
+    const ov = document.getElementById('kane-overall-val');
+    if (minVal >= 65) { ov.textContent = 'Strong'; ov.style.color = 'var(--teal)'; }
+    else if (minVal >= 35) { ov.textContent = 'Moderate'; ov.style.color = 'var(--orange)'; }
+    else { ov.textContent = 'Weak'; ov.style.color = 'var(--red)'; }
+
+    const status = document.getElementById('kane-status');
+    if (minVal >= 65)
+      status.textContent = 'All inferences are well-supported \u2014 the interpretive/use argument is strong.';
+    else if (minVal >= 35)
+      status.textContent = 'The argument is moderate. The ' + minInf.name.toLowerCase() + ' inference is the weakest link and needs stronger warrants.';
+    else if (minVal >= 10)
+      status.textContent = 'The argument is weak. The ' + minInf.name.toLowerCase() + ' inference lacks adequate support \u2014 this undermines the entire chain.';
+    else
+      status.textContent = 'The ' + minInf.name.toLowerCase() + ' inference has essentially no support. The interpretive argument collapses \u2014 downstream inferences are moot.';
+  }
+
+  updateKane();
+})();
+
+/* ===== NETWORK PSYCHOMETRICS ===== */
+(function() {
+  const svg = document.getElementById('np-svg');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const symptoms = [
+    { id: 'sad',   label: 'Sad Mood',        active: false },
+    { id: 'sleep', label: 'Insomnia',         active: false },
+    { id: 'fatg',  label: 'Fatigue',          active: false },
+    { id: 'inter', label: 'Loss of Interest', active: false },
+    { id: 'guilt', label: 'Guilt',            active: false },
+    { id: 'conc',  label: 'Concentration',    active: false },
+    { id: 'appet', label: 'Appetite',         active: false },
+  ];
+
+  /* Circular layout for symptoms */
+  const cx = 300, cy = 210, radius = 150;
+  symptoms.forEach((s, i) => {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI / symptoms.length);
+    s.x = cx + radius * Math.cos(angle);
+    s.y = cy + radius * Math.sin(angle);
+    s.r = 30;
+  });
+
+  /* Latent variable node */
+  const latentNode = { x: cx, y: cy, r: 38, label: 'Depression' };
+
+  /* Network edges (symptom-to-symptom causal pathways) */
+  const netEdges = [
+    { from: 'sad',   to: 'sleep' },  /* rumination → insomnia */
+    { from: 'sleep', to: 'fatg' },   /* poor sleep → fatigue */
+    { from: 'fatg',  to: 'inter' },  /* too tired → anhedonia */
+    { from: 'inter', to: 'sad' },    /* anhedonia → sadness */
+    { from: 'sad',   to: 'guilt' },  /* sadness → guilt */
+    { from: 'guilt', to: 'conc' },   /* ruminating guilt → poor focus */
+    { from: 'fatg',  to: 'conc' },   /* fatigue → poor focus */
+    { from: 'appet', to: 'fatg' },   /* poor nutrition → fatigue */
+    { from: 'inter', to: 'appet' },  /* loss of interest → appetite change */
+    { from: 'sleep', to: 'conc' },   /* poor sleep → poor focus */
+  ];
+
+  const symptomMap = {};
+  symptoms.forEach(s => symptomMap[s.id] = s);
+
+  let currentView = 'latent';
+
+  /* SVG groups */
+  const edgeG = document.createElementNS(ns, 'g');
+  const nodeG = document.createElementNS(ns, 'g');
+  svg.appendChild(edgeG);
+  svg.appendChild(nodeG);
+
+  /* Build elements */
+  /* Latent-to-symptom edges */
+  const latentEdges = [];
+  symptoms.forEach(s => {
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', latentNode.x); line.setAttribute('y1', latentNode.y);
+    line.setAttribute('x2', s.x); line.setAttribute('y2', s.y);
+    line.setAttribute('stroke', '#4a4d5e');
+    line.setAttribute('stroke-width', '1.5');
+    line.style.transition = 'opacity 0.4s';
+    edgeG.appendChild(line);
+    latentEdges.push(line);
+  });
+
+  /* Network edges */
+  const netEdgeEls = [];
+  netEdges.forEach(e => {
+    const s1 = symptomMap[e.from], s2 = symptomMap[e.to];
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', s1.x); line.setAttribute('y1', s1.y);
+    line.setAttribute('x2', s2.x); line.setAttribute('y2', s2.y);
+    line.setAttribute('stroke', '#3b82f6');
+    line.setAttribute('stroke-width', '1.5');
+    line.setAttribute('opacity', '0');
+    line.style.transition = 'opacity 0.4s';
+    edgeG.appendChild(line);
+    netEdgeEls.push(line);
+  });
+
+  /* Latent variable node */
+  const latentG = document.createElementNS(ns, 'g');
+  latentG.style.transition = 'opacity 0.4s';
+  const latentCircle = document.createElementNS(ns, 'circle');
+  latentCircle.setAttribute('cx', latentNode.x); latentCircle.setAttribute('cy', latentNode.y);
+  latentCircle.setAttribute('r', latentNode.r);
+  latentCircle.setAttribute('fill', 'rgba(45,212,191,0.10)');
+  latentCircle.setAttribute('stroke', '#2dd4bf');
+  latentCircle.setAttribute('stroke-width', '2.5');
+  latentCircle.setAttribute('stroke-dasharray', '6,3');
+  latentG.appendChild(latentCircle);
+  const latentText = document.createElementNS(ns, 'text');
+  latentText.setAttribute('x', latentNode.x); latentText.setAttribute('y', latentNode.y + 1);
+  latentText.setAttribute('text-anchor', 'middle');
+  latentText.setAttribute('dominant-baseline', 'central');
+  latentText.setAttribute('fill', '#2dd4bf');
+  latentText.setAttribute('font-family', 'IBM Plex Mono, monospace');
+  latentText.setAttribute('font-size', '11');
+  latentText.setAttribute('font-weight', '600');
+  latentText.style.pointerEvents = 'none';
+  latentText.textContent = 'Depression';
+  latentG.appendChild(latentText);
+  /* "Latent" sublabel */
+  const latentSub = document.createElementNS(ns, 'text');
+  latentSub.setAttribute('x', latentNode.x); latentSub.setAttribute('y', latentNode.y + 15);
+  latentSub.setAttribute('text-anchor', 'middle');
+  latentSub.setAttribute('fill', '#6b7084');
+  latentSub.setAttribute('font-family', 'IBM Plex Mono, monospace');
+  latentSub.setAttribute('font-size', '8');
+  latentSub.style.pointerEvents = 'none';
+  latentSub.textContent = '(latent)';
+  latentG.appendChild(latentSub);
+  nodeG.appendChild(latentG);
+
+  /* Symptom nodes */
+  symptoms.forEach(s => {
+    const g = document.createElementNS(ns, 'g');
+    g.style.cursor = 'pointer';
+    g.style.transition = 'opacity 0.3s';
+    s.groupEl = g;
+
+    const circle = document.createElementNS(ns, 'circle');
+    circle.setAttribute('cx', s.x); circle.setAttribute('cy', s.y);
+    circle.setAttribute('r', s.r);
+    circle.setAttribute('fill', 'rgba(59,130,246,0.08)');
+    circle.setAttribute('stroke', '#3b82f6');
+    circle.setAttribute('stroke-width', '1.5');
+    circle.style.transition = 'fill 0.2s, stroke 0.2s';
+    s.circleEl = circle;
+    g.appendChild(circle);
+
+    /* Multiline text for longer labels */
+    const parts = s.label.split(' ');
+    if (parts.length > 1 && s.label.length > 8) {
+      const mid = Math.ceil(parts.length / 2);
+      const line1 = parts.slice(0, mid).join(' ');
+      const line2 = parts.slice(mid).join(' ');
+      const text = document.createElementNS(ns, 'text');
+      text.setAttribute('x', s.x); text.setAttribute('y', s.y - 5);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('fill', '#3b82f6');
+      text.setAttribute('font-family', 'IBM Plex Mono, monospace');
+      text.setAttribute('font-size', '9');
+      text.style.pointerEvents = 'none';
+      const t1 = document.createElementNS(ns, 'tspan');
+      t1.setAttribute('x', s.x); t1.setAttribute('dy', '0');
+      t1.textContent = line1;
+      const t2 = document.createElementNS(ns, 'tspan');
+      t2.setAttribute('x', s.x); t2.setAttribute('dy', '11');
+      t2.textContent = line2;
+      text.appendChild(t1); text.appendChild(t2);
+      s.textEl = text;
+      g.appendChild(text);
+    } else {
+      const text = document.createElementNS(ns, 'text');
+      text.setAttribute('x', s.x); text.setAttribute('y', s.y + 1);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('fill', '#3b82f6');
+      text.setAttribute('font-family', 'IBM Plex Mono, monospace');
+      text.setAttribute('font-size', '9');
+      text.style.pointerEvents = 'none';
+      text.textContent = s.label;
+      s.textEl = text;
+      g.appendChild(text);
+    }
+
+    g.addEventListener('click', () => {
+      if (currentView !== 'network') return;
+      s.active = !s.active;
+      updateNP();
+    });
+
+    nodeG.appendChild(g);
+  });
+
+  function setView(view) {
+    currentView = view;
+    /* Toggle latent elements */
+    const showLatent = view === 'latent';
+    latentG.style.opacity = showLatent ? 1 : 0;
+    latentG.style.pointerEvents = showLatent ? 'auto' : 'none';
+    latentEdges.forEach(l => { l.style.opacity = showLatent ? 1 : 0; });
+    /* Toggle network edges */
+    netEdgeEls.forEach(l => { l.setAttribute('opacity', showLatent ? '0' : '0.4'); });
+
+    document.getElementById('np-view-label').textContent = showLatent ? 'Latent Variable' : 'Network';
+    document.getElementById('np-instructions').textContent = showLatent
+      ? 'Hub-and-spoke: a single latent variable "Depression" causes all observed symptoms.'
+      : 'Network: symptoms cause each other directly. Click symptoms to activate them and trace causal pathways.';
+
+    updateNP();
+  }
+
+  function updateNP() {
+    const activeCount = symptoms.filter(s => s.active).length;
+    document.getElementById('np-active-count').textContent = activeCount;
+
+    symptoms.forEach(s => {
+      if (currentView === 'network') {
+        if (s.active) {
+          s.circleEl.setAttribute('fill', 'rgba(45,212,191,0.20)');
+          s.circleEl.setAttribute('stroke', '#2dd4bf');
+          s.circleEl.setAttribute('stroke-width', '2.5');
+        } else {
+          /* Check if connected to any active symptom */
+          const connectedToActive = netEdges.some(e =>
+            (e.from === s.id && symptomMap[e.to].active) ||
+            (e.to === s.id && symptomMap[e.from].active)
+          );
+          s.circleEl.setAttribute('fill', 'rgba(59,130,246,0.08)');
+          s.circleEl.setAttribute('stroke', connectedToActive ? '#6b7084' : '#3b82f6');
+          s.circleEl.setAttribute('stroke-width', '1.5');
+        }
+      } else {
+        s.circleEl.setAttribute('fill', 'rgba(59,130,246,0.08)');
+        s.circleEl.setAttribute('stroke', '#3b82f6');
+        s.circleEl.setAttribute('stroke-width', '1.5');
+      }
+    });
+
+    /* Highlight edges between active symptoms */
+    if (currentView === 'network') {
+      netEdgeEls.forEach((el, i) => {
+        const e = netEdges[i];
+        const bothActive = symptomMap[e.from].active && symptomMap[e.to].active;
+        const oneActive = symptomMap[e.from].active || symptomMap[e.to].active;
+        if (bothActive) {
+          el.setAttribute('opacity', '1');
+          el.setAttribute('stroke', '#2dd4bf');
+          el.setAttribute('stroke-width', '2.5');
+        } else if (oneActive) {
+          el.setAttribute('opacity', '0.6');
+          el.setAttribute('stroke', '#6b7084');
+          el.setAttribute('stroke-width', '1.5');
+        } else {
+          el.setAttribute('opacity', '0.25');
+          el.setAttribute('stroke', '#3b82f6');
+          el.setAttribute('stroke-width', '1.5');
+        }
+      });
+    }
+
+    /* Status */
+    const status = document.getElementById('np-status');
+    if (currentView === 'latent') {
+      status.textContent = 'In the latent variable model, depression is a single hidden cause. All symptom correlations arise because they share this common cause.';
+    } else {
+      if (activeCount === 0)
+        status.textContent = 'No symptoms active. Click symptoms to activate them and see how they connect to each other through causal pathways.';
+      else if (activeCount <= 2)
+        status.textContent = activeCount + ' symptom' + (activeCount > 1 ? 's' : '') + ' active. In the network model, each symptom can trigger its neighbors \u2014 sadness causes insomnia, insomnia causes fatigue, and so on.';
+      else if (activeCount <= 4)
+        status.textContent = 'Multiple symptoms active and reinforcing each other. The network is partially activated \u2014 mutual reinforcement between symptoms sustains the state.';
+      else
+        status.textContent = 'The network has tipped into a strongly interconnected state. In the network model, this self-sustaining activation pattern is what we call "depression" \u2014 not a hidden cause, but an emergent property.';
+    }
+  }
+
+  /* View toggle */
+  const viewBtns = document.querySelectorAll('.np-toggle .btn[data-view]');
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      viewBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setView(btn.dataset.view);
+    });
+  });
+
+  /* Reset button */
+  document.getElementById('np-reset').addEventListener('click', () => {
+    symptoms.forEach(s => s.active = false);
+    updateNP();
+  });
+
+  setView('latent');
+})();
+</script>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Construct Validity</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/construct-validity/" target="_blank">https://bjorn-persson.github.io/visualizations/construct-validity/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026constructvalidity,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Construct Validity}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/construct-validity/}</span>}
+</span></span></code></pre></div>
+  </div>

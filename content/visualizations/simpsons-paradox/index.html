@@ -232,7 +232,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       ctx.beginPath();
       ctx.moveTo(toSx(x0), toSy(reg.m * x0 + reg.b));
       ctx.lineTo(toSx(x1), toSy(reg.m * x1 + reg.b));
-      ctx.strokeStyle = '#6b7084';
+      ctx.strokeStyle = '#b0b4c0';
       ctx.lineWidth = 2.5;
       ctx.setLineDash([6, 4]);
       ctx.globalAlpha = Math.max(0, 1 - t * 1.4);
@@ -252,7 +252,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       ctx.globalAlpha = 1;
     }
 
-    ctx.fillStyle = '#6b7084';
+    ctx.fillStyle = '#b0b4c0';
     ctx.font = '14px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
     ctx.fillText('Study Hours →', PAD_L + pw / 2, PAD_T + ph + 38);
@@ -263,7 +263,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     ctx.restore();
 
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#6b7084';
+    ctx.fillStyle = '#b0b4c0';
     ctx.font = '13px IBM Plex Mono, monospace';
     const xLabels = ['Low', '', 'Mid', '', 'High'];
     for (let i = 0; i <= 4; i++) {
