@@ -375,7 +375,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     </div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Reliability (α)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Validity (r<span style="font-size:0.7em;vertical-align:sub">yx</span>)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Validity (rᵧₓ)</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim);opacity:0.5"></div> Validity ceiling</div>
     </div>
   </div>
@@ -789,6 +789,16 @@ function drawAxes(ctx, w, h, pad, opts = {}) {
     ctx.textAlign = 'center';
     ctx.fillText(opts.xLabel, pad.left + (w - pad.left - pad.right) / 2, h - 2);
   }
+  if (opts.yLabel) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.translate(12, pad.top + (h - pad.top - pad.bottom) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '11px IBM Plex Mono';
+    ctx.fillText(opts.yLabel, 0, 0);
+    ctx.restore();
+  }
 }
 
 function drawLine(ctx, points, w, h, pad, xMin, xMax, yMin, yMax, color, lineWidth = 2) {
@@ -857,7 +867,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
 
     const xTicks = [1, 10, 20, 40, 60, 80, 100].map(v => ({ val: v, label: v.toString() }));
     const yTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0].map(v => ({ val: v, label: v.toFixed(1) }));
-    drawAxes(ctx, w, h, pad, { xTicks, yTicks, xMin: 1, xMax: maxK, yMin: 0, yMax: 1.05, xLabel: 'Number of items (k)' });
+    drawAxes(ctx, w, h, pad, { xTicks, yTicks, xMin: 1, xMax: maxK, yMin: 0, yMax: 1.05, xLabel: 'Number of items (k)', yLabel: 'Coefficient' });
 
     const relPoints = [];
     const valPoints = [];
@@ -939,7 +949,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
 
     const xTicks = [5, 10, 15, 20, 25, 30, 35, 40].map(v => ({ val: v, label: v.toString() }));
     const yTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0].map(v => ({ val: v, label: v.toFixed(1) }));
-    drawAxes(ctx, w, h, pad, { xTicks, yTicks, xMin: 2, xMax: maxK, yMin: 0, yMax: 1.05, xLabel: 'Items per domain' });
+    drawAxes(ctx, w, h, pad, { xTicks, yTicks, xMin: 2, xMax: maxK, yMin: 0, yMax: 1.05, xLabel: 'Items per domain', yLabel: 'Validity' });
 
     const ptsA = [], ptsB = [], ptsAB = [];
     for (let ki = 2; ki <= maxK; ki++) {
@@ -1215,6 +1225,22 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
     ctx.moveTo(pad.left, h - pad.bottom);
     ctx.lineTo(w - pad.right, h - pad.bottom);
     ctx.stroke();
+
+    // Y-axis line
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top);
+    ctx.lineTo(pad.left, h - pad.bottom);
+    ctx.stroke();
+
+    // Y-axis label
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.translate(12, pad.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '11px IBM Plex Mono';
+    ctx.fillText('Weight / Validity', 0, 0);
+    ctx.restore();
 
     if (mode === 'two') {
       // Scale separator

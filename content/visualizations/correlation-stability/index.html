@@ -1,14 +1,150 @@
 ---
-title: "At What Sample Size Do Correlations Stabilize?"
-description: "Interactive simulation of how sample correlations converge to the population value as N increases — based on Schönbrodt & Perugini (2013). Adjust the true correlation, corridor width, and watch trajectories stabilize."
-summary: "Watch simulated correlation trajectories converge to the true value as sample size grows. Based on Schönbrodt & Perugini (2013)."
+title: "Correlation Explorer & Correlation Stability"
+description: "Compare five association measures interactively, then watch how sample correlations converge to the population value as N increases — based on Schönbrodt & Perugini (2013)."
+summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and distance correlation side by side — then simulate how correlations stabilize with growing sample size."
 ---
 
 <style>
+  /* === Correlation Explorer === */
+  .ce-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px 18px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+  .ce-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    justify-content: flex-end;
+  }
+  .ce-control-group label { color: var(--text-dim); }
+  .ce-control-group input[type="range"] { flex: none; }
+  .ce-val { color: var(--teal); font-weight: 600; }
+  .ce-button-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .ce-preset-label {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text-dim);
+    margin-right: 4px;
+  }
+  .ce-btn-destructive:hover {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+  }
+  .ce-main-area {
+    display: grid;
+    grid-template-columns: 1fr 390px;
+    gap: 18px;
+    align-items: stretch;
+  }
+  .ce-canvas-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: -30px;
+  }
+  .ce-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    flex: 1;
+    background: var(--bg-surface);
+    border-radius: 6px;
+    cursor: crosshair;
+  }
+  .ce-canvas-hint {
+    margin-top: 7px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .ce-side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+  }
+  .ce-stat-card {
+    background: var(--bg-surface);
+    border-radius: 6px;
+    padding: 14px 16px;
+    border-left: 3px solid var(--border);
+    transition: border-color 0.3s;
+    font-family: var(--mono);
+  }
+  .ce-stat-card.active { border-left-color: var(--teal); }
+  .ce-stat-label {
+    font-size: 0.78em;
+    color: var(--text-dim);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ce-stat-label .badge {
+    font-size: 0.72em;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(45, 212, 191, 0.1);
+    color: var(--teal);
+  }
+  .ce-stat-value {
+    font-size: 1.15em;
+    font-weight: 600;
+    color: var(--teal);
+    margin: 4px 0;
+    letter-spacing: -0.02em;
+  }
+  .ce-stat-value.na { color: var(--border); font-size: 1.1em; }
+  .ce-stat-desc {
+    font-size: 0.75em;
+    color: var(--text-dim);
+    line-height: 1.45;
+  }
+  .ce-stat-bar-wrap {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .ce-stat-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease, background 0.3s;
+    width: 0%;
+  }
+  @media (max-width: 900px) {
+    .ce-main-area {
+      grid-template-columns: 1fr;
+    }
+    .ce-canvas-wrap canvas {
+      width: 100%;
+      flex: none;
+      aspect-ratio: 1 / 1;
+    }
+    .ce-side-panel {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    .ce-stat-card {
+      flex: 1;
+      min-width: 140px;
+    }
+  }
+
+  /* === Correlation Stability === */
   #trajCanvas { height: 425px; }
   #posDistCanvas { height: 300px; }
 
-  /* Controls overlay inside the chart area */
   .traj-wrapper {
     position: relative;
   }
@@ -54,7 +190,6 @@ summary: "Watch simulated correlation trajectories converge to the true value as
     padding: 4px 10px;
   }
 
-  /* POS reference table */
   .pos-table {
     font-family: var(--mono);
     font-size: 0.78em;
@@ -84,26 +219,113 @@ summary: "Watch simulated correlation trajectories converge to the true value as
 <div class="container">
 
   <div class="hero">
-    <h1>At What Sample Size Do Correlations Stabilize?</h1>
-    <div class="subtitle">Interactive simulation &mdash; based on Sch&ouml;nbrodt &amp; Perugini (2013)</div>
+    <h1>Correlation Explorer &amp; Correlation Stability</h1>
+    <div class="subtitle">Explore different association measures and how sample size affects correlation estimates</div>
   </div>
 
-  <!-- Intro -->
+  <!-- ==================== EXPLORER ==================== -->
+
   <div class="section">
-    <div class="section-label">Background</div>
-    <h2>Correlation trajectories</h2>
+    <h2>Compare association measures</h2>
     <p>
-      Sample correlations converge to the population value as <span class="m">N</span> grows, but estimates in small samples can be wildly inaccurate. A correlation that starts at <span class="m">r = .69</span> with 20 participants might settle at <span class="m">r = .26</span> by the time you have 274.
+      Correlation coefficients quantify the association between two variables, but not all coefficients capture the same thing. Pearson <span class="m">r</span> measures linear association and is sensitive to outliers; Spearman <span class="m">&rho;</span> and Kendall <span class="m">&tau;</span> use ranks and detect monotonic relationships; mutual information and distance correlation pick up arbitrary nonlinear dependencies.
     </p>
     <p>
-      The <strong>corridor of stability</strong> (COS) is a band of width <span class="m">&plusmn;w</span> around the true <span class="m">&rho;</span>. The <strong>point of stability</strong> (POS) is the sample size from which the running correlation never again leaves this corridor. Below, you can simulate this process and see how many participants you really need.
+      Click to place points, drag to reposition, and watch all five measures update in real time. Use the presets to generate common patterns.
+    </p>
+
+    <div class="ce-controls">
+      <div class="ce-control-group">
+        <label>Preset N: <span class="ce-val" id="v_n">60</span></label>
+        <input type="range" id="s_n" min="10" max="500" step="1" value="60"
+          oninput="document.getElementById('v_n').textContent=this.value">
+      </div>
+      <div class="ce-control-group">
+        <label>Signal strength: <span class="ce-val" id="v_str">0.80</span></label>
+        <input type="range" id="s_str" min="-1" max="1" step="0.01" value="0.80"
+          oninput="document.getElementById('v_str').textContent=parseFloat(this.value).toFixed(2)">
+      </div>
+    </div>
+    <div class="ce-button-row">
+      <span class="ce-preset-label"></span>
+      <button class="btn" onclick="ceLoadPreset('linear')">Linear</button>
+      <button class="btn" onclick="ceLoadPreset('quadratic')">Quadratic</button>
+      <button class="btn" onclick="ceLoadPreset('heteroscedastic')">Heteroscedastic</button>
+      <button class="btn" onclick="ceLoadPreset('circle')">Circle</button>
+      <button class="btn" onclick="ceLoadPreset('x-shape')">X-shape</button>
+      <button class="btn" onclick="ceLoadPreset('sine')">Sinusoidal</button>
+      <button class="btn" onclick="ceLoadPreset('random')">Random</button>
+      <button class="btn orange ce-btn-destructive" onclick="ceClearPoints()">Clear</button>
+    </div>
+    <div class="ce-main-area">
+      <div class="ce-canvas-wrap">
+        <canvas id="ceCanvas"></canvas>
+        <div class="ce-canvas-hint">
+          Click to add · Drag to move · Shift-click to remove · N = <span id="nValue">0</span>
+        </div>
+      </div>
+      <div class="ce-side-panel">
+        <div class="ce-stat-card" id="card-pearson">
+          <div class="ce-stat-label">
+            Pearson r <span class="badge">linear</span>
+            <button class="info-btn" onclick="ceShowInfo('pearson')" title="About Pearson r">?</button>
+          </div>
+          <div class="ce-stat-value na" id="val-pearson">—</div>
+          <div class="ce-stat-bar-wrap"><div class="ce-stat-bar" id="bar-pearson"></div></div>
+          <div class="ce-stat-desc">Linear association. Sensitive to outliers.</div>
+        </div>
+        <div class="ce-stat-card" id="card-spearman">
+          <div class="ce-stat-label">
+            Spearman ρ <span class="badge">rank</span>
+            <button class="info-btn" onclick="ceShowInfo('spearman')" title="About Spearman ρ">?</button>
+          </div>
+          <div class="ce-stat-value na" id="val-spearman">—</div>
+          <div class="ce-stat-bar-wrap"><div class="ce-stat-bar" id="bar-spearman"></div></div>
+          <div class="ce-stat-desc">Monotonic rank-based. Robust to outliers.</div>
+        </div>
+        <div class="ce-stat-card" id="card-kendall">
+          <div class="ce-stat-label">
+            Kendall τ <span class="badge">concordance</span>
+            <button class="info-btn" onclick="ceShowInfo('kendall')" title="About Kendall τ">?</button>
+          </div>
+          <div class="ce-stat-value na" id="val-kendall">—</div>
+          <div class="ce-stat-bar-wrap"><div class="ce-stat-bar" id="bar-kendall"></div></div>
+          <div class="ce-stat-desc">Pairwise concordance. Robust at small N.</div>
+        </div>
+        <div class="ce-stat-card" id="card-mi">
+          <div class="ce-stat-label">
+            Mutual Info <span class="badge">nonlinear</span>
+            <button class="info-btn" onclick="ceShowInfo('mi')" title="About Mutual Information">?</button>
+          </div>
+          <div class="ce-stat-value na" id="val-mi">—</div>
+          <div class="ce-stat-bar-wrap"><div class="ce-stat-bar" id="bar-mi"></div></div>
+          <div class="ce-stat-desc">KNN estimator (k=3). Biased at small N.</div>
+        </div>
+        <div class="ce-stat-card" id="card-dcor">
+          <div class="ce-stat-label">
+            dCor <span class="badge">nonlinear</span>
+            <button class="info-btn" onclick="ceShowInfo('dcor')" title="About Distance Correlation">?</button>
+          </div>
+          <div class="ce-stat-value na" id="val-dcor">—</div>
+          <div class="ce-stat-bar-wrap"><div class="ce-stat-bar" id="bar-dcor"></div></div>
+          <div class="ce-stat-desc">Zero iff independent. Range [0, 1].</div>
+        </div>
+      </div>
+    </div>
+    <p class="note" style="margin-top: 40px;">
+      Pearson, Spearman, and Kendall range [−1, 1]. MI ≥ 0 (nats); bar uses heuristic cap.
+      dCor ∈ [0, 1]. MI uses Kraskov et al. (2004) KNN with k=3 — noisy and upward-biased at small N.
+      Points live in [0, 1]². Click the <strong>?</strong> buttons for detailed descriptions.
     </p>
   </div>
 
-  <!-- Main simulation -->
+  <!-- ==================== STABILITY ==================== -->
+
   <div class="section">
-    <div class="section-label">Simulation</div>
-    <h2>Watch correlations converge</h2>
+    <h2>At what sample size do correlations stabilize?</h2>
+    <p>
+      Sample correlations converge to the population value as <span class="m">N</span> grows, but estimates in small samples can be wildly inaccurate. A correlation that starts at <span class="m">r = .69</span> with 20 participants might settle at <span class="m">r = .26</span> by the time you have 274. The <strong>corridor of stability</strong> (COS) is a band of width <span class="m">&plusmn;w</span> around the true <span class="m">&rho;</span>, and the <strong>point of stability</strong> (POS) is the sample size from which the running correlation never again leaves this corridor (Sch&ouml;nbrodt &amp; Perugini, 2013).
+    </p>
 
     <div class="viz-box">
       <div class="viz-title">Correlation trajectories</div>
@@ -206,10 +428,395 @@ summary: "Watch simulated correlation trajectories converge to the true value as
     </div>
   </div>
 
-
+  <p style="font-size: 0.78em; color: var(--text-dim); font-family: var(--mono); text-align: center; margin-top: 8px;">
+    Stability simulation based on Sch&ouml;nbrodt &amp; Perugini (2013).
+  </p>
 
 </div>
 
+<!-- Info modal (shared) -->
+<div class="info-overlay" id="modalOverlay" onclick="if(event.target===this)ceCloseInfo()">
+  <div class="info-modal">
+    <button class="info-close" onclick="ceCloseInfo()">×</button>
+    <h2 id="modalTitle"></h2>
+    <span class="info-badge" id="modalBadge"></span>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ==================== EXPLORER JS ==================== -->
+<script>
+(function() {
+  let points = [];
+  let dragging = null;
+  let dragStarted = false;
+
+  const GRAB_RADIUS = 12;
+  const POINT_RADIUS = 5;
+  const MIN_N_CORR = 3;
+  const MIN_N_MI = 5;
+  const MIN_N_DCOR = 4;
+
+  const infoContent = {
+    pearson: {
+      title: 'Pearson Product-Moment Correlation (r)',
+      badge: 'linear association',
+      body: '<p>The Pearson correlation measures the strength and direction of the <em>linear</em> relationship between two continuous variables.</p>' +
+        '<div class="eq-formula">r = Σ(xᵢ − x̄)(yᵢ − ȳ) / √[Σ(xᵢ − x̄)² · Σ(yᵢ − ȳ)²]</div>' +
+        '<p class="info-section-label">Range</p>' +
+        '<p>[−1, +1]. Zero indicates no linear association — but the variables may still be strongly dependent nonlinearly (try the Circle or Quadratic presets).</p>' +
+        '<p class="info-section-label">Assumptions</p>' +
+        '<p>Pearson r is a descriptive statistic computable on any paired data. However, inferential tests assume bivariate normality. It is not robust: a single outlier can dramatically shift r.</p>'
+    },
+    spearman: {
+      title: 'Spearman Rank Correlation (ρ)',
+      badge: 'monotonic association',
+      body: '<p>Spearman ρ is the Pearson correlation computed on the <em>ranks</em> of the data rather than raw values. It measures monotonic (not necessarily linear) association.</p>' +
+        '<div class="eq-formula">ρ = Pearson(rank(X), rank(Y))</div>' +
+        '<p class="info-section-label">Properties</p>' +
+        '<p>Robust to outliers and invariant under any monotone transformation. Suitable for ordinal data or monotonic-but-nonlinear relationships. Still fails for non-monotonic dependencies.</p>'
+    },
+    kendall: {
+      title: 'Kendall Rank Correlation (τ-b)',
+      badge: 'pairwise concordance',
+      body: '<p>Kendall τ examines every pair of observations and classifies it as concordant, discordant, or tied.</p>' +
+        '<div class="eq-formula">τ = (C − D) / √[(n₀ − tiedX)(n₀ − tiedY)]</div>' +
+        '<p class="info-section-label">When to prefer over Spearman</p>' +
+        '<p>Better statistical properties at small N. Handles ties more gracefully. In practice |τ| < |ρ| for the same data — they scale differently.</p>'
+    },
+    mi: {
+      title: 'Mutual Information (MI)',
+      badge: 'general dependence',
+      body: '<p>MI quantifies how much knowing one variable reduces uncertainty about the other. Detects <em>any</em> kind of statistical dependence.</p>' +
+        '<div class="eq-formula">I(X;Y) = ∫∫ p(x,y) log[p(x,y) / (p(x)p(y))] dx dy</div>' +
+        '<p class="info-section-label">Estimation</p>' +
+        '<p>Uses the KSG k-nearest-neighbour estimator (2004) with k=3. Upward-biased at small N.</p>'
+    },
+    dcor: {
+      title: 'Distance Correlation (dCor)',
+      badge: 'general dependence',
+      body: '<p>dCor = 0 if and only if X and Y are independent. Detects both linear and nonlinear association.</p>' +
+        '<div class="eq-formula">dCor(X,Y) = dCov(X,Y) / √[dVar(X) · dVar(Y)]</div>' +
+        '<p class="info-section-label">Range</p>' +
+        '<p>[0, 1]. Unsigned — measures dependence strength without indicating direction. Introduced by Székely, Rizzo & Bakirov (2007).</p>'
+    },
+  };
+
+  // Expose modal functions globally
+  window.ceShowInfo = function(key) {
+    const info = infoContent[key];
+    document.getElementById('modalTitle').textContent = info.title;
+    document.getElementById('modalBadge').textContent = info.badge;
+    document.getElementById('modalBody').innerHTML = info.body;
+    document.getElementById('modalOverlay').classList.add('active');
+  };
+  window.ceCloseInfo = function() {
+    document.getElementById('modalOverlay').classList.remove('active');
+  };
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') ceCloseInfo(); });
+
+  const canvas = document.getElementById('ceCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function getCanvasDims() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { W: rect.width, H: rect.height };
+  }
+
+  const PAD_L = 48, PAD_R = 16, PAD_T = 16, PAD_B = 40;
+  function plotW(W) { return W - PAD_L - PAD_R; }
+  function plotH(H) { return H - PAD_T - PAD_B; }
+  function toSx(v, W) { return PAD_L + v * plotW(W); }
+  function toSy(v, H) { return PAD_T + plotH(H) - v * plotH(H); }
+  function fromSx(sx, W) { return (sx - PAD_L) / plotW(W); }
+  function fromSy(sy, H) { return 1 - (sy - PAD_T) / plotH(H); }
+
+  function render() {
+    const { W, H } = getCanvasDims();
+    ctx.clearRect(0, 0, W, H);
+    const pw = plotW(W), ph = plotH(H);
+
+    ctx.strokeStyle = '#1e2030'; ctx.lineWidth = 0.5;
+    for (let t = 0; t <= 1.001; t += 0.2) {
+      const sx = toSx(t, W), sy = toSy(t, H);
+      ctx.beginPath(); ctx.moveTo(sx, PAD_T); ctx.lineTo(sx, PAD_T + ph); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(PAD_L, sy); ctx.lineTo(PAD_L + pw, sy); ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
+
+    ctx.font = '14px IBM Plex Mono, monospace'; ctx.fillStyle = '#6b7084'; ctx.textAlign = 'center';
+    for (let t = 0; t <= 1.001; t += 0.2) ctx.fillText(t.toFixed(1), toSx(t, W), PAD_T + ph + 16);
+    ctx.textAlign = 'right';
+    for (let t = 0; t <= 1.001; t += 0.2) ctx.fillText(t.toFixed(1), PAD_L - 6, toSy(t, H) + 4);
+
+    ctx.fillStyle = '#6b7084'; ctx.font = '15px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 30);
+    ctx.save(); ctx.translate(13, PAD_T + ph / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Y', 0, 0); ctx.restore();
+
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      const sx = toSx(p.x, W), sy = toSy(p.y, H);
+      ctx.beginPath(); ctx.arc(sx, sy, POINT_RADIUS, 0, Math.PI * 2);
+      ctx.fillStyle = (i === dragging) ? 'rgba(194, 100, 10, 0.9)' : 'rgba(109, 40, 217, 0.65)';
+      ctx.fill();
+    }
+
+    if (points.length === 0) {
+      ctx.fillStyle = '#2a2d3a'; ctx.font = '14px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
+      ctx.fillText('Click anywhere to add points', PAD_L + pw / 2, PAD_T + ph / 2);
+    }
+  }
+
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return { mx: e.clientX - rect.left, my: e.clientY - rect.top };
+  }
+
+  function findNearest(mx, my) {
+    const rect = canvas.getBoundingClientRect();
+    const W = rect.width, H = rect.height;
+    let best = -1, bestDist = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      const sx = toSx(points[i].x, W), sy = toSy(points[i].y, H);
+      const d = Math.hypot(mx - sx, my - sy);
+      if (d < bestDist) { bestDist = d; best = i; }
+    }
+    return bestDist <= GRAB_RADIUS ? best : -1;
+  }
+
+  canvas.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    const { mx, my } = getMousePos(e);
+    const rect = canvas.getBoundingClientRect();
+    const W = rect.width, H = rect.height;
+    if (e.shiftKey) { const idx = findNearest(mx, my); if (idx >= 0) { points.splice(idx, 1); update(); } return; }
+    const idx = findNearest(mx, my);
+    if (idx >= 0) { dragging = idx; dragStarted = false; render(); return; }
+    const x = Math.max(0, Math.min(1, fromSx(mx, W)));
+    const y = Math.max(0, Math.min(1, fromSy(my, H)));
+    points.push({ x, y }); update();
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (dragging === null) return;
+    dragStarted = true;
+    const { mx, my } = getMousePos(e);
+    const rect = canvas.getBoundingClientRect();
+    points[dragging].x = Math.max(0, Math.min(1, fromSx(mx, rect.width)));
+    points[dragging].y = Math.max(0, Math.min(1, fromSy(my, rect.height)));
+    update();
+  });
+
+  canvas.addEventListener('mouseup', () => { dragging = null; render(); });
+  canvas.addEventListener('mouseleave', () => { dragging = null; render(); });
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const mx = touch.clientX - rect.left, my = touch.clientY - rect.top;
+    const idx = findNearest(mx, my);
+    if (idx >= 0) { dragging = idx; dragStarted = false; render(); return; }
+    const x = Math.max(0, Math.min(1, fromSx(mx, rect.width)));
+    const y = Math.max(0, Math.min(1, fromSy(my, rect.height)));
+    points.push({ x, y }); update();
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (dragging === null) return;
+    e.preventDefault(); dragStarted = true;
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    points[dragging].x = Math.max(0, Math.min(1, fromSx(touch.clientX - rect.left, rect.width)));
+    points[dragging].y = Math.max(0, Math.min(1, fromSy(touch.clientY - rect.top, rect.height)));
+    update();
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', () => { dragging = null; render(); });
+
+  function pearson(pts) {
+    const n = pts.length; if (n < MIN_N_CORR) return null;
+    let sx=0,sy=0,sxx=0,syy=0,sxy=0;
+    for (const p of pts) { sx+=p.x; sy+=p.y; sxx+=p.x*p.x; syy+=p.y*p.y; sxy+=p.x*p.y; }
+    const num = n*sxy - sx*sy;
+    const den = Math.sqrt((n*sxx - sx*sx)*(n*syy - sy*sy));
+    return den < 1e-15 ? 0 : num/den;
+  }
+
+  function rank(arr) {
+    const n = arr.length;
+    const indexed = arr.map((v, i) => ({ v, i }));
+    indexed.sort((a, b) => a.v - b.v);
+    const ranks = new Array(n);
+    let i = 0;
+    while (i < n) {
+      let j = i;
+      while (j < n-1 && indexed[j+1].v === indexed[j].v) j++;
+      const avgRank = (i+j)/2 + 1;
+      for (let k = i; k <= j; k++) ranks[indexed[k].i] = avgRank;
+      i = j+1;
+    }
+    return ranks;
+  }
+
+  function spearman(pts) {
+    const n = pts.length; if (n < MIN_N_CORR) return null;
+    const rx = rank(pts.map(p => p.x)), ry = rank(pts.map(p => p.y));
+    return pearson(pts.map((_, i) => ({ x: rx[i], y: ry[i] })));
+  }
+
+  function kendall(pts) {
+    const n = pts.length; if (n < MIN_N_CORR) return null;
+    let concordant=0, discordant=0, tiedX=0, tiedY=0;
+    for (let i = 0; i < n; i++) for (let j = i+1; j < n; j++) {
+      const dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y;
+      if (Math.abs(dx)<1e-15 && Math.abs(dy)<1e-15) { tiedX++; tiedY++; }
+      else if (Math.abs(dx)<1e-15) tiedX++;
+      else if (Math.abs(dy)<1e-15) tiedY++;
+      else if (dx*dy > 0) concordant++;
+      else discordant++;
+    }
+    const n0 = n*(n-1)/2;
+    const den = Math.sqrt((n0-tiedX)*(n0-tiedY));
+    return den < 1e-15 ? 0 : (concordant-discordant)/den;
+  }
+
+  function mutualInfo(pts) {
+    const n = pts.length, k = 3;
+    if (n < k+1) return null;
+    function digamma(x) {
+      if (x < 1e-6) return -0.5772156649 - 1/x;
+      let result = 0;
+      while (x < 6) { result -= 1/x; x += 1; }
+      result += Math.log(x) - 1/(2*x);
+      const x2 = 1/(x*x);
+      result -= x2*(1/12 - x2*(1/120 - x2/252));
+      return result;
+    }
+    const eps = new Array(n), nx = new Array(n), ny = new Array(n);
+    for (let i = 0; i < n; i++) {
+      const dists = [];
+      for (let j = 0; j < n; j++) { if (j===i) continue; dists.push(Math.max(Math.abs(pts[i].x-pts[j].x), Math.abs(pts[i].y-pts[j].y))); }
+      dists.sort((a,b) => a-b);
+      eps[i] = dists[k-1];
+      let cx=0, cy=0;
+      for (let j = 0; j < n; j++) { if (j===i) continue; if (Math.abs(pts[i].x-pts[j].x)<eps[i]) cx++; if (Math.abs(pts[i].y-pts[j].y)<eps[i]) cy++; }
+      nx[i] = cx; ny[i] = cy;
+    }
+    let sumDg = 0;
+    for (let i = 0; i < n; i++) sumDg += digamma(nx[i]+1) + digamma(ny[i]+1);
+    return Math.max(0, digamma(k) - sumDg/n + digamma(n));
+  }
+
+  function distanceCorrelation(pts) {
+    const n = pts.length; if (n < MIN_N_DCOR) return null;
+    const ax = Array.from({length:n}, (_,i) => Array.from({length:n}, (_,j) => Math.abs(pts[i].x-pts[j].x)));
+    const ay = Array.from({length:n}, (_,i) => Array.from({length:n}, (_,j) => Math.abs(pts[i].y-pts[j].y)));
+    function doubleCenter(a) {
+      const rowMean = a.map(row => row.reduce((s,v)=>s+v,0)/n);
+      const colMean = new Array(n);
+      for (let j=0;j<n;j++) { let s=0; for (let i=0;i<n;i++) s+=a[i][j]; colMean[j]=s/n; }
+      let grandMean=0; for (let i=0;i<n;i++) grandMean+=rowMean[i]; grandMean/=n;
+      return Array.from({length:n}, (_,i) => Array.from({length:n}, (_,j) => a[i][j]-rowMean[i]-colMean[j]+grandMean));
+    }
+    const Ax = doubleCenter(ax), Ay = doubleCenter(ay);
+    let dCovXY=0, dVarX=0, dVarY=0;
+    for (let i=0;i<n;i++) for (let j=0;j<n;j++) { dCovXY+=Ax[i][j]*Ay[i][j]; dVarX+=Ax[i][j]*Ax[i][j]; dVarY+=Ay[i][j]*Ay[i][j]; }
+    dCovXY/=(n*n); dVarX/=(n*n); dVarY/=(n*n);
+    const den = Math.sqrt(dVarX*dVarY);
+    return den < 1e-15 ? 0 : Math.sqrt(Math.max(0,dCovXY)/den);
+  }
+
+  function update() { render(); computeAndDisplay(); }
+
+  function computeAndDisplay() {
+    const n = points.length;
+    document.getElementById('nValue').textContent = n;
+    const measures = [
+      { id:'pearson', fn:pearson, signed:true },
+      { id:'spearman', fn:spearman, signed:true },
+      { id:'kendall', fn:kendall, signed:true },
+      { id:'mi', fn:mutualInfo, signed:false },
+      { id:'dcor', fn:distanceCorrelation, signed:false },
+    ];
+    let miMax = 1;
+    for (const m of measures) {
+      const val = m.fn(points);
+      const valEl = document.getElementById('val-'+m.id);
+      const barEl = document.getElementById('bar-'+m.id);
+      const cardEl = document.getElementById('card-'+m.id);
+      if (val === null) {
+        valEl.textContent = '—'; valEl.className = 'ce-stat-value na';
+        barEl.style.width = '0%'; barEl.style.background = '#2a2d3a';
+        cardEl.classList.remove('active'); continue;
+      }
+      cardEl.classList.add('active');
+      valEl.textContent = val.toFixed(4); valEl.className = 'ce-stat-value';
+      if (m.signed) valEl.style.color = val > 0.05 ? '#2dd4bf' : val < -0.05 ? '#c2640a' : '#6b7084';
+      else valEl.style.color = '#2dd4bf';
+      let barPct;
+      if (m.signed) barPct = Math.abs(val)*100;
+      else if (m.id === 'mi') { miMax = Math.max(miMax, val*1.2, 1); barPct = (val/miMax)*100; }
+      else barPct = val*100;
+      barEl.style.width = Math.min(100, barPct)+'%';
+      barEl.style.background = (m.signed && val < 0) ? '#c2640a' : '#2dd4bf';
+    }
+  }
+
+  function getPresetN() { return parseInt(document.getElementById('s_n').value); }
+  function getStrength() { return parseFloat(document.getElementById('s_str').value); }
+
+  function randn() {
+    let u,v,s;
+    do { u=Math.random()*2-1; v=Math.random()*2-1; s=u*u+v*v; } while (s>=1||s===0);
+    return u*Math.sqrt(-2*Math.log(s)/s);
+  }
+
+  function clamp(v) { return Math.max(0, Math.min(1, v)); }
+
+  function rescaleToUnit(pts) {
+    if (pts.length < 2) return;
+    let xmin=Infinity, xmax=-Infinity, ymin=Infinity, ymax=-Infinity;
+    for (const p of pts) { if (p.x<xmin) xmin=p.x; if (p.x>xmax) xmax=p.x; if (p.y<ymin) ymin=p.y; if (p.y>ymax) ymax=p.y; }
+    const xr=xmax-xmin||1, yr=ymax-ymin||1;
+    for (const p of pts) { p.x=0.05+0.9*(p.x-xmin)/xr; p.y=0.05+0.9*(p.y-ymin)/yr; }
+  }
+
+  window.ceLoadPreset = function(name) {
+    points = [];
+    const N = getPresetN(), str = getStrength(), absStr = Math.abs(str);
+    switch (name) {
+      case 'linear': {
+        const raw = [];
+        for (let i=0;i<N;i++) { const xz=randn(); const nf=Math.sqrt(Math.max(0,1-str*str)); raw.push({x:xz, y:str*xz+nf*randn()}); }
+        rescaleToUnit(raw); points = raw; break;
+      }
+      case 'quadratic': { const noise=(1-absStr)*0.45; for (let i=0;i<N;i++) { const x=Math.random(); points.push({x, y:clamp(0.1+3.2*(x-0.5)**2+randn()*noise)}); } break; }
+      case 'heteroscedastic': { const raw=[]; for (let i=0;i<N;i++) { const xz=randn(); const nf=Math.sqrt(Math.max(0,1-str*str)); raw.push({x:xz,y:str*xz+nf*Math.abs(xz)*randn()}); } rescaleToUnit(raw); points=raw; break; }
+      case 'circle': { const spread=(1-absStr)*0.35; for (let i=0;i<N;i++) { const a=Math.random()*Math.PI*2; const r=0.35+randn()*Math.max(0.005,spread); points.push({x:clamp(0.5+r*Math.cos(a)),y:clamp(0.5+r*Math.sin(a))}); } break; }
+      case 'x-shape': { const noise=(1-absStr)*0.35; for (let i=0;i<N;i++) { const x=Math.random(); const base=Math.random()<0.5?x:1-x; points.push({x:clamp(x),y:clamp(base+randn()*noise)}); } break; }
+      case 'sine': { const noise=(1-absStr)*0.3; for (let i=0;i<N;i++) { const x=Math.random(); points.push({x,y:clamp(0.5+0.35*Math.sin(x*Math.PI*3)+randn()*noise)}); } break; }
+      case 'random': for (let i=0;i<N;i++) points.push({x:Math.random(),y:Math.random()}); break;
+    }
+    update();
+  };
+
+  window.ceClearPoints = function() { points = []; update(); };
+
+  window.addEventListener('resize', render);
+  render();
+  computeAndDisplay();
+})();
+</script>
+
+<!-- ==================== STABILITY JS ==================== -->
 <script>
 (function() {
   const trajCanvas = document.getElementById('trajCanvas');
@@ -228,7 +835,6 @@ summary: "Watch simulated correlation trajectories converge to the true value as
 
   const N_MIN = 10, N_MAX = 500;
 
-  // Table 1 data (from paper, COS width in r metric)
   const table1 = [
     [.1, 252,110,61, 362,158,88, 470,209,116],
     [.2, 238,104,57, 341,150,83, 446,197,109],
@@ -251,81 +857,62 @@ summary: "Watch simulated correlation trajectories converge to the true value as
     }
   }
 
-  // RNG
   function randn() {
-    let u = 0, v = 0;
-    while (u === 0) u = Math.random();
-    while (v === 0) v = Math.random();
-    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    let u=0, v=0;
+    while (u===0) u=Math.random();
+    while (v===0) v=Math.random();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
   }
 
   function generateBivariate(N, rho) {
-    const xs = [], ys = [];
-    for (let i = 0; i < N; i++) {
-      const z1 = randn(), z2 = randn();
-      xs.push(z1);
-      ys.push(rho * z1 + Math.sqrt(1 - rho * rho) * z2);
-    }
+    const xs=[], ys=[];
+    for (let i=0;i<N;i++) { const z1=randn(),z2=randn(); xs.push(z1); ys.push(rho*z1+Math.sqrt(1-rho*rho)*z2); }
     return { xs, ys };
   }
 
   function runningCorrelations(xs, ys) {
-    const N = xs.length, rs = [];
+    const N=xs.length, rs=[];
     let sx=0,sy=0,sxx=0,syy=0,sxy=0;
-    for (let i = 0; i < N; i++) {
+    for (let i=0;i<N;i++) {
       sx+=xs[i]; sy+=ys[i]; sxx+=xs[i]*xs[i]; syy+=ys[i]*ys[i]; sxy+=xs[i]*ys[i];
-      if (i+1 >= N_MIN) {
-        const n = i+1;
-        const num = n*sxy - sx*sy;
-        const den = Math.sqrt((n*sxx-sx*sx)*(n*syy-sy*sy));
-        rs.push(den===0 ? 0 : num/den);
-      }
+      if (i+1>=N_MIN) { const n=i+1; const num=n*sxy-sx*sy; const den=Math.sqrt((n*sxx-sx*sx)*(n*syy-sy*sy)); rs.push(den===0?0:num/den); }
     }
     return rs;
   }
 
   function findPOS(rs, rho, w) {
-    const lo = rho-w, hi = rho+w;
-    let pos = N_MIN;
-    for (let k = rs.length-1; k >= 0; k--) {
-      if (rs[k] < lo || rs[k] > hi) { pos = N_MIN+k+1; break; }
-    }
+    const lo=rho-w, hi=rho+w;
+    let pos=N_MIN;
+    for (let k=rs.length-1;k>=0;k--) { if (rs[k]<lo||rs[k]>hi) { pos=N_MIN+k+1; break; } }
     return pos;
   }
 
-  let trajectories = [], posValues = [];
-  let animFrame = null, animN = N_MIN;
+  let trajectories=[], posValues=[];
+  let animFrame=null, animN=N_MIN;
 
   function simulate() {
     cancelAnimation();
-    const rho = parseFloat(rhoSlider.value);
-    const w = parseFloat(wSlider.value);
-    const nTraj = parseInt(trajSlider.value);
-    trajectories = []; posValues = [];
-    for (let t = 0; t < nTraj; t++) {
-      const { xs, ys } = generateBivariate(N_MAX, rho);
-      const rs = runningCorrelations(xs, ys);
-      trajectories.push(rs);
-      posValues.push(findPOS(rs, rho, w));
+    const rho=parseFloat(rhoSlider.value), w=parseFloat(wSlider.value), nTraj=parseInt(trajSlider.value);
+    trajectories=[]; posValues=[];
+    for (let t=0;t<nTraj;t++) {
+      const {xs,ys}=generateBivariate(N_MAX,rho);
+      const rs=runningCorrelations(xs,ys);
+      trajectories.push(rs); posValues.push(findPOS(rs,rho,w));
     }
-    posValues.sort((a,b) => a-b);
-    updateStats(rho, w);
-    drawTrajectories(N_MAX);
-    drawPOSDistribution();
+    posValues.sort((a,b)=>a-b);
+    updateStats(rho,w); drawTrajectories(N_MAX); drawPOSDistribution();
   }
 
   function updateStats(rho, w) {
-    const lo = Math.max(-1,rho-w).toFixed(2);
-    const hi = Math.min(1,rho+w).toFixed(2);
+    const lo=Math.max(-1,rho-w).toFixed(2), hi=Math.min(1,rho+w).toFixed(2);
     document.getElementById('cosRange').textContent = `[${lo}, ${hi}]`;
     if (!posValues.length) return;
-    const s = [...posValues];
+    const s=[...posValues];
     document.getElementById('medianPOS').textContent = `n = ${s[Math.floor(s.length*0.5)]}`;
     document.getElementById('p80POS').textContent = `n = ${s[Math.min(s.length-1, Math.floor(s.length*0.8))]}`;
     document.getElementById('pctStable').textContent = `${(s.filter(v=>v<=250).length/s.length*100).toFixed(0)}%`;
   }
 
-  // Colors for trajectories
   const palette = [
     '#818cf8','#a78bfa','#c084fc','#f472b6','#fb923c',
     '#facc15','#4ade80','#22d3ee','#60a5fa','#e879f9',
@@ -334,223 +921,140 @@ summary: "Watch simulated correlation trajectories converge to the true value as
   ];
 
   function setupCanvas(canvas) {
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    const ctx = canvas.getContext('2d');
+    const dpr=window.devicePixelRatio||1;
+    const rect=canvas.getBoundingClientRect();
+    canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+    const ctx=canvas.getContext('2d');
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    return { ctx, W: rect.width, H: rect.height };
+    return { ctx, W:rect.width, H:rect.height };
   }
 
   function drawTrajectories(maxN) {
-    const { ctx, W, H } = setupCanvas(trajCanvas);
-    const rho = parseFloat(rhoSlider.value);
-    const w = parseFloat(wSlider.value);
+    const {ctx,W,H}=setupCanvas(trajCanvas);
+    const rho=parseFloat(rhoSlider.value), w=parseFloat(wSlider.value);
+    const pad={top:24,right:20,bottom:66,left:52};
+    const pw=W-pad.left-pad.right, ph=H-pad.top-pad.bottom;
+    const ySpan=Math.max(0.5,w+0.25);
+    let yMin=Math.max(-1,rho-ySpan), yMax=Math.min(1,rho+ySpan);
+    if (yMax-yMin<0.4) { yMin=rho-0.3; yMax=rho+0.3; }
+    yMin=Math.max(-1,yMin); yMax=Math.min(1,yMax);
+    const xPx=n=>pad.left+(n-N_MIN)/(N_MAX-N_MIN)*pw;
+    const yPx=r=>pad.top+(1-(r-yMin)/(yMax-yMin))*ph;
 
-    const pad = { top:24, right:20, bottom:66, left:52 };
-    const pw = W-pad.left-pad.right, ph = H-pad.top-pad.bottom;
+    ctx.fillStyle='#181a24'; ctx.fillRect(0,0,W,H);
 
-    const ySpan = Math.max(0.5, w+0.25);
-    let yMin = Math.max(-1, rho-ySpan), yMax = Math.min(1, rho+ySpan);
-    if (yMax-yMin < 0.4) { yMin = rho-0.3; yMax = rho+0.3; }
-    yMin = Math.max(-1,yMin); yMax = Math.min(1,yMax);
-
-    const xPx = n => pad.left + (n-N_MIN)/(N_MAX-N_MIN)*pw;
-    const yPx = r => pad.top + (1-(r-yMin)/(yMax-yMin))*ph;
-
-    // Background
-    ctx.fillStyle = '#181a24';
-    ctx.fillRect(0,0,W,H);
-
-    // Grid
-    ctx.strokeStyle = '#1e2030';
-    ctx.lineWidth = 1;
-    for (let y = Math.ceil(yMin/0.1)*0.1; y <= yMax+0.001; y += 0.1) {
-      const py = yPx(y);
+    ctx.strokeStyle='#1e2030'; ctx.lineWidth=1;
+    for (let y=Math.ceil(yMin/0.1)*0.1;y<=yMax+0.001;y+=0.1) {
+      const py=yPx(y);
       ctx.beginPath(); ctx.moveTo(pad.left,py); ctx.lineTo(W-pad.right,py); ctx.stroke();
-      ctx.fillStyle = '#6b7084'; ctx.font = '11px IBM Plex Mono';
-      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-      ctx.fillText(y.toFixed(1), pad.left-8, py);
+      ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='right'; ctx.textBaseline='middle';
+      ctx.fillText(y.toFixed(1),pad.left-8,py);
     }
     for (const n of [50,100,150,200,250,300,350,400,450,500]) {
-      if (n < N_MIN || n > N_MAX) continue;
-      const px = xPx(n);
+      if (n<N_MIN||n>N_MAX) continue;
+      const px=xPx(n);
       ctx.beginPath(); ctx.moveTo(px,pad.top); ctx.lineTo(px,H-pad.bottom); ctx.stroke();
-      ctx.fillStyle = '#6b7084'; ctx.font = '11px IBM Plex Mono';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      ctx.fillText(n, px, H-pad.bottom+10);
+      ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillText(n,px,H-pad.bottom+10);
     }
 
-    // Axis labels
-    ctx.fillStyle = '#6b7084'; ctx.font = '11px IBM Plex Mono'; ctx.textAlign = 'center';
-    ctx.fillText('Sample size (n)', pad.left+pw/2, H-16);
-    ctx.save(); ctx.translate(12, pad.top+ph/2); ctx.rotate(-Math.PI/2);
-    ctx.fillText('Correlation (r)', 0, 0); ctx.restore();
+    ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillText('Sample size (n)',pad.left+pw/2,H-16);
+    ctx.save(); ctx.translate(12,pad.top+ph/2); ctx.rotate(-Math.PI/2); ctx.fillText('Correlation (r)',0,0); ctx.restore();
 
-    // COS band
-    const cosLoY = yPx(Math.max(yMin, rho-w));
-    const cosHiY = yPx(Math.min(yMax, rho+w));
-    ctx.fillStyle = 'rgba(45,212,191,0.06)';
-    ctx.fillRect(pad.left, cosHiY, pw, cosLoY-cosHiY);
+    const cosLoY=yPx(Math.max(yMin,rho-w)), cosHiY=yPx(Math.min(yMax,rho+w));
+    ctx.fillStyle='rgba(45,212,191,0.06)'; ctx.fillRect(pad.left,cosHiY,pw,cosLoY-cosHiY);
 
-    // COS borders
-    ctx.strokeStyle = 'rgba(45,212,191,0.35)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([6,4]);
-    for (const bound of [rho+w, rho-w]) {
-      if (bound >= yMin && bound <= yMax) {
-        ctx.beginPath(); ctx.moveTo(pad.left, yPx(bound)); ctx.lineTo(W-pad.right, yPx(bound)); ctx.stroke();
-      }
-    }
+    ctx.strokeStyle='rgba(45,212,191,0.35)'; ctx.lineWidth=1; ctx.setLineDash([6,4]);
+    for (const bound of [rho+w,rho-w]) { if (bound>=yMin&&bound<=yMax) { ctx.beginPath(); ctx.moveTo(pad.left,yPx(bound)); ctx.lineTo(W-pad.right,yPx(bound)); ctx.stroke(); } }
     ctx.setLineDash([]);
 
-    // True rho
-    ctx.strokeStyle = '#2dd4bf';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4,3]);
-    ctx.beginPath(); ctx.moveTo(pad.left, yPx(rho)); ctx.lineTo(W-pad.right, yPx(rho)); ctx.stroke();
+    ctx.strokeStyle='#2dd4bf'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(pad.left,yPx(rho)); ctx.lineTo(W-pad.right,yPx(rho)); ctx.stroke();
     ctx.setLineDash([]);
 
-    // Trajectories
-    const drawUpTo = Math.min(maxN, N_MAX) - N_MIN;
-    for (let t = 0; t < trajectories.length; t++) {
-      const rs = trajectories[t];
-      const end = Math.min(drawUpTo, rs.length);
-      ctx.strokeStyle = palette[t % palette.length];
-      ctx.globalAlpha = 0.5;
-      ctx.lineWidth = 1.3;
+    const drawUpTo=Math.min(maxN,N_MAX)-N_MIN;
+    for (let t=0;t<trajectories.length;t++) {
+      const rs=trajectories[t]; const end=Math.min(drawUpTo,rs.length);
+      ctx.strokeStyle=palette[t%palette.length]; ctx.globalAlpha=0.5; ctx.lineWidth=1.3;
       ctx.beginPath();
-      for (let k = 0; k < end; k++) {
-        const px = xPx(N_MIN+k), py = yPx(rs[k]);
-        k === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-      }
+      for (let k=0;k<end;k++) { const px=xPx(N_MIN+k),py=yPx(rs[k]); k===0?ctx.moveTo(px,py):ctx.lineTo(px,py); }
       ctx.stroke();
     }
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha=1;
 
-    // Labels
-    ctx.fillStyle = 'rgba(45,212,191,0.55)'; ctx.font = '11px IBM Plex Mono'; ctx.textAlign = 'left';
-    ctx.fillText(`\u03C1 = ${rho.toFixed(2)}`, pad.left+6, yPx(Math.min(yMax, rho+w))-8);
+    ctx.fillStyle='rgba(45,212,191,0.55)'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='left';
+    ctx.fillText(`\u03C1 = ${rho.toFixed(2)}`,pad.left+6,yPx(Math.min(yMax,rho+w))-8);
   }
 
   function drawPOSDistribution() {
-    const { ctx, W, H } = setupCanvas(posCanvas);
-    const pad = { top:20, right:20, bottom:66, left:52 };
-    const pw = W-pad.left-pad.right, ph = H-pad.top-pad.bottom;
-
-    ctx.fillStyle = '#181a24';
-    ctx.fillRect(0,0,W,H);
-
+    const {ctx,W,H}=setupCanvas(posCanvas);
+    const pad={top:20,right:20,bottom:66,left:52};
+    const pw=W-pad.left-pad.right, ph=H-pad.top-pad.bottom;
+    ctx.fillStyle='#181a24'; ctx.fillRect(0,0,W,H);
     if (!posValues.length) return;
 
-    // Histogram bins
-    const binWidth = 20;
-    const bins = {};
-    let maxCount = 0;
-    for (const pos of posValues) {
-      const bin = Math.floor(pos / binWidth) * binWidth;
-      bins[bin] = (bins[bin]||0) + 1;
-      if (bins[bin] > maxCount) maxCount = bins[bin];
-    }
+    const binWidth=20; const bins={}; let maxCount=0;
+    for (const pos of posValues) { const bin=Math.floor(pos/binWidth)*binWidth; bins[bin]=(bins[bin]||0)+1; if (bins[bin]>maxCount) maxCount=bins[bin]; }
+    const xPx=n=>pad.left+(n-N_MIN)/(N_MAX-N_MIN)*pw;
+    const hPx=c=>(c/maxCount)*ph;
 
-    const xPx = n => pad.left + (n-N_MIN)/(N_MAX-N_MIN)*pw;
-    const hPx = c => (c/maxCount)*ph;
-
-    // Grid
-    ctx.strokeStyle = '#1e2030'; ctx.lineWidth = 1;
+    ctx.strokeStyle='#1e2030'; ctx.lineWidth=1;
     for (const n of [50,100,150,200,250,300,350,400,450,500]) {
-      const px = xPx(n);
+      const px=xPx(n);
       ctx.beginPath(); ctx.moveTo(px,pad.top); ctx.lineTo(px,H-pad.bottom); ctx.stroke();
-      ctx.fillStyle = '#6b7084'; ctx.font = '11px IBM Plex Mono';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      ctx.fillText(n, px, H-pad.bottom+10);
+      ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillText(n,px,H-pad.bottom+10);
     }
 
-    // Bars
-    for (const [bin, count] of Object.entries(bins)) {
-      const b = parseInt(bin);
-      const x = xPx(b);
-      const barW = xPx(b+binWidth) - x - 1;
-      const barH = hPx(count);
-      ctx.fillStyle = 'rgba(129,140,248,0.4)';
-      ctx.fillRect(x, H-pad.bottom-barH, barW, barH);
-      ctx.strokeStyle = 'rgba(129,140,248,0.7)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(x, H-pad.bottom-barH, barW, barH);
+    for (const [bin,count] of Object.entries(bins)) {
+      const b=parseInt(bin); const x=xPx(b); const barW=xPx(b+binWidth)-x-1; const barH=hPx(count);
+      ctx.fillStyle='rgba(129,140,248,0.4)'; ctx.fillRect(x,H-pad.bottom-barH,barW,barH);
+      ctx.strokeStyle='rgba(129,140,248,0.7)'; ctx.lineWidth=1; ctx.strokeRect(x,H-pad.bottom-barH,barW,barH);
     }
 
-    // 80th percentile line
-    const p80 = posValues[Math.min(posValues.length-1, Math.floor(posValues.length*0.8))];
-    const p80x = xPx(p80);
-    ctx.strokeStyle = '#f97316';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5,3]);
-    ctx.beginPath(); ctx.moveTo(p80x, pad.top); ctx.lineTo(p80x, H-pad.bottom); ctx.stroke();
+    const p80=posValues[Math.min(posValues.length-1,Math.floor(posValues.length*0.8))];
+    const p80x=xPx(p80);
+    ctx.strokeStyle='#f97316'; ctx.lineWidth=2; ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(p80x,pad.top); ctx.lineTo(p80x,H-pad.bottom); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#f97316'; ctx.font = '11px IBM Plex Mono'; ctx.textAlign = 'left';
-    ctx.fillText(`80th pctl: n=${p80}`, p80x+6, pad.top+12);
+    ctx.fillStyle='#f97316'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='left';
+    ctx.fillText(`80th pctl: n=${p80}`,p80x+6,pad.top+12);
 
-    // Axis label
-    ctx.fillStyle = '#6b7084'; ctx.font = '11px IBM Plex Mono'; ctx.textAlign = 'center';
-    ctx.fillText('Point of stability (n)', pad.left+pw/2, H-16);
+    ctx.fillStyle='#6b7084'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillText('Point of stability (n)',pad.left+pw/2,H-16);
   }
 
-  // Animation
-  function cancelAnimation() {
-    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
-    animateBtn.textContent = 'Animate';
-  }
+  function cancelAnimation() { if (animFrame) { cancelAnimationFrame(animFrame); animFrame=null; } animateBtn.textContent='Animate'; }
 
   function startAnimation() {
-    const rho = parseFloat(rhoSlider.value);
-    const w = parseFloat(wSlider.value);
-    const nTraj = parseInt(trajSlider.value);
-    trajectories = []; posValues = [];
-    for (let t = 0; t < nTraj; t++) {
-      const { xs, ys } = generateBivariate(N_MAX, rho);
-      const rs = runningCorrelations(xs, ys);
-      trajectories.push(rs);
-      posValues.push(findPOS(rs, rho, w));
-    }
-    posValues.sort((a,b) => a-b);
-    updateStats(rho, w);
-
-    animN = N_MIN;
-    animateBtn.textContent = 'Stop';
+    const rho=parseFloat(rhoSlider.value), w=parseFloat(wSlider.value), nTraj=parseInt(trajSlider.value);
+    trajectories=[]; posValues=[];
+    for (let t=0;t<nTraj;t++) { const {xs,ys}=generateBivariate(N_MAX,rho); const rs=runningCorrelations(xs,ys); trajectories.push(rs); posValues.push(findPOS(rs,rho,w)); }
+    posValues.sort((a,b)=>a-b); updateStats(rho,w);
+    animN=N_MIN; animateBtn.textContent='Stop';
     function step() {
-      animN += 3;
-      if (animN > N_MAX) {
-        animN = N_MAX;
-        drawTrajectories(animN);
-        drawPOSDistribution();
-        cancelAnimation();
-        return;
-      }
-      drawTrajectories(animN);
-      animFrame = requestAnimationFrame(step);
+      animN+=3;
+      if (animN>N_MAX) { animN=N_MAX; drawTrajectories(animN); drawPOSDistribution(); cancelAnimation(); return; }
+      drawTrajectories(animN); animFrame=requestAnimationFrame(step);
     }
-    animFrame = requestAnimationFrame(step);
+    animFrame=requestAnimationFrame(step);
   }
 
-  animateBtn.addEventListener('click', () => {
-    if (animFrame) cancelAnimation();
-    else startAnimation();
-  });
+  animateBtn.addEventListener('click', () => { if (animFrame) cancelAnimation(); else startAnimation(); });
 
   function onSliderChange() {
-    rhoVal.textContent = parseFloat(rhoSlider.value).toFixed(2);
-    wVal.textContent = '\u00B1' + parseFloat(wSlider.value).toFixed(2);
-    trajVal.textContent = trajSlider.value;
-    buildTable(parseFloat(rhoSlider.value));
-    simulate();
+    rhoVal.textContent=parseFloat(rhoSlider.value).toFixed(2);
+    wVal.textContent='\u00B1'+parseFloat(wSlider.value).toFixed(2);
+    trajVal.textContent=trajSlider.value;
+    buildTable(parseFloat(rhoSlider.value)); simulate();
   }
 
   rhoSlider.addEventListener('input', onSliderChange);
   wSlider.addEventListener('input', onSliderChange);
   trajSlider.addEventListener('input', onSliderChange);
   resampleBtn.addEventListener('click', simulate);
-  window.addEventListener('resize', () => { drawTrajectories(animFrame ? animN : N_MAX); drawPOSDistribution(); });
+  window.addEventListener('resize', () => { drawTrajectories(animFrame?animN:N_MAX); drawPOSDistribution(); });
 
   buildTable(parseFloat(rhoSlider.value));
   simulate();
@@ -560,13 +1064,14 @@ summary: "Watch simulated correlation trajectories converge to the true value as
   <!-- Citation -->
   <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
     <h5 id="citation">Citation</h5>
-    <p>Persson, B. N. (2026). <em>At what sample size do correlations stabilize?</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/correlation-stability/" target="_blank">https://bjorn-persson.github.io/visualizations/correlation-stability/</a></p>
+    <p>Persson, B. N. (2026). <em>Correlation Explorer & Correlation Stability</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/correlation-stability/" target="_blank">https://bjorn-persson.github.io/visualizations/correlation-stability/</a></p>
     <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026correlationstability,
 </span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
-</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{At What Sample Size Do Correlations Stabilize?}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Correlation Explorer \& Correlation Stability}</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/correlation-stability/}</span>}
 </span></span></code></pre></div>
   </div>
 
+</output>
