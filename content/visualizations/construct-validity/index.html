@@ -377,6 +377,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
     gap: 24px;
     flex-wrap: wrap;
     margin-bottom: 20px;
+    max-width: 800px;
   }
   .mtmm-control {
     flex: 1;
@@ -415,6 +416,9 @@ summary: "Compare six influential frameworks for construct validity and see how 
     letter-spacing: 0.05em;
     border-bottom: 1px solid var(--border);
     padding-bottom: 4px;
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0;
   }
   .mtmm-table td {
     padding: 6px 10px;
@@ -424,11 +428,11 @@ summary: "Compare six influential frameworks for construct validity and see how 
     min-width: 52px;
     transition: background 0.2s;
   }
-  .mtmm-table td.cell-conv { background: rgba(45,212,191,0.12); color: var(--teal); font-weight: 600; }
-  .mtmm-table td.cell-mono { background: rgba(249,115,22,0.08); }
-  .mtmm-table td.cell-mono.warn { background: rgba(249,115,22,0.18); color: var(--orange); font-weight: 600; }
-  .mtmm-table td.cell-hetero { color: var(--text-dim); }
-  .mtmm-table td.cell-diag { background: var(--bg-elevated); color: var(--text-dim); }
+  .mtmm-table td.cell-conv { background: rgba(45,212,191,0.18); color: var(--teal); font-weight: 600; }
+  .mtmm-table td.cell-mono { background: rgba(249,115,22,0.16); color: var(--orange); }
+  .mtmm-table td.cell-mono.warn { background: rgba(249,115,22,0.22); color: var(--orange); font-weight: 600; }
+  .mtmm-table td.cell-hetero { background: rgba(139,92,246,0.10); color: #a78bda; }
+  .mtmm-table td.cell-diag { background: rgba(250,204,21,0.10); color: #d4b94e; font-weight: 600; }
   .mtmm-table td.cell-empty { border: none; background: transparent; }
   .mtmm-table th.row-label { text-align: right; border: none; padding-right: 12px; }
   .mtmm-legend {
@@ -541,20 +545,6 @@ summary: "Compare six influential frameworks for construct validity and see how 
     line-height: 1.5;
   }
 
-  /* Contextual aside */
-  .ctx-aside {
-    font-family: var(--mono);
-    font-size: 0.75em;
-    color: var(--text-dim);
-    background: var(--bg-elevated);
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin: 16px 0;
-    line-height: 1.55;
-    max-width: 680px;
-  }
-  .ctx-aside strong { color: var(--text); }
-
   /* Mobile */
   @media (max-width: 640px) {
     .fw-select { gap: 6px; }
@@ -579,6 +569,8 @@ summary: "Compare six influential frameworks for construct validity and see how 
   </div>
 
   <div class="section">
+    <div class="section-label">Section 1</div>
+    <h2>Six Frameworks for Construct Validity</h2>
     <p>Construct validity is the central question in psychological measurement: does a test actually measure the theoretical construct it's intended to measure? Over 70 years, several influential frameworks have emerged &mdash; each asking this question differently. Explore each below, applied to the same running example: <strong>a depression screening questionnaire (the PHQ-9)</strong>.</p>
 
     <div class="fw-select">
@@ -621,7 +613,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
         <strong>Key idea:</strong> Validity is not a property of a test alone &mdash; it is a property of a construct's place in theory. Without a nomological network, there is nothing to validate against. The construct's meaning <em>is</em> its web of lawful relationships.
       </div>
 
-      <div class="ctx-aside">
+      <div class="note caveat">
         <strong><a href="https://doi.org/10.1037/0033-2909.93.1.179" target="_blank">Embretson (1983)</a></strong> later refined this approach by splitting the nomological network into two components: <em>construct representation</em> (the cognitive processes underlying test performance) and <em>nomothetic span</em> (external correlates). This distinguished the internal "how does the test work?" question from the external "what does it predict?" question &mdash; a distinction the original framework left implicit.
       </div>
     </div>
@@ -652,13 +644,18 @@ summary: "Compare six influential frameworks for construct validity and see how 
       </div>
 
       <div class="mtmm-legend">
-        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(45,212,191,0.15)"></div> Convergent (same trait, diff method)</div>
-        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(249,115,22,0.12)"></div> Heterotrait-monomethod</div>
-        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:transparent"></div> Heterotrait-heteromethod</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(250,204,21,0.15)"></div> Reliability (diagonal)</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(45,212,191,0.20)"></div> Convergent (same trait, diff method)</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(249,115,22,0.35)"></div> Heterotrait-monomethod</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(139,92,246,0.15)"></div> Heterotrait-heteromethod</div>
       </div>
 
       <div class="mtmm-wrap">
         <table class="mtmm-table" id="mtmm-table"></table>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:0.72em;color:var(--text-dim);margin-bottom:12px;">
+        D = Depression, A = Anxiety, F = Fatigue; SR = Self-Report, CR = Clinician Rating
       </div>
 
       <div class="mtmm-criteria" id="mtmm-criteria"></div>
@@ -699,7 +696,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
         <strong>Key idea:</strong> Most validation studies address only content and external (criterion-related) evidence, ignoring consequences entirely. For Messick, this is an incomplete argument &mdash; you cannot claim a test is valid without considering how its use affects people.
       </div>
 
-      <div class="ctx-aside">
+      <div class="note caveat">
         <strong><a href="https://doi.org/10.2466/pr0.1957.3.3.635" target="_blank">Loevinger (1957)</a></strong> anticipated much of Messick's framework, arguing that construct validity subsumes all other forms. Her three components &mdash; substantive, structural, and external &mdash; directly prefigure Messick's more elaborated six facets. &mdash; <strong><a href="https://doi.org/10.3102/0013189X07311286" target="_blank">Lissitz &amp; Samuelsen (2007)</a></strong> pushed back in the other direction, arguing that consequences belong to a test's <em>utility</em>, not its validity. In their view, construct validity should rest strictly on internal evidence: content, reliability, and the cognitive processes items elicit.
       </div>
     </div>
@@ -798,7 +795,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
         <strong>Key idea:</strong> If constructs are networks rather than latent variables, then "construct validity" in the traditional sense may not apply. There is no single attribute to measure &mdash; instead, the question becomes whether the test adequately captures the network's structure and dynamics.
       </div>
 
-      <div class="ctx-aside">
+      <div class="note caveat">
         This framework raises a deep challenge for Borsboom's causal realism: if the attribute doesn't exist as a unitary entity (his first condition fails), his framework declares the test invalid. But the network perspective suggests the test might still be useful and meaningful &mdash; just not in the way latent variable models assume. The debate remains active.
       </div>
     </div>
@@ -806,7 +803,8 @@ summary: "Compare six influential frameworks for construct validity and see how 
 
   <!-- ============ COMPARISON ============ -->
   <div class="section" style="border-top:1px solid var(--border);padding-top:40px">
-    <div class="viz-title">Where Does Validity Live?</div>
+    <div class="section-label">Section 2</div>
+    <h2>Where Does Validity Live?</h2>
 
     <div class="comparison-grid">
       <div class="comparison-card">
@@ -836,7 +834,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
     </div>
 
     <div class="note caveat">
-      <strong>These are not just academic distinctions.</strong> Applied to the same test, these frameworks can reach different conclusions. A test can be ontologically valid (Borsboom) but lack consequential evidence (Messick). It can have a strong interpretive argument (Kane) while the construct itself is poorly embedded in theory (Cronbach &amp; Meehl). The network view may question whether the construct is even the right unit of analysis. Choosing a framework shapes which questions you ask &mdash; and which evidence you gather.
+      <strong>These are not just academic distinctions.</strong> Applied to the same test, these frameworks can reach different conclusions. A test can be ontologically valid (Borsboom) but lack consequential evidence (Messick). It can have a strong interpretive argument (Kane) while the construct itself is poorly embedded in theory (Cronbach &amp; Meehl). The network view may question whether the construct is even the right unit of analysis. Choosing a framework shapes which questions you ask &mdash; and which evidence you gather. That these disagreements persist after decades goes to the heart of why psychology is difficult: unlike physics or chemistry, the things we most want to measure &mdash; depression, intelligence, personality &mdash; cannot be directly observed, and there is no independent way to verify that we have carved nature at its joints.
     </div>
   </div>
 </div>
@@ -996,7 +994,7 @@ fwBtns.forEach(btn => {
 /* ===== CAMPBELL & FISKE: MTMM Matrix ===== */
 (function() {
   const traits = ['Depression', 'Anxiety', 'Fatigue'];
-  const methods = ['Self-Report', 'Clinician'];
+  const methods = ['Self-Report', 'Clinician Rating'];
   const vars = [];
   methods.forEach((m, mi) => {
     traits.forEach((t, ti) => {
@@ -1042,7 +1040,10 @@ fwBtns.forEach(btn => {
     const warnMono = monoVal >= p.conv;
 
     /* Build table */
-    let html = '<tr><th></th>';
+    let html = '<colgroup><col style="width:60px">';
+    for (let c = 0; c < vars.length; c++) html += '<col style="width:72px">';
+    html += '</colgroup>';
+    html += '<tr><th></th>';
     /* Method group headers */
     html += '<th class="method-header" colspan="3">' + methods[0] + '</th>';
     html += '<th class="method-header" colspan="3">' + methods[1] + '</th>';
