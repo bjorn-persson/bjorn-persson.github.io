@@ -123,7 +123,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
   </div>
 
   <div class="section">
-    <div class="viz-title">Controls</div>
+    <div class="viz-title">Controls <button class="info-btn" onclick="dichShowInfo()" title="About cut-point flexibility">?</button></div>
 
     <div class="controls-row">
       <div>
@@ -216,11 +216,31 @@ summary: "Interactively explore why median splits and other dichotomizations red
     <div class="note">
       <strong>Why does this happen?</strong> Dichotomization replaces each data point's actual value with its group membership, discarding within-group variance. For a median split on a normally distributed variable, this attenuates the correlation by a factor of roughly &radic;(2/&pi;) &asymp; 0.798. Dichotomizing <em>both</em> variables multiplies the attenuation: r is reduced by 2/&pi; &asymp; 0.637. The lost information directly translates to reduced statistical power &mdash; you need a larger sample to detect the same underlying effect.
     </div>
+
     <div class="note warn">
       <strong>How much sample do you waste?</strong> Dichotomizing one variable at the median is equivalent to discarding roughly 1/3 of your data. Dichotomizing both is like throwing away nearly half. The <em>N needed</em> to maintain the same power can increase by 50&ndash;100% or more. This is not just theory: <a href="https://doi.org/10.1002/sim.70402" target="_blank" rel="noopener">van Zwet, Harrell &amp; Senn (2026)</a> analyzed 21,435 randomized controlled trials from the Cochrane Database and found that on average only about 60% of information is retained after dichotomization. Despite binary-outcome trials enrolling larger samples to compensate, fewer of them reached statistical significance than trials that kept the outcome continuous. Their recommendation: <em>model continuously but interpret dichotomously</em> &mdash; derive "percentage achieving clinically meaningful improvement" from a continuous analysis rather than by splitting the raw data.
     </div>
-    <div class="note warn">
-      <strong>A researcher degree of freedom hiding in plain sight.</strong> Try dragging the cut-point slider back and forth and watch the p-value on the right. Notice how it swings between significant and non-significant depending on where you place the split? That is not a bug in the simulation &mdash; it is a real analytic choice that researchers make, and it is rarely preregistered. A "median split" sounds principled, but nothing stops a researcher from trying the 40th percentile, then the 60th, then an "upper vs. lower tercile" comparison, reporting whichever version crosses <em>p</em> &lt; .05. Each repositioning of the cut is a separate test on the same data, silently inflating the false positive rate. Multiply this by other common degrees of freedom &mdash; which covariates to include, which items to drop, which subsample to analyze &mdash; and you start to see why so many published dichotomized effects failed to replicate. The replication crisis was not just about fraud or incompetence. It was, in large part, about flexible analyses applied to noisy data with low power &mdash; exactly the conditions that dichotomization creates.
+
+    <div class="note caveat">
+      A "median split" sounds principled, but nothing stops a researcher from trying the 40th percentile, then the 60th, then an "upper vs. lower tercile" comparison, reporting whichever version crosses <em>p</em> &lt; .05. Each repositioning of the cut is a separate test on the same data, silently inflating the false positive rate.
+      <br><br>
+      Multiply this by other common degrees of freedom &mdash; which covariates to include, which items to drop, which subsample to analyze &mdash; and you start to see why so many published dichotomized effects failed to replicate.
+      <br><br>
+      The replication crisis was not just about fraud or incompetence. It was, in large part, about flexible analyses applied to noisy data with low power &mdash; exactly the conditions that dichotomization creates.
+    </div>
+  </div>
+</div>
+
+<div class="info-overlay" id="dichModalOverlay" onclick="if(event.target===this)dichCloseInfo()">
+  <div class="info-modal">
+    <button class="info-close" onclick="dichCloseInfo()">&times;</button>
+    <h3>A researcher degree of freedom hiding in plain sight</h3>
+    <span class="info-modal-badge">CONTROLS</span>
+    <div>
+      <p><strong>&rho; (population correlation)</strong> sets the true linear association between X and Y before any data are generated. Higher values make the cost of dichotomization easier to see &mdash; but even modest correlations (&rho; &asymp; .20&ndash;.30) lose noticeably once you split.</p>
+      <p><strong>N (sample size)</strong> controls statistical power for both analyses. Try lowering it to 60&ndash;80 and watch how quickly the dichotomized test loses significance while the continuous test still holds.</p>
+      <p><strong>Cut-point percentile</strong> determines where the continuous variable is split. The median (50%) is the most common choice, but it is not the only one &mdash; and that is the problem. Try dragging the slider back and forth and watch the p-value on the right. Notice how it swings between significant and non-significant depending on where you place the split? That is not a bug in the simulation &mdash; it is a real analytic choice that researchers make, and it is rarely preregistered.</p>
+      <p><strong>Dichotomize X / Both</strong> toggles whether only the predictor is split (yielding a two-group t-test) or both variables are split (yielding a 2&times;2 &chi;&sup2; test). Splitting both compounds the information loss.</p>
     </div>
   </div>
 </div>
@@ -689,4 +709,27 @@ summary: "Interactively explore why median splits and other dichotomizations red
   window.addEventListener('resize', update);
   resample();
 })();
+
+function dichShowInfo() {
+  document.getElementById('dichModalOverlay').classList.add('active');
+}
+function dichCloseInfo() {
+  document.getElementById('dichModalOverlay').classList.remove('active');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') dichCloseInfo();
+});
 </script>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>The Cost of Dichotomization</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/dichotomization/" target="_blank">https://bjorn-persson.github.io/visualizations/dichotomization/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026dichotomization,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{The Cost of Dichotomization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/dichotomization/}</span>}
+</span></span></code></pre></div>
+  </div>

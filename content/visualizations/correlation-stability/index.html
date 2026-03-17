@@ -5,6 +5,16 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
 ---
 
 <style>
+  /* === Info modal section labels === */
+  .info-section-label {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--teal);
+    margin-bottom: 2px;
+  }
+
   /* === Correlation Explorer === */
   .ce-controls {
     display: grid;
@@ -194,6 +204,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     font-family: var(--mono);
     font-size: 0.78em;
     border-collapse: collapse;
+    table-layout: fixed;
     width: 100%;
     color: var(--text);
     margin-top: 8px;
@@ -201,7 +212,8 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
   .pos-table th {
     color: var(--text-dim);
     font-weight: 500;
-    text-align: center;
+    text-align: center !important;
+    vertical-align: middle;
     padding: 6px 10px;
     border-bottom: 1px solid var(--border);
   }
@@ -209,6 +221,12 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     text-align: center;
     padding: 5px 10px;
     border-bottom: 1px solid var(--bg-elevated);
+  }
+  .pos-table thead tr:first-child th:first-child {
+    border-bottom: none;
+  }
+  .pos-table .group-sep {
+    border-left: 1px solid var(--border);
   }
   .pos-table .row-hl td {
     color: var(--teal);
@@ -402,21 +420,28 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     <div class="section-label">Reference</div>
     <h2>Critical sample sizes (Table 1)</h2>
     <p>
-      From the original paper (corridor width <span class="m">w</span> in the <em>r</em> metric, per the 2018 corrigendum). The row closest to your current &rho; is highlighted.
+      From the original paper (per the 2018 corrigendum). Each cell shows the sample size at which the running correlation first remains within &plusmn; <span class="m">w</span> of the true correlation <span class="m">&rho;</span>, at the given confidence level. The row closest to your current &rho; is highlighted.
     </p>
     <div class="viz-box" style="overflow-x:auto;">
       <table class="pos-table" id="posTable">
+        <colgroup>
+          <col style="width:50px">
+          <col style="width:72px"><col style="width:72px"><col style="width:72px">
+          <col style="width:72px"><col style="width:72px"><col style="width:72px">
+          <col style="width:72px"><col style="width:72px"><col style="width:72px">
+        </colgroup>
         <thead>
           <tr>
-            <th rowspan="2">&rho;</th>
+            <th></th>
             <th colspan="3">80% confidence</th>
-            <th colspan="3">90% confidence</th>
-            <th colspan="3">95% confidence</th>
+            <th colspan="3" class="group-sep">90%  confidence</th>
+            <th colspan="3" class="group-sep">95%  confidence</th>
           </tr>
           <tr>
-            <th><em>w</em>=.10</th><th><em>w</em>=.15</th><th><em>w</em>=.20</th>
-            <th><em>w</em>=.10</th><th><em>w</em>=.15</th><th><em>w</em>=.20</th>
-            <th><em>w</em>=.10</th><th><em>w</em>=.15</th><th><em>w</em>=.20</th>
+            <th>&rho;</th>
+            <th><em>w</em> = .10</th><th><em>w</em> = .15</th><th><em>w</em> = .20</th>
+            <th class="group-sep"><em>w</em> = .10</th><th><em>w</em> = .15</th><th><em>w</em> = .20</th>
+            <th class="group-sep"><em>w</em> = .10</th><th><em>w</em> = .15</th><th><em>w</em> = .20</th>
           </tr>
         </thead>
         <tbody id="posTableBody"></tbody>
@@ -426,12 +451,11 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     <div class="note warn">
       <strong>Bottom line:</strong> For typical effect sizes in personality psychology (<span class="m">r &asymp; .21</span>), with a corridor of <span class="m">&plusmn;.10</span> and 80% confidence, you need roughly <strong>N &asymp; 250</strong> for a stable correlation estimate. There are few scenarios where going below <strong>N = 150</strong> is justifiable.
     </div>
+
+    <div class="note caveat">
+      Stability simulation based on <a href="https://doi.org/10.1016/j.jrp.2013.05.009" target="_blank">Sch&ouml;nbrodt &amp; Perugini (2013)</a>.
+    </div>
   </div>
-
-  <p style="font-size: 0.78em; color: var(--text-dim); font-family: var(--mono); text-align: center; margin-top: 8px;">
-    Stability simulation based on Sch&ouml;nbrodt &amp; Perugini (2013).
-  </p>
-
 </div>
 
 <!-- Info modal (shared) -->
@@ -439,7 +463,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
   <div class="info-modal">
     <button class="info-close" onclick="ceCloseInfo()">×</button>
     <h2 id="modalTitle"></h2>
-    <span class="info-badge" id="modalBadge"></span>
+    <span class="info-modal-badge" id="modalBadge" style="text-transform:uppercase;letter-spacing:0.07em;"></span>
     <div id="modalBody"></div>
   </div>
 </div>
@@ -462,7 +486,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       title: 'Pearson Product-Moment Correlation (r)',
       badge: 'linear association',
       body: '<p>The Pearson correlation measures the strength and direction of the <em>linear</em> relationship between two continuous variables.</p>' +
-        '<div class="eq-formula">r = Σ(xᵢ − x̄)(yᵢ − ȳ) / √[Σ(xᵢ − x̄)² · Σ(yᵢ − ȳ)²]</div>' +
+        '<div class="formula" style="font-size:20px;">\\(r = \\frac{\\sum(x_i - \\bar{x})(y_i - \\bar{y})}{\\sqrt{\\sum(x_i - \\bar{x})^2 \\cdot \\sum(y_i - \\bar{y})^2}}\\)</div><br>' +
         '<p class="info-section-label">Range</p>' +
         '<p>[−1, +1]. Zero indicates no linear association — but the variables may still be strongly dependent nonlinearly (try the Circle or Quadratic presets).</p>' +
         '<p class="info-section-label">Assumptions</p>' +
@@ -472,7 +496,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       title: 'Spearman Rank Correlation (ρ)',
       badge: 'monotonic association',
       body: '<p>Spearman ρ is the Pearson correlation computed on the <em>ranks</em> of the data rather than raw values. It measures monotonic (not necessarily linear) association.</p>' +
-        '<div class="eq-formula">ρ = Pearson(rank(X), rank(Y))</div>' +
+        '<div class="formula" style="font-size:16px;">\\(\\rho = \\text{Pearson}(\\text{rank}(X),\\; \\text{rank}(Y))\\)</div><br>' +
         '<p class="info-section-label">Properties</p>' +
         '<p>Robust to outliers and invariant under any monotone transformation. Suitable for ordinal data or monotonic-but-nonlinear relationships. Still fails for non-monotonic dependencies.</p>'
     },
@@ -480,7 +504,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       title: 'Kendall Rank Correlation (τ-b)',
       badge: 'pairwise concordance',
       body: '<p>Kendall τ examines every pair of observations and classifies it as concordant, discordant, or tied.</p>' +
-        '<div class="eq-formula">τ = (C − D) / √[(n₀ − tiedX)(n₀ − tiedY)]</div>' +
+        '<div class="formula" style="font-size:20px;">\\(\\tau_b = \\frac{C - D}{\\sqrt{(n_0 - t_X)(n_0 - t_Y)}}\\)</div><br>' +
         '<p class="info-section-label">When to prefer over Spearman</p>' +
         '<p>Better statistical properties at small N. Handles ties more gracefully. In practice |τ| < |ρ| for the same data — they scale differently.</p>'
     },
@@ -488,7 +512,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       title: 'Mutual Information (MI)',
       badge: 'general dependence',
       body: '<p>MI quantifies how much knowing one variable reduces uncertainty about the other. Detects <em>any</em> kind of statistical dependence.</p>' +
-        '<div class="eq-formula">I(X;Y) = ∫∫ p(x,y) log[p(x,y) / (p(x)p(y))] dx dy</div>' +
+        '<div class="formula" style="font-size:16px;">\\(I(X;Y) = \\iint p(x,y) \\log \\frac{p(x,y)}{p(x)\\,p(y)} \\, dx \\, dy\\)</div><br>' +
         '<p class="info-section-label">Estimation</p>' +
         '<p>Uses the KSG k-nearest-neighbour estimator (2004) with k=3. Upward-biased at small N.</p>'
     },
@@ -496,7 +520,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       title: 'Distance Correlation (dCor)',
       badge: 'general dependence',
       body: '<p>dCor = 0 if and only if X and Y are independent. Detects both linear and nonlinear association.</p>' +
-        '<div class="eq-formula">dCor(X,Y) = dCov(X,Y) / √[dVar(X) · dVar(Y)]</div>' +
+        '<div class="formula" style="font-size:16px;">\\(\\text{dCor}(X,Y) = \\frac{\\text{dCov}(X,Y)}{\\sqrt{\\text{dVar}(X) \\cdot \\text{dVar}(Y)}}\\)</div><br>' +
         '<p class="info-section-label">Range</p>' +
         '<p>[0, 1]. Unsigned — measures dependence strength without indicating direction. Introduced by Székely, Rizzo & Bakirov (2007).</p>'
     },
@@ -507,7 +531,16 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     const info = infoContent[key];
     document.getElementById('modalTitle').textContent = info.title;
     document.getElementById('modalBadge').textContent = info.badge;
-    document.getElementById('modalBody').innerHTML = info.body;
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = info.body;
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(modalBody, {
+        delimiters: [
+          {left: '\\(', right: '\\)', display: false},
+          {left: '$$', right: '$$', display: true}
+        ]
+      });
+    }
     document.getElementById('modalOverlay').classList.add('active');
   };
   window.ceCloseInfo = function() {
@@ -852,7 +885,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     const closest = rhos.reduce((a,b) => Math.abs(b-currentRho)<Math.abs(a-currentRho)?b:a);
     for (const row of table1) {
       const hl = row[0] === closest ? ' class="row-hl"' : '';
-      const cells = row.slice(1).map(v => `<td>${v}</td>`).join('');
+      const cells = row.slice(1).map((v,i) => `<td${i===3||i===6?' class="group-sep"':''}>${v}</td>`).join('');
       tbody.innerHTML += `<tr${hl}><td>.${Math.round(row[0]*10)}</td>${cells}</tr>`;
     }
   }

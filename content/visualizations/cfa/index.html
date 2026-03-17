@@ -560,7 +560,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
         <div style="flex:1;">
           <div id="omega-display" class="omega-grid"></div>
           <div style="font-size:0.88em;margin-top:20px;max-width:520px;">
-            <p style="margin-bottom:8px;"><span class="m">ω</span> — Computed from the actual loadings: (Σλ)² / [(Σλ)² + Σθ]. Uses the factor model directly.</p>
+            <p style="margin-bottom:8px;"><span class="m">ω</span> — Computed from the actual loadings: \(\omega = \frac{(\sum \lambda_i)^2}{(\sum \lambda_i)^2 + \sum \theta_i}\). Uses the factor model directly.</p>
             <p style="margin-bottom:0;"><span class="m">α</span> — Computed from the mean inter-item correlation. Equivalent to omega only when all loadings are equal (tau-equivalence).</p>
           </div>
         </div>
@@ -623,11 +623,9 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
     <div class="note">
       <strong>Why AIC/BIC?</strong> The 1-factor model is not simply the 2-factor model with an added constraint — they have different loading patterns. So instead of a likelihood ratio test, we use information criteria. AIC and BIC both balance fit against complexity; lower values are better. When the difference is large, the conclusion is unambiguous.
     </div>
-  </div>
-
-  <!-- Footer note -->
-  <div class="note caveat">
-    This visualization is built as a pedagogical tool, this is not lavaan!<br><br>The observed matrix is a sample correlation matrix from 500 simulated observations drawn from the true model (a larger pool is generated for the factor score scatterplots). Each page load generates a fresh sample, so the exact numbers will vary. The optimizer uses gradient descent on the ML discrepancy function. All computations happen in your browser.
+    <div class="note caveat">
+      This visualization is built as a pedagogical tool, this is not lavaan!<br><br>The observed matrix is a sample correlation matrix from 500 simulated observations drawn from the true model (a larger pool is generated for the factor score scatterplots). Each page load generates a fresh sample, so the exact numbers will vary. The optimizer uses gradient descent on the ML discrepancy function. All computations happen in your browser.
+    </div>
   </div>
 
   <!-- Citation -->
@@ -2360,9 +2358,9 @@ const infoContent = {
     badge: 'reliability',
     body: `
       <p>Both coefficients estimate the same thing: the proportion of composite score variance attributable to the latent factor(s). They differ in their assumptions.</p>
-      <p><em>Coefficient omega (ω)</em> uses the actual factor loadings. For a single factor with items indexed 1…k:</p>
-      <div class="formula">ω = (Σλᵢ)² / [(Σλᵢ)² + Σθᵢ]</div>
-      <p>This correctly accounts for the fact that items contribute unequally to the composite. Items with higher loadings contribute more true-score variance; items with lower loadings contribute more noise.</p>
+      <p><em>Coefficient omega (ω)</em> uses the actual factor loadings. For a single factor, ω is defined as:</p>
+      <div class="formula" style="font-size:1.3em;"><span class="katex-pending">\\(\\omega = \\frac{\\left(\\sum_{i=1}^{k} \\lambda_i\\right)^2}{\\left(\\sum_{i=1}^{k} \\lambda_i\\right)^2 + \\sum_{i=1}^{k} \\theta_i}\\)</span></div>
+      <p>where \\(\\lambda_i\\) is the standardized factor loading for item \\(i\\), \\(\\theta_i = 1 - \\lambda_i^2\\) is its uniqueness (error variance), and \\(k\\) is the number of items on the subscale. The numerator is the shared (true-score) variance of the composite; the denominator is the total variance. Items with higher loadings contribute more true-score variance; items with lower loadings contribute more noise.</p>
       <p><em>Coefficient alpha (α)</em> can be computed from inter-item correlations alone — no factor model required. Under the hood, it assumes <em>tau-equivalence</em>: that all items have equal loadings. When this holds, alpha equals omega. When it doesn't, alpha underestimates reliability (sometimes substantially).</p>
       <p><em>Why per factor?</em> Reliability is a property of a unidimensional composite — a set of items measuring one construct. If your CFA says there are two factors, you have two subscales, each with its own reliability. Computing a single alpha or omega across all items would conflate two distinct constructs. The resulting number doesn't answer "how reliably am I measuring X" for any specific X. If you need a total score across factors, that requires a higher-order factor model or a bifactor model — a different specification, not just a different formula applied to the same parameters.</p>
       <p>In practice, if you're running a CFA anyway, report omega per subscale. Alpha is fine as a quick summary when you have reason to believe items are roughly tau-equivalent, but omega is strictly more general.</p>
@@ -2415,6 +2413,14 @@ function showInfo(key) {
   `;
   document.getElementById('info-overlay').classList.add('active');
   document.body.style.overflow = 'hidden';
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(modal, {
+      delimiters: [
+        {left: '\\(', right: '\\)', display: false},
+        {left: '$$', right: '$$', display: true}
+      ]
+    });
+  }
 }
 
 function closeInfo() {

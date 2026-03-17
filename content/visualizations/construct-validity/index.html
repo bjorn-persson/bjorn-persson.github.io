@@ -212,7 +212,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
     gap: 0;
   }
   .bb-node {
-    width: 150px;
+    width: 240px;
     height: 90px;
     border: 2px solid var(--border);
     border-radius: 8px;
@@ -232,7 +232,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
   .bb-node.missing { border-color: var(--red); color: var(--red); border-style: dashed; opacity: 0.5; }
   .bb-node.neutral { border-color: var(--text-dim); }
   .bb-arrow {
-    width: 80px;
+    width: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -278,8 +278,9 @@ summary: "Compare six influential frameworks for construct validity and see how 
   .bb-verdict.valid { color: var(--teal); background: var(--teal-dim); }
   .bb-verdict.invalid { color: var(--red); background: rgba(239,68,68,0.12); }
   .bb-explanation {
+    font-family: var(--mono);
     font-size: 0.82em;
-    color: var(--text-dim);
+    color: var(--text);
     margin-top: 16px;
     max-width: 540px;
     margin-left: auto;
@@ -613,7 +614,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
         <strong>Key idea:</strong> Validity is not a property of a test alone &mdash; it is a property of a construct's place in theory. Without a nomological network, there is nothing to validate against. The construct's meaning <em>is</em> its web of lawful relationships.
       </div>
 
-      <div class="note caveat">
+      <div class="note warn">
         <strong><a href="https://doi.org/10.1037/0033-2909.93.1.179" target="_blank">Embretson (1983)</a></strong> later refined this approach by splitting the nomological network into two components: <em>construct representation</em> (the cognitive processes underlying test performance) and <em>nomothetic span</em> (external correlates). This distinguished the internal "how does the test work?" question from the external "what does it predict?" question &mdash; a distinction the original framework left implicit.
       </div>
     </div>
@@ -662,7 +663,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
 
       <div class="density-status" id="mtmm-status"></div>
 
-      <div class="note warn">
+      <div class="note">
         <strong>Key idea:</strong> High correlations between a test and a criterion are not sufficient evidence of validity. If a self-report depression scale correlates .60 with a self-report anxiety scale, is that convergent validity or method variance? Only by crossing traits with methods can you tell.
       </div>
     </div>
@@ -692,11 +693,11 @@ summary: "Compare six influential frameworks for construct validity and see how 
 
       <div class="density-status" id="messick-status"></div>
 
-      <div class="note warn">
+      <div class="note">
         <strong>Key idea:</strong> Most validation studies address only content and external (criterion-related) evidence, ignoring consequences entirely. For Messick, this is an incomplete argument &mdash; you cannot claim a test is valid without considering how its use affects people.
       </div>
 
-      <div class="note caveat">
+      <div class="note warn">
         <strong><a href="https://doi.org/10.2466/pr0.1957.3.3.635" target="_blank">Loevinger (1957)</a></strong> anticipated much of Messick's framework, arguing that construct validity subsumes all other forms. Her three components &mdash; substantive, structural, and external &mdash; directly prefigure Messick's more elaborated six facets. &mdash; <strong><a href="https://doi.org/10.3102/0013189X07311286" target="_blank">Lissitz &amp; Samuelsen (2007)</a></strong> pushed back in the other direction, arguing that consequences belong to a test's <em>utility</em>, not its validity. In their view, construct validity should rest strictly on internal evidence: content, reliability, and the cognitive processes items elicit.
       </div>
     </div>
@@ -757,7 +758,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
 
       <div class="density-status" id="kane-status"></div>
 
-      <div class="note warn">
+      <div class="note">
         <strong>Key idea:</strong> Validity is not about a test &mdash; it is about an argument. A strong scoring inference cannot compensate for a weak extrapolation inference. This shifts the burden: instead of asking "is this test valid?", we ask "is this interpretation and use of test scores justified?"
       </div>
     </div>
@@ -781,7 +782,7 @@ summary: "Compare six influential frameworks for construct validity and see how 
       <div class="np-instructions" id="np-instructions">Hub-and-spoke: a single latent variable "Depression" causes all observed symptoms.</div>
 
       <div class="np-wrap">
-        <svg id="np-svg" class="np-svg network-svg" viewBox="0 0 600 420"></svg>
+        <svg id="np-svg" class="np-svg network-svg" viewBox="0 0 600 460"></svg>
       </div>
 
       <div class="np-status-row" id="np-status-row">
@@ -858,14 +859,14 @@ fwBtns.forEach(btn => {
   const ns = 'http://www.w3.org/2000/svg';
 
   const nodes = [
-    { id: 'dep',  label: 'Depression',   x: 300, y: 215, r: 36, type: 'target' },
-    { id: 'na',   label: 'Neg. Affect',  x: 120, y: 90,  r: 28, type: 'construct' },
-    { id: 'anx',  label: 'Anxiety',      x: 480, y: 90,  r: 28, type: 'construct' },
-    { id: 'fat',  label: 'Fatigue',      x: 510, y: 330, r: 28, type: 'construct' },
-    { id: 'sw',   label: 'Withdrawal',   x: 90,  y: 330, r: 28, type: 'construct' },
-    { id: 'phq',  label: 'PHQ-9',        x: 155, y: 440, r: 25, type: 'observable' },
-    { id: 'clin', label: 'Clinician Dx', x: 300, y: 450, r: 25, type: 'observable' },
-    { id: 'cort', label: 'Cortisol',     x: 445, y: 440, r: 25, type: 'observable' },
+    { id: 'dep',  label: 'Depression',   x: 300, y: 185, r: 46, type: 'target' },
+    { id: 'na',   label: 'Neg. Affect',  x: 120, y: 65,  r: 36, type: 'construct' },
+    { id: 'anx',  label: 'Anxiety',      x: 480, y: 65,  r: 36, type: 'construct' },
+    { id: 'fat',  label: 'Fatigue',      x: 510, y: 300, r: 36, type: 'construct' },
+    { id: 'sw',   label: 'Withdrawal',   x: 90,  y: 300, r: 36, type: 'construct' },
+    { id: 'phq',  label: 'PHQ-9',        x: 155, y: 410, r: 33, type: 'observable' },
+    { id: 'clin', label: 'Clinician\nDx', x: 300, y: 420, r: 33, type: 'observable' },
+    { id: 'cort', label: 'Cortisol',     x: 445, y: 410, r: 33, type: 'observable' },
   ];
 
   const edges = [
@@ -938,15 +939,31 @@ fwBtns.forEach(btn => {
     g.appendChild(circle);
 
     const text = document.createElementNS(ns, 'text');
-    text.setAttribute('x', n.x); text.setAttribute('y', n.y + 1);
     text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('dominant-baseline', 'central');
     text.setAttribute('fill', colors[n.type].stroke);
     text.setAttribute('font-family', 'IBM Plex Mono, monospace');
-    text.setAttribute('font-size', n.type === 'target' ? '13' : '10');
+    text.setAttribute('font-size', n.type === 'target' ? '14' : '11');
     text.setAttribute('font-weight', n.type === 'target' ? '600' : '400');
     text.style.pointerEvents = 'none';
-    text.textContent = n.label;
+    const lines = n.label.split('\n');
+    if (lines.length > 1) {
+      const lineH = 13;
+      const startY = n.y - (lines.length - 1) * lineH / 2;
+      text.setAttribute('x', n.x); text.setAttribute('y', startY);
+      text.setAttribute('dominant-baseline', 'central');
+      lines.forEach((line, li) => {
+        const ts = document.createElementNS(ns, 'tspan');
+        ts.setAttribute('x', n.x);
+        if (li === 0) ts.setAttribute('dy', '0');
+        else ts.setAttribute('dy', String(lineH));
+        ts.textContent = line;
+        text.appendChild(ts);
+      });
+    } else {
+      text.setAttribute('x', n.x); text.setAttribute('y', n.y + 1);
+      text.setAttribute('dominant-baseline', 'central');
+      text.textContent = n.label;
+    }
     g.appendChild(text);
 
     nodeG.appendChild(g);
@@ -1337,16 +1354,16 @@ fwBtns.forEach(btn => {
   ];
 
   /* Circular layout for symptoms */
-  const cx = 300, cy = 210, radius = 150;
+  const cx = 300, cy = 230, radius = 180;
   symptoms.forEach((s, i) => {
     const angle = -Math.PI / 2 + (i * 2 * Math.PI / symptoms.length);
     s.x = cx + radius * Math.cos(angle);
     s.y = cy + radius * Math.sin(angle);
-    s.r = 30;
+    s.r = 38;
   });
 
   /* Latent variable node */
-  const latentNode = { x: cx, y: cy, r: 38, label: 'Depression' };
+  const latentNode = { x: cx, y: cy, r: 48, label: 'Depression' };
 
   /* Network edges (symptom-to-symptom causal pathways) */
   const netEdges = [
@@ -1419,7 +1436,7 @@ fwBtns.forEach(btn => {
   latentText.setAttribute('dominant-baseline', 'central');
   latentText.setAttribute('fill', '#2dd4bf');
   latentText.setAttribute('font-family', 'IBM Plex Mono, monospace');
-  latentText.setAttribute('font-size', '11');
+  latentText.setAttribute('font-size', '12');
   latentText.setAttribute('font-weight', '600');
   latentText.style.pointerEvents = 'none';
   latentText.textContent = 'Depression';
@@ -1430,7 +1447,7 @@ fwBtns.forEach(btn => {
   latentSub.setAttribute('text-anchor', 'middle');
   latentSub.setAttribute('fill', '#6b7084');
   latentSub.setAttribute('font-family', 'IBM Plex Mono, monospace');
-  latentSub.setAttribute('font-size', '8');
+  latentSub.setAttribute('font-size', '9');
   latentSub.style.pointerEvents = 'none';
   latentSub.textContent = '(latent)';
   latentG.appendChild(latentSub);
@@ -1464,7 +1481,7 @@ fwBtns.forEach(btn => {
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('fill', '#3b82f6');
       text.setAttribute('font-family', 'IBM Plex Mono, monospace');
-      text.setAttribute('font-size', '9');
+      text.setAttribute('font-size', '10');
       text.style.pointerEvents = 'none';
       const t1 = document.createElementNS(ns, 'tspan');
       t1.setAttribute('x', s.x); t1.setAttribute('dy', '0');
@@ -1482,7 +1499,7 @@ fwBtns.forEach(btn => {
       text.setAttribute('dominant-baseline', 'central');
       text.setAttribute('fill', '#3b82f6');
       text.setAttribute('font-family', 'IBM Plex Mono, monospace');
-      text.setAttribute('font-size', '9');
+      text.setAttribute('font-size', '10');
       text.style.pointerEvents = 'none';
       text.textContent = s.label;
       s.textEl = text;

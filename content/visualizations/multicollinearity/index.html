@@ -86,19 +86,21 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
 <div class="container">
 
   <div class="hero">
-    <h1>Multicollinearity in Multiple Regression</h1>
+    <h1>Multicollinearity in Multiple Regression <button class="info-btn hero-info" onclick="mcShowInfo('about')" title="About this visualization">?</button></h1>
     <div class="subtitle">How correlated predictors destabilize regression coefficients and inflate standard errors</div>
   </div>
 
   <div class="section">
     <p>Multicollinearity arises when two predictors (X₁, X₂) are highly correlated. Geometrically, the data cloud collapses onto a line — the regression plane loses its support and can "wobble" wildly while still fitting Y well. This inflates standard errors and makes coefficients unreliable.</p>
+    <p>A concrete example: in personality psychology, the Dark Triad traits — Machiavellianism, narcissism, and psychopathy — are moderately to highly intercorrelated (typically r = 0.4–0.7). Suppose you regress workplace deviance on all three. Even if psychopathy is the strongest unique predictor, its confidence interval will be wide because the three predictors share so much variance. At r = 0.6, VIF ≈ 1.6 — tolerable. But with a short measure that conflates the traits (pushing r toward 0.85), VIF climbs to 3.6 and each SE is inflated by √3.6 ≈ 1.9×. The predictors individually "wash out" even though the model as a whole explains substantial variance. When researchers report that "none of the Dark Triad traits uniquely predicted the outcome" but the overall R² is large, multicollinearity is one common explanation — though short measures, conceptual overlap, and noisy outcomes can also play a role.</p>
+    <p><strong>Common remedies:</strong> (1) <em>Increase sample size</em> — to achieve the same precision you would have with uncorrelated predictors, you need roughly VIF times as many observations (a useful heuristic, not a formal requirement). (2) <em>Combine predictors</em> — replacing near-identical measures with a composite eliminates the collinearity at the cost of granularity. (3) <em>Ridge regression</em> — a small penalty shrinks coefficients toward zero, dramatically reducing variance at the cost of slight bias. (4) <em>Orthogonalize</em> — residualizing one predictor on the other removes collinearity but changes what the coefficients mean, and if the residualized predictor retains little variance the estimates can become even more unstable (for a thorough treatment of why partialing is often a questionable practice, see <a href="https://doi.org/10.1146/annurev-clinpsy-071720-015436" target="_blank">Hoyle et al., 2023</a>).</p>
     <div class="mc-layout">
       <div>
-        <div class="mc-canvas-label">X₁–X₂ Predictor Space (projection)</div>
+        <div class="mc-canvas-label">X₁–X₂ Predictor Space (projection) <button class="info-btn" onclick="mcShowInfo('scatter')" title="About this panel">?</button></div>
         <div class="mc-canvas-wrap"><canvas id="mc_scatter"></canvas></div>
       </div>
       <div>
-        <div class="mc-canvas-label">Cross-section (Y on X₁)</div>
+        <div class="mc-canvas-label">Cross-section (Y on X₁) <button class="info-btn" onclick="mcShowInfo('plane')" title="About this panel">?</button></div>
         <div class="mc-canvas-wrap"><canvas id="mc_plane"></canvas></div>
       </div>
       <div class="mc-controls" style="grid-column:1/-1">
@@ -117,15 +119,15 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       </div>
       <div class="mc-stats" style="grid-column:1/-1">
         <div class="mc-stat-card" id="mc_vif_card">
-          <div class="mc-stat-label">VIF</div>
+          <div class="mc-stat-label">VIF <button class="info-btn" onclick="mcShowInfo('vif')" title="About VIF">?</button></div>
           <div class="mc-stat-value" id="mc_vif">1.00</div>
         </div>
         <div class="mc-stat-card" id="mc_se_card">
-          <div class="mc-stat-label">SE inflation factor</div>
+          <div class="mc-stat-label">SE inflation factor <button class="info-btn" onclick="mcShowInfo('se')" title="About SE inflation">?</button></div>
           <div class="mc-stat-value" id="mc_se_inf">1.00×</div>
         </div>
         <div class="mc-stat-card" id="mc_b1est_card">
-          <div class="mc-stat-label">β̂₁ OLS 95% CI</div>
+          <div class="mc-stat-label">β̂₁ OLS 95% CI <button class="info-btn" onclick="mcShowInfo('ci')" title="About OLS CIs">?</button></div>
           <div class="mc-stat-value" id="mc_b1est">—</div>
         </div>
         <div class="mc-stat-card" id="mc_b2est_card">
@@ -136,14 +138,17 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       <div class="mc-wobble-label" id="mc_wobble_text" style="grid-column:1/-1">
         The regression plane is well-supported. Coefficient estimates are stable.
       </div>
-      <div class="note" style="grid-column:1/-1">
-        VIF (Variance Inflation Factor) = 1/(1−r²). At r = 0.9, VIF = 5.3; at r = 0.99, VIF = 50.
-        The SE of each coefficient is inflated by √VIF. Rules of thumb: VIF > 5 is concerning, VIF > 10 is severe.
-      </div>
-      <div class="note caveat" style="grid-column:1/-1">
-        Multicollinearity does <em>not</em> bias the regression coefficients — it only inflates their uncertainty.
-        The model still predicts Y well; it just cannot tell X₁ and X₂ apart.
-      </div>
+    </div>
+    <div class="note">
+      <strong>Try this:</strong> Set β₁ = 1.0 and β₂ = 0, then slowly increase r from 0 to 0.95. The true effect of X₁ never changes, but the 95% CI balloons — at r = 0.95, a genuinely large effect can become non-significant. Now set both β values to 0.50 and increase r: the model predicts Y just as well, but it cannot determine which predictor deserves the credit.
+    </div>
+    <div class="note caveat">
+      VIF (Variance Inflation Factor) = 1/(1−r²). At r = 0.9, VIF = 5.3; at r = 0.99, VIF = 50.
+      The SE of each coefficient is inflated by √VIF. Rules of thumb: VIF > 5 is concerning, VIF > 10 is severe.
+    </div>
+    <div class="note caveat">
+      Multicollinearity does <em>not</em> bias the regression coefficients — it only inflates their uncertainty.
+      The model still predicts Y well; it just cannot tell X₁ and X₂ apart.
     </div>
   </div>
 
@@ -440,6 +445,106 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   window.addEventListener('resize', resize);
   requestAnimationFrame(() => requestAnimationFrame(resize));
 })();
+</script>
+
+<div class="info-overlay" id="mcModalOverlay" onclick="if(event.target===this)mcCloseInfo()">
+  <div class="info-modal">
+    <button class="info-close" onclick="mcCloseInfo()">&times;</button>
+    <h3 id="mcModalTitle"></h3>
+    <span class="info-modal-badge" id="mcModalBadge"></span>
+    <div id="mcModalBody"></div>
+  </div>
+</div>
+
+<script>
+const mcInfoContent = {
+  about: {
+    title: 'About This Visualization',
+    badge: 'Overview',
+    body: `
+      <p>This tool illustrates multicollinearity: what happens to a multiple regression when two predictors (X₁, X₂) are correlated with each other.</p>
+      <div class="section-label">The data model</div>
+      <p>Each sample of N = 60 observations is generated from:</p>
+      <div class="formula">Y = β₁X₁ + β₂X₂ + ε</div>
+      <p>where X₁ and X₂ are standard-normal predictors with a controlled correlation <em>r</em>, and ε is Gaussian noise with SD = 0.3. The noise term is fixed — it does not change with the sliders — so even when β₁ = 1 and β₂ = 0, the relationship between X₁ and Y will not be perfect (theoretical R² ≈ 0.92 in that case).</p>
+      <div class="section-label">What you can explore</div>
+      <p>Use the correlation slider to watch the predictor cloud collapse from a circle into a line. As this happens, the regression plane loses support and the OLS coefficient estimates become unstable — their confidence intervals widen dramatically, even though the model's overall fit to Y barely changes.</p>
+    `
+  },
+  scatter: {
+    title: 'Predictor Space (X₁ vs X₂)',
+    badge: 'Left panel',
+    body: `
+      <p>This panel plots the two predictors against each other — X₁ on the horizontal axis and X₂ on the vertical axis. Each dot is one observation, colored by its Y value (teal = high, purple = low).</p>
+      <div class="section-label">What to look for</div>
+      <p>When r = 0, the cloud is roughly circular — X₁ and X₂ span a full 2D plane, giving the regression plenty of information to separately estimate β₁ and β₂. As r increases, the cloud collapses toward a diagonal line. In the extreme (r → 1), the data are essentially one-dimensional: X₁ ≈ X₂, so the model cannot distinguish their individual contributions.</p>
+      <div class="section-label">The color gradient</div>
+      <p>The color encodes Y, not a residual. When β₁ is large and β₂ is zero, the color gradient runs left-to-right (Y tracks X₁). When both β values are nonzero, the gradient is diagonal. This is a visual cue for the direction of the true regression plane in 3D.</p>
+    `
+  },
+  plane: {
+    title: 'Cross-Section: Y on X₁',
+    badge: 'Right panel',
+    body: `
+      <p>This panel shows the marginal relationship between X₁ and Y. Each dot plots one observation's (X₁, Y) pair, and the teal line is the simple OLS regression of Y on X₁ alone (not the multiple regression).</p>
+      <div class="section-label">The wobble band</div>
+      <p>The red-shaded band and dashed lines illustrate the uncertainty in the regression slope caused by multicollinearity. As r increases, the band widens — the data no longer pin down the slope precisely. This is a schematic illustration of the SE inflation, not a literal confidence band.</p>
+      <div class="section-label">Why the fit is not perfect</div>
+      <p>The data-generating model includes a noise term (ε with SD = 0.3). Even with β₁ = 1.0 and β₂ = 0 at r = 0, Y is not a deterministic function of X₁. The theoretical correlation between X₁ and Y in that case is about r ≈ 0.96 (R² ≈ 0.92). This is realistic — real regressions always have residual variance.</p>
+    `
+  },
+  vif: {
+    title: 'Variance Inflation Factor',
+    badge: 'VIF',
+    body: `
+      <p>The VIF measures how much the variance of a coefficient estimate is inflated by collinearity, relative to what it would be if the predictors were uncorrelated.</p>
+      <div class="formula">VIF = 1 / (1 − r²)</div>
+      <p>where r is the correlation between X₁ and X₂.</p>
+      <div class="section-label">Rules of thumb</div>
+      <p>VIF = 1 means no collinearity. VIF > 5 is often flagged as concerning. VIF > 10 is considered severe. At r = 0.95, VIF ≈ 10; at r = 0.99, VIF ≈ 50.</p>
+      <div class="section-label">Interpretation</div>
+      <p>A VIF of 10 means the variance of β̂ is 10 times larger than it would be with orthogonal predictors. The standard error is inflated by √VIF ≈ 3.2×. This does not bias the coefficient — it just makes it much harder to detect a real effect.</p>
+    `
+  },
+  se: {
+    title: 'Standard Error Inflation',
+    badge: 'SE factor',
+    body: `
+      <p>The SE inflation factor is √VIF. It tells you how many times wider the confidence interval for each coefficient is, compared to the ideal case of uncorrelated predictors.</p>
+      <div class="formula">SE inflation = √VIF = 1 / √(1 − r²)</div>
+      <div class="section-label">Practical impact</div>
+      <p>At r = 0.80, the SE is inflated by 1.67×. At r = 0.95, by 3.2×. At r = 0.99, by 7.1×. Since the width of a confidence interval is proportional to the SE, a 3× inflation means you need roughly 9× the sample size to achieve the same precision.</p>
+    `
+  },
+  ci: {
+    title: 'OLS Coefficient Confidence Intervals',
+    badge: '95% CI',
+    body: `
+      <p>These intervals show the range within which the true coefficient (β₁ or β₂) would plausibly fall, based on the OLS estimates from the current sample of 60 observations.</p>
+      <div class="formula">95% CI = β̂ ± 2 × SE(β̂)</div>
+      <div class="section-label">What multicollinearity does</div>
+      <p>Multicollinearity inflates SE(β̂), which widens the CI. When the CI includes zero, the coefficient is not statistically significant — even if the true effect is substantial. This is the core practical problem: collinearity can make real effects undetectable.</p>
+      <div class="section-label">The CIs use the true β, not β̂</div>
+      <p>For clarity, the displayed CIs are centered on the true parameter value (set by the sliders) ± 2 × SE. This shows the expected width of the interval, not a single sample's estimate. The key insight is how the width changes with r.</p>
+    `
+  }
+};
+
+function mcShowInfo(key) {
+  const info = mcInfoContent[key];
+  document.getElementById('mcModalTitle').textContent = info.title;
+  document.getElementById('mcModalBadge').textContent = info.badge;
+  document.getElementById('mcModalBody').innerHTML = info.body;
+  document.getElementById('mcModalOverlay').classList.add('active');
+}
+
+function mcCloseInfo() {
+  document.getElementById('mcModalOverlay').classList.remove('active');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') mcCloseInfo();
+});
 </script>
 
   <!-- Citation -->
