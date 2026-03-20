@@ -1,205 +1,1644 @@
 ---
-title: "IRT Curve (3PL Model)"
-description: "Interactive visualization of the three-parameter logistic IRT model. Adjust discrimination, difficulty, and guessing parameters to see how they shape the item characteristic curve."
-summary: "Explore how discrimination (a), difficulty (b), and pseudo-guessing (c) parameters shape the item characteristic curve in the 3PL IRT model."
+title: "Inside Item Response Theory"
+description: "Interactive visualization of Item Response Theory: explore how item characteristic curves, discrimination, difficulty, and information functions reveal measurement precision that Classical Test Theory hides."
+summary: "Explore how IRT models each item as having its own characteristic curve, why measurement precision varies across the trait continuum, and how this transforms test development."
 ---
 
 <style>
-  /* IRT Curve — page-specific styles */
+  /* IRT visualization — page-specific styles */
+  html, body, .post-content, .post-single { overflow-x: hidden; }
 
-  .irt-chart-container {
-    position: relative;
-    height: max(280px, calc(100vh - 520px));
+  .equation-box {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: 14px 20px;
+    margin: 16px 0;
+    text-align: center;
+    border-radius: 6px;
+  }
+  .equation-box .eq-label {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  .irt-compare {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .irt-compare > div {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .response-grid {
+    display: inline-grid;
+    gap: 0;
+    font-family: var(--mono);
+    font-size: 0.82em;
+  }
+
+  .item-bank {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .item-card {
+    background: var(--bg-elevated);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.78em;
+  }
+  .item-card:hover {
+    border-color: var(--text-dim);
+  }
+  .item-card.selected {
+    border-color: var(--teal);
+    background: var(--teal-dim);
+  }
+  .item-card canvas {
+    display: block;
     width: 100%;
-    margin-bottom: 24px;
+    height: 50px;
+    margin-bottom: 6px;
+    border-radius: 3px;
+  }
+  .item-card .item-params {
+    color: var(--text-dim);
+  }
+  .item-card .item-params span {
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  .canvas-wrap {
+    position: relative;
+    width: 100%;
     background: var(--bg-surface);
     border-radius: 6px;
     overflow: hidden;
   }
+  .canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .canvas-tall { height: max(260px, 32vh); }
+  .canvas-med  { height: max(220px, 26vh); }
+  .canvas-short { height: 180px; }
 
-  .irt-controls {
+  .irt-stat-row {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 12px 0;
   }
-  .irt-control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  .irt-stat {
+    background: var(--bg-elevated);
+    border-radius: 5px;
+    padding: 10px 14px;
+    border-left: 3px solid var(--border);
     font-family: var(--mono);
+    min-width: 100px;
   }
-  .irt-control-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.82em;
-    color: #b0b4c0;
+  .irt-stat.good { border-left-color: var(--teal); }
+  .irt-stat.warn { border-left-color: var(--orange); }
+  .irt-stat.bad  { border-left-color: var(--red); }
+  .irt-stat-label {
+    font-size: 0.72em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 3px;
   }
-  .irt-value-display {
+  .irt-stat-value {
+    font-size: 1.1em;
     font-weight: 600;
-    color: var(--teal);
+    color: var(--text-bright);
+  }
+
+  .demo-table {
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 0.82em;
+    margin: 16px 0;
+  }
+  .demo-table th {
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.04em;
+    padding: 8px 14px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .demo-table td {
+    padding: 7px 14px;
+    text-align: center;
+    color: var(--text);
+  }
+  .demo-table .person-a { color: var(--teal); font-weight: 600; }
+  .demo-table .person-b { color: var(--orange); font-weight: 600; }
+  .demo-table .person-c { color: #a78bfa; font-weight: 600; }
+
+  .custom-sliders { display: none; }
+  .custom-sliders.visible { display: block; }
+
+  .slider-val { width: 48px; }
+
+  @media (max-width: 640px) {
+    .irt-compare { flex-direction: column; }
+    .irt-compare > div { min-width: auto; }
+    .item-bank { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
   }
 </style>
 
 <div class="container">
 
+  <!-- HERO -->
   <div class="hero">
-    <h1>IRT Curve (3PL Model)</h1>
-    <div class="subtitle">Adjust the parameters below to see how they influence the probability of endorsing an item across different levels of a latent trait (&theta;).</div>
+    <h1>Inside Item Response Theory<button class="info-btn hero-info" onclick="showInfo('global')">?</button></h1>
+    <div class="subtitle">An interactive walkthrough of what IRT does, and why it matters</div>
   </div>
 
-  <div class="section">
-    <p>In Classical Test Theory, every item is treated the same — a correct answer is worth one point regardless of who answered or how hard the question was. Item Response Theory (IRT) replaces this with a probabilistic model: each item has its own characteristic curve that describes the probability of a correct (or endorsed) response as a function of an underlying latent trait, &theta;.</p>
-    <p>The three-parameter logistic (3PL) model is the most general of the standard unidimensional IRT models. It describes each item with three parameters: <em>discrimination</em> (a) controls the steepness of the curve — how sharply the item distinguishes between respondents near the difficulty threshold; <em>difficulty</em> (b) locates the curve along the trait axis — higher values mean more of the trait is needed for a correct response; and <em>pseudo-guessing</em> (c) sets a lower asymptote, acknowledging that even very low-ability respondents may endorse the item by chance. Setting c&nbsp;=&nbsp;0 recovers the 2PL model, and further fixing a to be equal across items gives the Rasch (1PL) model.</p>
-  </div>
+  <!-- SECTION 1 -->
+  <div class="section" id="sec1" style="overflow-x:hidden;">
+    <div class="section-label">Section 1</div>
+    <h2>What does a test score actually mean?<button class="info-btn" onclick="showInfo('sec1')">?</button></h2>
+    <p>Suppose three people take a 10-item test and all score 6 out of 10. In Classical Test Theory, they receive the same observed score and the same standard error of measurement. But look at their response patterns:</p>
 
-  <div class="section">
-    <div class="irt-chart-container">
-      <canvas id="irtChart"></canvas>
+    <div class="viz-box" style="overflow-x:hidden;">
+      <div class="viz-title">Response Patterns (&#x2713; = correct, &#x2717; = incorrect)</div>
+      <div id="response-matrix" style="overflow:hidden;"></div>
+      <div class="irt-stat-row" id="sec1-stats"></div>
     </div>
 
-    <div class="irt-controls">
-      <div class="irt-control-group">
-        <div class="irt-control-label">
-          <span>Discrimination (a): How well the item differentiates individuals.</span>
-          <span class="irt-value-display" id="aVal">1.00</span>
+    <p>Person A answered the easy items correctly and missed the hard ones — a sensible pattern. Person B shows the opposite: hard items correct, easy items wrong. Person C has a scattered pattern with no clear logic. CTT treats all three identically.</p>
+
+    <div class="note">
+      IRT asks: are these three people really equivalent? The response <em>pattern</em> matters, not just the sum. A theory that models each item individually can extract information that sum scores discard.
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section" id="sec2">
+    <div class="section-label">Section 2</div>
+    <h2>Items have personalities<button class="info-btn" onclick="showInfo('sec2')">?</button></h2>
+    <p>IRT's core idea: each item has its own <em>Item Characteristic Curve</em> (ICC) — an S-shaped function describing the probability of a correct response at each level of the latent trait $\theta$. Unlike CTT, which treats items as interchangeable units in a sum, IRT gives each item its own identity.</p>
+    <p>The <em>2-parameter logistic</em> (2PL) model describes each item with two parameters: <em>discrimination</em> ($a$) controls the steepness — how sharply the item separates people near its threshold; <em>difficulty</em> ($b$) locates the curve along the trait axis.</p>
+
+    <div class="equation-box">
+      $$P(\theta) = \frac{1}{1 + e^{-a(\theta - b)}}$$
+      <div class="eq-label">2PL Item Characteristic Curve — probability of correct response at trait level $\theta$</div>
+    </div>
+
+    <div class="viz-box">
+      <div class="viz-title">Item Characteristic Curve</div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div style="flex:0 0 230px;">
+          <div class="slider-group">
+            <div class="slider-row">
+              <span class="slider-label">a</span>
+              <input type="range" id="sl-s2-a" min="0.3" max="3.0" step="0.1" value="1.5">
+              <span class="slider-val" id="sv-s2-a">1.50</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">b</span>
+              <input type="range" id="sl-s2-b" min="-3.0" max="3.0" step="0.1" value="0.0">
+              <span class="slider-val" id="sv-s2-b">0.00</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">&theta;</span>
+              <input type="range" id="sl-s2-theta" min="-3.0" max="3.0" step="0.1" value="0.0">
+              <span class="slider-val" id="sv-s2-theta">0.00</span>
+            </div>
+          </div>
+          <div class="irt-stat-row">
+            <div class="irt-stat good">
+              <div class="irt-stat-label">P(&theta;)</div>
+              <div class="irt-stat-value" id="s2-prob">0.50</div>
+            </div>
+          </div>
         </div>
-        <input type="range" id="aSlider" min="0.1" max="3.0" step="0.1" value="1.0">
-      </div>
-      <div class="irt-control-group">
-        <div class="irt-control-label">
-          <span>Difficulty (b): The inflection point of the curve. <br>P(&theta;=b) = (1+c)/2 — midway between the guessing floor c and 1.</span>
-          <span class="irt-value-display" id="bVal">0.00</span>
+        <div style="flex:1;min-width:280px;">
+          <div class="canvas-wrap canvas-tall">
+            <canvas id="cv-s2"></canvas>
+          </div>
         </div>
-        <input type="range" id="bSlider" min="-3.0" max="3.0" step="0.1" value="0.0">
-      </div>
-      <div class="irt-control-group">
-        <div class="irt-control-label">
-          <span>Guessing/Pseudo-guessing (c): The lower asymptote.</span>
-          <span class="irt-value-display" id="cVal">0.00</span>
-        </div>
-        <input type="range" id="cSlider" min="0.0" max="0.5" step="0.01" value="0.0">
       </div>
     </div>
 
     <div class="note">
-      <strong>Try it:</strong> Set c = 0 and increase a — the curve steepens into a near-step function, meaning the item sharply discriminates around the difficulty point. Now raise c to 0.25 and notice the curve never reaches 0: even very low-ability respondents have a 25% chance of a correct response (guessing floor). Move b to see how difficulty shifts the inflection point along the trait axis.
-    </div>
-    <div class="note caveat">
-      The 3PL model assumes unidimensionality (a single latent trait drives responses) and local independence (items are independent given θ). When c = 0 this reduces to the 2PL; when a is also fixed across items, it reduces to the Rasch (1PL) model. In practice, the c parameter is difficult to estimate reliably and is often constrained or set to zero.
+      <strong>Try it:</strong> Move $\theta$ along the trait axis and watch $P(\theta)$ change. At $\theta = b$, the probability is exactly 0.50. Increase $a$ and the curve steepens — the item becomes a sharper separator. Decrease $a$ toward 0.3 and the curve flattens — the item barely distinguishes anyone.
     </div>
   </div>
 
-</div>
+  <!-- SECTION 3 -->
+  <div class="section" id="sec3">
+    <div class="section-label">Section 3</div>
+    <h2>Difficulty shifts, discrimination sharpens<button class="info-btn" onclick="showInfo('sec3')">?</button></h2>
+    <p>One curve tells you about one item. Multiple curves reveal the test's architecture: where along the trait continuum each item operates, and how sharply each one discriminates.</p>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    function calculateProbability(theta, a, b, c) {
-        const exponent = -a * (theta - b);
-        return c + ((1 - c) / (1 + Math.exp(exponent)));
-    }
+    <div class="viz-box">
+      <div class="viz-title">Four Item Characteristic Curves</div>
+      <div style="margin-bottom:12px;">
+        <div class="btn-row">
+          <button class="btn scenario-btn active" data-scenario="difficulty" onclick="setMultiMode('difficulty')">Vary Difficulty</button>
+          <button class="btn scenario-btn" data-scenario="discrimination" onclick="setMultiMode('discrimination')">Vary Discrimination</button>
+          <button class="btn scenario-btn" data-scenario="custom" onclick="setMultiMode('custom')">Custom</button>
+        </div>
+      </div>
+      <div class="canvas-wrap canvas-tall">
+        <canvas id="cv-s3"></canvas>
+      </div>
+      <div id="s3-legend" class="legend" style="margin-top:10px;"></div>
+      <div id="s3-custom" class="custom-sliders">
+        <div id="s3-custom-sliders" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:12px;"></div>
+      </div>
+    </div>
 
-    function generateData(a, b, c) {
-        const data = [];
-        for (let theta = -4; theta <= 4; theta += 0.1) {
-            data.push({
-                x: parseFloat(theta.toFixed(1)),
-                y: calculateProbability(theta, a, b, c)
-            });
-        }
-        return data;
-    }
+    <div class="note">
+      <strong>Try it:</strong> "Vary Difficulty" spreads items across the trait axis — each item targets a different ability level. "Vary Discrimination" keeps them at the same difficulty but changes how sharp each one is. Switch to "Custom" to design your own set.
+    </div>
+    <div class="note warn">
+      Items with very low discrimination (a &lt; 0.5) are nearly flat — they contribute almost no measurement information. In practice, such items would be flagged for removal or revision.
+    </div>
+  </div>
 
-    const irtCtx = document.getElementById('irtChart').getContext('2d');
-    const irtChart = new Chart(irtCtx, {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'Probability of Endorsement / Correct Response',
-                data: generateData(1.0, 0.0, 0.0),
-                borderColor: '#2dd4bf',
-                backgroundColor: 'rgba(45, 212, 191, 0.08)',
-                borderWidth: 2.5,
-                fill: true,
-                pointRadius: 0,
-                pointHitRadius: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    type: 'linear',
-                    title: {
-                        display: true,
-                        text: 'Latent Trait Level (θ)',
-                        font: { size: 15, family: 'IBM Plex Mono, monospace' },
-                        color: '#b0b4c0'
-                    },
-                    min: -4,
-                    max: 4,
-                    ticks: {
-                        stepSize: 1,
-                        font: { size: 14, family: 'IBM Plex Mono, monospace' },
-                        color: '#b0b4c0'
-                    },
-                    grid: { color: '#1e2030' },
-                    border: { color: '#2a2d3a' }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Probability P(θ)',
-                        font: { size: 15, family: 'IBM Plex Mono, monospace' },
-                        color: '#b0b4c0'
-                    },
-                    min: 0,
-                    max: 1,
-                    ticks: {
-                        stepSize: 0.2,
-                        font: { size: 14, family: 'IBM Plex Mono, monospace' },
-                        color: '#b0b4c0'
-                    },
-                    grid: { color: '#1e2030' },
-                    border: { color: '#2a2d3a' }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: (context) => `Probability: ${context.parsed.y.toFixed(2)}`
-                    }
-                }
-            }
-        }
-    });
+  <!-- SECTION 4 -->
+  <div class="section" id="sec4">
+    <div class="section-label">Section 4</div>
+    <h2>What CTT misses<button class="info-btn" onclick="showInfo('sec4')">?</button></h2>
+    <p>In CTT, a test score is a simple sum: each item contributes one point, equally weighted. In IRT, each item's contribution depends on <em>where</em> on the trait continuum the person falls. An item centered at $\theta = 2$ provides almost no information about someone at $\theta = -2$, even though CTT counts that item the same as any other.</p>
 
-    const sliders = ['a', 'b', 'c'];
-    sliders.forEach(param => {
-        const slider = document.getElementById(`${param}Slider`);
-        const display = document.getElementById(`${param}Val`);
-        slider.addEventListener('input', (e) => {
-            display.textContent = parseFloat(e.target.value).toFixed(2);
-            const a = parseFloat(document.getElementById('aSlider').value);
-            const b = parseFloat(document.getElementById('bSlider').value);
-            const c = parseFloat(document.getElementById('cSlider').value);
-            irtChart.data.datasets[0].data = generateData(a, b, c);
-            irtChart.update('none');
-        });
-    });
-</script>
+    <div class="viz-box wide">
+      <div style="margin-bottom:12px;">
+        <div class="btn-row">
+          <button class="btn scenario-btn active" data-scenario="realistic" onclick="setCompMode('realistic')">Realistic Items</button>
+          <button class="btn scenario-btn" data-scenario="equal" onclick="setCompMode('equal')">Equal Items</button>
+        </div>
+        <div class="slider-row" style="margin-top:10px;max-width:380px;">
+          <span class="slider-label">&theta;</span>
+          <input type="range" id="sl-s4-theta" min="-3.0" max="3.0" step="0.1" value="0.0">
+          <span class="slider-val" id="sv-s4-theta">0.00</span>
+        </div>
+      </div>
+      <div class="irt-compare">
+        <div>
+          <div class="viz-title">CTT: Equal Item Weights</div>
+          <div class="canvas-wrap canvas-med">
+            <canvas id="cv-s4-ctt"></canvas>
+          </div>
+        </div>
+        <div>
+          <div class="viz-title">IRT: Information at &theta; = <span id="s4-theta-label">0.00</span></div>
+          <div class="canvas-wrap canvas-med">
+            <canvas id="cv-s4-irt"></canvas>
+          </div>
+        </div>
+      </div>
+      <div id="s4-item-table" style="margin-top:12px;overflow-x:auto;"></div>
+    </div>
+
+    <div class="note warn">
+      CTT says each item contributes equally to the total score. IRT reveals that at any given trait level, some items contribute many times more information than others. The sum score treats a maximally informative item and a useless one the same.
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section" id="sec5">
+    <div class="section-label">Section 5</div>
+    <h2>Item information<button class="info-btn" onclick="showInfo('sec5')">?</button></h2>
+    <p>Each item's <em>information function</em> tells you exactly how much measurement precision it provides at each trait level. For the 2PL model, item information has a clean formula:</p>
+    <div class="equation-box">
+      $$I_i(\theta) = a_i^2 \, P_i(\theta) \, Q_i(\theta)$$
+      <div class="eq-label">Item information function, where $Q = 1 - P$</div>
+    </div>
+    <p>This is always a bell-shaped curve, peaking at $\theta = b$ with height $a^2/4$. High discrimination means a tall, narrow peak of information. Low discrimination means a short, wide bump — less information everywhere.</p>
+
+    <div class="viz-box">
+      <div class="viz-title">ICC and Item Information Function</div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div style="flex:0 0 230px;">
+          <div class="slider-group">
+            <div class="slider-row">
+              <span class="slider-label">a</span>
+              <input type="range" id="sl-s5-a" min="0.3" max="3.0" step="0.1" value="1.5">
+              <span class="slider-val" id="sv-s5-a">1.50</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">b</span>
+              <input type="range" id="sl-s5-b" min="-3.0" max="3.0" step="0.1" value="0.0">
+              <span class="slider-val" id="sv-s5-b">0.00</span>
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:8px;display:flex;flex-direction:column;gap:4px;">
+            <button class="btn scenario-btn active" data-scenario="both" onclick="setInfoMode('both')" style="width:100%;">Both</button>
+            <button class="btn scenario-btn" data-scenario="icc" onclick="setInfoMode('icc')" style="width:100%;">ICC Only</button>
+            <button class="btn scenario-btn" data-scenario="info" onclick="setInfoMode('info')" style="width:100%;">Info Only</button>
+          </div>
+          <div class="irt-stat-row">
+            <div class="irt-stat good">
+              <div class="irt-stat-label">Peak Info</div>
+              <div class="irt-stat-value" id="s5-peak">0.56</div>
+            </div>
+            <div class="irt-stat">
+              <div class="irt-stat-label">Peak at &theta;</div>
+              <div class="irt-stat-value" id="s5-peakat">0.00</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:280px;">
+          <div class="canvas-wrap canvas-tall">
+            <canvas id="cv-s5"></canvas>
+          </div>
+          <div class="legend" style="margin-top:8px;">
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--teal);"></div>ICC: P(&theta;)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--orange);"></div>Information: I(&theta;)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Increase $a$ and watch the information peak grow taller and narrower — the item provides intense precision in a narrow band around its difficulty. Decrease $a$ and the peak flattens — the item spreads weak information over a broad range. Move $b$ to shift where the peak falls.
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section" id="sec6">
+    <div class="section-label">Section 6</div>
+    <h2>From items to tests: the Test Information Function<button class="info-btn" onclick="showInfo('sec6')">?</button></h2>
+    <p>A test's total information at any trait level is simply the <em>sum</em> of its items' information functions. This <em>Test Information Function</em> (TIF) is IRT's answer to reliability — but unlike a single reliability coefficient, the TIF tells you <em>where</em> the test is precise and where it isn't.</p>
+
+    <div class="viz-box wide">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div style="flex:0 0 220px;">
+          <div class="slider-group">
+            <div class="slider-group-title">Test Parameters</div>
+            <div class="slider-row">
+              <span class="slider-label" style="width:50px;">Items</span>
+              <input type="range" id="sl-s6-n" min="3" max="20" step="1" value="10">
+              <span class="slider-val" id="sv-s6-n">10</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label" style="width:50px;">Avg a</span>
+              <input type="range" id="sl-s6-a" min="0.5" max="3.0" step="0.1" value="1.5">
+              <span class="slider-val" id="sv-s6-a">1.50</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label" style="width:50px;">Avg b</span>
+              <input type="range" id="sl-s6-b" min="-2.0" max="2.0" step="0.1" value="0.0">
+              <span class="slider-val" id="sv-s6-b">0.00</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label" style="width:56px;">Spread</span>
+              <input type="range" id="sl-s6-spread" min="0.0" max="3.0" step="0.1" value="1.5">
+              <span class="slider-val" id="sv-s6-spread">1.50</span>
+            </div>
+          </div>
+          <div class="slider-group" style="margin-top:10px;">
+            <div class="slider-row">
+              <span class="slider-label">&theta;</span>
+              <input type="range" id="sl-s6-theta" min="-3.0" max="3.0" step="0.1" value="0.0">
+              <span class="slider-val" id="sv-s6-theta">0.00</span>
+            </div>
+          </div>
+          <div class="irt-stat-row">
+            <div class="irt-stat good">
+              <div class="irt-stat-label">I(&theta;)</div>
+              <div class="irt-stat-value" id="s6-info">—</div>
+            </div>
+            <div class="irt-stat">
+              <div class="irt-stat-label">SE(&theta;)</div>
+              <div class="irt-stat-value" id="s6-se">—</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:280px;">
+          <div class="canvas-wrap canvas-tall">
+            <canvas id="cv-s6"></canvas>
+          </div>
+          <div class="legend" style="margin-top:8px;">
+            <div class="legend-item"><div class="legend-swatch" style="background:rgba(45,212,191,0.3);"></div>Individual item info</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--teal);"></div>Test Information I(&theta;)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:var(--orange);"></div>SE(&theta;)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Set Spread to 0 — all items cluster at the same difficulty, creating a sharp information peak. Increase Spread and the TIF broadens but its peak drops. This is the fundamental tradeoff: <em>precision at one point vs. coverage across the range</em>.
+    </div>
+    <div class="note warn">
+      For a deeper exploration of $SE(\theta)$ and confidence intervals, see the <a href="/visualizations/irt-precision/">IRT Precision</a> visualization.
+    </div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section" id="sec7">
+    <div class="section-label">Section 7</div>
+    <h2>The measurement precision illusion<button class="info-btn" onclick="showInfo('sec7')">?</button></h2>
+    <p>This is the conceptual payoff. Classical Test Theory reports a <em>single</em> Standard Error of Measurement (SEM) for the entire test — it doesn't matter who you're measuring. IRT reveals the truth: measurement precision varies dramatically depending on where on the trait continuum a person falls.</p>
+
+    <div class="viz-box wide">
+      <div style="margin-bottom:12px;">
+        <div class="btn-row">
+          <button class="btn scenario-btn active" data-scenario="peaked" onclick="setPrecisionScenario('peaked')">Peaked Test</button>
+          <button class="btn scenario-btn" data-scenario="broad" onclick="setPrecisionScenario('broad')">Broad Test</button>
+          <button class="btn scenario-btn" data-scenario="clinical" onclick="setPrecisionScenario('clinical')">Clinical Cutoff</button>
+        </div>
+        <div class="slider-row" style="margin-top:10px;max-width:380px;">
+          <span class="slider-label">&theta;</span>
+          <input type="range" id="sl-s7-theta" min="-3.0" max="3.0" step="0.1" value="0.0">
+          <span class="slider-val" id="sv-s7-theta">0.00</span>
+        </div>
+      </div>
+      <div class="irt-compare">
+        <div>
+          <div class="viz-title">CTT: Constant SEM</div>
+          <div class="canvas-wrap canvas-med">
+            <canvas id="cv-s7-ctt"></canvas>
+          </div>
+        </div>
+        <div>
+          <div class="viz-title">IRT: Conditional SE(&theta;)</div>
+          <div class="canvas-wrap canvas-med">
+            <canvas id="cv-s7-irt"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="irt-stat-row" id="s7-stats"></div>
+    </div>
+
+    <div class="note">
+      <strong>Try it:</strong> Select "Peaked Test" and move $\theta$ — the IRT SE stays low near the center but explodes at the extremes, while CTT's SEM stays flat. Select "Clinical Cutoff" — items are targeted around $\theta = 1.5$, so precision is excellent near the cutoff but poor elsewhere. CTT's single SEM hides this completely.
+    </div>
+    <div class="note warn">
+      CTT says the test has a single SEM everywhere. IRT reveals that the SEM can range from excellent to useless depending on who you're measuring. For clinical decisions at specific cutoffs, this distinction is critical.
+    </div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section" id="sec8">
+    <div class="section-label">Section 8</div>
+    <h2>Building a better test<button class="info-btn" onclick="showInfo('sec8')">?</button></h2>
+    <p>IRT doesn't just describe tests — it guides test construction. Since each item's information function is known, you can <em>choose</em> items to shape the TIF to match your measurement goals. Click items in the bank below to add them to your test and watch the TIF update in real time.</p>
+
+    <div class="viz-box wide">
+      <div style="margin-bottom:12px;">
+        <div class="btn-row">
+          <button class="btn" onclick="autoSelect('screening')">Screen at Cutoff</button>
+          <button class="btn" onclick="autoSelect('broad')">Broad Assessment</button>
+          <button class="btn" onclick="autoSelect('research')">Research (Center)</button>
+          <button class="btn btn-orange" onclick="autoSelect('clear')">Clear All</button>
+        </div>
+      </div>
+      <div id="item-bank" class="item-bank"></div>
+      <div class="viz-title">Test Information Function (<span id="s8-count">0</span> items selected)</div>
+      <div class="canvas-wrap canvas-med">
+        <canvas id="cv-s8"></canvas>
+      </div>
+      <div class="irt-stat-row" id="s8-stats"></div>
+    </div>
+
+    <div class="note">
+      Clinical screening tests need precision at a specific cutoff. Research instruments need broad coverage. Computerized Adaptive Testing (CAT) selects items in real time to maximize information at the test-taker's estimated ability.
+    </div>
+    <div class="note caveat">
+      Real test assembly must also consider content coverage, item exposure, and practical constraints. This demonstrates the psychometric logic only.
+    </div>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="section" id="sec9">
+    <div class="section-label">Section 9</div>
+    <h2>What IRT makes possible<button class="info-btn" onclick="showInfo('sec9')">?</button></h2>
+    <p>Return to Section 1's puzzle: three people, same sum score, different patterns. IRT doesn't just count correct answers — it uses the full response pattern and each item's parameters to estimate a trait level ($\theta$) and a standard error for each person individually.</p>
+
+    <div class="viz-box">
+      <div class="viz-title">Same Sum Score, Different Estimates</div>
+      <div id="sec9-table"></div>
+    </div>
+
+    <p>Person A's pattern — getting easy items right and hard items wrong — is the most likely pattern for someone near the middle of the trait range, and IRT rewards this consistency with a smaller standard error. Person B's reversed pattern is improbable under the model; the MLE still produces an estimate, but the likelihood surface is flatter, yielding a larger SE. Person C's scattered pattern is the least informative, and IRT reports this honestly through an even wider SE.</p>
+
+    <div class="note warn">
+      IRT doesn't just change how we think about measurement. It changes what's <em>possible</em>: adaptive testing that adjusts difficulty in real time, fair comparison across different test forms (equating), detection of items that function differently across groups (DIF), and honest reporting of where a test is precise and where it isn't.
+    </div>
+    <div class="note caveat">
+      This visualization uses the 2PL model throughout. The 3PL adds a guessing parameter, the GRM and GPCM handle polytomous (Likert-type) items, and multidimensional models allow multiple latent traits. The 2PL captures the core logic; extensions add flexibility for specific applications.
+    </div>
+  </div>
 
   <!-- Citation -->
   <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
     <h5 id="citation">Citation</h5>
-    <p>Persson, B. N. (2026). <em>IRT Curve (3PL Model)</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/irt-curve/" target="_blank">https://bjorn-persson.github.io/visualizations/irt-curve/</a></p>
-    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026irtcurve,
+    <p>Persson, B. N. (2026). <em>Inside Item Response Theory</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/irt-curve/" target="_blank">https://bjorn-persson.github.io/visualizations/irt-curve/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026irt,
 </span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
-</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{IRT Curve (3PL Model)}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Inside Item Response Theory}</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/irt-curve/}</span>}
 </span></span></code></pre></div>
   </div>
 
+</div>
+
+<!-- Info Modal Overlay -->
+<div class="info-overlay" id="infoOverlay" onclick="if(event.target===this)closeInfo()">
+  <div class="info-modal">
+    <button class="info-close" onclick="closeInfo()">&times;</button>
+    <span class="info-modal-badge" id="infoBadge"></span>
+    <h3 id="infoTitle"></h3>
+    <div id="infoBody"></div>
+  </div>
+</div>
+
+<script>
+// =============================================================
+// CORE IRT MATH
+// =============================================================
+function icc2PL(theta, a, b) {
+  return 1 / (1 + Math.exp(-a * (theta - b)));
+}
+function itemInfo2PL(theta, a, b) {
+  const p = icc2PL(theta, a, b);
+  return a * a * p * (1 - p);
+}
+function testInfo(theta, items) {
+  let sum = 0;
+  for (const it of items) sum += itemInfo2PL(theta, it.a, it.b);
+  return sum;
+}
+function se(theta, items) {
+  const info = testInfo(theta, items);
+  return info > 0 ? 1 / Math.sqrt(info) : 99;
+}
+
+// MLE theta estimation via Newton-Raphson
+function estimateThetaMLE(responses, items) {
+  let theta = 0;
+  for (let iter = 0; iter < 40; iter++) {
+    let L1 = 0, L2 = 0;
+    for (let i = 0; i < items.length; i++) {
+      const p = icc2PL(theta, items[i].a, items[i].b);
+      const a = items[i].a;
+      L1 += a * (responses[i] - p);
+      L2 -= a * a * p * (1 - p);
+    }
+    if (Math.abs(L2) < 1e-10) break;
+    const delta = L1 / L2;
+    theta -= delta;
+    theta = Math.max(-4, Math.min(4, theta));
+    if (Math.abs(delta) < 1e-6) break;
+  }
+  return theta;
+}
+
+// SE at MLE
+function seAtMLE(theta, items) {
+  let info = 0;
+  for (const it of items) info += itemInfo2PL(theta, it.a, it.b);
+  return info > 0 ? 1 / Math.sqrt(info) : 99;
+}
+
+// =============================================================
+// DEMO DATA (Sections 1 & 9)
+// =============================================================
+// 10 items with known parameters, ordered by difficulty
+const DEMO_ITEMS = [
+  {a:1.2, b:-2.0}, {a:1.5, b:-1.5}, {a:1.8, b:-1.0}, {a:1.4, b:-0.5}, {a:1.6, b: 0.0},
+  {a:1.3, b: 0.5}, {a:1.7, b: 1.0}, {a:1.5, b: 1.5}, {a:1.2, b: 2.0}, {a:1.4, b: 2.5}
+];
+// Person A: sensible pattern (easy correct, hard wrong) — 6/10
+const RESP_A = [1,1,1,1,1,1,0,0,0,0];
+// Person B: reversed pattern (hard correct, easy wrong) — 6/10
+const RESP_B = [0,0,0,0,1,1,1,1,1,1];
+// Person C: scattered — 6/10
+const RESP_C = [1,0,1,1,0,0,1,0,1,1];
+
+// =============================================================
+// CANVAS UTILITIES
+// =============================================================
+let dpr = window.devicePixelRatio || 1;
+
+function setupCanvas(canvas) {
+  dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+const COLORS = {
+  teal: '#2dd4bf', orange: '#f97316', red: '#ef4444',
+  blue: '#3b82f6', purple: '#a78bfa',
+  text: '#c9cdd8', textDim: '#6b7084', textBright: '#e8ecf4',
+  bg: '#181a24', grid: '#1e2030', border: '#2a2d3a', muted: '#4a5568'
+};
+const ITEM_COLORS = ['#2dd4bf','#f97316','#a78bfa','#3b82f6','#f472b6'];
+
+function drawAxes(ctx, W, H, pad, xRange, yRange, xLabel, yLabel, opts) {
+  opts = opts || {};
+  const plotW = W - pad.l - pad.r;
+  const plotH = H - pad.t - pad.b;
+
+  ctx.strokeStyle = COLORS.border;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b);
+  ctx.lineTo(W - pad.r, H - pad.b);
+  ctx.stroke();
+
+  // Grid lines
+  ctx.strokeStyle = COLORS.grid;
+  ctx.lineWidth = 0.5;
+  ctx.font = '13px IBM Plex Mono, monospace';
+  ctx.fillStyle = COLORS.text;
+  ctx.textAlign = 'center';
+
+  // X ticks
+  const xStep = opts.xStep || 1;
+  for (let x = Math.ceil(xRange[0]/xStep)*xStep; x <= xRange[1]; x += xStep) {
+    const px = pad.l + ((x - xRange[0]) / (xRange[1] - xRange[0])) * plotW;
+    ctx.beginPath(); ctx.moveTo(px, pad.t); ctx.lineTo(px, H - pad.b); ctx.stroke();
+    ctx.fillText(Number.isInteger(x) ? x : x.toFixed(1), px, H - pad.b + 16);
+  }
+
+  // Y ticks
+  const yStep = opts.yStep || 0.2;
+  ctx.textAlign = 'right';
+  for (let y = yRange[0]; y <= yRange[1] + 0.001; y += yStep) {
+    const py = H - pad.b - ((y - yRange[0]) / (yRange[1] - yRange[0])) * plotH;
+    if (py < pad.t - 2) continue;
+    ctx.beginPath(); ctx.moveTo(pad.l, py); ctx.lineTo(W - pad.r, py); ctx.stroke();
+    ctx.fillText(y.toFixed(opts.yDecimals != null ? opts.yDecimals : 1), pad.l - 6, py + 4);
+  }
+
+  // Labels
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '13px IBM Plex Mono, monospace';
+  ctx.textAlign = 'center';
+  if (xLabel) ctx.fillText(xLabel, pad.l + plotW/2, H - 4);
+  if (yLabel) {
+    ctx.save();
+    ctx.translate(12, pad.t + plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+  }
+
+  return { plotW, plotH, toX: (v) => pad.l + ((v - xRange[0])/(xRange[1]-xRange[0]))*plotW,
+           toY: (v) => H - pad.b - ((v - yRange[0])/(yRange[1]-yRange[0]))*plotH };
+}
+
+function drawCurve(ctx, points, color, width, dash) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width || 2;
+  ctx.setLineDash(dash || []);
+  ctx.beginPath();
+  for (let i = 0; i < points.length; i++) {
+    if (i === 0) ctx.moveTo(points[i][0], points[i][1]);
+    else ctx.lineTo(points[i][0], points[i][1]);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawVerticalLine(ctx, x, y1, y2, color, dash) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash(dash || [5,4]);
+  ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawDot(ctx, x, y, r, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+}
+
+// =============================================================
+// STATE
+// =============================================================
+const STATE = {
+  // Section 2
+  s2: { a: 1.5, b: 0.0, theta: 0.0 },
+  // Section 3
+  multiMode: 'difficulty',
+  customItems: [
+    {a:1.5,b:-1.5},{a:1.5,b:-0.5},{a:1.5,b:0.5},{a:1.5,b:1.5}
+  ],
+  // Section 4
+  compMode: 'realistic',
+  s4theta: 0.0,
+  // Section 5
+  s5: { a: 1.5, b: 0.0 },
+  infoMode: 'both',
+  // Section 6
+  s6: { n: 10, a: 1.5, b: 0.0, spread: 1.5, theta: 0.0 },
+  // Section 7
+  precisionScenario: 'peaked',
+  s7theta: 0.0,
+  // Section 8
+  itemBank: [],
+  selected: new Set()
+};
+
+// =============================================================
+// ITEM GENERATION
+// =============================================================
+function generateTestItems(n, avgA, avgB, spread) {
+  const items = [];
+  for (let i = 0; i < n; i++) {
+    const t = n > 1 ? i / (n - 1) : 0.5;
+    const b = avgB + spread * (2 * t - 1);
+    items.push({ a: avgA, b: b });
+  }
+  return items;
+}
+
+function generateItemBank() {
+  // Seeded pseudo-random for consistent bank
+  let seed = 42;
+  function rand() { seed = (seed * 16807 + 0) % 2147483647; return seed / 2147483647; }
+  const bank = [];
+  for (let i = 0; i < 18; i++) {
+    const a = 0.5 + rand() * 2.0;  // 0.5 to 2.5
+    const b = -2.5 + rand() * 5.0; // -2.5 to 2.5
+    bank.push({ a: Math.round(a*100)/100, b: Math.round(b*100)/100 });
+  }
+  return bank;
+}
+
+// Section 4 items
+const COMP_ITEMS_REALISTIC = [
+  {a:0.6,b:-2.0},{a:1.8,b:-1.0},{a:2.2,b:-0.3},{a:1.0,b:0.2},{a:1.5,b:1.0},{a:0.8,b:2.0}
+];
+const COMP_ITEMS_EQUAL = [
+  {a:1.5,b:0.0},{a:1.5,b:0.0},{a:1.5,b:0.0},{a:1.5,b:0.0},{a:1.5,b:0.0},{a:1.5,b:0.0}
+];
+
+// Section 7 scenarios
+const PRECISION_SCENARIOS = {
+  peaked: () => generateTestItems(12, 1.5, 0.0, 0.3),
+  broad:  () => generateTestItems(12, 1.5, 0.0, 2.5),
+  clinical: () => generateTestItems(12, 1.5, 1.5, 0.5)
+};
+
+function getMultiItems() {
+  if (STATE.multiMode === 'difficulty') {
+    return [{a:1.5,b:-1.5},{a:1.5,b:-0.5},{a:1.5,b:0.5},{a:1.5,b:1.5}];
+  } else if (STATE.multiMode === 'discrimination') {
+    return [{a:0.5,b:0},{a:1.0,b:0},{a:1.8,b:0},{a:3.0,b:0}];
+  }
+  return STATE.customItems;
+}
+
+// =============================================================
+// SECTION 1: RESPONSE MATRIX
+// =============================================================
+function drawSection1() {
+  const el = document.getElementById('response-matrix');
+  const items = DEMO_ITEMS;
+  const persons = [
+    { label: 'Person A', resp: RESP_A, cls: 'person-a' },
+    { label: 'Person B', resp: RESP_B, cls: 'person-b' },
+    { label: 'Person C', resp: RESP_C, cls: 'person-c' }
+  ];
+
+  let html = '<table class="data-table" style="margin:0;width:102%;font-size:0.78em;">';
+  html += '<tr><th></th>';
+  for (let i = 0; i < items.length; i++) {
+    html += `<th style="font-size:0.92em;padding:4px 3px;text-align:center;color:var(--text);">Item ${i+1}<br><span style="color:var(--text);font-weight:400;font-size:0.85em;">b=${items[i].b.toFixed(1)}</span></th>`;
+  }
+  html += '<th style="font-size:0.92em;padding:4px 3px;text-align:center;color:var(--text);">Sum</th></tr>';
+
+  for (const p of persons) {
+    html += `<tr><td class="${p.cls}" style="text-align:left;white-space:nowrap;font-size:0.85em;padding:4px 3px;">${p.label}</td>`;
+    const sum = p.resp.reduce((a,b) => a+b, 0);
+    for (let i = 0; i < p.resp.length; i++) {
+      const icon = p.resp[i] ? '<span style="color:var(--teal);">&#x2713;</span>' : '<span style="color:var(--red);">&#x2717;</span>';
+      html += `<td style="padding:4px 3px;">${icon}</td>`;
+    }
+    html += `<td style="font-weight:600;padding:4px 3px;">${sum}</td></tr>`;
+  }
+  html += '</table>';
+  el.innerHTML = html;
+
+  // Stats
+  const statsEl = document.getElementById('sec1-stats');
+  statsEl.innerHTML = `
+    <div class="irt-stat"><div class="irt-stat-label">CTT Score</div><div class="irt-stat-value">6 / 10</div></div>
+    <div class="irt-stat"><div class="irt-stat-label">CTT Verdict</div><div class="irt-stat-value" style="font-size:0.82em;">All identical</div></div>
+  `;
+}
+
+// =============================================================
+// SECTION 2: SINGLE ICC
+// =============================================================
+function drawSection2() {
+  const canvas = document.getElementById('cv-s2');
+  const ctx = setupCanvas(canvas);
+  const W = canvas.width / dpr, H = canvas.height / dpr;
+  const pad = { l: 50, r: 20, t: 20, b: 48 };
+  const { a, b, theta } = STATE.s2;
+
+  ctx.clearRect(0, 0, W, H);
+  const ax = drawAxes(ctx, W, H, pad, [-4, 4], [0, 1], 'θ', 'P(θ)');
+
+  // ICC curve
+  const pts = [];
+  for (let t = -4; t <= 4; t += 0.05) pts.push([ax.toX(t), ax.toY(icc2PL(t, a, b))]);
+  drawCurve(ctx, pts, COLORS.teal, 2.5);
+
+  // Theta marker
+  const prob = icc2PL(theta, a, b);
+  const tx = ax.toX(theta), ty = ax.toY(prob);
+  drawVerticalLine(ctx, tx, ax.toY(0), ty, COLORS.textDim);
+  drawDot(ctx, tx, ty, 5, COLORS.teal);
+
+  // Horizontal line to y-axis
+  ctx.strokeStyle = COLORS.textDim;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(pad.l, ty); ctx.lineTo(tx, ty); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // P label
+  ctx.fillStyle = COLORS.teal;
+  ctx.font = 'bold 13px IBM Plex Mono, monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(`P = ${prob.toFixed(2)}`, tx + 8, ty - 8);
+
+  // b marker
+  const bx = ax.toX(b);
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '13px IBM Plex Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('b', bx, ax.toY(0) + 28);
+  drawDot(ctx, bx, ax.toY(0.5), 3, COLORS.textDim);
+
+  document.getElementById('s2-prob').textContent = prob.toFixed(3);
+}
+
+// =============================================================
+// SECTION 3: MULTIPLE ICCs
+// =============================================================
+function drawSection3() {
+  const canvas = document.getElementById('cv-s3');
+  const ctx = setupCanvas(canvas);
+  const W = canvas.width / dpr, H = canvas.height / dpr;
+  const pad = { l: 50, r: 20, t: 20, b: 48 };
+
+  ctx.clearRect(0, 0, W, H);
+  const ax = drawAxes(ctx, W, H, pad, [-4, 4], [0, 1], 'θ', 'P(θ)');
+
+  const items = getMultiItems();
+  const legendEl = document.getElementById('s3-legend');
+  let legendHtml = '';
+
+  for (let idx = 0; idx < items.length; idx++) {
+    const { a, b } = items[idx];
+    const color = ITEM_COLORS[idx % ITEM_COLORS.length];
+    const pts = [];
+    for (let t = -4; t <= 4; t += 0.05) pts.push([ax.toX(t), ax.toY(icc2PL(t, a, b))]);
+    drawCurve(ctx, pts, color, 2);
+    const label = `Item ${idx+1} (a=${a.toFixed(1)}, b=${b.toFixed(1)})`;
+    legendHtml += `<div class="legend-item"><div class="legend-swatch" style="background:${color};"></div>${label}</div>`;
+  }
+  legendEl.innerHTML = legendHtml;
+}
+
+function setMultiMode(mode) {
+  STATE.multiMode = mode;
+  document.querySelectorAll('#sec3 .scenario-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.scenario === mode);
+  });
+  const customEl = document.getElementById('s3-custom');
+  customEl.classList.toggle('visible', mode === 'custom');
+  drawSection3();
+}
+
+function buildCustomSliders() {
+  const el = document.getElementById('s3-custom-sliders');
+  let html = '';
+  for (let i = 0; i < 4; i++) {
+    html += `<div style="margin-bottom:8px;">
+      <div style="font-family:var(--mono);font-size:0.78em;color:${ITEM_COLORS[i]};font-weight:600;margin-bottom:4px;">Item ${i+1}</div>
+      <div class="slider-row"><span class="slider-label">a</span>
+        <input type="range" min="0.3" max="3.0" step="0.1" value="${STATE.customItems[i].a}" oninput="STATE.customItems[${i}].a=+this.value;this.nextElementSibling.textContent=(+this.value).toFixed(1);drawSection3()">
+        <span class="slider-val">${STATE.customItems[i].a.toFixed(1)}</span></div>
+      <div class="slider-row"><span class="slider-label">b</span>
+        <input type="range" min="-3.0" max="3.0" step="0.1" value="${STATE.customItems[i].b}" oninput="STATE.customItems[${i}].b=+this.value;this.nextElementSibling.textContent=(+this.value).toFixed(1);drawSection3()">
+        <span class="slider-val">${STATE.customItems[i].b.toFixed(1)}</span></div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+// =============================================================
+// SECTION 4: CTT vs IRT
+// =============================================================
+function getCompItems() {
+  return STATE.compMode === 'realistic' ? COMP_ITEMS_REALISTIC : COMP_ITEMS_EQUAL;
+}
+
+function drawSection4() {
+  const items = getCompItems();
+  const theta = STATE.s4theta;
+  const nItems = items.length;
+
+  // CTT bar chart
+  const cvCTT = document.getElementById('cv-s4-ctt');
+  const ctxC = setupCanvas(cvCTT);
+  const W = cvCTT.width/dpr, H = cvCTT.height/dpr;
+  const pad = {l:50, r:20, t:20, b:48};
+
+  ctxC.clearRect(0, 0, W, H);
+  const maxY = 1.0;
+  const plotW = W - pad.l - pad.r;
+  const plotH = H - pad.t - pad.b;
+  const barW = plotW / nItems * 0.6;
+  const gap = plotW / nItems;
+
+  // Y axis
+  ctxC.strokeStyle = COLORS.border; ctxC.lineWidth = 1;
+  ctxC.beginPath(); ctxC.moveTo(pad.l, pad.t); ctxC.lineTo(pad.l, H-pad.b); ctxC.lineTo(W-pad.r, H-pad.b); ctxC.stroke();
+
+  ctxC.font = '13px IBM Plex Mono, monospace';
+  ctxC.fillStyle = COLORS.text; ctxC.textAlign = 'right';
+  for (let y = 0; y <= maxY; y += 0.2) {
+    const py = H - pad.b - (y/maxY)*plotH;
+    ctxC.strokeStyle = COLORS.grid; ctxC.lineWidth = 0.5;
+    ctxC.beginPath(); ctxC.moveTo(pad.l, py); ctxC.lineTo(W-pad.r, py); ctxC.stroke();
+    ctxC.fillText(y.toFixed(1), pad.l-6, py+4);
+  }
+
+  // CTT weight = 1/k for each item
+  const cttWeight = 1 / nItems;
+  ctxC.fillStyle = COLORS.text;
+  for (let i = 0; i < nItems; i++) {
+    const x = pad.l + gap*i + (gap-barW)/2;
+    const barH = (cttWeight/maxY)*plotH;
+    ctxC.fillStyle = COLORS.muted;
+    ctxC.fillRect(x, H-pad.b-barH, barW, barH);
+    ctxC.fillStyle = COLORS.text;
+    ctxC.textAlign = 'center';
+    ctxC.fillText(`${i+1}`, x + barW/2, H-pad.b+16);
+  }
+  ctxC.fillStyle = COLORS.text; ctxC.textAlign = 'center';
+  ctxC.fillText('Item', pad.l+plotW/2, H-2);
+
+  // IRT bar chart
+  const cvIRT = document.getElementById('cv-s4-irt');
+  const ctxI = setupCanvas(cvIRT);
+  const W2 = cvIRT.width/dpr, H2 = cvIRT.height/dpr;
+
+  ctxI.clearRect(0, 0, W2, H2);
+  const plotW2 = W2 - pad.l - pad.r;
+  const plotH2 = H2 - pad.t - pad.b;
+  const gap2 = plotW2 / nItems;
+  const barW2 = plotW2 / nItems * 0.6;
+
+  // Find max info for scaling
+  const infos = items.map(it => itemInfo2PL(theta, it.a, it.b));
+  const maxInfo = Math.max(0.5, ...infos) * 1.2;
+
+  ctxI.strokeStyle = COLORS.border; ctxI.lineWidth = 1;
+  ctxI.beginPath(); ctxI.moveTo(pad.l, pad.t); ctxI.lineTo(pad.l, H2-pad.b); ctxI.lineTo(W2-pad.r, H2-pad.b); ctxI.stroke();
+
+  ctxI.font = '13px IBM Plex Mono, monospace';
+  ctxI.fillStyle = COLORS.text; ctxI.textAlign = 'right';
+  const yStep = maxInfo > 2 ? 0.5 : 0.2;
+  for (let y = 0; y <= maxInfo; y += yStep) {
+    const py = H2 - pad.b - (y/maxInfo)*plotH2;
+    ctxI.strokeStyle = COLORS.grid; ctxI.lineWidth = 0.5;
+    ctxI.beginPath(); ctxI.moveTo(pad.l, py); ctxI.lineTo(W2-pad.r, py); ctxI.stroke();
+    ctxI.fillText(y.toFixed(1), pad.l-6, py+4);
+  }
+
+  for (let i = 0; i < nItems; i++) {
+    const x = pad.l + gap2*i + (gap2-barW2)/2;
+    const barH = (infos[i]/maxInfo)*plotH2;
+    ctxI.fillStyle = COLORS.teal;
+    ctxI.globalAlpha = 0.8;
+    ctxI.fillRect(x, H2-pad.b-barH, barW2, barH);
+    ctxI.globalAlpha = 1;
+    ctxI.fillStyle = COLORS.text;
+    ctxI.textAlign = 'center';
+    ctxI.fillText(`${i+1}`, x + barW2/2, H2-pad.b+16);
+  }
+  ctxI.fillStyle = COLORS.text; ctxI.textAlign = 'center';
+  ctxI.fillText('Item', pad.l+plotW2/2, H2-2);
+
+  document.getElementById('s4-theta-label').textContent = theta.toFixed(1);
+
+  // Item table
+  const tableEl = document.getElementById('s4-item-table');
+  let html = '<table class="data-table"><tr><th>Item</th><th>a</th><th>b</th><th>CTT Weight</th><th>IRT Info at θ</th></tr>';
+  for (let i = 0; i < nItems; i++) {
+    html += `<tr><td>${i+1}</td><td>${items[i].a.toFixed(1)}</td><td>${items[i].b.toFixed(1)}</td><td>${cttWeight.toFixed(3)}</td><td style="color:var(--teal);font-weight:600;">${infos[i].toFixed(3)}</td></tr>`;
+  }
+  html += '</table>';
+  tableEl.innerHTML = html;
+}
+
+function setCompMode(mode) {
+  STATE.compMode = mode;
+  document.querySelectorAll('#sec4 .scenario-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.scenario === mode);
+  });
+  drawSection4();
+}
+
+// =============================================================
+// SECTION 5: ITEM INFORMATION
+// =============================================================
+function drawSection5() {
+  const canvas = document.getElementById('cv-s5');
+  const ctx = setupCanvas(canvas);
+  const W = canvas.width/dpr, H = canvas.height/dpr;
+  const pad = {l:50, r:50, t:20, b:48};
+  const { a, b } = STATE.s5;
+  const mode = STATE.infoMode;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const maxInfo = Math.max(1.0, a*a/4 * 1.3);
+  const ax = drawAxes(ctx, W, H, pad, [-4, 4], [0, 1], 'θ', mode === 'info' ? '' : 'P(θ)');
+
+  // Draw ICC
+  if (mode === 'icc' || mode === 'both') {
+    const pts = [];
+    for (let t = -4; t <= 4; t += 0.05) pts.push([ax.toX(t), ax.toY(icc2PL(t, a, b))]);
+    drawCurve(ctx, pts, COLORS.teal, 2.5);
+  }
+
+  // Draw info function (scaled to right axis)
+  if (mode === 'info' || mode === 'both') {
+    const plotH = H - pad.t - pad.b;
+    const pts = [];
+    for (let t = -4; t <= 4; t += 0.05) {
+      const info = itemInfo2PL(t, a, b);
+      const py = H - pad.b - (info / maxInfo) * plotH;
+      pts.push([ax.toX(t), py]);
+    }
+    drawCurve(ctx, pts, COLORS.orange, 2.5);
+
+    // Right axis labels for info
+    ctx.fillStyle = COLORS.orange;
+    ctx.font = '13px IBM Plex Mono, monospace';
+    ctx.textAlign = 'left';
+    const infoStep = maxInfo > 1.5 ? 0.5 : 0.2;
+    for (let y = 0; y <= maxInfo; y += infoStep) {
+      const py = H - pad.b - (y/maxInfo)*plotH;
+      ctx.fillText(y.toFixed(1), W - pad.r + 6, py + 4);
+    }
+    ctx.save();
+    ctx.translate(W - 8, pad.t + plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign = 'center';
+    ctx.fillText('I(θ)', 0, 0);
+    ctx.restore();
+  }
+
+  const peak = a*a/4;
+  document.getElementById('s5-peak').textContent = peak.toFixed(3);
+  document.getElementById('s5-peakat').textContent = b.toFixed(1);
+}
+
+function setInfoMode(mode) {
+  STATE.infoMode = mode;
+  document.querySelectorAll('#sec5 .scenario-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.scenario === mode);
+  });
+  drawSection5();
+}
+
+// =============================================================
+// SECTION 6: TEST INFORMATION FUNCTION
+// =============================================================
+function drawSection6() {
+  const canvas = document.getElementById('cv-s6');
+  const ctx = setupCanvas(canvas);
+  const W = canvas.width/dpr, H = canvas.height/dpr;
+  const pad = {l:50, r:50, t:20, b:48};
+  const { n, a, b: avgB, spread, theta } = STATE.s6;
+
+  const items = generateTestItems(n, a, avgB, spread);
+  ctx.clearRect(0, 0, W, H);
+
+  // Find max TIF for scaling
+  let maxTIF = 0;
+  for (let t = -4; t <= 4; t += 0.1) {
+    const ti = testInfo(t, items);
+    if (ti > maxTIF) maxTIF = ti;
+  }
+  maxTIF = Math.max(1, maxTIF * 1.2);
+
+  const plotH = H - pad.t - pad.b;
+  const plotW = W - pad.l - pad.r;
+
+  // Axes
+  const ax = drawAxes(ctx, W, H, pad, [-4, 4], [0, maxTIF], 'θ', 'I(θ)', { yStep: maxTIF > 8 ? 2 : maxTIF > 3 ? 1 : 0.5, yDecimals: maxTIF > 3 ? 0 : 1 });
+
+  // Individual item info curves (thin, semi-transparent)
+  for (let i = 0; i < items.length; i++) {
+    const pts = [];
+    for (let t = -4; t <= 4; t += 0.05) {
+      const info = itemInfo2PL(t, items[i].a, items[i].b);
+      pts.push([ax.toX(t), ax.toY(info)]);
+    }
+    ctx.globalAlpha = 0.25;
+    drawCurve(ctx, pts, COLORS.teal, 1);
+    ctx.globalAlpha = 1;
+  }
+
+  // TIF (thick)
+  const tifPts = [];
+  for (let t = -4; t <= 4; t += 0.05) {
+    tifPts.push([ax.toX(t), ax.toY(testInfo(t, items))]);
+  }
+  drawCurve(ctx, tifPts, COLORS.teal, 3);
+
+  // SE curve on right axis (max SE = 2.0)
+  const maxSE = 2.0;
+  const sePts = [];
+  for (let t = -4; t <= 4; t += 0.05) {
+    const seVal = se(t, items);
+    const py = H - pad.b - (Math.min(seVal, maxSE) / maxSE) * plotH;
+    sePts.push([ax.toX(t), py]);
+  }
+  drawCurve(ctx, sePts, COLORS.orange, 2, [6, 4]);
+
+  // Right axis for SE
+  ctx.fillStyle = COLORS.orange;
+  ctx.font = '13px IBM Plex Mono, monospace';
+  ctx.textAlign = 'left';
+  for (let y = 0; y <= maxSE; y += 0.5) {
+    const py = H - pad.b - (y/maxSE)*plotH;
+    ctx.fillText(y.toFixed(1), W - pad.r + 6, py + 4);
+  }
+  ctx.save();
+  ctx.translate(W - 8, pad.t + plotH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.fillText('SE(θ)', 0, 0);
+  ctx.restore();
+
+  // Theta marker
+  const thetaInfo = testInfo(theta, items);
+  const thetaSE = se(theta, items);
+  drawVerticalLine(ctx, ax.toX(theta), H - pad.b, pad.t, COLORS.textDim);
+  drawDot(ctx, ax.toX(theta), ax.toY(thetaInfo), 5, COLORS.teal);
+
+  document.getElementById('s6-info').textContent = thetaInfo.toFixed(2);
+  document.getElementById('s6-se').textContent = thetaSE.toFixed(3);
+}
+
+// =============================================================
+// SECTION 7: CTT vs IRT PRECISION
+// =============================================================
+function drawSection7() {
+  const items = PRECISION_SCENARIOS[STATE.precisionScenario]();
+  const theta = STATE.s7theta;
+
+  // Compute CTT-equivalent SEM: average SE across theta range
+  let sumSE = 0, countSE = 0;
+  for (let t = -3; t <= 3; t += 0.1) {
+    sumSE += se(t, items);
+    countSE++;
+  }
+  const cttSEM = sumSE / countSE;
+  const irtSE = se(theta, items);
+
+  // CTT panel
+  const cvCTT = document.getElementById('cv-s7-ctt');
+  const ctxC = setupCanvas(cvCTT);
+  const W = cvCTT.width/dpr, H = cvCTT.height/dpr;
+  const pad = {l:50, r:20, t:20, b:48};
+  const maxSE = 1.5;
+
+  ctxC.clearRect(0, 0, W, H);
+  const axC = drawAxes(ctxC, W, H, pad, [-4, 4], [0, maxSE], 'θ', 'SEM', { yStep: 0.3, yDecimals: 1 });
+
+  // Flat SEM line
+  const semY = axC.toY(cttSEM);
+  ctxC.fillStyle = 'rgba(74,85,104,0.15)';
+  ctxC.fillRect(pad.l, semY, W-pad.l-pad.r, axC.toY(0)-semY);
+  drawCurve(ctxC, [[-4,4].map(t => [axC.toX(t), semY])].flat().length ? [[axC.toX(-4), semY],[axC.toX(4), semY]] : [], COLORS.muted, 2.5);
+
+  // Theta marker
+  drawVerticalLine(ctxC, axC.toX(theta), H-pad.b, pad.t, COLORS.textDim);
+  drawDot(ctxC, axC.toX(theta), semY, 5, COLORS.muted);
+
+  // Label
+  ctxC.fillStyle = COLORS.text;
+  ctxC.font = 'bold 13px IBM Plex Mono, monospace';
+  ctxC.textAlign = 'left';
+  ctxC.fillText(`SEM = ${cttSEM.toFixed(2)}`, axC.toX(-3.5), semY - 10);
+
+  // IRT panel
+  const cvIRT = document.getElementById('cv-s7-irt');
+  const ctxI = setupCanvas(cvIRT);
+  const W2 = cvIRT.width/dpr, H2 = cvIRT.height/dpr;
+
+  ctxI.clearRect(0, 0, W2, H2);
+  const axI = drawAxes(ctxI, W2, H2, pad, [-4, 4], [0, maxSE], 'θ', 'SE(θ)', { yStep: 0.3, yDecimals: 1 });
+
+  // SE curve
+  const sePts = [];
+  for (let t = -4; t <= 4; t += 0.05) {
+    const seVal = Math.min(se(t, items), maxSE);
+    sePts.push([axI.toX(t), axI.toY(seVal)]);
+  }
+
+  // Fill under curve
+  ctxI.fillStyle = 'rgba(45,212,191,0.1)';
+  ctxI.beginPath();
+  ctxI.moveTo(sePts[0][0], axI.toY(0));
+  for (const p of sePts) ctxI.lineTo(p[0], p[1]);
+  ctxI.lineTo(sePts[sePts.length-1][0], axI.toY(0));
+  ctxI.fill();
+
+  drawCurve(ctxI, sePts, COLORS.teal, 2.5);
+
+  // Theta marker
+  const seClamp = Math.min(irtSE, maxSE);
+  drawVerticalLine(ctxI, axI.toX(theta), H2-pad.b, pad.t, COLORS.textDim);
+  drawDot(ctxI, axI.toX(theta), axI.toY(seClamp), 5, COLORS.teal);
+
+  ctxI.fillStyle = COLORS.teal;
+  ctxI.font = 'bold 13px IBM Plex Mono, monospace';
+  ctxI.textAlign = 'left';
+  ctxI.fillText(`SE = ${irtSE.toFixed(2)}`, axI.toX(theta) + 8, axI.toY(seClamp) - 8);
+
+  // Stats
+  const statsEl = document.getElementById('s7-stats');
+  const ratio = irtSE / cttSEM;
+  const ratioClass = ratio > 1.5 ? 'bad' : ratio > 1.0 ? 'warn' : 'good';
+  statsEl.innerHTML = `
+    <div class="irt-stat"><div class="irt-stat-label">CTT SEM</div><div class="irt-stat-value">${cttSEM.toFixed(3)}</div></div>
+    <div class="irt-stat ${irtSE < cttSEM ? 'good' : 'warn'}"><div class="irt-stat-label">IRT SE(θ)</div><div class="irt-stat-value">${irtSE.toFixed(3)}</div></div>
+    <div class="irt-stat ${ratioClass}"><div class="irt-stat-label">Ratio</div><div class="irt-stat-value">${ratio.toFixed(2)}×</div></div>
+  `;
+}
+
+function setPrecisionScenario(scenario) {
+  STATE.precisionScenario = scenario;
+  document.querySelectorAll('#sec7 .scenario-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.scenario === scenario);
+  });
+  drawSection7();
+}
+
+// =============================================================
+// SECTION 8: TEST ASSEMBLY
+// =============================================================
+function drawItemBank() {
+  const el = document.getElementById('item-bank');
+  let html = '';
+  for (let i = 0; i < STATE.itemBank.length; i++) {
+    const it = STATE.itemBank[i];
+    const sel = STATE.selected.has(i) ? ' selected' : '';
+    html += `<div class="item-card${sel}" onclick="toggleItem(${i})" id="item-card-${i}">
+      <canvas id="sparkline-${i}"></canvas>
+      <div class="item-params">a=<span>${it.a.toFixed(1)}</span> b=<span>${it.b.toFixed(1)}</span></div>
+    </div>`;
+  }
+  el.innerHTML = html;
+
+  // Draw sparklines
+  requestAnimationFrame(() => {
+    for (let i = 0; i < STATE.itemBank.length; i++) {
+      drawSparkline(i);
+    }
+  });
+}
+
+function drawSparkline(idx) {
+  const canvas = document.getElementById(`sparkline-${idx}`);
+  if (!canvas) return;
+  const ctx = setupCanvas(canvas);
+  const W = canvas.width/dpr, H = canvas.height/dpr;
+  const { a, b } = STATE.itemBank[idx];
+  const pts = [];
+  const m = 3; // margin so curves aren't clipped at edges
+  for (let t = -4; t <= 4; t += 0.2) {
+    const x = ((t+4)/8) * W;
+    const y = m + (1 - icc2PL(t, a, b)) * (H - 2*m);
+    pts.push([x, y]);
+  }
+  ctx.clearRect(0, 0, W, H);
+  const color = STATE.selected.has(idx) ? COLORS.teal : COLORS.textDim;
+  drawCurve(ctx, pts, color, 1.5);
+}
+
+function toggleItem(idx) {
+  if (STATE.selected.has(idx)) STATE.selected.delete(idx);
+  else STATE.selected.add(idx);
+  const card = document.getElementById(`item-card-${idx}`);
+  card.classList.toggle('selected');
+  drawSparkline(idx);
+  drawSection8TIF();
+}
+
+function autoSelect(strategy) {
+  STATE.selected.clear();
+  if (strategy === 'screening') {
+    // Select items near theta = 1.5
+    const ranked = STATE.itemBank.map((it,i) => ({i, dist: Math.abs(it.b - 1.5)})).sort((a,b) => a.dist - b.dist);
+    for (let j = 0; j < 8; j++) STATE.selected.add(ranked[j].i);
+  } else if (strategy === 'broad') {
+    // Select items spread across the range
+    const ranked = STATE.itemBank.map((it,i) => ({i, b: it.b})).sort((a,b) => a.b - b.b);
+    for (let j = 0; j < ranked.length; j += 2) STATE.selected.add(ranked[j].i);
+  } else if (strategy === 'research') {
+    // Select items near theta = 0
+    const ranked = STATE.itemBank.map((it,i) => ({i, dist: Math.abs(it.b)})).sort((a,b) => a.dist - b.dist);
+    for (let j = 0; j < 8; j++) STATE.selected.add(ranked[j].i);
+  }
+  // Redraw all cards
+  drawItemBank();
+  drawSection8TIF();
+}
+
+function drawSection8TIF() {
+  const canvas = document.getElementById('cv-s8');
+  const ctx = setupCanvas(canvas);
+  const W = canvas.width/dpr, H = canvas.height/dpr;
+  const pad = {l:50, r:20, t:20, b:48};
+
+  const selectedItems = [...STATE.selected].map(i => STATE.itemBank[i]);
+  document.getElementById('s8-count').textContent = selectedItems.length;
+
+  ctx.clearRect(0, 0, W, H);
+
+  let maxTIF = 1;
+  if (selectedItems.length > 0) {
+    for (let t = -4; t <= 4; t += 0.1) {
+      const ti = testInfo(t, selectedItems);
+      if (ti > maxTIF) maxTIF = ti;
+    }
+  }
+  maxTIF = Math.max(1, maxTIF * 1.2);
+
+  const ax = drawAxes(ctx, W, H, pad, [-4, 4], [0, maxTIF], 'θ', 'I(θ)', { yStep: maxTIF > 8 ? 2 : maxTIF > 3 ? 1 : 0.5, yDecimals: maxTIF > 3 ? 0 : 1 });
+
+  if (selectedItems.length > 0) {
+    // Individual item info
+    for (const it of selectedItems) {
+      const pts = [];
+      for (let t = -4; t <= 4; t += 0.05) pts.push([ax.toX(t), ax.toY(itemInfo2PL(t, it.a, it.b))]);
+      ctx.globalAlpha = 0.2;
+      drawCurve(ctx, pts, COLORS.teal, 1);
+      ctx.globalAlpha = 1;
+    }
+
+    // TIF
+    const tifPts = [];
+    for (let t = -4; t <= 4; t += 0.05) tifPts.push([ax.toX(t), ax.toY(testInfo(t, selectedItems))]);
+    drawCurve(ctx, tifPts, COLORS.teal, 3);
+
+    // Reliability > 0.90 zone (info >= 10 when variance=1, or SE < 0.316)
+    const relThreshold = 1 / (0.316 * 0.316); // ~10
+    // Actually let's use a more reasonable threshold: SE < 0.40 (info > 6.25)
+    // Just show peak info and SE at peak
+    let peakInfo = 0, peakTheta = 0;
+    for (let t = -4; t <= 4; t += 0.05) {
+      const ti = testInfo(t, selectedItems);
+      if (ti > peakInfo) { peakInfo = ti; peakTheta = t; }
+    }
+
+    const statsEl = document.getElementById('s8-stats');
+    const peakSE = se(peakTheta, selectedItems);
+    statsEl.innerHTML = `
+      <div class="irt-stat good"><div class="irt-stat-label">Peak I(θ)</div><div class="irt-stat-value">${peakInfo.toFixed(1)}</div></div>
+      <div class="irt-stat"><div class="irt-stat-label">Peak at θ</div><div class="irt-stat-value">${peakTheta.toFixed(1)}</div></div>
+      <div class="irt-stat good"><div class="irt-stat-label">Min SE</div><div class="irt-stat-value">${peakSE.toFixed(3)}</div></div>
+    `;
+  } else {
+    // Empty
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '14px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Select items from the bank above', W/2, H/2);
+    document.getElementById('s8-stats').innerHTML = '';
+  }
+}
+
+// =============================================================
+// SECTION 9: BOOKEND
+// =============================================================
+function drawSection9() {
+  const items = DEMO_ITEMS;
+  const persons = [
+    { label: 'Person A', resp: RESP_A, cls: 'person-a' },
+    { label: 'Person B', resp: RESP_B, cls: 'person-b' },
+    { label: 'Person C', resp: RESP_C, cls: 'person-c' }
+  ];
+
+  let html = '<table class="demo-table"><tr><th>Person</th><th>Sum Score</th><th>θ̂ (MLE)</th><th>SE(θ̂)</th><th>95% CI</th></tr>';
+  for (const p of persons) {
+    const sum = p.resp.reduce((a,b)=>a+b, 0);
+    const thetaHat = estimateThetaMLE(p.resp, items);
+    const seHat = seAtMLE(thetaHat, items);
+    const ciLo = (thetaHat - 1.96 * seHat).toFixed(2);
+    const ciHi = (thetaHat + 1.96 * seHat).toFixed(2);
+    html += `<tr>
+      <td class="${p.cls}">${p.label}</td>
+      <td>${sum} / 10</td>
+      <td class="${p.cls}">${thetaHat.toFixed(2)}</td>
+      <td>${seHat.toFixed(2)}</td>
+      <td>[${ciLo}, ${ciHi}]</td>
+    </tr>`;
+  }
+  html += '</table>';
+  document.getElementById('sec9-table').innerHTML = html;
+}
+
+// =============================================================
+// SLIDER WIRING
+// =============================================================
+function wireSlider(id, stateKey, path, callback) {
+  const sl = document.getElementById(id);
+  const sv = document.getElementById(id.replace('sl-', 'sv-'));
+  if (!sl) return;
+  sl.addEventListener('input', () => {
+    const val = parseFloat(sl.value);
+    if (path) {
+      const parts = path.split('.');
+      let obj = STATE;
+      for (let i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
+      obj[parts[parts.length - 1]] = val;
+    } else {
+      STATE[stateKey] = val;
+    }
+    if (sv) sv.textContent = val.toFixed(val === Math.round(val) && Math.abs(val) < 100 ? 0 : 2);
+    if (callback) callback();
+  });
+}
+
+// =============================================================
+// INFO MODALS
+// =============================================================
+const INFO_CONTENT = {
+  global: {
+    badge: 'Overview',
+    title: 'Inside Item Response Theory',
+    body: `<p>This interactive visualization walks through the core ideas of <em>Item Response Theory</em> (IRT) — a statistical framework for modeling how people respond to test items. Unlike Classical Test Theory, which treats every item identically, IRT gives each item its own characteristic curve and reveals how measurement precision varies across the trait continuum.</p>
+    <p>The visualization uses the <strong>2-parameter logistic (2PL)</strong> model throughout. All computations happen in your browser — nothing is sent to a server.</p>`
+  },
+  sec1: {
+    badge: 'Section 1',
+    title: 'Sum Scores and Their Limits',
+    body: `<p>Classical Test Theory (CTT) defines the observed score as the sum of item responses. Two people with the same sum score are treated as having the same ability, regardless of <em>which</em> items they got right. The Standard Error of Measurement (SEM) is also the same for everyone.</p>
+    <p>IRT challenges this by modeling the probability of each response as a function of an underlying latent trait (\\(\\theta\\)). The response <em>pattern</em> — not just the count — carries information about the person's trait level.</p>`
+  },
+  sec2: {
+    badge: 'Section 2',
+    title: 'The Item Characteristic Curve',
+    body: `<p>The ICC is the fundamental building block of IRT. For the 2PL model:</p>
+    <p>$$P(\\theta) = \\frac{1}{1 + e^{-a(\\theta - b)}}$$</p>
+    <p><strong>Discrimination (\\(a\\))</strong> controls the curve's steepness. Higher \\(a\\) means the item more sharply separates people just above and below the difficulty threshold. <strong>Difficulty (\\(b\\))</strong> is the trait level at which \\(P(\\theta) = 0.50\\) — the inflection point of the curve.</p>`
+  },
+  sec3: {
+    badge: 'Section 3',
+    title: 'Multiple Items',
+    body: `<p>A test's items typically span a range of difficulties and have varying discrimination levels. "Vary Difficulty" shows items with the same discrimination but spread across the trait axis — each one targets a different ability level. "Vary Discrimination" shows items at the same difficulty but with different steepness.</p>
+    <p>In practice, well-constructed tests have items with moderate-to-high discrimination (a > 0.8) and difficulties spread to cover the trait range of interest.</p>`
+  },
+  sec4: {
+    badge: 'Section 4',
+    title: 'CTT vs IRT Item Contributions',
+    body: `<p>In CTT, each item contributes \\(1/k\\) to the total score (where \\(k\\) is the number of items). Item difficulty and discrimination affect the overall reliability coefficient but do not change how individual items are weighted in the score.</p>
+    <p>In IRT, each item's contribution is measured by its <em>information function</em>: \\(I(\\theta) = a^2 P(\\theta) Q(\\theta)\\). This varies with \\(\\theta\\), so the same item can be highly informative for one person and useless for another.</p>`
+  },
+  sec5: {
+    badge: 'Section 5',
+    title: 'Item Information',
+    body: `<p>Item information quantifies measurement precision. For the 2PL, the information function is:</p>
+    <p>$$I_i(\\theta) = a_i^2 \\, P_i(\\theta) \\, Q_i(\\theta)$$</p>
+    <p>This is bell-shaped, peaking at \\(\\theta = b\\) with maximum value \\(a^2/4\\). The width of the peak is inversely related to \\(a\\) — high-discrimination items give intense but narrow precision, while low-discrimination items give weak but broad precision.</p>`
+  },
+  sec6: {
+    badge: 'Section 6',
+    title: 'Test Information Function',
+    body: `<p>The TIF is the sum of all item information functions: \\(I(\\theta) = \\sum I_i(\\theta)\\). Because information is additive, each item contributes an independent bell-shaped bump. The shape of the TIF depends entirely on which items are in the test.</p>
+    <p>The Standard Error at any trait level is \\(SE(\\theta) = 1/\\sqrt{I(\\theta)}\\). Where information is high, the SE is low (precise measurement). Where information is low, the SE is high (imprecise measurement).</p>`
+  },
+  sec7: {
+    badge: 'Section 7',
+    title: 'The Precision Illusion',
+    body: `<p>CTT reports a single SEM for the entire test, computed from the reliability coefficient: \\(SEM = SD \\times \\sqrt{1 - r}\\). This number is the same regardless of who is being measured.</p>
+    <p>IRT reveals that this is an average that masks dramatic variation. A test optimized for average-ability respondents (peaked test) has excellent precision near the center but poor precision at the extremes. A clinical cutoff test is precise near the cutoff but poor elsewhere. CTT's single SEM hides these differences.</p>`
+  },
+  sec8: {
+    badge: 'Section 8',
+    title: 'Test Assembly',
+    body: `<p>Because IRT makes item-level information explicit, test developers can <em>choose</em> items to optimize the TIF for specific measurement goals. Clinical screening tests need items clustered near a diagnostic cutoff. Broad research instruments need items spread across the range.</p>
+    <p><strong>Computerized Adaptive Testing (CAT)</strong> takes this further: after each response, the algorithm selects the next item to maximize information at the current ability estimate, creating a custom test for each person.</p>`
+  }
+};
+
+function showInfo(key) {
+  const content = INFO_CONTENT[key];
+  if (!content) return;
+  document.getElementById('infoBadge').textContent = content.badge;
+  document.getElementById('infoTitle').textContent = content.title;
+  const bodyEl = document.getElementById('infoBody');
+  bodyEl.innerHTML = content.body;
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(bodyEl, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '\\(', right: '\\)', display: false},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+  document.getElementById('infoOverlay').classList.add('active');
+}
+function closeInfo() {
+  document.getElementById('infoOverlay').classList.remove('active');
+}
+
+// =============================================================
+// INITIALIZATION
+// =============================================================
+function init() {
+  // Generate item bank
+  STATE.itemBank = generateItemBank();
+
+  // Section 1
+  drawSection1();
+
+  // Section 2
+  wireSlider('sl-s2-a', null, 's2.a', drawSection2);
+  wireSlider('sl-s2-b', null, 's2.b', drawSection2);
+  wireSlider('sl-s2-theta', null, 's2.theta', drawSection2);
+  drawSection2();
+
+  // Section 3
+  buildCustomSliders();
+  drawSection3();
+
+  // Section 4
+  wireSlider('sl-s4-theta', 's4theta', null, drawSection4);
+  drawSection4();
+
+  // Section 5
+  wireSlider('sl-s5-a', null, 's5.a', drawSection5);
+  wireSlider('sl-s5-b', null, 's5.b', drawSection5);
+  drawSection5();
+
+  // Section 6
+  wireSlider('sl-s6-n', null, 's6.n', drawSection6);
+  wireSlider('sl-s6-a', null, 's6.a', drawSection6);
+  wireSlider('sl-s6-b', null, 's6.b', drawSection6);
+  wireSlider('sl-s6-spread', null, 's6.spread', drawSection6);
+  wireSlider('sl-s6-theta', null, 's6.theta', drawSection6);
+  drawSection6();
+
+  // Section 7
+  wireSlider('sl-s7-theta', 's7theta', null, drawSection7);
+  drawSection7();
+
+  // Section 8
+  drawItemBank();
+  drawSection8TIF();
+
+  // Section 9
+  drawSection9();
+}
+
+window.addEventListener('resize', () => {
+  drawSection2();
+  drawSection3();
+  drawSection4();
+  drawSection5();
+  drawSection6();
+  drawSection7();
+  drawSection8TIF();
+  // Re-render sparklines
+  for (let i = 0; i < STATE.itemBank.length; i++) drawSparkline(i);
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
