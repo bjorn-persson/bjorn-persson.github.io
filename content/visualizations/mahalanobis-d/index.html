@@ -1,0 +1,1740 @@
+---
+title: "Mahalanobis D & M-F Indices"
+description: "Interactive exploration of multivariate sex differences: Mahalanobis D and four M-F indices (directionality, typicality, probability, centrality) from Del Giudice (2024)."
+summary: "Explore how Mahalanobis D combines multiple effect sizes into a single multivariate index, and compare four alternative ways to quantify masculinity-femininity from trait profiles."
+draft: true
+---
+
+<style>
+  /* Panel switching */
+  .panel-select {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .panel-select .btn {
+    font-size: 0.78em;
+    padding: 8px 16px;
+  }
+  .panel-select .btn.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+  .viz-panel { display: none; }
+  .viz-panel.active { display: block; }
+
+  /* Preset row */
+  .preset-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .preset-row .btn { font-size: 0.75em; padding: 6px 12px; }
+  .preset-row .btn.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  /* d-slider grid */
+  .d-sliders {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .d-slider-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .d-slider-cell label {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .d-slider-cell input[type="range"] {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    height: 90px;
+    width: 4px;
+    flex: none;
+  }
+  .d-slider-cell .d-val {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  /* Structural param row */
+  .param-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .param-row .slider-row { flex: 1; min-width: 200px; }
+  .param-row .slider-label { width: 20px; }
+
+  /* Sample size buttons */
+  .n-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .n-row .n-label {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 4px;
+  }
+  .n-row .btn { font-size: 0.72em; padding: 5px 12px; }
+  .n-row .btn.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  /* Canvas sizing */
+  .md-canvas {
+    width: 100%;
+    height: 260px;
+    border-radius: 6px;
+    background: var(--bg-surface);
+  }
+  .md-canvas-tall {
+    width: 100%;
+    height: 320px;
+    border-radius: 6px;
+    background: var(--bg-surface);
+  }
+
+  /* Panel intro */
+  .panel-intro {
+    font-size: 0.92em;
+    color: var(--text);
+    margin-bottom: 20px;
+    max-width: 680px;
+    line-height: 1.65;
+  }
+  .panel-intro strong { color: var(--text-bright); }
+
+  /* Discordant highlight */
+  .disc-pct { color: var(--orange); font-weight: 600; }
+
+  /* Aggregation table */
+  .agg-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .agg-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    text-align: center;
+  }
+  .agg-card-title {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .agg-card-val {
+    font-family: var(--mono);
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 4px;
+  }
+  .agg-card-sub {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 640px) {
+    .d-sliders { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .d-slider-cell input[type="range"] { height: 60px; }
+    .agg-cards { grid-template-columns: 1fr; }
+    .param-row { flex-direction: column; gap: 8px; }
+    .mf-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>Mahalanobis D &amp; M-F Indices</h1>
+    <div class="subtitle">Multivariate effect sizes for group differences, and four ways to place individuals on a masculinity-femininity continuum</div>
+  </div>
+
+  <!-- ============ CONTROLS ============ -->
+  <div class="section">
+    <div class="slider-group">
+      <div class="slider-group-title">Presets</div>
+      <div class="preset-row" id="preset-row">
+        <button class="btn active" data-preset="realistic">Realistic Big 5</button>
+        <button class="btn" data-preset="equal">Equal d's</button>
+        <button class="btn" data-preset="dominant">One dominant</button>
+        <button class="btn" data-preset="lowrel">Low reliability</button>
+        <button class="btn" data-preset="highrel">High reliability</button>
+        <button class="btn" data-preset="orthogonal">Orthogonal</button>
+      </div>
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-group-title">Cohen's d per domain (positive = males higher)</div>
+      <div class="d-sliders" id="d-sliders">
+        <div class="d-slider-cell">
+          <label>E</label>
+          <input type="range" id="d-E" min="-100" max="100" value="0" step="5">
+          <span class="d-val" id="dv-E">0.00</span>
+        </div>
+        <div class="d-slider-cell">
+          <label>A</label>
+          <input type="range" id="d-A" min="-100" max="100" value="-50" step="5">
+          <span class="d-val" id="dv-A">&minus;0.50</span>
+        </div>
+        <div class="d-slider-cell">
+          <label>C</label>
+          <input type="range" id="d-C" min="-100" max="100" value="-15" step="5">
+          <span class="d-val" id="dv-C">&minus;0.15</span>
+        </div>
+        <div class="d-slider-cell">
+          <label>N</label>
+          <input type="range" id="d-N" min="-100" max="100" value="-40" step="5">
+          <span class="d-val" id="dv-N">&minus;0.40</span>
+        </div>
+        <div class="d-slider-cell">
+          <label>O</label>
+          <input type="range" id="d-O" min="-100" max="100" value="10" step="5">
+          <span class="d-val" id="dv-O">0.10</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="param-row">
+      <div class="slider-row">
+        <span class="slider-label" style="width:auto; font-family:var(--mono); font-size:0.82em; color:var(--text)">r</span>
+        <input type="range" id="sl-r" min="0" max="50" value="15" step="1">
+        <span class="slider-val" id="sv-r">0.15</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label" style="width:auto; font-family:var(--mono); font-size:0.82em; color:var(--text)">&alpha;</span>
+        <input type="range" id="sl-alpha" min="50" max="99" value="80" step="1">
+        <span class="slider-val" id="sv-alpha">0.80</span>
+      </div>
+    </div>
+
+    <div class="n-row">
+      <span class="n-label">n per group</span>
+      <button class="btn" data-n="200">200</button>
+      <button class="btn active" data-n="500">500</button>
+      <button class="btn" data-n="1000">1000</button>
+    </div>
+
+    <div class="panel-select" id="panel-select">
+      <button class="btn active" data-panel="overview">Overview</button>
+      <button class="btn" data-panel="mf-d">M-F<sub>D</sub></button>
+      <button class="btn" data-panel="mf-t">M-F<sub>T</sub></button>
+      <button class="btn" data-panel="mf-p">M-F<sub>P</sub></button>
+      <button class="btn" data-panel="mf-c">M-F<sub>C</sub></button>
+      <button class="btn" data-panel="aggregation">Aggregation</button>
+    </div>
+  </div>
+
+  <!-- ============ PANEL: OVERVIEW ============ -->
+  <div id="panel-overview" class="viz-panel active">
+    <div class="panel-intro">
+      <strong>Mahalanobis D</strong> is a multivariate effect size that combines multiple standardized mean differences (Cohen's <em>d</em>) into a single number, accounting for the correlations between variables. Unlike simply averaging the <em>d</em> values, it captures the full multivariate separation between groups. When traits are correlated, D can be substantially larger or smaller than you'd expect from the individual <em>d</em>'s alone.
+    </div>
+
+    <div class="viz-box">
+      <div class="viz-row">
+        <div class="viz-col">
+          <div class="viz-title">Univariate effect sizes (Cohen's d)</div>
+          <canvas id="c-overview-bars" class="md-canvas"></canvas>
+        </div>
+      </div>
+      <div class="mf-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <div>
+          <div class="viz-title">M-F<sub>D</sub> (directionality)</div>
+          <canvas id="c-overview-mfd" class="md-canvas"></canvas>
+        </div>
+        <div>
+          <div class="viz-title">M-F<sub>T</sub> (typicality)</div>
+          <canvas id="c-overview-mft" class="md-canvas"></canvas>
+        </div>
+        <div>
+          <div class="viz-title">M-F<sub>P</sub> (probability)</div>
+          <canvas id="c-overview-mfp" class="md-canvas"></canvas>
+        </div>
+        <div>
+          <div class="viz-title">M-F<sub>C</sub> (centrality)</div>
+          <canvas id="c-overview-mfc" class="md-canvas"></canvas>
+        </div>
+      </div>
+      <div class="fit-stats" id="stats-overview"></div>
+    </div>
+
+    <div class="equation">
+      D = &radic;(<strong>d</strong>&prime; <strong>R</strong><sup>&minus;1</sup> <strong>d</strong>)
+    </div>
+    <div class="note">
+      <strong>d</strong> is the vector of Cohen's <em>d</em> values and <strong>R</strong> is the pooled within-group correlation matrix. When traits are uncorrelated (R = I), D reduces to the square root of the sum of squared <em>d</em>'s. With positive correlations and <em>d</em>'s of mixed sign, D can exceed this value because the correlations amplify the separation along the discriminant axis.
+    </div>
+  </div>
+
+  <!-- ============ PANEL: M-F_D ============ -->
+  <div id="panel-mf-d" class="viz-panel">
+    <div class="panel-intro">
+      <strong>Sex-directionality (M-F<sub>D</sub>)</strong> is the simplest M-F index: a weighted sum of standardized trait scores, where each trait is weighted by its Cohen's <em>d</em>. It captures the extent to which an individual's profile is shifted in the male or female direction, irrespective of how the traits correlate with each other.
+    </div>
+
+    <div class="viz-box">
+      <div class="viz-row">
+        <div class="viz-col">
+          <div class="viz-title">M-F<sub>D</sub> distribution by sex</div>
+          <canvas id="c-mfd-density" class="md-canvas"></canvas>
+        </div>
+        <div class="viz-col">
+          <div class="viz-title">Trait weights in M-F<sub>D</sub></div>
+          <canvas id="c-mfd-weights" class="md-canvas"></canvas>
+        </div>
+      </div>
+      <div class="fit-stats" id="stats-mfd"></div>
+    </div>
+
+    <div class="equation">
+      M-F<sub>D</sub> = <strong>z</strong>&prime;<strong>d</strong> / &Vert;<strong>d</strong>&Vert;
+    </div>
+    <div class="note">
+      Each trait contributes proportionally to its <em>d</em> value, regardless of how it correlates with other traits. This makes M-F<sub>D</sub> simple and transparent, but it does not maximize group separation &mdash; that requires accounting for the correlation structure.
+    </div>
+  </div>
+
+  <!-- ============ PANEL: M-F_T ============ -->
+  <div id="panel-mf-t" class="viz-panel">
+    <div class="panel-intro">
+      <strong>Sex-typicality (M-F<sub>T</sub>)</strong> uses the discriminant function (LDA) to find the linear combination that <em>maximally separates</em> the groups. Unlike M-F<sub>D</sub>, it accounts for trait correlations, weighting traits not just by their <em>d</em> values but by their unique contribution to group separation. The two indices usually correlate strongly, but can disagree for individual profiles &mdash; producing <strong>discordant</strong> cases.
+    </div>
+
+    <div class="viz-box">
+      <div class="viz-row">
+        <div class="viz-col">
+          <div class="viz-title">M-F<sub>T</sub> distribution by sex</div>
+          <canvas id="c-mft-density" class="md-canvas"></canvas>
+        </div>
+        <div class="viz-col">
+          <div class="viz-title">M-F<sub>D</sub> vs M-F<sub>T</sub> (discordant profiles shaded)</div>
+          <canvas id="c-mft-scatter" class="md-canvas"></canvas>
+        </div>
+      </div>
+      <div class="fit-stats" id="stats-mft"></div>
+    </div>
+
+    <div class="equation">
+      M-F<sub>T</sub> = <strong>z</strong>&prime;<strong>a</strong> / &radic;(<strong>a</strong>&prime;<strong>R</strong><sup>&minus;1</sup><strong>a</strong>), &nbsp; <strong>a</strong> = <strong>R</strong><sup>&minus;1</sup><strong>d</strong>
+    </div>
+    <div class="note">
+      <strong>Discordant profiles</strong> are individuals whose M-F<sub>D</sub> and M-F<sub>T</sub> scores have opposite signs: they are shifted in the male direction on the raw composite but classified as more female-typical by the discriminant function (or vice versa). This happens when the centroid axis and discriminant axis diverge, which increases with stronger trait correlations.
+    </div>
+  </div>
+
+  <!-- ============ PANEL: M-F_P ============ -->
+  <div id="panel-mf-p" class="viz-panel">
+    <div class="panel-intro">
+      <strong>Sex-probability (M-F<sub>P</sub>)</strong> converts the typicality score into a probability of group membership via the logistic function. It is a monotonic transformation of M-F<sub>T</sub>, which compresses the tails: highly male-typical and highly female-typical profiles are pushed toward 1 and 0, while the distinction between "somewhat typical" and "very typical" is blurred.
+    </div>
+
+    <div class="viz-box">
+      <div class="viz-row">
+        <div class="viz-col">
+          <div class="viz-title">M-F<sub>P</sub> distribution by sex</div>
+          <canvas id="c-mfp-density" class="md-canvas-tall"></canvas>
+        </div>
+        <div class="viz-col">
+          <div class="viz-title">Logistic mapping: M-F<sub>T</sub> &rarr; M-F<sub>P</sub></div>
+          <canvas id="c-mfp-logistic" class="md-canvas-tall"></canvas>
+        </div>
+      </div>
+      <div class="fit-stats" id="stats-mfp"></div>
+    </div>
+
+    <div class="equation">
+      M-F<sub>P</sub> = exp(<strong>z</strong>&prime;<strong>a</strong>) / (1 + exp(<strong>z</strong>&prime;<strong>a</strong>))
+    </div>
+    <div class="note">
+      When the groups are well separated (large D), the M-F<sub>P</sub> distributions become highly skewed, clustering near 0 and 1. This makes M-F<sub>P</sub> excellent for classification but less useful for distinguishing individuals within the tails. Note that M-F<sub>P</sub> uses the un-normalized discriminant score, so it is always concordant with M-F<sub>T</sub>.
+    </div>
+  </div>
+
+  <!-- ============ PANEL: M-F_C ============ -->
+  <div id="panel-mf-c" class="viz-panel">
+    <div class="panel-intro">
+      <strong>Sex-centrality (M-F<sub>C</sub>)</strong> measures how close an individual is to each group's centroid using the Mahalanobis distance, rather than projecting onto an axis. A score of +1 means the profile is as close to the male centroid as the centroids are to each other; &minus;1 means the same for the female centroid. Unlike M-F<sub>T</sub>, M-F<sub>C</sub> captures "averageness" within a group, not just position along the separating axis.
+    </div>
+
+    <div class="viz-box">
+      <div class="viz-row">
+        <div class="viz-col">
+          <div class="viz-title">M-F<sub>C</sub> distribution by sex</div>
+          <canvas id="c-mfc-density" class="md-canvas"></canvas>
+        </div>
+        <div class="viz-col">
+          <div class="viz-title">M-F<sub>T</sub> vs M-F<sub>C</sub></div>
+          <canvas id="c-mfc-scatter" class="md-canvas"></canvas>
+        </div>
+      </div>
+      <div class="fit-stats" id="stats-mfc"></div>
+    </div>
+
+    <div class="equation">
+      M-F<sub>C</sub> = (D<sub>M</sub>(<strong>z</strong>, <strong>f</strong>) &minus; D<sub>M</sub>(<strong>z</strong>, <strong>m</strong>)) / D<sub>M</sub>(<strong>m</strong>, <strong>f</strong>)
+    </div>
+    <div class="note">
+      M-F<sub>C</sub> and M-F<sub>T</sub> agree closely near the center of the distribution but diverge in the tails. M-F<sub>C</sub> is more "compressed" toward the extremes because the iso-centrality curves become increasingly non-linear far from the classification boundary. With many traits, the meaning of centrality changes: most individuals lie far from both centroids in high-dimensional space.
+    </div>
+  </div>
+
+  <!-- ============ PANEL: AGGREGATION ============ -->
+  <div id="panel-aggregation" class="viz-panel">
+    <div class="panel-intro">
+      <strong>The aggregation tradeoff</strong> for Mahalanobis D: using more, narrower variables (items vs. facets vs. domains) increases the number of dimensions <em>p</em>, which inflates raw D through sampling bias. At the same time, narrower variables have lower reliability, attenuating the correlations and distorting the indices. The bias-corrected D<sub>u</sub> adjusts for the dimensionality bias.
+    </div>
+
+    <div class="viz-box">
+      <div class="viz-title">Mahalanobis D across aggregation levels</div>
+      <canvas id="c-agg-bars" class="md-canvas-tall"></canvas>
+      <div class="agg-cards" id="agg-cards"></div>
+    </div>
+
+    <div class="note">
+      Raw D increases with the number of variables, partly because each added variable contributes sampling noise to the distance estimate. The bias-corrected estimator D<sub>u</sub> = &radic;max(0, D&sup2;(n<sub>m</sub>+n<sub>f</sub>&minus;p&minus;3)/(n<sub>m</sub>+n<sub>f</sub>&minus;2) &minus; p(n<sub>m</sub>+n<sub>f</sub>)/(n<sub>m</sub>n<sub>f</sub>)) removes this inflation. When reliability is low and <em>p</em> is large, the correction can be dramatic.
+    </div>
+    <div class="note warn">
+      This demonstrates a genuine tradeoff: domain-level analysis is more reliable and stable, but may miss sex differences that emerge at the facet level. There is no universally "correct" level of aggregation &mdash; the choice depends on the research question.
+    </div>
+  </div>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Mahalanobis D &amp; M-F indices</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/mahalanobis-d/" target="_blank">https://bjorn-persson.github.io/visualizations/mahalanobis-d/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026mahalanobis,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Mahalanobis {D} \& {M-F} Indices}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/mahalanobis-d/}</span>}
+</span></span></code></pre></div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+'use strict';
+
+// ============================================================
+// CONSTANTS & PRESETS
+// ============================================================
+const TRAITS = ['E', 'A', 'C', 'N', 'O'];
+const P = 5;
+
+const PRESETS = {
+  realistic:   { d: [0, -0.50, -0.15, -0.40, 0.10], r: 0.15, alpha: 0.80 },
+  equal:       { d: [0.30, 0.30, 0.30, 0.30, 0.30], r: 0.15, alpha: 0.80 },
+  dominant:    { d: [0.80, 0.00, 0.00, 0.00, 0.00], r: 0.15, alpha: 0.80 },
+  lowrel:      { d: [0, -0.50, -0.15, -0.40, 0.10], r: 0.15, alpha: 0.50 },
+  highrel:     { d: [0, -0.50, -0.15, -0.40, 0.10], r: 0.15, alpha: 0.95 },
+  orthogonal:  { d: [0, -0.50, -0.15, -0.40, 0.10], r: 0.00, alpha: 0.80 }
+};
+
+const COLORS = {
+  male: '#3b9eff',
+  female: '#f472b6',
+  maleAlpha: 'rgba(59,158,255,0.35)',
+  femaleAlpha: 'rgba(244,114,182,0.35)',
+  teal: '#2dd4bf',
+  orange: '#f97316',
+  text: '#b0b4c0',
+  textBright: '#e8ecf4',
+  dim: 'rgba(201,205,216,0.3)',
+  dimmer: 'rgba(201,205,216,0.15)',
+  bg: '#181a24',
+  border: '#2a2d3a'
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {};
+let sampleSize = 500;
+let seed = 12345;
+
+// ============================================================
+// MATRIX UTILITIES
+// ============================================================
+function matCreate(n, m, fill) { fill = fill || 0; return Array.from({length:n}, () => Array(m).fill(fill)); }
+
+function matMul(A, B) {
+  const m = A.length, n = B[0].length, p = B.length;
+  const C = matCreate(m, n);
+  for (let i = 0; i < m; i++)
+    for (let j = 0; j < n; j++)
+      for (let k = 0; k < p; k++)
+        C[i][j] += A[i][k] * B[k][j];
+  return C;
+}
+
+function matInverse(A) {
+  const n = A.length;
+  const aug = A.map((row, i) => {
+    const r = row.slice();
+    for (let j = 0; j < n; j++) r.push(i === j ? 1 : 0);
+    return r;
+  });
+  for (let k = 0; k < n; k++) {
+    let maxVal = Math.abs(aug[k][k]), maxRow = k;
+    for (let i = k+1; i < n; i++) {
+      if (Math.abs(aug[i][k]) > maxVal) { maxVal = Math.abs(aug[i][k]); maxRow = i; }
+    }
+    const tmp = aug[k]; aug[k] = aug[maxRow]; aug[maxRow] = tmp;
+    if (Math.abs(aug[k][k]) < 1e-12) return null;
+    const pivot = aug[k][k];
+    for (let j = 0; j < 2*n; j++) aug[k][j] /= pivot;
+    for (let i = 0; i < n; i++) {
+      if (i === k) continue;
+      const f = aug[i][k];
+      for (let j = 0; j < 2*n; j++) aug[i][j] -= f * aug[k][j];
+    }
+  }
+  return aug.map(row => row.slice(n));
+}
+
+function cholesky(A) {
+  const n = A.length;
+  const L = matCreate(n, n);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j <= i; j++) {
+      let sum = 0;
+      for (let k = 0; k < j; k++) sum += L[i][k] * L[j][k];
+      L[i][j] = (i === j)
+        ? Math.sqrt(Math.max(1e-10, A[i][i] - sum))
+        : (A[i][j] - sum) / L[j][j];
+    }
+  }
+  return L;
+}
+
+function vecDot(a, b) { let s = 0; for (let i = 0; i < a.length; i++) s += a[i]*b[i]; return s; }
+function vecNorm(v) { return Math.sqrt(vecDot(v, v)); }
+function matVecMul(M, v) { return M.map(row => vecDot(row, v)); }
+
+// ============================================================
+// SEEDED RNG
+// ============================================================
+function mulberry32(s) {
+  return function() {
+    s |= 0; s = s + 0x6D2B79F5 | 0;
+    let t = Math.imul(s ^ s >>> 15, 1 | s);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+let rng;
+function randn() {
+  let u, v, s;
+  do { u = 2*rng()-1; v = 2*rng()-1; s = u*u+v*v; } while (s >= 1 || s === 0);
+  return u * Math.sqrt(-2*Math.log(s)/s);
+}
+
+// ============================================================
+// MVN GENERATION
+// ============================================================
+function generateMVN(mu, sigma, N) {
+  const L = cholesky(sigma);
+  const p = mu.length;
+  const data = [];
+  for (let i = 0; i < N; i++) {
+    const z = Array.from({length: p}, () => randn());
+    const x = Array(p).fill(0);
+    for (let j = 0; j < p; j++)
+      for (let k = 0; k <= j; k++)
+        x[j] += L[j][k] * z[k];
+    for (let j = 0; j < p; j++) x[j] += mu[j];
+    data.push(x);
+  }
+  return data;
+}
+
+// ============================================================
+// STATISTICS
+// ============================================================
+function colMeans(data) {
+  const p = data[0].length, n = data.length;
+  const m = Array(p).fill(0);
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < p; j++) m[j] += data[i][j];
+  for (let j = 0; j < p; j++) m[j] /= n;
+  return m;
+}
+
+function covMatrix(data, means) {
+  const p = means.length, n = data.length;
+  const C = matCreate(p, p);
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < p; j++)
+      for (let k = 0; k <= j; k++) {
+        const v = (data[i][j]-means[j]) * (data[i][k]-means[k]);
+        C[j][k] += v;
+        if (j !== k) C[k][j] += v;
+      }
+  for (let j = 0; j < p; j++)
+    for (let k = 0; k < p; k++) C[j][k] /= (n-1);
+  return C;
+}
+
+function corFromCov(C) {
+  const p = C.length;
+  const R = matCreate(p, p);
+  for (let i = 0; i < p; i++)
+    for (let j = 0; j < p; j++)
+      R[i][j] = C[i][j] / Math.sqrt(C[i][i]*C[j][j]);
+  return R;
+}
+
+function pooledCor(dataM, dataF, meansM, meansF) {
+  const nm = dataM.length, nf = dataF.length;
+  const Cm = covMatrix(dataM, meansM);
+  const Cf = covMatrix(dataF, meansF);
+  const p = meansM.length;
+  const Cp = matCreate(p, p);
+  for (let i = 0; i < p; i++)
+    for (let j = 0; j < p; j++)
+      Cp[i][j] = ((nm-1)*Cm[i][j] + (nf-1)*Cf[i][j]) / (nm+nf-2);
+  return { pooledCov: Cp, pooledCorr: corFromCov(Cp) };
+}
+
+function normalPDF(x, mu, sigma) {
+  const z = (x - mu) / sigma;
+  return Math.exp(-0.5*z*z) / (sigma * Math.sqrt(2*Math.PI));
+}
+
+function normalCDF(x) {
+  const a1=0.254829592, a2=-0.284496736, a3=1.421413741, a4=-1.453152027, a5=1.061405429, p2=0.3275911;
+  const sign = x < 0 ? -1 : 1;
+  const ax = Math.abs(x) / Math.sqrt(2);
+  const t = 1/(1+p2*ax);
+  const y = 1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-ax*ax);
+  return 0.5*(1+sign*y);
+}
+
+function mean(arr) { let s=0; for (let i=0;i<arr.length;i++) s+=arr[i]; return s/arr.length; }
+function sd(arr) { const m=mean(arr); let s=0; for (let i=0;i<arr.length;i++) s+=(arr[i]-m)*(arr[i]-m); return Math.sqrt(s/(arr.length-1)); }
+function pearsonR(a, b) {
+  const ma=mean(a), mb=mean(b);
+  let num=0, da=0, db=0;
+  for (let i=0;i<a.length;i++) { const x=a[i]-ma, y=b[i]-mb; num+=x*y; da+=x*x; db+=y*y; }
+  return num/Math.sqrt(da*db);
+}
+
+// ============================================================
+// SIMULATION ENGINE
+// ============================================================
+function simulate() {
+  rng = mulberry32(seed);
+
+  // Read slider values
+  const dVec = TRAITS.map(t => parseInt(document.getElementById('d-'+t).value) / 100);
+  const avgR = parseInt(document.getElementById('sl-r').value) / 100;
+  const alpha = parseInt(document.getElementById('sl-alpha').value) / 100;
+  const N = sampleSize;
+
+  // Build true correlation matrix (compound symmetry)
+  const Rtrue = matCreate(P, P);
+  for (let i = 0; i < P; i++) {
+    Rtrue[i][i] = 1;
+    for (let j = 0; j < i; j++) { Rtrue[i][j] = avgR; Rtrue[j][i] = avgR; }
+  }
+
+  // Observed correlation matrix (attenuated by reliability)
+  // Robs_ij = Rtrue_ij * sqrt(alpha_i) * sqrt(alpha_j) for i!=j; 1 for i==j
+  const Robs = matCreate(P, P);
+  for (let i = 0; i < P; i++) {
+    Robs[i][i] = 1;
+    for (let j = 0; j < i; j++) {
+      const v = Rtrue[i][j] * alpha; // alpha_i = alpha_j = alpha
+      Robs[i][j] = v; Robs[j][i] = v;
+    }
+  }
+
+  // Observed d-values (attenuated)
+  const dObs = dVec.map(d => d * Math.sqrt(alpha));
+
+  // Generate data: females centered at 0, males at dObs (in pooled SD units)
+  // The covariance matrix = Robs (since vars are standardized)
+  const muF = Array(P).fill(0);
+  const muM = dObs.slice();
+  const dataF = generateMVN(muF, Robs, N);
+  const dataM = generateMVN(muM, Robs, N);
+
+  // Sample statistics
+  const meansM = colMeans(dataM);
+  const meansF = colMeans(dataF);
+  const { pooledCov, pooledCorr } = pooledCor(dataM, dataF, meansM, meansF);
+  const pooledVars = Array(P);
+  for (let i = 0; i < P; i++) pooledVars[i] = pooledCov[i][i];
+
+  // Standardize: center on unweighted centroid mean, scale by pooled SD
+  const grandMean = meansM.map((m, i) => (m + meansF[i]) / 2);
+  const pooledSD = pooledVars.map(v => Math.sqrt(v));
+
+  const allData = dataF.concat(dataM);
+  const allZ = allData.map(row => row.map((v, j) => (v - grandMean[j]) / pooledSD[j]));
+  const nF = dataF.length, nM = dataM.length, nTotal = nF + nM;
+
+  // Sample d-vector from standardized data
+  const centM = colMeans(allZ.slice(nF));
+  const centF = colMeans(allZ.slice(0, nF));
+  const dSample = centM.map((m, i) => m - centF[i]);
+
+  // Pooled correlation from standardized data (same as before but recompute for consistency)
+  const Rpool = pooledCorr;
+  const Rinv = matInverse(Rpool);
+  if (!Rinv) { state = { error: true }; return; }
+
+  // Mahalanobis D
+  const Rinv_d = matVecMul(Rinv, dSample);
+  const D2 = vecDot(dSample, Rinv_d);
+  const DM = Math.sqrt(Math.max(0, D2));
+
+  // Bias-corrected D
+  const DM_corrected = Math.sqrt(Math.max(0, D2*(nM+nF-P-3)/(nM+nF-2) - P*(nM+nF)/(nM*nF)));
+
+  // Discriminant coefficients: a = R^{-1} d
+  const aVec = Rinv_d;
+  const aRa = vecDot(aVec, matVecMul(Rinv, aVec)); // a'R^{-1}a — but since a = R^{-1}d, a'R^{-1}a = d'R^{-1}R^{-1}d? No.
+  // Actually for normalization: sqrt(a'R a) where R is the pooled cor. Let's compute a'Ra:
+  const aRaVal = vecDot(aVec, matVecMul(Rpool, aVec));
+  const normFactor = Math.sqrt(Math.max(1e-10, aRaVal));
+
+  // Compute indices for each individual
+  const mfD = [], mfT = [], mfP = [], mfC = [];
+  const dNorm = vecNorm(dSample);
+
+  for (let i = 0; i < nTotal; i++) {
+    const z = allZ[i];
+
+    // M-F_D: z'd / ||d||
+    mfD.push(dNorm > 1e-10 ? vecDot(z, dSample) / dNorm : 0);
+
+    // M-F_T: z'a / sqrt(a'Ra)
+    const discScore = vecDot(z, aVec);
+    mfT.push(discScore / normFactor);
+
+    // M-F_P: exp(z'a) / (1 + exp(z'a))
+    // Clamp to avoid overflow
+    const clampedScore = Math.max(-30, Math.min(30, discScore));
+    mfP.push(1 / (1 + Math.exp(-clampedScore)));
+
+    // M-F_C: (D_M(z, centF) - D_M(z, centM)) / D_M(centM, centF)
+    const diffF = z.map((v, j) => v - centF[j]);
+    const diffM = z.map((v, j) => v - centM[j]);
+    const distF = Math.sqrt(Math.max(0, vecDot(diffF, matVecMul(Rinv, diffF))));
+    const distM = Math.sqrt(Math.max(0, vecDot(diffM, matVecMul(Rinv, diffM))));
+    mfC.push(DM > 1e-10 ? (distF - distM) / DM : 0);
+  }
+
+  // Sex vector: 0 = female, 1 = male
+  const sexVec = Array(nF).fill(0).concat(Array(nM).fill(1));
+
+  // Proportion discordant (D and T have opposite signs)
+  const nDiscordant = mfD.reduce((c, d, i) => c + (d * mfT[i] < 0 ? 1 : 0), 0);
+
+  // Store state
+  state = {
+    dVec, dObs, dSample, avgR, alpha, N: sampleSize,
+    Rpool, Rinv, DM, DM_corrected,
+    aVec, normFactor,
+    mfD, mfT, mfP, mfC, sexVec,
+    nF, nM, nTotal,
+    centM, centF,
+    pctDiscordant: nDiscordant / nTotal,
+    error: false
+  };
+
+  drawActivePanel();
+}
+
+// ============================================================
+// CANVAS UTILITIES
+// ============================================================
+function setupCanvas(canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, w: rect.width, h: rect.height };
+}
+
+function drawAxes(ctx, w, h, pad, opts) {
+  opts = opts || {};
+  ctx.strokeStyle = COLORS.dim;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, h - pad.bottom);
+  ctx.lineTo(w - pad.right, h - pad.bottom);
+  ctx.stroke();
+
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '11px IBM Plex Mono';
+  ctx.textAlign = 'center';
+
+  if (opts.xTicks) {
+    opts.xTicks.forEach(function(t) {
+      const x = pad.left + (t.val - opts.xMin) / (opts.xMax - opts.xMin) * (w - pad.left - pad.right);
+      ctx.fillText(t.label, x, h - pad.bottom + 15);
+      ctx.beginPath();
+      ctx.moveTo(x, h - pad.bottom);
+      ctx.lineTo(x, h - pad.bottom + 4);
+      ctx.strokeStyle = COLORS.dim;
+      ctx.stroke();
+    });
+  }
+  if (opts.yTicks) {
+    ctx.textAlign = 'right';
+    opts.yTicks.forEach(function(t) {
+      const y = h - pad.bottom - (t.val - opts.yMin) / (opts.yMax - opts.yMin) * (h - pad.top - pad.bottom);
+      ctx.fillText(t.label, pad.left - 6, y + 4);
+      ctx.beginPath();
+      ctx.strokeStyle = COLORS.dimmer;
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(w - pad.right, y);
+      ctx.stroke();
+    });
+  }
+  if (opts.xLabel) {
+    ctx.textAlign = 'center';
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '11px IBM Plex Mono';
+    ctx.fillText(opts.xLabel, pad.left + (w - pad.left - pad.right)/2, h - 2);
+  }
+}
+
+function drawDensityCurve(ctx, w, h, pad, mu, sigma, xMin, xMax, yMax, color, fillColor) {
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+  const steps = 200;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, h - pad.bottom);
+  for (let i = 0; i <= steps; i++) {
+    const x = xMin + (xMax - xMin) * i / steps;
+    const y = normalPDF(x, mu, sigma);
+    const px = pad.left + (x - xMin) / (xMax - xMin) * plotW;
+    const py = h - pad.bottom - (y / yMax) * plotH;
+    ctx.lineTo(px, py);
+  }
+  ctx.lineTo(pad.left + plotW, h - pad.bottom);
+  ctx.closePath();
+  if (fillColor) { ctx.fillStyle = fillColor; ctx.fill(); }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function drawHistDensity(ctx, w, h, pad, values, xMin, xMax, yMax, color, fillColor, nBins) {
+  // KDE-like histogram for non-normal distributions (M-F_P)
+  nBins = nBins || 40;
+  const binW = (xMax - xMin) / nBins;
+  const counts = Array(nBins).fill(0);
+  for (let i = 0; i < values.length; i++) {
+    const bin = Math.floor((values[i] - xMin) / binW);
+    if (bin >= 0 && bin < nBins) counts[bin]++;
+  }
+  // Convert to density
+  const density = counts.map(c => c / (values.length * binW));
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+
+  ctx.beginPath();
+  ctx.moveTo(pad.left, h - pad.bottom);
+  for (let i = 0; i < nBins; i++) {
+    const x1 = pad.left + (i * binW) / (xMax - xMin) * plotW;
+    const x2 = pad.left + ((i+1) * binW) / (xMax - xMin) * plotW;
+    const y = h - pad.bottom - (density[i] / yMax) * plotH;
+    ctx.lineTo(x1, y);
+    ctx.lineTo(x2, y);
+  }
+  ctx.lineTo(pad.left + plotW, h - pad.bottom);
+  ctx.closePath();
+  if (fillColor) { ctx.fillStyle = fillColor; ctx.fill(); }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function drawDashedV(ctx, x, y1, y2, color) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function xPos(val, xMin, xMax, pad, w) {
+  return pad.left + (val - xMin) / (xMax - xMin) * (w - pad.left - pad.right);
+}
+function yPos(val, yMin, yMax, pad, h) {
+  return h - pad.bottom - (val - yMin) / (yMax - yMin) * (h - pad.top - pad.bottom);
+}
+
+function statHTML(label, value, cls) {
+  cls = cls || '';
+  return '<div class="fit-stat"><div class="fit-stat-label">' + label + '</div><div class="fit-stat-value ' + cls + '">' + value + '</div></div>';
+}
+
+// ============================================================
+// PANEL DRAWING FUNCTIONS
+// ============================================================
+
+function drawOverview() {
+  if (state.error) return;
+  const s = state;
+
+  // Bar chart of d-values
+  const c1 = document.getElementById('c-overview-bars');
+  const { ctx, w, h } = setupCanvas(c1);
+  ctx.clearRect(0, 0, w, h);
+
+  const pad = { top: 20, right: 20, bottom: 30, left: 55 };
+  const maxD = Math.max(1.0, Math.max(...s.dSample.map(Math.abs)) * 1.2);
+  const barH = (h - pad.top - pad.bottom - 30) / P;
+
+  // Draw zero line
+  const zeroX = xPos(0, -maxD, maxD, pad, w);
+  drawDashedV(ctx, zeroX, pad.top, h - pad.bottom, COLORS.dim);
+
+  // x axis ticks
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '11px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  [-1, -0.5, 0, 0.5, 1].forEach(function(v) {
+    if (Math.abs(v) <= maxD) {
+      const x = xPos(v, -maxD, maxD, pad, w);
+      ctx.fillText(v.toFixed(1), x, h - pad.bottom + 14);
+    }
+  });
+
+  for (let i = 0; i < P; i++) {
+    const y = pad.top + 15 + i * barH;
+    const d = s.dSample[i];
+    const bx = xPos(0, -maxD, maxD, pad, w);
+    const ex = xPos(d, -maxD, maxD, pad, w);
+    const barTop = y + 2;
+    const barBot = y + barH - 6;
+
+    ctx.fillStyle = d >= 0 ? COLORS.male : COLORS.female;
+    ctx.globalAlpha = 0.7;
+    ctx.fillRect(Math.min(bx, ex), barTop, Math.abs(ex - bx), barBot - barTop);
+    ctx.globalAlpha = 1;
+
+    // Label
+    ctx.fillStyle = COLORS.text;
+    ctx.textAlign = 'right';
+    ctx.font = '12px IBM Plex Mono';
+    ctx.fillText(TRAITS[i], pad.left - 8, (barTop + barBot) / 2 + 4);
+
+    // Value
+    ctx.textAlign = 'left';
+    ctx.fillStyle = COLORS.textBright;
+    ctx.font = '11px IBM Plex Mono';
+    const valX = Math.max(bx, ex) + 6;
+    ctx.fillText(d.toFixed(2), valX, (barTop + barBot) / 2 + 4);
+  }
+
+  // Density plots for all 4 M-F indices
+  drawTwoGroupDensity(setupCanvas(document.getElementById('c-overview-mfd')), s.mfD, s.sexVec, 'M-F_D');
+  drawTwoGroupDensity(setupCanvas(document.getElementById('c-overview-mft')), s.mfT, s.sexVec, 'M-F_T');
+  drawMFPHistogram(setupCanvas(document.getElementById('c-overview-mfp')), s.mfP, s.sexVec);
+  drawTwoGroupDensity(setupCanvas(document.getElementById('c-overview-mfc')), s.mfC, s.sexVec, 'M-F_C');
+
+  // Compute group-separation d for each M-F index
+  function groupD(vals, sex) {
+    const m = vals.filter(function(_, i) { return sex[i] === 1; });
+    const f = vals.filter(function(_, i) { return sex[i] === 0; });
+    const sdM = sd(m), sdF = sd(f);
+    const sdPool = Math.sqrt((sdM * sdM + sdF * sdF) / 2);
+    return sdPool > 1e-10 ? (mean(m) - mean(f)) / sdPool : 0;
+  }
+  const dD = groupD(s.mfD, s.sexVec);
+  const dT = groupD(s.mfT, s.sexVec);
+  const dC = groupD(s.mfC, s.sexVec);
+
+  // Stats
+  document.getElementById('stats-overview').innerHTML =
+    statHTML('D (Mahalanobis)', s.DM.toFixed(2)) +
+    statHTML('D<sub>u</sub> (corrected)', s.DM_corrected.toFixed(2)) +
+    statHTML('D<sub>D</sub>', dD.toFixed(2)) +
+    statHTML('D<sub>T</sub>', dT.toFixed(2)) +
+    statHTML('D<sub>C</sub>', dC.toFixed(2));
+}
+
+function drawMFPHistogram(g, pVals, sex) {
+  const { ctx, w, h } = g;
+  ctx.clearRect(0, 0, w, h);
+  const maleP = pVals.filter(function(_, i) { return sex[i] === 1; });
+  const femP = pVals.filter(function(_, i) { return sex[i] === 0; });
+  const pad = { top: 15, right: 15, bottom: 30, left: 15 };
+  const nBins = 30;
+  function binMax(vals, nB) {
+    const bw = 1 / nB;
+    const counts = Array(nB).fill(0);
+    for (let i = 0; i < vals.length; i++) {
+      const b = Math.min(nB-1, Math.floor(vals[i] / bw));
+      if (b >= 0) counts[b]++;
+    }
+    return Math.max(...counts.map(function(c) { return c / (vals.length * bw); }));
+  }
+  const yMax = Math.max(binMax(maleP, nBins), binMax(femP, nBins)) * 1.15;
+  ctx.strokeStyle = COLORS.dim;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, h - pad.bottom);
+  ctx.lineTo(w - pad.right, h - pad.bottom);
+  ctx.stroke();
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  [0, 0.25, 0.5, 0.75, 1].forEach(function(v) {
+    ctx.fillText(v.toFixed(2), xPos(v, 0, 1, pad, w), h - pad.bottom + 13);
+  });
+  drawDashedV(ctx, xPos(0.5, 0, 1, pad, w), pad.top, h - pad.bottom, COLORS.dim);
+  drawHistDensity(ctx, w, h, pad, femP, 0, 1, yMax, COLORS.female, COLORS.femaleAlpha, nBins);
+  drawHistDensity(ctx, w, h, pad, maleP, 0, 1, yMax, COLORS.male, COLORS.maleAlpha, nBins);
+  ctx.font = '10px IBM Plex Mono';
+  [[COLORS.male, 'Male'], [COLORS.female, 'Female']].forEach(function(pair, i) {
+    const lx = w - pad.right - 80;
+    const ly = pad.top + 10 + i * 16;
+    ctx.fillStyle = pair[0];
+    ctx.fillRect(lx, ly - 4, 10, 10);
+    ctx.fillStyle = COLORS.text;
+    ctx.textAlign = 'left';
+    ctx.fillText(pair[1], lx + 14, ly + 5);
+  });
+}
+
+function drawTwoGroupDensity(g, values, sex, label) {
+  const { ctx, w, h } = g;
+  ctx.clearRect(0, 0, w, h);
+
+  const maleVals = values.filter(function(_, i) { return sex[i] === 1; });
+  const femVals = values.filter(function(_, i) { return sex[i] === 0; });
+
+  const muM = mean(maleVals), sdM = sd(maleVals);
+  const muF = mean(femVals), sdF = sd(femVals);
+
+  const xMin = Math.min(muM - 3.5*sdM, muF - 3.5*sdF);
+  const xMax = Math.max(muM + 3.5*sdM, muF + 3.5*sdF);
+  const yMaxM = normalPDF(muM, muM, sdM);
+  const yMaxF = normalPDF(muF, muF, sdF);
+  const yMax = Math.max(yMaxM, yMaxF) * 1.15;
+
+  const pad = { top: 15, right: 15, bottom: 30, left: 15 };
+
+  // Axes
+  ctx.strokeStyle = COLORS.dim;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, h - pad.bottom);
+  ctx.lineTo(w - pad.right, h - pad.bottom);
+  ctx.stroke();
+
+  // x ticks
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  const range = xMax - xMin;
+  const step = range > 8 ? 2 : range > 4 ? 1 : 0.5;
+  for (let v = Math.ceil(xMin / step) * step; v <= xMax; v += step) {
+    const x = xPos(v, xMin, xMax, pad, w);
+    ctx.fillText(v.toFixed(step < 1 ? 1 : 0), x, h - pad.bottom + 13);
+  }
+
+  // Zero line
+  if (xMin < 0 && xMax > 0) {
+    drawDashedV(ctx, xPos(0, xMin, xMax, pad, w), pad.top, h - pad.bottom, COLORS.dim);
+  }
+
+  // Draw densities
+  drawDensityCurve(ctx, w, h, pad, muF, sdF, xMin, xMax, yMax, COLORS.female, COLORS.femaleAlpha);
+  drawDensityCurve(ctx, w, h, pad, muM, sdM, xMin, xMax, yMax, COLORS.male, COLORS.maleAlpha);
+
+  // Legend
+  ctx.font = '10px IBM Plex Mono';
+  [[COLORS.male, 'Male'], [COLORS.female, 'Female']].forEach(function(pair, i) {
+    const lx = w - pad.right - 80;
+    const ly = pad.top + 10 + i * 16;
+    ctx.fillStyle = pair[0];
+    ctx.fillRect(lx, ly - 4, 10, 10);
+    ctx.fillStyle = COLORS.text;
+    ctx.textAlign = 'left';
+    ctx.fillText(pair[1], lx + 14, ly + 5);
+  });
+}
+
+function drawMFD() {
+  if (state.error) return;
+  const s = state;
+
+  // Density
+  const c1 = document.getElementById('c-mfd-density');
+  drawTwoGroupDensity(setupCanvas(c1), s.mfD, s.sexVec, 'M-F_D');
+
+  // Weights bar chart
+  const c2 = document.getElementById('c-mfd-weights');
+  const { ctx, w, h } = setupCanvas(c2);
+  ctx.clearRect(0, 0, w, h);
+
+  const dNorm = vecNorm(s.dSample);
+  const weights = s.dSample.map(function(d) { return dNorm > 1e-10 ? d / dNorm : 0; });
+  const maxW = Math.max(0.6, Math.max(...weights.map(Math.abs)) * 1.3);
+
+  const pad = { top: 20, right: 20, bottom: 30, left: 55 };
+  const barH = (h - pad.top - pad.bottom - 30) / P;
+
+  const zeroX = xPos(0, -maxW, maxW, pad, w);
+  drawDashedV(ctx, zeroX, pad.top, h - pad.bottom, COLORS.dim);
+
+  for (let i = 0; i < P; i++) {
+    const y = pad.top + 15 + i * barH;
+    const wt = weights[i];
+    const bx = xPos(0, -maxW, maxW, pad, w);
+    const ex = xPos(wt, -maxW, maxW, pad, w);
+    const barTop = y + 2;
+    const barBot = y + barH - 6;
+
+    ctx.fillStyle = COLORS.teal;
+    ctx.globalAlpha = 0.6;
+    ctx.fillRect(Math.min(bx, ex), barTop, Math.abs(ex - bx), barBot - barTop);
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = COLORS.text;
+    ctx.textAlign = 'right';
+    ctx.font = '12px IBM Plex Mono';
+    ctx.fillText(TRAITS[i], pad.left - 8, (barTop + barBot) / 2 + 4);
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = COLORS.textBright;
+    ctx.font = '11px IBM Plex Mono';
+    ctx.fillText(wt.toFixed(2), Math.max(bx, ex) + 6, (barTop + barBot) / 2 + 4);
+  }
+
+  // Stats
+  const maleVals = s.mfD.filter(function(_, i) { return s.sexVec[i] === 1; });
+  const femVals = s.mfD.filter(function(_, i) { return s.sexVec[i] === 0; });
+  document.getElementById('stats-mfd').innerHTML =
+    statHTML('Mean (M)', mean(maleVals).toFixed(2)) +
+    statHTML('Mean (F)', mean(femVals).toFixed(2)) +
+    statHTML('SD (pooled)', ((sd(maleVals)+sd(femVals))/2).toFixed(2));
+}
+
+function drawMFT() {
+  if (state.error) return;
+  const s = state;
+
+  // Density
+  const c1 = document.getElementById('c-mft-density');
+  drawTwoGroupDensity(setupCanvas(c1), s.mfT, s.sexVec, 'M-F_T');
+
+  // Scatterplot: M-F_D vs M-F_T
+  const c2 = document.getElementById('c-mft-scatter');
+  const { ctx, w, h } = setupCanvas(c2);
+  ctx.clearRect(0, 0, w, h);
+
+  const pad = { top: 15, right: 15, bottom: 30, left: 40 };
+  const allD = s.mfD, allT = s.mfT;
+  const maxAbs = Math.max(
+    Math.max(...allD.map(Math.abs)),
+    Math.max(...allT.map(Math.abs))
+  ) * 1.1;
+  const lim = Math.max(2, maxAbs);
+
+  // Shade discordant quadrants
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+  const zeroXpx = xPos(0, -lim, lim, pad, w);
+  const zeroYpx = yPos(0, -lim, lim, pad, h);
+
+  ctx.fillStyle = 'rgba(249,115,22,0.06)';
+  // top-left quadrant (D<0, T>0)
+  ctx.fillRect(pad.left, pad.top, zeroXpx - pad.left, zeroYpx - pad.top);
+  // bottom-right quadrant (D>0, T<0)
+  ctx.fillRect(zeroXpx, zeroYpx, w - pad.right - zeroXpx, h - pad.bottom - zeroYpx);
+
+  // Axes
+  drawDashedV(ctx, zeroXpx, pad.top, h - pad.bottom, COLORS.dim);
+  ctx.strokeStyle = COLORS.dim;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(pad.left, zeroYpx); ctx.lineTo(w - pad.right, zeroYpx); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Axis frame
+  ctx.strokeStyle = COLORS.dim;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(pad.left, h - pad.bottom);
+  ctx.lineTo(w - pad.right, h - pad.bottom);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, h - pad.bottom);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('M-F_D', pad.left + plotW/2, h - 3);
+  ctx.save();
+  ctx.translate(10, pad.top + plotH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText('M-F_T', 0, 0);
+  ctx.restore();
+
+  // Plot points (scramble to reduce overplotting)
+  const indices = Array.from({length: s.nTotal}, function(_, i) { return i; });
+  // Fisher-Yates shuffle with seeded rng
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+  }
+
+  for (let k = 0; k < indices.length; k++) {
+    const i = indices[k];
+    const px = xPos(allD[i], -lim, lim, pad, w);
+    const py = yPos(allT[i], -lim, lim, pad, h);
+    ctx.beginPath();
+    ctx.arc(px, py, 2, 0, Math.PI * 2);
+    ctx.fillStyle = s.sexVec[i] === 1 ? COLORS.maleAlpha : COLORS.femaleAlpha;
+    ctx.fill();
+  }
+
+  // Stats
+  const r_DT = pearsonR(s.mfD, s.mfT);
+  document.getElementById('stats-mft').innerHTML =
+    statHTML('r(D, T)', r_DT.toFixed(2)) +
+    statHTML('Discordant', (s.pctDiscordant * 100).toFixed(1) + '%') +
+    statHTML('D (Mahalanobis)', s.DM.toFixed(2));
+}
+
+function drawMFP() {
+  if (state.error) return;
+  const s = state;
+
+  // Histogram density for M-F_P (non-normal)
+  drawMFPHistogram(setupCanvas(document.getElementById('c-mfp-density')), s.mfP, s.sexVec);
+
+  const maleP = s.mfP.filter(function(_, i) { return s.sexVec[i] === 1; });
+  const femP = s.mfP.filter(function(_, i) { return s.sexVec[i] === 0; });
+
+  // Logistic curve
+  const c2 = document.getElementById('c-mfp-logistic');
+  const g2 = setupCanvas(c2);
+  g2.ctx.clearRect(0, 0, g2.w, g2.h);
+
+  const pad2 = { top: 15, right: 15, bottom: 30, left: 40 };
+  const tVals = s.mfT;
+  const tMin = Math.min(...tVals) * 1.1;
+  const tMax = Math.max(...tVals) * 1.1;
+
+  // Axes
+  g2.ctx.strokeStyle = COLORS.dim;
+  g2.ctx.lineWidth = 1;
+  g2.ctx.beginPath();
+  g2.ctx.moveTo(pad2.left, g2.h - pad2.bottom);
+  g2.ctx.lineTo(g2.w - pad2.right, g2.h - pad2.bottom);
+  g2.ctx.stroke();
+  g2.ctx.beginPath();
+  g2.ctx.moveTo(pad2.left, pad2.top);
+  g2.ctx.lineTo(pad2.left, g2.h - pad2.bottom);
+  g2.ctx.stroke();
+
+  // Y ticks
+  g2.ctx.fillStyle = COLORS.text;
+  g2.ctx.font = '10px IBM Plex Mono';
+  g2.ctx.textAlign = 'right';
+  [0, 0.25, 0.5, 0.75, 1].forEach(function(v) {
+    const y = yPos(v, 0, 1, pad2, g2.h);
+    g2.ctx.fillText(v.toFixed(2), pad2.left - 6, y + 4);
+    g2.ctx.beginPath();
+    g2.ctx.strokeStyle = COLORS.dimmer;
+    g2.ctx.moveTo(pad2.left, y);
+    g2.ctx.lineTo(g2.w - pad2.right, y);
+    g2.ctx.stroke();
+  });
+
+  // X label
+  g2.ctx.textAlign = 'center';
+  g2.ctx.fillStyle = COLORS.text;
+  g2.ctx.fillText('M-F_T', pad2.left + (g2.w - pad2.left - pad2.right)/2, g2.h - 3);
+  // Y label
+  g2.ctx.save();
+  g2.ctx.translate(10, pad2.top + (g2.h - pad2.top - pad2.bottom)/2);
+  g2.ctx.rotate(-Math.PI/2);
+  g2.ctx.fillText('M-F_P', 0, 0);
+  g2.ctx.restore();
+
+  // Draw logistic curve using the actual discriminant normalization
+  g2.ctx.strokeStyle = COLORS.teal;
+  g2.ctx.lineWidth = 2;
+  g2.ctx.beginPath();
+  let first = true;
+  for (let i = 0; i <= 200; i++) {
+    const t = tMin + (tMax - tMin) * i / 200;
+    // M-F_P from M-F_T: the un-normalized score = t * normFactor
+    const rawScore = t * s.normFactor;
+    const p = 1 / (1 + Math.exp(-Math.max(-30, Math.min(30, rawScore))));
+    const px = xPos(t, tMin, tMax, pad2, g2.w);
+    const py = yPos(p, 0, 1, pad2, g2.h);
+    if (first) { g2.ctx.moveTo(px, py); first = false; }
+    else g2.ctx.lineTo(px, py);
+  }
+  g2.ctx.stroke();
+
+  // Scatter individuals on the curve
+  const indices = Array.from({length: s.nTotal}, function(_, i) { return i; });
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+  }
+  for (let k = 0; k < indices.length; k++) {
+    const i = indices[k];
+    const px = xPos(s.mfT[i], tMin, tMax, pad2, g2.w);
+    const py = yPos(s.mfP[i], 0, 1, pad2, g2.h);
+    g2.ctx.beginPath();
+    g2.ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+    g2.ctx.fillStyle = s.sexVec[i] === 1 ? COLORS.maleAlpha : COLORS.femaleAlpha;
+    g2.ctx.fill();
+  }
+
+  // Stats
+  const maleCorrect = maleP.filter(function(p) { return p > 0.5; }).length / maleP.length;
+  const femCorrect = femP.filter(function(p) { return p < 0.5; }).length / femP.length;
+  document.getElementById('stats-mfp').innerHTML =
+    statHTML('Males P > 0.5', (maleCorrect * 100).toFixed(1) + '%') +
+    statHTML('Females P < 0.5', (femCorrect * 100).toFixed(1) + '%') +
+    statHTML('Overall accuracy', ((maleCorrect * s.nM + femCorrect * s.nF) / s.nTotal * 100).toFixed(1) + '%');
+}
+
+function drawMFC() {
+  if (state.error) return;
+  const s = state;
+
+  // Density
+  const c1 = document.getElementById('c-mfc-density');
+  drawTwoGroupDensity(setupCanvas(c1), s.mfC, s.sexVec, 'M-F_C');
+
+  // Scatterplot: M-F_T vs M-F_C
+  const c2 = document.getElementById('c-mfc-scatter');
+  const { ctx, w, h } = setupCanvas(c2);
+  ctx.clearRect(0, 0, w, h);
+
+  const pad = { top: 15, right: 15, bottom: 30, left: 40 };
+
+  const allT = s.mfT, allC = s.mfC;
+  const maxAbsT = Math.max(...allT.map(Math.abs)) * 1.1;
+  const maxAbsC = Math.max(...allC.map(Math.abs)) * 1.1;
+  const limT = Math.max(2, maxAbsT);
+  const limC = Math.max(1.5, maxAbsC);
+
+  // Axes
+  ctx.strokeStyle = COLORS.dim;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, h - pad.bottom);
+  ctx.lineTo(w - pad.right, h - pad.bottom);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, h - pad.bottom);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('M-F_T', pad.left + (w - pad.left - pad.right)/2, h - 3);
+  ctx.save();
+  ctx.translate(10, pad.top + (h - pad.top - pad.bottom)/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText('M-F_C', 0, 0);
+  ctx.restore();
+
+  // Zero crosshairs
+  const zxpx = xPos(0, -limT, limT, pad, w);
+  const zypx = yPos(0, -limC, limC, pad, h);
+  drawDashedV(ctx, zxpx, pad.top, h - pad.bottom, COLORS.dim);
+  ctx.strokeStyle = COLORS.dim;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(pad.left, zypx); ctx.lineTo(w - pad.right, zypx); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Plot points
+  const indices = Array.from({length: s.nTotal}, function(_, i) { return i; });
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+  }
+
+  for (let k = 0; k < indices.length; k++) {
+    const i = indices[k];
+    const px = xPos(allT[i], -limT, limT, pad, w);
+    const py = yPos(allC[i], -limC, limC, pad, h);
+    ctx.beginPath();
+    ctx.arc(px, py, 2, 0, Math.PI * 2);
+    ctx.fillStyle = s.sexVec[i] === 1 ? COLORS.maleAlpha : COLORS.femaleAlpha;
+    ctx.fill();
+  }
+
+  // Stats
+  const r_TC = pearsonR(s.mfT, s.mfC);
+  document.getElementById('stats-mfc').innerHTML =
+    statHTML('r(T, C)', r_TC.toFixed(2)) +
+    statHTML('Mean M-F_C (M)', mean(s.mfC.filter(function(_, i) { return s.sexVec[i] === 1; })).toFixed(2)) +
+    statHTML('Mean M-F_C (F)', mean(s.mfC.filter(function(_, i) { return s.sexVec[i] === 0; })).toFixed(2));
+}
+
+function drawAggregation() {
+  if (state.error) return;
+  const s = state;
+
+  // We simulate aggregation by computing what D would be at different levels.
+  // At domain level (p=5): use actual simulated D
+  // At facet level (p=15) and item level (p=60): estimate using the relationship
+  // D^2 grows with p when d's are sampled from a distribution.
+
+  // For a hierarchical model:
+  // - Each domain has 3 facets, each facet has 4 items
+  // - Facet-level d's: domain d + noise, so more d's but smaller
+  // - Item-level d's: facet d + more noise, even more d's, even smaller
+  // We estimate D at each level analytically:
+
+  // True D^2 at domain level from population parameters
+  const dTrue = s.dVec; // true d's before attenuation
+  const avgR = s.avgR;
+  const alpha = s.alpha;
+
+  // Build true R at domain level
+  const Rtrue5 = matCreate(P, P);
+  for (let i = 0; i < P; i++) {
+    Rtrue5[i][i] = 1;
+    for (let j = 0; j < i; j++) { Rtrue5[i][j] = avgR; Rtrue5[j][i] = avgR; }
+  }
+  const Rinv5 = matInverse(Rtrue5);
+  const D2_true5 = Rinv5 ? vecDot(dTrue, matVecMul(Rinv5, dTrue)) : 0;
+
+  // Facet level (p=15): 3 facets per domain
+  // Facet d = domain d (facets inherit domain-level differences)
+  // Facet reliability = lower (roughly alpha^(1/3) by Spearman-Brown, or we use SB with k/3 items)
+  const kItems = 12; // items per domain
+  const kFacetItems = 4; // items per facet
+  // Item-level reliability proxy (single item)
+  const alphaItem = alpha / (kItems - (kItems - 1) * alpha); // inverse SB
+  // Facet reliability (SB from item-level)
+  const alphaFacet = kFacetItems * alphaItem / (1 + (kFacetItems - 1) * alphaItem);
+  // Domain reliability stays as alpha
+
+  // Facet correlations: within-domain facets share more variance
+  // r_within = r_domain_latent * sqrt(alphaFacet)^2 roughly
+  // Between-domain facet r = avgR * alphaFacet (attenuated)
+
+  // For the bar chart, we use a simpler approach:
+  // Sample observed D at each level with appropriate p, alpha, and n
+  const nPer = s.N;
+
+  // Domain level: use actual simulation results
+  const D_raw_5 = s.DM;
+  const D_corr_5 = s.DM_corrected;
+
+  // For facet and item levels, compute expected D analytically
+  // D^2_pop at domain level from true parameters
+  const D2_pop = D2_true5;
+
+  // At facet level (p=15): each of 3 facets per domain has the same d as the domain
+  // but with facet-level reliability
+  // D^2 is approximately the same (same underlying true D), but observed D is affected by:
+  // 1. More variables -> more bias: E[D^2_obs] = D^2_true + p/n_eff
+  // 2. Lower reliability -> attenuated d's -> smaller D^2_true
+  const dFacet = [];
+  for (let i = 0; i < P; i++) for (let f = 0; f < 3; f++) dFacet.push(dTrue[i] * Math.sqrt(alphaFacet));
+  const pFacet = 15;
+  // Build facet R (compound symmetry with two levels)
+  const Rfacet = matCreate(pFacet, pFacet);
+  const rWithin = 0.30 * alphaFacet; // within-domain facet correlation
+  const rBetween = avgR * alphaFacet; // between-domain facet correlation
+  for (let i = 0; i < pFacet; i++) {
+    Rfacet[i][i] = 1;
+    for (let j = 0; j < i; j++) {
+      const domI = Math.floor(i / 3), domJ = Math.floor(j / 3);
+      Rfacet[i][j] = domI === domJ ? rWithin : rBetween;
+      Rfacet[j][i] = Rfacet[i][j];
+    }
+  }
+  const RinvFacet = matInverse(Rfacet);
+  const D2_true_facet = RinvFacet ? vecDot(dFacet, matVecMul(RinvFacet, dFacet)) : 0;
+  // Expected observed D^2 with bias: D^2_obs ≈ D^2_true * (n+n-2)/(n+n-p-3) + p*(n+n)/(n*n)
+  const nEff = nPer; // per group
+  const D2_obs_facet = D2_true_facet * (2*nEff - 2) / (2*nEff - pFacet - 3) + pFacet * 2 / nEff;
+  const D_raw_facet = Math.sqrt(Math.max(0, D2_obs_facet));
+  const D_corr_facet = Math.sqrt(Math.max(0, D2_obs_facet*(2*nEff-pFacet-3)/(2*nEff-2) - pFacet*2/nEff));
+
+  // Item level (p=60)
+  const dItem = [];
+  for (let i = 0; i < P; i++) for (let it = 0; it < kItems; it++) dItem.push(dTrue[i] * Math.sqrt(Math.max(0.01, alphaItem)));
+  const pItem = 60;
+  // Item R: items within facet correlate more
+  const rItemWithinFacet = 0.15 * Math.max(0.01, alphaItem);
+  const rItemWithinDomain = 0.08 * Math.max(0.01, alphaItem);
+  const rItemBetween = avgR * Math.max(0.01, alphaItem);
+  // Simplified: use compound symmetry with average r
+  const avgItemR = (rItemWithinFacet * 3 + rItemWithinDomain * 8 + rItemBetween * 48) / 59;
+  const RitemSimple = matCreate(pItem, pItem);
+  for (let i = 0; i < pItem; i++) {
+    RitemSimple[i][i] = 1;
+    for (let j = 0; j < i; j++) {
+      RitemSimple[i][j] = avgItemR;
+      RitemSimple[j][i] = avgItemR;
+    }
+  }
+  // For compound symmetry, R^{-1}d' d R^{-1} simplifies
+  // D^2 = sum(di^2)/(1-r) - r*sum(di)^2 / ((1-r)(1+(p-1)r)) for compound symmetry
+  const sumD2item = dItem.reduce(function(s, d) { return s + d*d; }, 0);
+  const sumDitem = dItem.reduce(function(s, d) { return s + d; }, 0);
+  const D2_true_item = sumD2item / (1 - avgItemR) - avgItemR * sumDitem * sumDitem / ((1 - avgItemR) * (1 + (pItem - 1) * avgItemR));
+  const D2_obs_item = Math.max(0, D2_true_item) * (2*nEff - 2) / Math.max(1, 2*nEff - pItem - 3) + pItem * 2 / nEff;
+  const D_raw_item = Math.sqrt(Math.max(0, D2_obs_item));
+  const D_corr_item = Math.sqrt(Math.max(0, D2_obs_item * Math.max(0, 2*nEff - pItem - 3) / (2*nEff - 2) - pItem * 2 / nEff));
+
+  // Draw grouped bar chart
+  const c = document.getElementById('c-agg-bars');
+  const { ctx, w, h } = setupCanvas(c);
+  ctx.clearRect(0, 0, w, h);
+
+  const pad = { top: 25, right: 20, bottom: 45, left: 50 };
+  const levels = [
+    { label: '5 Domains', pVal: 5, alpha: alpha, Draw: D_raw_5, Dcorr: D_corr_5 },
+    { label: '15 Facets', pVal: 15, alpha: alphaFacet, Draw: D_raw_facet, Dcorr: D_corr_facet },
+    { label: '60 Items', pVal: 60, alpha: Math.max(0.01, alphaItem), Draw: D_raw_item, Dcorr: D_corr_item }
+  ];
+
+  const maxY = Math.max(...levels.map(function(l) { return Math.max(l.Draw, l.Dcorr); })) * 1.3;
+  const yMax = Math.max(3, maxY);
+
+  // Y axis ticks
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '11px IBM Plex Mono';
+  ctx.textAlign = 'right';
+  const yStep = yMax > 8 ? 2 : yMax > 4 ? 1 : 0.5;
+  for (let v = 0; v <= yMax; v += yStep) {
+    const y = yPos(v, 0, yMax, pad, h);
+    ctx.fillText(v.toFixed(1), pad.left - 6, y + 4);
+    ctx.beginPath();
+    ctx.strokeStyle = COLORS.dimmer;
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(w - pad.right, y);
+    ctx.stroke();
+  }
+
+  // Bars
+  const groupW = (w - pad.left - pad.right) / 3;
+  const barW = groupW * 0.25;
+
+  levels.forEach(function(lev, gi) {
+    const cx = pad.left + groupW * (gi + 0.5);
+
+    // Raw D bar
+    const rawH = (lev.Draw / yMax) * (h - pad.top - pad.bottom);
+    ctx.fillStyle = 'rgba(249,115,22,0.5)';
+    ctx.fillRect(cx - barW - 2, h - pad.bottom - rawH, barW, rawH);
+    ctx.strokeStyle = COLORS.orange;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(cx - barW - 2, h - pad.bottom - rawH, barW, rawH);
+
+    // Corrected D bar
+    const corrH = (lev.Dcorr / yMax) * (h - pad.top - pad.bottom);
+    ctx.fillStyle = 'rgba(45,212,191,0.5)';
+    ctx.fillRect(cx + 2, h - pad.bottom - corrH, barW, corrH);
+    ctx.strokeStyle = COLORS.teal;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(cx + 2, h - pad.bottom - corrH, barW, corrH);
+
+    // Values on top
+    ctx.fillStyle = COLORS.orange;
+    ctx.font = '11px IBM Plex Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(lev.Draw.toFixed(2), cx - barW/2 - 2, h - pad.bottom - rawH - 5);
+    ctx.fillStyle = COLORS.teal;
+    ctx.fillText(lev.Dcorr.toFixed(2), cx + barW/2 + 2, h - pad.bottom - corrH - 5);
+
+    // Group label
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '11px IBM Plex Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(lev.label, cx, h - pad.bottom + 16);
+    ctx.font = '10px IBM Plex Mono';
+    ctx.fillStyle = COLORS.dim;
+    ctx.fillText('\u03B1 = ' + lev.alpha.toFixed(2), cx, h - pad.bottom + 30);
+  });
+
+  // Legend
+  ctx.font = '10px IBM Plex Mono';
+  [['D (raw)', COLORS.orange], ['D (corrected)', COLORS.teal]].forEach(function(pair, i) {
+    const lx = w - pad.right - 120;
+    const ly = pad.top + 5 + i * 16;
+    ctx.fillStyle = pair[1];
+    ctx.fillRect(lx, ly - 4, 10, 10);
+    ctx.fillStyle = COLORS.text;
+    ctx.textAlign = 'left';
+    ctx.fillText(pair[0], lx + 14, ly + 5);
+  });
+
+  // Y label
+  ctx.save();
+  ctx.fillStyle = COLORS.text;
+  ctx.font = '11px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.translate(12, pad.top + (h - pad.top - pad.bottom)/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText('Mahalanobis D', 0, 0);
+  ctx.restore();
+
+  // Agg cards
+  document.getElementById('agg-cards').innerHTML = levels.map(function(lev) {
+    return '<div class="agg-card">' +
+      '<div class="agg-card-title">' + lev.label + ' (p = ' + lev.pVal + ')</div>' +
+      '<div class="agg-card-val">' + lev.Dcorr.toFixed(2) + '</div>' +
+      '<div class="agg-card-sub">corrected &middot; raw = ' + lev.Draw.toFixed(2) + ' &middot; \u03B1 = ' + lev.alpha.toFixed(2) + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// ============================================================
+// PANEL SWITCHING & EVENT WIRING
+// ============================================================
+function drawActivePanel() {
+  const active = document.querySelector('.viz-panel.active');
+  if (!active || state.error) return;
+  switch (active.id) {
+    case 'panel-overview': drawOverview(); break;
+    case 'panel-mf-d': drawMFD(); break;
+    case 'panel-mf-t': drawMFT(); break;
+    case 'panel-mf-p': drawMFP(); break;
+    case 'panel-mf-c': drawMFC(); break;
+    case 'panel-aggregation': drawAggregation(); break;
+  }
+}
+
+// Panel buttons
+document.getElementById('panel-select').addEventListener('click', function(e) {
+  const btn = e.target.closest('.btn');
+  if (!btn) return;
+  document.querySelectorAll('#panel-select .btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('.viz-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  // Reset rng for consistent scatter plots
+  rng = mulberry32(seed);
+  drawActivePanel();
+});
+
+// Preset buttons
+document.getElementById('preset-row').addEventListener('click', function(e) {
+  const btn = e.target.closest('.btn');
+  if (!btn || !btn.dataset.preset) return;
+  document.querySelectorAll('#preset-row .btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  const p = PRESETS[btn.dataset.preset];
+  TRAITS.forEach(function(t, i) {
+    document.getElementById('d-' + t).value = Math.round(p.d[i] * 100);
+  });
+  document.getElementById('sl-r').value = Math.round(p.r * 100);
+  document.getElementById('sl-alpha').value = Math.round(p.alpha * 100);
+  updateSliderDisplays();
+  simulate();
+});
+
+// Sample size buttons
+document.querySelectorAll('.n-row .btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.n-row .btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    sampleSize = parseInt(btn.dataset.n);
+    seed = Math.floor(Math.random() * 100000);
+    simulate();
+  });
+});
+
+// Slider displays
+function updateSliderDisplays() {
+  TRAITS.forEach(function(t) {
+    const v = parseInt(document.getElementById('d-' + t).value) / 100;
+    const el = document.getElementById('dv-' + t);
+    el.textContent = (v < 0 ? '\u2212' : '') + Math.abs(v).toFixed(2);
+  });
+  document.getElementById('sv-r').textContent = (parseInt(document.getElementById('sl-r').value) / 100).toFixed(2);
+  document.getElementById('sv-alpha').textContent = (parseInt(document.getElementById('sl-alpha').value) / 100).toFixed(2);
+}
+
+// Wire all sliders
+let rafId = null;
+function onSliderInput() {
+  updateSliderDisplays();
+  // Deactivate preset
+  document.querySelectorAll('#preset-row .btn').forEach(function(b) { b.classList.remove('active'); });
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(function() { rafId = null; simulate(); });
+}
+
+TRAITS.forEach(function(t) {
+  document.getElementById('d-' + t).addEventListener('input', onSliderInput);
+});
+document.getElementById('sl-r').addEventListener('input', onSliderInput);
+document.getElementById('sl-alpha').addEventListener('input', onSliderInput);
+
+// Resize
+let resizeTimer;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(function() { rng = mulberry32(seed); drawActivePanel(); }, 100);
+});
+
+// ============================================================
+// INIT
+// ============================================================
+simulate();
+
+})();
+</script>
