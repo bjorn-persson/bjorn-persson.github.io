@@ -167,12 +167,62 @@ draft: true
     color: var(--text-dim);
   }
 
+  /* Section 1 walkthrough */
+  .wt-canvas {
+    width: 100%;
+    height: 420px;
+    border-radius: 6px;
+    background: var(--bg-surface);
+  }
+  .wt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .wt-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .wt-card-title {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .wt-matrix {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    color: var(--text);
+    line-height: 1.8;
+  }
+  .wt-val {
+    color: var(--teal);
+    font-weight: 600;
+  }
+  .wt-val-o {
+    color: var(--orange);
+    font-weight: 600;
+  }
+  .wt-eq {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
   @media (max-width: 640px) {
     .d-sliders { grid-template-columns: repeat(5, 1fr); gap: 4px; }
     .d-slider-cell input[type="range"] { height: 60px; }
     .agg-cards { grid-template-columns: 1fr; }
     .param-row { flex-direction: column; gap: 8px; }
     .mf-grid { grid-template-columns: 1fr !important; }
+    .wt-grid { grid-template-columns: 1fr; }
+    .wt-canvas { height: 320px; }
   }
 </style>
 
@@ -183,6 +233,90 @@ draft: true
     <div class="subtitle">Multivariate effect sizes for group differences, and four ways to place individuals on a masculinity-femininity continuum</div>
   </div>
 
+  <!-- ============ SECTION 1: WALKTHROUGH ============ -->
+  <div class="section" id="sec1">
+    <div class="section-label">Section 1</div>
+    <h2>Why One Number Isn't Enough<button class="info-btn" onclick="showInfo('standardize')">?</button></h2>
+
+    <p>Cohen's <em>d</em> measures how much two groups differ on a single variable. But what if you measure <em>two</em> variables &mdash; say, height and shoulder width? You get two <em>d</em> values, one per variable. Can you combine them into a single number that captures how different the groups really are?</p>
+
+    <p>The answer depends on whether the variables are correlated. The scatter plot below shows two groups measured on two variables (X<sub>1</sub> and X<sub>2</sub>). Use the sliders to set the effect sizes and correlation, and watch two different strategies for combining them:</p>
+
+    <ul style="margin: 8px 0 16px 0; padding-left: 20px; line-height: 1.8; font-size: 0.92em;">
+      <li>The <span style="color:var(--teal);font-weight:600">teal arrow</span> (<strong>simple approach</strong>) &mdash; weight each variable by its <em>d</em>, ignoring correlations.</li>
+      <li>The <span style="color:var(--orange);font-weight:600">orange arrow</span> (<strong>Mahalanobis approach</strong>) &mdash; weight each variable by its <em>unique</em> contribution, adjusting for the correlation.</li>
+    </ul>
+
+    <p style="font-size:0.92em; color:var(--text-dim)">When the correlation is zero, both arrows point the same way. Increase <em>r</em> and watch them diverge.</p>
+
+    <!-- Walkthrough controls -->
+    <div class="param-row" style="margin-bottom:16px; gap:14px;">
+      <div class="slider-row" style="min-width:170px">
+        <span class="slider-label" style="width:auto">d<sub>1</sub></span>
+        <input type="range" id="wt-d1" min="-150" max="150" value="80" step="5">
+        <span class="slider-val" id="wt-d1v" style="width:50px">0.80</span>
+      </div>
+      <div class="slider-row" style="min-width:170px">
+        <span class="slider-label" style="width:auto">d<sub>2</sub></span>
+        <input type="range" id="wt-d2" min="-150" max="150" value="60" step="5">
+        <span class="slider-val" id="wt-d2v" style="width:50px">0.60</span>
+      </div>
+      <div class="slider-row" style="min-width:170px">
+        <span class="slider-label" style="width:auto">r</span>
+        <input type="range" id="wt-r" min="-80" max="80" value="40" step="5">
+        <span class="slider-val" id="wt-rv" style="width:50px">0.40</span>
+      </div>
+    </div>
+
+    <!-- Scatter plot -->
+    <div class="viz-box">
+      <canvas id="c-wt-scatter" class="wt-canvas"></canvas>
+    </div>
+
+    <!-- Step-by-step readouts -->
+    <div class="wt-grid" id="wt-grid">
+      <div class="wt-card">
+        <div class="wt-card-title">Effect sizes (Cohen's d)</div>
+        <div class="wt-matrix" id="wt-step-d"></div>
+      </div>
+      <div class="wt-card">
+        <div class="wt-card-title">Within-group correlation (r)</div>
+        <div class="wt-matrix" id="wt-step-R"></div>
+      </div>
+      <div class="wt-card" style="border-left: 3px solid var(--teal)">
+        <div class="wt-card-title">Simple composite<button class="info-btn" onclick="showInfo('normD')" style="margin-left:6px;font-size:0.85em;width:18px;height:18px;line-height:18px">?</button></div>
+        <div class="wt-matrix" id="wt-step-wD"></div>
+      </div>
+      <div class="wt-card" style="border-left: 3px solid var(--orange)">
+        <div class="wt-card-title">Mahalanobis composite<button class="info-btn" onclick="showInfo('normT')" style="margin-left:6px;font-size:0.85em;width:18px;height:18px;line-height:18px">?</button></div>
+        <div class="wt-matrix" id="wt-step-wT"></div>
+      </div>
+    </div>
+
+    <!-- Comparison -->
+    <div class="wt-card" style="margin-top:16px">
+      <div class="wt-card-title">How well does each composite separate the groups?</div>
+      <div class="wt-matrix" id="wt-step-compare"></div>
+    </div>
+
+    <div class="note" style="margin-top:20px">
+      <strong>Key idea:</strong> The simple composite treats each variable independently &mdash; if two variables both show <em>d</em> = 0.50, it counts that twice, even if the variables measure almost the same thing. The Mahalanobis composite adjusts for this redundancy. The resulting group separation (Mahalanobis D) can be larger <em>or</em> smaller than the simple version, depending on how the correlations interact with the pattern of effect sizes.
+    </div>
+
+    <div class="note warn" style="margin-top:12px">
+      <strong>Try this:</strong> Set both <em>d</em>'s to positive (say, 0.80 and 0.60) and increase the correlation. The Mahalanobis D <em>decreases</em> &mdash; because correlated variables with same-sign <em>d</em>'s are partly redundant. Now flip d<sub>2</sub> to negative and watch D <em>increase</em>: when correlated variables pull in opposite directions, that pattern is especially diagnostic of group membership.
+    </div>
+
+    <p style="margin-top:16px; font-size:0.88em; color:var(--text-dim)">Formally, the simple composite corresponds to M-F<sub>D</sub> (sex-directionality) and the Mahalanobis composite to M-F<sub>T</sub> (sex-typicality) in <a href="https://doi.org/10.3758/s13428-024-02369-5" target="_blank" style="color:var(--text-dim)">Del Giudice (2024)</a>. Section 2 explores all four indices with more variables.</p>
+  </div>
+
+  <!-- ============ SECTION 2: INTERACTIVE EXPLORER ============ -->
+  <div class="section" id="sec2">
+    <div class="section-label">Section 2</div>
+    <h2>Interactive Explorer</h2>
+    <p>The walkthrough above used two variables. In practice, researchers work with many more. This section simulates five correlated traits (Big Five personality domains), letting you adjust each univariate effect size, the average correlation, reliability, and sample size, then explore all four M-F indices and the aggregation tradeoff.</p>
+  </div>
+
   <!-- ============ CONTROLS ============ -->
   <div class="section">
     <div class="slider-group">
@@ -190,7 +324,7 @@ draft: true
       <div class="preset-row" id="preset-row">
         <button class="btn active" data-preset="realistic">Realistic Big 5</button>
         <button class="btn" data-preset="equal">Equal d's</button>
-        <button class="btn" data-preset="dominant">One dominant</button>
+        <button class="btn" data-preset="dominant">Max differences</button>
         <button class="btn" data-preset="lowrel">Low reliability</button>
         <button class="btn" data-preset="highrel">High reliability</button>
         <button class="btn" data-preset="orthogonal">Orthogonal</button>
@@ -397,8 +531,8 @@ draft: true
           <canvas id="c-mfc-density" class="md-canvas"></canvas>
         </div>
         <div class="viz-col">
-          <div class="viz-title">M-F<sub>T</sub> vs M-F<sub>C</sub></div>
-          <canvas id="c-mfc-scatter" class="md-canvas"></canvas>
+          <div class="viz-title">Centroid geometry (2D projection)</div>
+          <canvas id="c-mfc-scatter" class="md-canvas" style="height:312px"></canvas>
         </div>
       </div>
       <div class="fit-stats" id="stats-mfc"></div>
@@ -448,6 +582,314 @@ draft: true
 </div>
 
 <script>
+// ============================================================
+// SECTION 1: WALKTHROUGH — 2D scatter with d-axis vs discriminant
+// ============================================================
+(function() {
+'use strict';
+
+const WT_N = 150; // per group
+const WT_COLORS = {
+  male: '#3b9eff',
+  female: '#f472b6',
+  maleAlpha: 'rgba(59,158,255,0.22)',
+  femaleAlpha: 'rgba(244,114,182,0.22)',
+  teal: '#2dd4bf',
+  orange: '#f97316',
+  text: '#b0b4c0',
+  textBright: '#e8ecf4',
+  dim: 'rgba(201,205,216,0.3)',
+  dimmer: 'rgba(201,205,216,0.12)',
+  bg: '#181a24'
+};
+
+// Seeded RNG
+function mulberry32(s) {
+  return function() {
+    s |= 0; s = s + 0x6D2B79F5 | 0;
+    let t = Math.imul(s ^ s >>> 15, 1 | s);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+let wtRng = mulberry32(77777);
+function wtRandn() {
+  let u, v, s;
+  do { u = 2*wtRng()-1; v = 2*wtRng()-1; s = u*u+v*v; } while (s >= 1 || s === 0);
+  return u * Math.sqrt(-2*Math.log(s)/s);
+}
+
+// Generate 2D MVN samples
+function genMVN2(mu, r, n) {
+  const data = [];
+  for (let i = 0; i < n; i++) {
+    const z1 = wtRandn(), z2 = wtRandn();
+    const x1 = mu[0] + z1;
+    const x2 = mu[1] + r * z1 + Math.sqrt(1 - r * r) * z2;
+    data.push([x1, x2]);
+  }
+  return data;
+}
+
+function fmt(v) { return (v < 0 ? '\u2212' : '') + Math.abs(v).toFixed(2); }
+function fmtP(v) { return (v < 0 ? '\u2212' : '+') + Math.abs(v).toFixed(2); }
+
+function wtUpdate() {
+  const d1 = parseInt(document.getElementById('wt-d1').value) / 100;
+  const d2 = parseInt(document.getElementById('wt-d2').value) / 100;
+  const r  = parseInt(document.getElementById('wt-r').value) / 100;
+
+  // Update slider displays
+  document.getElementById('wt-d1v').textContent = fmt(d1);
+  document.getElementById('wt-d2v').textContent = fmt(d2);
+  document.getElementById('wt-rv').textContent = fmt(r);
+
+  // Generate data: females at -d/2, males at +d/2, within-group cor = r
+  wtRng = mulberry32(77777);
+  const muF = [-d1/2, -d2/2];
+  const muM = [d1/2, d2/2];
+  const dataF = genMVN2(muF, r, WT_N);
+  const dataM = genMVN2(muM, r, WT_N);
+
+  // --- Computations ---
+  // R^{-1} for 2x2: [[1, -r], [-r, 1]] / (1 - r^2)
+  const det = 1 - r * r;
+  const Rinv00 = 1 / det, Rinv01 = -r / det;
+  const Rinv10 = -r / det, Rinv11 = 1 / det;
+
+  // Discriminant weights a = R^{-1} d
+  const a1 = Rinv00 * d1 + Rinv01 * d2;
+  const a2 = Rinv10 * d1 + Rinv11 * d2;
+
+  // Norms
+  const dNorm = Math.sqrt(d1*d1 + d2*d2);
+  // a'Ra = d'R^{-1}d = Mahalanobis D^2
+  const D2 = d1 * a1 + d2 * a2;
+  const DM = Math.sqrt(Math.max(0, D2));
+
+  // D_D (group-level effect size for mf.D) = ||d||
+  const DD = dNorm;
+
+  // Angle between d-vector and discriminant axis
+  const aDot = d1*a1 + d2*a2;
+  const aNorm = Math.sqrt(a1*a1 + a2*a2);
+  let angle = 0;
+  if (dNorm > 1e-8 && aNorm > 1e-8) {
+    angle = Math.acos(Math.min(1, Math.max(-1, aDot / (dNorm * aNorm)))) * 180 / Math.PI;
+  }
+
+  // --- Draw scatter ---
+  drawWTScatter(dataF, dataM, d1, d2, a1, a2, dNorm, aNorm, r);
+
+  // --- Update readout panels ---
+  document.getElementById('wt-step-d').innerHTML =
+    'X<sub>1</sub>: <em>d</em> = <span class="wt-val">' + fmt(d1) + '</span><br>' +
+    'X<sub>2</sub>: <em>d</em> = <span class="wt-val">' + fmt(d2) + '</span>' +
+    '<div class="wt-eq">How much the groups differ on each variable,<br>in pooled standard deviation units.</div>';
+
+  document.getElementById('wt-step-R').innerHTML =
+    '<em>r</em> = <span class="wt-val">' + fmt(r) + '</span>' +
+    '<div class="wt-eq">How strongly X<sub>1</sub> and X<sub>2</sub> correlate <em>within</em> each group.<br>' +
+    'At r = 0 the variables carry independent information.</div>';
+
+  document.getElementById('wt-step-wD').innerHTML =
+    'Weight each variable by its <em>d</em>:<br>' +
+    'X<sub>1</sub> &times; <span class="wt-val">' + fmt(d1) + '</span> + ' +
+    'X<sub>2</sub> &times; <span class="wt-val">' + fmt(d2) + '</span>' +
+    '<div class="wt-eq">Ignores the correlation &mdash; treats variables<br>as if they were independent.</div>';
+
+  document.getElementById('wt-step-wT').innerHTML =
+    'Adjusted weights (accounting for <em>r</em>):<br>' +
+    'X<sub>1</sub> &times; <span class="wt-val-o">' + fmt(a1) + '</span> + ' +
+    'X<sub>2</sub> &times; <span class="wt-val-o">' + fmt(a2) + '</span>' +
+    '<div class="wt-eq">Upweights variables with unique information,<br>downweights redundant overlap.</div>';
+
+  document.getElementById('wt-step-compare').innerHTML =
+    '<div style="display:flex;gap:40px;flex-wrap:wrap;justify-content:center;align-items:baseline">' +
+    '<div><span style="color:var(--teal)">Simple</span> separation = <span class="wt-val" style="font-size:1.15em">' + DD.toFixed(2) + '</span></div>' +
+    '<div><span style="color:var(--orange)">Mahalanobis D</span> = <span class="wt-val-o" style="font-size:1.15em">' + DM.toFixed(2) + '</span></div>' +
+    '<div>Angle between axes = <span style="color:var(--text-bright);font-weight:600">' + angle.toFixed(1) + '&deg;</span></div>' +
+    '</div>';
+}
+
+function drawWTScatter(dataF, dataM, d1, d2, a1, a2, dNorm, aNorm, r) {
+  const canvas = document.getElementById('c-wt-scatter');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const w = rect.width, h = rect.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Plot bounds
+  const pad = { top: 30, right: 30, bottom: 40, left: 50 };
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+  const xRange = 4.5, yRange = 4.5;
+
+  function toX(v) { return pad.left + (v + xRange) / (2 * xRange) * plotW; }
+  function toY(v) { return pad.top + (yRange - v) / (2 * yRange) * plotH; }
+
+  // Grid lines
+  ctx.strokeStyle = WT_COLORS.dimmer;
+  ctx.lineWidth = 1;
+  for (let v = -4; v <= 4; v += 2) {
+    ctx.beginPath(); ctx.moveTo(toX(v), pad.top); ctx.lineTo(toX(v), h - pad.bottom); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.left, toY(v)); ctx.lineTo(w - pad.right, toY(v)); ctx.stroke();
+  }
+
+  // Axes through origin
+  ctx.strokeStyle = WT_COLORS.dim;
+  ctx.beginPath(); ctx.moveTo(toX(-xRange), toY(0)); ctx.lineTo(toX(xRange), toY(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(toX(0), toY(-yRange)); ctx.lineTo(toX(0), toY(yRange)); ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle = WT_COLORS.text;
+  ctx.font = '11px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('X\u2081', w - pad.right + 15, toY(0) + 4);
+  ctx.fillText('X\u2082', toX(0), pad.top - 10);
+  for (let v = -4; v <= 4; v += 2) {
+    if (v === 0) continue;
+    ctx.fillText(v.toString(), toX(v), h - pad.bottom + 15);
+    ctx.textAlign = 'right';
+    ctx.fillText(v.toString(), pad.left - 6, toY(v) + 4);
+    ctx.textAlign = 'center';
+  }
+
+  // Draw data points
+  function drawPoints(data, color) {
+    ctx.fillStyle = color;
+    for (let i = 0; i < data.length; i++) {
+      const px = toX(data[i][0]), py = toY(data[i][1]);
+      if (px >= pad.left && px <= w - pad.right && py >= pad.top && py <= h - pad.bottom) {
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+  drawPoints(dataF, WT_COLORS.femaleAlpha);
+  drawPoints(dataM, WT_COLORS.maleAlpha);
+
+  // Draw centroids
+  function drawCentroid(x, y, color, label) {
+    const px = toX(x), py = toY(y);
+    ctx.beginPath();
+    ctx.arc(px, py, 6, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = WT_COLORS.textBright;
+    ctx.font = 'bold 11px IBM Plex Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(label, px + 10, py + 4);
+  }
+  drawCentroid(-d1/2, -d2/2, WT_COLORS.female, 'F');
+  drawCentroid(d1/2, d2/2, WT_COLORS.male, 'M');
+
+  // Draw arrow helper
+  function drawArrow(dx, dy, norm, color, dashed, label) {
+    if (norm < 1e-8) return;
+    // Normalize to a fixed display length
+    const arrowLen = Math.min(plotW, plotH) * 0.38;
+    const ux = dx / norm, uy = dy / norm;
+    const ex = ux * arrowLen, ey = uy * arrowLen;
+
+    // Arrow line from -direction to +direction through origin
+    const x0 = toX(-ux * arrowLen * xRange / (plotW / 2));
+    const y0 = toY(-uy * arrowLen * yRange / (plotH / 2));
+    const x1 = toX(ux * arrowLen * xRange / (plotW / 2));
+    const y1 = toY(uy * arrowLen * yRange / (plotH / 2));
+
+    // Actually, draw as a line through origin in data coords
+    const scale = 3.8; // how far the arrow extends in data units
+    const sx = -ux * scale, sy = -uy * scale;
+    const ex2 = ux * scale, ey2 = uy * scale;
+
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    if (dashed) ctx.setLineDash([8, 5]);
+    else ctx.setLineDash([]);
+    ctx.moveTo(toX(sx), toY(sy));
+    ctx.lineTo(toX(ex2), toY(ey2));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Arrowhead
+    const tipX = toX(ex2), tipY = toY(ey2);
+    const headLen = 10;
+    const ang = Math.atan2(-(ey2 - sy) * plotH / (2 * yRange), (ex2 - sx) * plotW / (2 * xRange));
+    ctx.beginPath();
+    ctx.moveTo(tipX, tipY);
+    ctx.lineTo(tipX - headLen * Math.cos(ang - 0.35), tipY + headLen * Math.sin(ang - 0.35));
+    ctx.moveTo(tipX, tipY);
+    ctx.lineTo(tipX - headLen * Math.cos(ang + 0.35), tipY + headLen * Math.sin(ang + 0.35));
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // Label
+    ctx.fillStyle = color;
+    ctx.font = 'bold 12px IBM Plex Mono';
+    const labelX = toX(ux * (scale + 0.3));
+    const labelY = toY(uy * (scale + 0.3));
+    ctx.textAlign = 'center';
+    ctx.fillText(label, labelX, labelY - 4);
+  }
+
+  // d-vector arrow (teal, solid) — simple composite axis
+  drawArrow(d1, d2, dNorm, WT_COLORS.teal, false, 'simple');
+
+  // Discriminant arrow (orange, dashed) — Mahalanobis axis
+  drawArrow(a1, a2, aNorm, WT_COLORS.orange, true, 'Mah.');
+
+  // Legend
+  ctx.font = '11px IBM Plex Mono';
+  ctx.textAlign = 'left';
+  const lx = pad.left + 10, ly = pad.top + 16;
+  ctx.fillStyle = WT_COLORS.female; ctx.fillRect(lx, ly - 8, 10, 10);
+  ctx.fillStyle = WT_COLORS.text; ctx.fillText('Female', lx + 14, ly);
+  ctx.fillStyle = WT_COLORS.male; ctx.fillRect(lx, ly + 10, 10, 10);
+  ctx.fillStyle = WT_COLORS.text; ctx.fillText('Male', lx + 14, ly + 18);
+
+  // Arrow legend
+  const lx2 = w - pad.right - 140, ly2 = pad.top + 16;
+  ctx.strokeStyle = WT_COLORS.teal; ctx.lineWidth = 2.5; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(lx2, ly2 - 3); ctx.lineTo(lx2 + 20, ly2 - 3); ctx.stroke();
+  ctx.fillStyle = WT_COLORS.text; ctx.fillText('Simple (d-weighted)', lx2 + 24, ly2);
+  ctx.strokeStyle = WT_COLORS.orange; ctx.setLineDash([6, 4]);
+  ctx.beginPath(); ctx.moveTo(lx2, ly2 + 15); ctx.lineTo(lx2 + 20, ly2 + 15); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = WT_COLORS.text; ctx.fillText('Mahalanobis (adjusted)', lx2 + 24, ly2 + 18);
+}
+
+// Wire up walkthrough sliders
+['wt-d1', 'wt-d2', 'wt-r'].forEach(function(id) {
+  document.getElementById(id).addEventListener('input', wtUpdate);
+});
+
+// Resize
+let wtResizeTimer;
+window.addEventListener('resize', function() {
+  clearTimeout(wtResizeTimer);
+  wtResizeTimer = setTimeout(wtUpdate, 100);
+});
+
+// Init
+wtUpdate();
+
+})();
+</script>
+
+<script>
 (function() {
 'use strict';
 
@@ -460,7 +902,7 @@ const P = 5;
 const PRESETS = {
   realistic:   { d: [0, -0.50, -0.15, -0.40, 0.10], r: 0.15, alpha: 0.80 },
   equal:       { d: [0.30, 0.30, 0.30, 0.30, 0.30], r: 0.15, alpha: 0.80 },
-  dominant:    { d: [0.80, 0.00, 0.00, 0.00, 0.00], r: 0.15, alpha: 0.80 },
+  dominant:    { d: [-1.00, 1.00, -1.00, -1.00, 1.00], r: 0.15, alpha: 0.80 },
   lowrel:      { d: [0, -0.50, -0.15, -0.40, 0.10], r: 0.15, alpha: 0.50 },
   highrel:     { d: [0, -0.50, -0.15, -0.40, 0.10], r: 0.15, alpha: 0.95 },
   orthogonal:  { d: [0, -0.50, -0.15, -0.40, 0.10], r: 0.00, alpha: 0.80 }
@@ -776,7 +1218,7 @@ function simulate() {
     aVec, normFactor,
     mfD, mfT, mfP, mfC, sexVec,
     nF, nM, nTotal,
-    centM, centF,
+    centM, centF, allZ,
     pctDiscordant: nDiscordant / nTotal,
     error: false
   };
@@ -1357,72 +1799,177 @@ function drawMFC() {
   const c1 = document.getElementById('c-mfc-density');
   drawTwoGroupDensity(setupCanvas(c1), s.mfC, s.sexVec, 'M-F_C');
 
-  // Scatterplot: M-F_T vs M-F_C
+  // Centroid geometry: 2D projection showing centroids and distance
   const c2 = document.getElementById('c-mfc-scatter');
   const { ctx, w, h } = setupCanvas(c2);
   ctx.clearRect(0, 0, w, h);
 
-  const pad = { top: 15, right: 15, bottom: 30, left: 40 };
+  const pad = { top: 12, right: 12, bottom: 12, left: 12 };
+  const P = s.dSample.length;
 
-  const allT = s.mfT, allC = s.mfC;
-  const maxAbsT = Math.max(...allT.map(Math.abs)) * 1.1;
-  const maxAbsC = Math.max(...allC.map(Math.abs)) * 1.1;
-  const limT = Math.max(2, maxAbsT);
-  const limC = Math.max(1.5, maxAbsC);
+  // Axis 1: discriminant direction (normalized)
+  const aNorm = vecNorm(s.aVec);
+  const e1 = s.aVec.map(function(v) { return v / aNorm; });
 
-  // Axes
-  ctx.strokeStyle = COLORS.dim;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(pad.left, h - pad.bottom);
-  ctx.lineTo(w - pad.right, h - pad.bottom);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(pad.left, pad.top);
-  ctx.lineTo(pad.left, h - pad.bottom);
-  ctx.stroke();
+  // Axis 2: direction of max variance orthogonal to e1
+  // Compute residual covariance after projecting out e1, then power-iterate
+  var e2 = Array(P).fill(0);
+  // Start with a vector not parallel to e1
+  var startIdx = 0;
+  for (var si = 1; si < P; si++) {
+    if (Math.abs(e1[si]) < Math.abs(e1[startIdx])) startIdx = si;
+  }
+  e2[startIdx] = 1;
+  // Gram-Schmidt: remove e1 component
+  var dot1 = vecDot(e2, e1);
+  e2 = e2.map(function(v, j) { return v - dot1 * e1[j]; });
+  var n2 = vecNorm(e2);
+  e2 = e2.map(function(v) { return v / n2; });
 
-  // Labels
-  ctx.fillStyle = COLORS.text;
-  ctx.font = '10px IBM Plex Mono';
-  ctx.textAlign = 'center';
-  ctx.fillText('M-F_T', pad.left + (w - pad.left - pad.right)/2, h - 3);
-  ctx.save();
-  ctx.translate(10, pad.top + (h - pad.top - pad.bottom)/2);
-  ctx.rotate(-Math.PI/2);
-  ctx.fillText('M-F_C', 0, 0);
-  ctx.restore();
-
-  // Zero crosshairs
-  const zxpx = xPos(0, -limT, limT, pad, w);
-  const zypx = yPos(0, -limC, limC, pad, h);
-  drawDashedV(ctx, zxpx, pad.top, h - pad.bottom, COLORS.dim);
-  ctx.strokeStyle = COLORS.dim;
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath(); ctx.moveTo(pad.left, zypx); ctx.lineTo(w - pad.right, zypx); ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Plot points
-  const indices = Array.from({length: s.nTotal}, function(_, i) { return i; });
-  for (let i = indices.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+  // Power iteration (5 steps) on the data covariance projected orthogonal to e1
+  for (var iter = 0; iter < 5; iter++) {
+    var newE2 = Array(P).fill(0);
+    for (var i = 0; i < s.nTotal; i++) {
+      var zi = s.allZ[i];
+      var proj2 = vecDot(zi, e2);
+      for (var j = 0; j < P; j++) newE2[j] += zi[j] * proj2;
+    }
+    // Remove e1 component
+    dot1 = vecDot(newE2, e1);
+    newE2 = newE2.map(function(v, j) { return v - dot1 * e1[j]; });
+    n2 = vecNorm(newE2);
+    if (n2 > 1e-10) e2 = newE2.map(function(v) { return v / n2; });
   }
 
-  for (let k = 0; k < indices.length; k++) {
-    const i = indices[k];
-    const px = xPos(allT[i], -limT, limT, pad, w);
-    const py = yPos(allC[i], -limC, limC, pad, h);
+  // Project all points onto (e1, e2)
+  var proj = [];
+  for (var i = 0; i < s.nTotal; i++) {
+    proj.push([vecDot(s.allZ[i], e1), vecDot(s.allZ[i], e2)]);
+  }
+  var cM2d = [vecDot(s.centM, e1), vecDot(s.centM, e2)];
+  var cF2d = [vecDot(s.centF, e1), vecDot(s.centF, e2)];
+
+  // 2D projected pooled covariance for ellipses
+  // Cov2d = [[e1'R e1, e1'R e2],[e2'R e1, e2'R e2]]
+  var Re1 = matVecMul(s.Rpool, e1);
+  var Re2 = matVecMul(s.Rpool, e2);
+  var cov11 = vecDot(e1, Re1);
+  var cov12 = vecDot(e1, Re2);
+  var cov22 = vecDot(e2, Re2);
+
+  // Eigenvalues/vectors of 2x2 cov for ellipse
+  var trC = cov11 + cov22;
+  var detC = cov11 * cov22 - cov12 * cov12;
+  var disc = Math.sqrt(Math.max(0, trC * trC / 4 - detC));
+  var lam1 = trC / 2 + disc;
+  var lam2 = trC / 2 - disc;
+  var angle;
+  if (Math.abs(cov12) < 1e-10) {
+    angle = cov11 >= cov22 ? 0 : Math.PI / 2;
+  } else {
+    angle = Math.atan2(lam1 - cov11, cov12);
+  }
+
+  // Determine plot bounds
+  var allX = proj.map(function(p) { return p[0]; });
+  var allY = proj.map(function(p) { return p[1]; });
+  var xMin = Math.min.apply(null, allX), xMax = Math.max.apply(null, allX);
+  var yMin = Math.min.apply(null, allY), yMax = Math.max.apply(null, allY);
+  var xRange = xMax - xMin, yRange = yMax - yMin;
+  var margin = 0.12;
+  xMin -= xRange * margin; xMax += xRange * margin;
+  yMin -= yRange * margin; yMax += yRange * margin;
+  // Make aspect ratio equal
+  var plotW = w - pad.left - pad.right;
+  var plotH = h - pad.top - pad.bottom;
+  var dataAspect = (xMax - xMin) / (yMax - yMin);
+  var canvasAspect = plotW / plotH;
+  if (dataAspect > canvasAspect) {
+    var expand = (xMax - xMin) / canvasAspect - (yMax - yMin);
+    yMin -= expand / 2; yMax += expand / 2;
+  } else {
+    var expand = (yMax - yMin) * canvasAspect - (xMax - xMin);
+    xMin -= expand / 2; xMax += expand / 2;
+  }
+
+  function px(v) { return pad.left + (v - xMin) / (xMax - xMin) * plotW; }
+  function py(v) { return pad.top + (yMax - v) / (yMax - yMin) * plotH; }
+
+  // Draw 1-SD iso-distance ellipse around each centroid (parametric in data coords)
+  function drawEllipse(cx, cy, color) {
+    var r1 = Math.sqrt(Math.max(0, lam1));
+    var r2 = Math.sqrt(Math.max(0, lam2));
+    var cosA = Math.cos(angle), sinA = Math.sin(angle);
+    var steps = 80;
     ctx.beginPath();
-    ctx.arc(px, py, 2, 0, Math.PI * 2);
+    for (var t = 0; t <= steps; t++) {
+      var th = 2 * Math.PI * t / steps;
+      var dx = r1 * Math.cos(th) * cosA - r2 * Math.sin(th) * sinA;
+      var dy = r1 * Math.cos(th) * sinA + r2 * Math.sin(th) * cosA;
+      var epx = px(cx + dx), epy = py(cy + dy);
+      if (t === 0) ctx.moveTo(epx, epy);
+      else ctx.lineTo(epx, epy);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.8;
+    ctx.setLineDash([6, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  drawEllipse(cF2d[0], cF2d[1], COLORS.female);
+  drawEllipse(cM2d[0], cM2d[1], COLORS.male);
+
+  // Draw data points (shuffled to avoid overplot bias)
+  var indices = Array.from({length: s.nTotal}, function(_, i) { return i; });
+  for (var i = indices.length - 1; i > 0; i--) {
+    var j = Math.floor(rng() * (i + 1));
+    var tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+  }
+  for (var k = 0; k < indices.length; k++) {
+    var i = indices[k];
+    ctx.beginPath();
+    ctx.arc(px(proj[i][0]), py(proj[i][1]), 2.2, 0, Math.PI * 2);
     ctx.fillStyle = s.sexVec[i] === 1 ? COLORS.maleAlpha : COLORS.femaleAlpha;
     ctx.fill();
   }
 
+  // Draw line between centroids
+  ctx.beginPath();
+  ctx.moveTo(px(cF2d[0]), py(cF2d[1]));
+  ctx.lineTo(px(cM2d[0]), py(cM2d[1]));
+  ctx.strokeStyle = COLORS.teal;
+  ctx.lineWidth = 2.4;
+  ctx.stroke();
+
+  // D label at midpoint
+  var midX = (px(cF2d[0]) + px(cM2d[0])) / 2;
+  var midY = (py(cF2d[1]) + py(cM2d[1])) / 2;
+  ctx.fillStyle = COLORS.teal;
+  ctx.font = '13px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('D = ' + s.DM.toFixed(2), midX, midY - 10);
+
+  // Draw centroid markers
+  function drawCentroid(cx, cy, color, label) {
+    ctx.beginPath();
+    ctx.arc(px(cx), py(cy), 7, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#0f1117';
+    ctx.lineWidth = 2.4;
+    ctx.stroke();
+    ctx.fillStyle = COLORS.textBright;
+    ctx.font = 'bold 12px IBM Plex Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, px(cx), py(cy) - 13);
+  }
+  drawCentroid(cF2d[0], cF2d[1], COLORS.female, 'F');
+  drawCentroid(cM2d[0], cM2d[1], COLORS.male, 'M');
+
   // Stats
-  const r_TC = pearsonR(s.mfT, s.mfC);
   document.getElementById('stats-mfc').innerHTML =
-    statHTML('r(T, C)', r_TC.toFixed(2)) +
+    statHTML('D (between centroids)', s.DM.toFixed(2)) +
     statHTML('Mean M-F_C (M)', mean(s.mfC.filter(function(_, i) { return s.sexVec[i] === 1; })).toFixed(2)) +
     statHTML('Mean M-F_C (F)', mean(s.mfC.filter(function(_, i) { return s.sexVec[i] === 0; })).toFixed(2));
 }
@@ -1737,4 +2284,71 @@ window.addEventListener('resize', function() {
 simulate();
 
 })();
+</script>
+
+<!-- Info overlay -->
+<div class="info-overlay" id="info-overlay" onclick="if(event.target===this)closeInfo()">
+  <div class="info-modal">
+    <button class="info-close" onclick="closeInfo()">&times;</button>
+    <div id="info-modal-content"></div>
+  </div>
+</div>
+
+<script>
+const infoContent = {
+  standardize: {
+    title: 'How is the data prepared before computing the indices?',
+    badge: 'standardization',
+    body: `
+      <p>Before computing any M-F index, the raw data need to be put on a common scale. The steps are:</p>
+      <ol style="margin:8px 0 8px 18px;">
+        <li><strong>Compute the pooled within-group variance</strong> for each variable — the weighted average of the male and female variances: <em>s²_p = [(n_m − 1)s²_m + (n_f − 1)s²_f] / (n_m + n_f − 2)</em>.</li>
+        <li><strong>Compute Cohen's d</strong> for each variable: <em>d = (mean_m − mean_f) / s_p</em>. Positive values mean males score higher.</li>
+        <li><strong>Compute the pooled within-group correlation matrix R</strong> by averaging the male and female correlation matrices (weighted by degrees of freedom). This describes how the variables relate <em>within</em> each group, not across the full sample.</li>
+        <li><strong>Standardize each person's scores:</strong> center on the midpoint between the male and female means, then divide by the pooled SD. After this, the female centroid sits at −<strong>d</strong>/2 and the male centroid at +<strong>d</strong>/2.</li>
+      </ol>
+      <p>The result is a matrix of <em>z</em>-scores in which every variable has unit variance and the group centroids are symmetric around the origin. All four M-F indices are then computed from these standardized scores, the <strong>d</strong> vector, and <strong>R</strong>.</p>
+    `
+  },
+  normD: {
+    title: 'Why divide by ‖d‖?',
+    badge: 'normalization',
+    body: `
+      <p>The raw weighted sum <strong>z</strong>′<strong>d</strong> gives each person a score, but its scale depends on the number of variables and the magnitude of the <em>d</em> values. To make the score interpretable, we normalize.</p>
+      <p>Dividing by ‖<strong>d</strong>‖ = √(d₁² + d₂² + … + d_p²) ensures that the <strong>within-group standard deviation of M-F<sub>D</sub> is approximately 1</strong>. This works because, in the standardized data, the within-group variance of <strong>z</strong>′<strong>d</strong> is <strong>d</strong>′<strong>Rd</strong>. Dividing by ‖<strong>d</strong>‖ gives variance <strong>d</strong>′<strong>Rd</strong> / ‖<strong>d</strong>‖². When variables are uncorrelated (<strong>R</strong> = <strong>I</strong>), this is exactly 1. With nonzero correlations it is only approximately 1 — and that is by design: M-F<sub>D</sub> deliberately ignores the correlation structure.</p>
+      <p>The group-level effect size on this composite — the distance between the male and female means of M-F<sub>D</sub>, in within-group SD units — equals ‖<strong>d</strong>‖, the Euclidean norm of the <em>d</em>-vector. This quantity is sometimes called D<sub>D</sub>.</p>
+    `
+  },
+  normT: {
+    title: 'Why divide by √(a′Ra)?',
+    badge: 'normalization',
+    body: `
+      <p>For M-F<sub>T</sub>, the weights are <strong>a</strong> = <strong>R</strong><sup>−1</sup><strong>d</strong> (the discriminant coefficients from Fisher's LDA). The raw score <strong>z</strong>′<strong>a</strong> has within-group variance equal to <strong>a</strong>′<strong>Ra</strong>. Dividing by √(<strong>a</strong>′<strong>Ra</strong>) standardizes the composite to <strong>within-group SD = 1 exactly</strong>, regardless of the correlation structure.</p>
+      <p>A nice identity makes this normalization especially meaningful. Since <strong>a</strong> = <strong>R</strong><sup>−1</sup><strong>d</strong>, we have:</p>
+      <p style="text-align:center"><strong>a</strong>′<strong>Ra</strong> = (<strong>R</strong><sup>−1</sup><strong>d</strong>)′<strong>R</strong>(<strong>R</strong><sup>−1</sup><strong>d</strong>) = <strong>d</strong>′<strong>R</strong><sup>−1</sup><strong>d</strong> = D²</p>
+      <p>So √(<strong>a</strong>′<strong>Ra</strong>) = D, the Mahalanobis distance itself. The normalization constant <em>is</em> the multivariate effect size.</p>
+      <p>The group-level effect size on the M-F<sub>T</sub> composite therefore equals D. Because the discriminant function is the <em>optimal</em> linear separator, D ≥ D<sub>D</sub> = ‖<strong>d</strong>‖ always — no other weighting of the variables can produce a larger group-level effect size.</p>
+    `
+  }
+};
+
+function showInfo(key) {
+  const content = infoContent[key];
+  if (!content) return;
+  document.getElementById('info-modal-content').innerHTML = `
+    <div class="info-modal-badge">${content.badge}</div>
+    <h3>${content.title}</h3>
+    ${content.body}`;
+  document.getElementById('info-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeInfo() {
+  document.getElementById('info-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeInfo();
+});
 </script>
