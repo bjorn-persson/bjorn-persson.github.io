@@ -6,3 +6,6 @@ resources/
 # Claude Code
 .claude/
 CLAUDE.md
+
+# Local reference PDFs (not deployed)
+references/
