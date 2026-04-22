@@ -416,6 +416,13 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 
   <p>Below, two domains are simulated side by side. Within each domain, items are correlated at $\bar{r}_\text{within}$. Across domains, items correlate at $\bar{r}_\text{across}$. Watch what happens to validity when the two domains are combined.</p>
 
+  <div style="margin: 12px 0;">
+    <button class="btn orange" id="btn_athenstaedt">Load Athenstaedt example</button>
+    <span style="font-family: var(--mono); font-size: 0.78em; color: var(--text-dim); margin-left: 6px;">
+      5 feminine + 5 masculine activity items predicting gender, from <a href="https://doi.org/10.1016/j.paid.2024.112552" target="_blank" rel="noopener" style="color: var(--text-dim); text-decoration: underline;">Revelle (2024)</a>.
+    </span>
+  </div>
+
   <div class="chart-container">
     <div class="chart-title">Validity: Single domains vs Combined</div>
     <div class="chart-wrapper">
@@ -482,9 +489,9 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 
   <p>Scale validity (a correlation) may feel abstract. But it translates directly to how well you can <em>classify</em> people — for example, predicting sex from a psychological composite. The relationship between the point-biserial r and the distributions of two groups is deterministic: a higher validity means the group distributions are pulled further apart, and fewer people are misclassified.</p>
 
-  <p>The implied Cohen's d is: $d = \frac{2r}{\sqrt{1 - r^2}}$. Given d, the overlap of two normal distributions determines classification accuracy at the optimal threshold.</p>
+  <p>The implied Cohen's d is $d = \dfrac{r}{\sqrt{p(1-p)(1 - r^2)}}$, where $p$ is the base rate of one group. At $p = 0.5$ this reduces to the familiar $2r/\sqrt{1-r^2}$; as the base rate moves away from 0.5, a given validity implies a larger $d$ because the less common group carries more information per case. Given $d$, the overlap of two normal distributions determines classification accuracy at the optimal threshold.</p>
 
-  <p>Drag the scale validity to see the distributions separate and accuracy change.</p>
+  <p>Drag the scale validity and base rate to see the distributions separate and accuracy change.</p>
 
   <div class="chart-container">
     <div class="chart-title">Group distributions on the composite score</div>
@@ -537,9 +544,9 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 
   <p>A traditional scale score assigns <em>equal weight</em> to every item in the scale. If 10 items measure agreeableness, each contributes 1/10 to the composite — regardless of whether some items strongly differentiate groups and others don't.</p>
 
-  <p>Item-level predictive models — such as penalized regression (e.g. lasso, ridge, elastic net), random forests, or neural networks — assign each item its <em>own</em> weight, optimized for predicting the criterion. Items with high individual validity get large weights; irrelevant items get shrunk toward zero. This is equivalent to building an optimal composite with maximal validity — it sidesteps the constraint that all items within a scale must be weighted equally.</p>
+  <p>Item-level predictive models — such as penalized regression (e.g. lasso, ridge, elastic net), random forests, or neural networks — assign each item its <em>own</em> weight, optimized for predicting the criterion. Items with high individual validity get large weights; irrelevant items get shrunk toward zero.</p>
 
-  <p>Below, items are simulated with "true" validities for predicting a criterion. The scale-score approach averages all items equally; the optimal-weight approach assigns weights proportional to each item's validity. Toggle between a single scale and two separate scales to see how the structure affects the gain from optimal weighting.</p>
+  <p>Below, items are simulated with "true" validities for predicting a criterion. The scale-score approach averages all items equally; the <em>validity-proportional</em> approach assigns weights in proportion to each item's individual validity. This is a deliberate simplification of what penalized regression does — true regression weights under correlated items are slightly different (they further shrink redundant items) — but it captures the essential point: upweight informative items. Toggle between a single scale and two separate scales to see how the structure affects the gain.</p>
 
   <div style="margin:16px 0; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
     <div style="display:flex; gap:0;">
@@ -560,35 +567,52 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim)"></div> True item validity</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> Scale-score weight</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Optimal weight</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Validity-proportional weight</div>
     </div>
+  </div>
+
+  <div style="margin: 16px 0; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <span style="font-family: var(--mono); font-size: 0.82em; color: var(--text); white-space: nowrap;">
+      Sample size for estimating weights (\(N\))
+      <button class="info-btn" onclick="showInfoModal('sampleN')">?</button>
+    </span>
+    <input type="range" id="sl_N4" min="30" max="3000" value="500" step="10" style="flex: 1; min-width: 180px;">
+    <span class="slider-val" id="v_N4" style="font-family: var(--mono); font-size: 0.82em; color: var(--teal); min-width: 50px; text-align: right;">500</span>
   </div>
 
   <div class="metrics-row">
     <div class="metric-card">
       <div class="metric-label">Scale-score validity</div>
       <div class="metric-value" id="m_scale_val">—</div>
+      <div class="metric-sub">equal weighting</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">Optimal-weight validity</div>
+      <div class="metric-label">Oracle validity</div>
       <div class="metric-value orange" id="m_opt_val">—</div>
+      <div class="metric-sub">true weights, $N \to \infty$</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">Validity gain</div>
+      <div class="metric-label">Estimated at $N$</div>
+      <div class="metric-value" id="m_oos_val" style="color:var(--yellow)">—</div>
+      <div class="metric-sub">weights fit on sample</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Realized gain</div>
       <div class="metric-value" id="m_gain" style="color:var(--green)">—</div>
+      <div class="metric-sub">vs scale score, at $N$</div>
     </div>
   </div>
 
   <div class="try-it" id="tryit_1scale">
-    <strong>Try it:</strong> Click "Uniform Validity" — when all items predict equally well, equal weighting is already optimal and the gain is zero. Now click "Concentrated Signal" — when a few items carry most of the predictive signal, optimal weighting massively outperforms equal weighting because it upweights the informative items and downweights the rest. The validity values assume an inter-item correlation of 0.30.
+    <strong>Try it:</strong> Click "Uniform Validity" — when all items predict equally well, equal weighting is already oracle, and the realized gain is zero or slightly negative once estimation noise enters. Click "Concentrated Signal" — a few items carry most of the predictive signal, so validity-proportional weighting can massively outperform equal weighting. Now drag $N$ down toward 30 and watch the realized gain shrink: estimated weights are noisy, and at small $N$ the overfitting can erase most of the oracle advantage. Within-scale interitem correlation is fixed at 0.30.
   </div>
   <div class="try-it" id="tryit_2scale" style="display:none">
-    <strong>Try it:</strong> Click "Uniform Validity" — when all items predict equally well, equal weighting is already optimal and the gain is zero. Now click "Concentrated Signal" — when a few items carry most of the predictive signal, optimal weighting massively outperforms equal weighting because it upweights the informative items and downweights the rest. "Mixed Validity" falls in between: one scale is more predictive than the other, yielding a moderate gain. The validity values assume a within-scale inter-item correlation of 0.30 and zero correlation between scales.
+    <strong>Try it:</strong> Same patterns as the one-scale view. With "Concentrated Signal" the oracle gain is large but only realized at large $N$. "Mixed Validity" gives a moderate oracle gain that gets eroded at small $N$. Within-scale interitem correlation is 0.30 and between-scale correlation is 0.
   </div>
 
-  <p>This pattern appears in many applied settings: when item-level signal varies, scale scores dilute the composite validity by averaging strong-signal items with weak-signal items. Item-level models recover that lost signal by letting each item speak for itself.</p>
+  <p>A complementary route to higher predictive validity, not shown here, is to use <em>narrower</em> scales — replacing a few broad factors with many specific facets while still using equal weights within each. Revelle (<a href="https://doi.org/10.1016/j.paid.2024.112552" target="_blank" rel="noopener">2024</a>) shows that decomposing the Big Five into ~27 narrower facets accounts for most of the cross-validated gain over higher-order factors; differential item weighting on top of that adds further but smaller gains.</p>
 
-  <p><strong>A critical caveat:</strong> the optimal weights shown above are population-level (oracle) weights. In practice, these weights must be estimated from a finite sample, and with many items relative to participants, estimated weights will overfit — capturing sample-specific noise as if it were signal. This is why item-level models require regularization (e.g., Lasso, Ridge) and cross-validation to honestly assess their predictive gain. Without these safeguards, the apparent advantage of item-level models over scale scores can be entirely illusory. Scale scores, by contrast, are inherently regularized: equal weighting is a strong constraint that sacrifices flexibility but dramatically reduces variance across samples (<a href="https://doi.org/10.1177/1745691617693393" target="_blank" rel="noopener">Yarkoni &amp; Westfall, 2017</a>).</p>
+  <p><strong>A critical caveat:</strong> the validity-proportional weights drawn above are <em>oracle</em> weights — assuming you know each item's true population validity. In practice they must be estimated from a finite sample, and at small $N$ the noise in sample correlations introduces overfitting. The "Estimated at $N$" metric and "Realized gain" card already make this visible. Penalized regression (Lasso, Ridge, elastic net) handles overfitting by shrinking estimated weights toward zero or toward the equal-weight baseline. Scale scores are the extreme form of that regularization: equal weighting is a strong constraint that sacrifices the oracle ceiling but reduces estimation variance to zero (<a href="https://doi.org/10.1177/1745691617693393" target="_blank" rel="noopener">Yarkoni &amp; Westfall, 2017</a>).</p>
 </div>
 
 <!-- SECTION 5: The tradeoff summarized -->
@@ -646,6 +670,10 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 
   <div class="note warn">
     Recognizing this isn't a criticism of either approach. It's a recognition that measurement and prediction are different psychometric goals, and there is no free lunch. The validity gains shown in Section 4 represent a theoretical ceiling; realizing those gains in practice requires enough data, proper regularization, and honest out-of-sample evaluation.
+  </div>
+
+  <div class="note">
+    <strong>Reflective vs formative composites.</strong> When the items in a scale genuinely share a single common factor, the scale score is a <em>reflective</em> measure: the latent construct causes the item responses, and the composite estimates that latent value. Many high-validity composites are not like this — the 10-item example in Section 2 has $\bar{r}_i \approx 0.25$ yet predicts the criterion at $r = 0.74$. Such a composite is better read as a <em>formative</em> sum: a weighted aggregate of items that each contribute distinct information, more like a polygenic risk score or a body-size measurement than the indicator of a single latent trait. A high $\alpha$ is consistent with either reading; the choice between them is a substantive claim about the measurement model, not something internal consistency can decide for you (<a href="https://doi.org/10.1016/j.paid.2024.112552" target="_blank" rel="noopener">Revelle, 2024</a>).
   </div>
 
   <div class="note caveat">
@@ -986,6 +1014,23 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
   }
 
   [sl_kd, sl_riyA, sl_riyB, sl_riW, sl_riA].forEach(s => s.addEventListener('input', update));
+
+  // Athenstaedt preset — values back-computed from Revelle (2024) Table 2 / Fig. 2:
+  // F5 scale: α = 0.85, r_gender = 0.56 → r̄_within ≈ 0.53, |r̄_iy| ≈ 0.44
+  // M5 scale: α = 0.82, r_gender = 0.52 → r̄_within ≈ 0.48, |r̄_iy| ≈ 0.40
+  // MF10 combined: α = 0.77, r_gender = 0.74 → r̄_across ≈ 0.05
+  const btnAth = document.getElementById('btn_athenstaedt');
+  if (btnAth) {
+    btnAth.addEventListener('click', () => {
+      sl_kd.value = 5;
+      sl_riyA.value = 0.44;
+      sl_riyB.value = 0.40;
+      sl_riW.value = 0.50;
+      sl_riA.value = 0.05;
+      update();
+    });
+  }
+
   update();
 })();
 
@@ -1003,7 +1048,9 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
     document.getElementById('v_ryx3').textContent = '.' + ryx.toFixed(2).slice(2);
     document.getElementById('v_base3').textContent = '.' + base.toFixed(2).slice(2);
 
-    const d = rToD(Math.min(ryx, 0.999));
+    const rClamp = Math.min(ryx, 0.999);
+    const pq = Math.max(base * (1 - base), 1e-6);
+    const d = rClamp / Math.sqrt(pq * (1 - rClamp * rClamp));
     const acc = optimalAccuracy(d, base);
     const ovl = overlapCoeff(d);
 
@@ -1097,6 +1144,72 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
   const nItems = 20;
   const kPerScale = 10;
   let mode = 'one'; // 'one' or 'two'
+  const RIW = 0.30; // assumed within-scale interitem correlation
+
+  // Box-Muller standard normal
+  function randn() {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  // Fixed pool of standard normal draws so MC results are stable across slider drags.
+  const N_TRIALS = 250;
+  let _randPool = null;
+  function getRandPool() {
+    if (_randPool !== null) return _randPool;
+    _randPool = [];
+    for (let t = 0; t < N_TRIALS; t++) {
+      const trial = [];
+      for (let i = 0; i < nItems; i++) trial.push(randn());
+      _randPool.push(trial);
+    }
+    return _randPool;
+  }
+
+  // Compute composite-criterion correlation under (block) compound symmetry.
+  // R_xx = (1-riW) I + riW 11' within each block; between blocks = 0 in two-scale mode.
+  function compositeValidity(weights, trueR, currentMode) {
+    const wR = weights.reduce((s, w, i) => s + w * trueR[i], 0);
+    let wRxw = 0;
+    if (currentMode === 'one') {
+      let s2 = 0, s1 = 0;
+      for (let i = 0; i < weights.length; i++) { s2 += weights[i] * weights[i]; s1 += weights[i]; }
+      wRxw = (1 - RIW) * s2 + RIW * s1 * s1;
+    } else {
+      for (let b = 0; b < 2; b++) {
+        const lo = b * kPerScale, hi = lo + kPerScale;
+        let s2 = 0, s1 = 0;
+        for (let i = lo; i < hi; i++) { s2 += weights[i] * weights[i]; s1 += weights[i]; }
+        wRxw += (1 - RIW) * s2 + RIW * s1 * s1;
+      }
+    }
+    return wRxw > 1e-12 ? wR / Math.sqrt(wRxw) : 0;
+  }
+
+  // Expected out-of-sample validity when weights are estimated from a sample of size N.
+  // Each sample item-criterion correlation is drawn via Fisher-z + Gaussian noise (SE = 1/sqrt(N-3)).
+  // The resulting (signed, raw) sample correlations are used as weights; their TRUE validity
+  // is then evaluated against the population parameters.
+  function simulateOOSValidity(trueR, N, currentMode) {
+    const pool = getRandPool();
+    const seZ = 1 / Math.sqrt(Math.max(N - 3, 1));
+    let sum = 0, count = 0;
+    for (let t = 0; t < pool.length; t++) {
+      const zs = pool[t];
+      const sampleR = trueR.map((r, i) => {
+        const rC = Math.max(Math.min(r, 0.999), -0.999);
+        const z = 0.5 * Math.log((1 + rC) / (1 - rC));
+        const zHat = z + zs[i] * seZ;
+        const e2 = Math.exp(2 * zHat);
+        return (e2 - 1) / (e2 + 1);
+      });
+      const v = compositeValidity(sampleR, trueR, currentMode);
+      if (isFinite(v)) { sum += v; count++; }
+    }
+    return count > 0 ? sum / count : 0;
+  }
 
   const btnTab1 = document.getElementById('btn_tab1');
   const btnTab2 = document.getElementById('btn_tab2');
@@ -1295,44 +1408,36 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
       ctx.fillText((i + 1).toString(), x + barW / 2, h - pad.bottom + 14);
     });
 
-    // Compute composite validities
-    const riW = 0.30;
+    // Compute composite validities (uses block compound symmetry: within r̄ᵢ = RIW, between = 0)
     const rVec = items.map(it => it.validity);
-
-    function computeValidity(weights, r) {
-      const wR = weights.reduce((s, wi, i) => s + wi * r[i], 0);
-      let wRxw = 0;
-      if (mode === 'one') {
-        // Single scale: compound symmetry
-        let s2 = 0, s1 = 0;
-        for (let i = 0; i < nItems; i++) { s2 += weights[i] * weights[i]; s1 += weights[i]; }
-        wRxw = (1 - riW) * s2 + riW * s1 * s1;
-      } else {
-        // Two scales: block compound symmetry (within r̄ᵢ = 0.30, between = 0)
-        for (let b = 0; b < 2; b++) {
-          const lo = b * kPerScale, hi = lo + kPerScale;
-          let s2 = 0, s1 = 0;
-          for (let i = lo; i < hi; i++) { s2 += weights[i] * weights[i]; s1 += weights[i]; }
-          wRxw += (1 - riW) * s2 + riW * s1 * s1;
-        }
-      }
-      return wR / Math.sqrt(wRxw);
-    }
-
     const equalW = items.map(() => 1 / nItems);
-    const scaleValNorm = computeValidity(equalW, rVec);
-    const optValNorm = computeValidity(optWeights, rVec);
+    const scaleValNorm = compositeValidity(equalW, rVec, mode);
+    const optValNorm = compositeValidity(optWeights, rVec, mode);
+
+    const N = +document.getElementById('sl_N4').value;
+    const oosValNorm = simulateOOSValidity(rVec, N, mode);
 
     document.getElementById('m_scale_val').textContent = Math.min(scaleValNorm, 0.99).toFixed(3);
     document.getElementById('m_opt_val').textContent = Math.min(optValNorm, 0.99).toFixed(3);
-    const gain = ((optValNorm - scaleValNorm) / scaleValNorm * 100);
-    document.getElementById('m_gain').textContent = (gain > 0 ? '+' : '') + gain.toFixed(1) + '%';
+    document.getElementById('m_oos_val').textContent = Math.min(Math.max(oosValNorm, 0), 0.99).toFixed(3);
+
+    const gain = scaleValNorm > 1e-6 ? ((oosValNorm - scaleValNorm) / scaleValNorm * 100) : 0;
+    const gainEl = document.getElementById('m_gain');
+    gainEl.textContent = (gain > 0 ? '+' : '') + gain.toFixed(1) + '%';
+    gainEl.style.color = gain >= 0 ? COLORS.green : COLORS.red;
   }
 
   document.getElementById('btn_gen').addEventListener('click', generateRandom);
   document.getElementById('btn_preset1').addEventListener('click', () => setPreset('uniform'));
   document.getElementById('btn_preset2').addEventListener('click', () => setPreset('mixed'));
   document.getElementById('btn_preset3').addEventListener('click', () => setPreset('concentrated'));
+
+  const sl_N4 = document.getElementById('sl_N4');
+  const v_N4 = document.getElementById('v_N4');
+  sl_N4.addEventListener('input', () => {
+    v_N4.textContent = sl_N4.value;
+    update();
+  });
 
   setPreset('mixed');
 })();
@@ -1381,6 +1486,14 @@ const infoContent = {
       <p>When combining the two domains into a single composite, the effective average interitem correlation is a weighted mix of within-domain and across-domain correlations. A low (or negative) across-domain $\bar{r}_i$ pulls the combined average down — which raises the validity ceiling of the combined scale.</p>
       <p>This is the key mechanism behind the cross-domain advantage: if two domains each predict a criterion but are weakly correlated with each other, combining them yields a composite whose effective interitem correlation is lower than either domain alone, allowing validity to climb higher.</p>
       <p>The slider allows negative values (down to −0.30) because some pairs of domains genuinely anti-correlate — for example, items measuring introversion vs. extraversion, or approach vs. avoidance motivation. The maximum of 0.50 keeps the across-domain correlation clearly below the within-domain range, preserving a meaningful distinction between the two domains.</p>
+    `
+  },
+  sampleN: {
+    title: 'Sample size for estimating weights (N)',
+    body: `
+      <p>The validity-proportional weights drawn in the chart above are <em>oracle</em> weights — they assume you know each item's true population validity. In practice, you must estimate item-criterion correlations from a finite sample, and sample correlations are noisy. For a true r = 0.30, the standard error at N = 100 is roughly ±0.10.</p>
+      <p>The "Estimated at N" metric reports the expected out-of-sample validity when weights are fit on a sample of size N and then evaluated against the population. It is computed by Monte Carlo simulation (~250 trials), drawing each item's sample correlation via the Fisher-z approximation and using the (signed) sample correlations as composite weights.</p>
+      <p>At small N the gap between oracle and estimated validity is large — sometimes large enough that estimated weights underperform equal weighting (the "Realized gain" turns red). Equal weighting itself does not depend on a sample, which is why scale scores are inherently regularized: they sacrifice the oracle ceiling in exchange for zero estimation variance. This is the bias–variance tradeoff Yarkoni & Westfall (2017) discuss.</p>
     `
   }
 };
