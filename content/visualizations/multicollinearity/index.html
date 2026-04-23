@@ -32,17 +32,9 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   .mc-controls {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    font-family: var(--mono);
-    font-size: 0.82em;
+    gap: 6px;
   }
-  .mc-control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .mc-control-group label { color: var(--text-dim); }
-  .mc-val { color: var(--teal); font-weight: 600; }
+  /* Individual sliders use shared .slider-row.wide / .slider-val */
   .mc-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -104,17 +96,20 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
         <div class="mc-canvas-wrap"><canvas id="mc_plane"></canvas></div>
       </div>
       <div class="mc-controls" style="grid-column:1/-1">
-        <div class="mc-control-group">
-          <label>Correlation between X₁ and X₂ (r): <span class="mc-val" id="mc_r_val">0.00</span></label>
-          <input type="range" id="mc_r" min="0" max="0.999" step="0.001" value="0">
+        <div class="slider-row wide">
+          <span class="slider-label">Correlation between X₁ and X₂ (r)</span>
+          <input type="range" id="mc_r" min="0" max="0.99" step="0.01" value="0">
+          <span class="slider-val" id="mc_r_val">0.00</span>
         </div>
-        <div class="mc-control-group">
-          <label>True β₁ (effect of X₁): <span class="mc-val" id="mc_b1_val">0.60</span></label>
+        <div class="slider-row wide">
+          <span class="slider-label">True β₁ (effect of X₁)</span>
           <input type="range" id="mc_b1" min="-1" max="1" step="0.01" value="0.60">
+          <span class="slider-val" id="mc_b1_val">0.60</span>
         </div>
-        <div class="mc-control-group">
-          <label>True β₂ (effect of X₂): <span class="mc-val" id="mc_b2_val">0.40</span></label>
+        <div class="slider-row wide">
+          <span class="slider-label">True β₂ (effect of X₂)</span>
           <input type="range" id="mc_b2" min="-1" max="1" step="0.01" value="0.40">
+          <span class="slider-val" id="mc_b2_val">0.40</span>
         </div>
       </div>
       <div class="mc-stats" style="grid-column:1/-1">
@@ -430,7 +425,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     const r  = parseFloat(document.getElementById('mc_r').value);
     const b1 = parseFloat(document.getElementById('mc_b1').value);
     const b2 = parseFloat(document.getElementById('mc_b2').value);
-    document.getElementById('mc_r_val').textContent = r.toFixed(3);
+    document.getElementById('mc_r_val').textContent = r.toFixed(2);
     document.getElementById('mc_b1_val').textContent = b1.toFixed(2);
     document.getElementById('mc_b2_val').textContent = b2.toFixed(2);
     const pts = getPoints(r, b1, b2);

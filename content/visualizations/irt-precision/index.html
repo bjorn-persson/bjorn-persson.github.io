@@ -29,23 +29,8 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     display: grid;
     grid-template-columns: 0.9fr 1fr 1fr 1fr;
     gap: 12px 18px;
-    font-family: var(--mono);
-    font-size: 0.82em;
   }
-  .irt-control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .irt-control-group label { color: var(--text-dim); }
-  .irt-control-group input[type="range"] {
-    width: 100%;
-    box-sizing: border-box;
-    height: 20px;
-    padding: 0;
-    margin: 0;
-  }
-  .irt-val { color: var(--teal); font-weight: 600; }
+  /* Individual sliders use shared .slider-col / .slider-val */
   .irt-stat-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -139,24 +124,24 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   <div class="section">
     <p>In IRT, measurement precision is <strong>not constant</strong> — it depends on where a person falls on the latent trait. The <strong>Test Information Function</strong> I(&theta;) determines the local Standard Error: $SE(\theta) = 1/\sqrt{I(\theta)}$. A test can be highly reliable at one trait level and nearly useless at another.</p>
     <div class="irt-controls">
-          <div class="irt-control-group">
-            <label>Number of items: <span class="irt-val" id="irt_nitems_val">10</span></label>
+          <div class="slider-col">
+            <label>Number of items: <span class="slider-val" id="irt_nitems_val">10</span></label>
             <input type="range" id="irt_nitems" min="5" max="30" step="1" value="10">
           </div>
-          <div class="irt-control-group">
-            <label>&theta; (person's trait): <span class="irt-val" id="irt_theta_val">0.0</span></label>
+          <div class="slider-col">
+            <label>&theta; (person's trait): <span class="slider-val" id="irt_theta_val">0.0</span></label>
             <input type="range" id="irt_theta" min="-3.0" max="3.0" step="0.1" value="0.0">
           </div>
-          <div class="irt-control-group">
-            <label>Avg discrimination (a): <span class="irt-val" id="irt_avgdisc_val">1.5</span></label>
+          <div class="slider-col">
+            <label>Avg discrimination (a): <span class="slider-val" id="irt_avgdisc_val">1.5</span></label>
             <input type="range" id="irt_avgdisc" min="0.5" max="3.0" step="0.1" value="1.5">
           </div>
-          <div class="irt-control-group">
-            <label>Avg difficulty (b): <span class="irt-val" id="irt_avgdiff_val">0.0</span></label>
+          <div class="slider-col">
+            <label>Avg difficulty (b): <span class="slider-val" id="irt_avgdiff_val">0.0</span></label>
             <input type="range" id="irt_avgdiff" min="-2.0" max="2.0" step="0.1" value="0.0">
           </div>
-          <div class="irt-control-group" id="irt_cat_group" style="display:none">
-            <label>Response categories: <span class="irt-val" id="irt_ncat_val">5</span></label>
+          <div class="slider-col" id="irt_cat_group" style="display:none">
+            <label>Response categories: <span class="slider-val" id="irt_ncat_val">5</span></label>
             <input type="range" id="irt_ncat" min="2" max="7" step="1" value="5">
           </div>
     </div>

@@ -12,21 +12,8 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 10px 20px;
-    font-family: var(--mono);
-    font-size: 0.82em;
   }
-  .ca-controls .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .ca-controls .control-group label {
-    color: var(--text-dim);
-  }
-  .ca-controls .val {
-    color: var(--teal);
-    font-weight: 600;
-  }
+  /* Individual sliders use shared .slider-col / .slider-val */
 
   /* Stat cards with left border instead of full border */
   .ca-stat {
@@ -128,16 +115,16 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
   <div class="section">
     <p>Cronbach's &alpha; determines the <strong>Standard Error of Measurement (SEM)</strong>: how much a single observed score is expected to differ from a person's true score. A score is not a point — it is an interval. Low &alpha; widens that interval and increases classification errors.</p>
     <div class="ca-controls">
-      <div class="control-group">
-        <label>Cronbach's &alpha;: <span class="val" id="ca_alpha_val">0.80</span></label>
+      <div class="slider-col">
+        <label>Cronbach's &alpha;: <span class="slider-val" id="ca_alpha_val">0.80</span></label>
         <input type="range" id="ca_alpha" min="0.40" max="1.00" step="0.01" value="0.80">
       </div>
-      <div class="control-group">
-        <label>Observed score: <span class="val" id="ca_true_val">100</span></label>
+      <div class="slider-col">
+        <label>Observed score: <span class="slider-val" id="ca_true_val">100</span></label>
         <input type="range" id="ca_true" min="40" max="160" step="1" value="100">
       </div>
-      <div class="control-group">
-        <label>Test SD (score units): <span class="val" id="ca_sd_val">15</span></label>
+      <div class="slider-col">
+        <label>Test SD (score units): <span class="slider-val" id="ca_sd_val">15</span></label>
         <input type="range" id="ca_sd" min="1" max="30" step="1" value="15">
       </div>
     </div>

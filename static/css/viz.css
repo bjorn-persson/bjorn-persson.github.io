@@ -9,7 +9,7 @@
    1. Prefer shared classes over local redefinitions. Shared:
       .container .hero .section .section-label
       .viz-box .viz-row .viz-col .viz-title
-      .slider-group .slider-row .slider-label .slider-val
+      .slider-group .slider-row .slider-col .slider-label .slider-val .slider-sublabel
       .btn .btn.btn-orange .scenario-btn.active
       .fit-stats .fit-stat .fit-stat-label .fit-stat-value
       .note (+ .note.warn .note.caveat) .equation
@@ -196,6 +196,7 @@
   letter-spacing: 0.06em;
   margin-bottom: 10px;
 }
+/* Horizontal slider row: label | slider | value. Good for short labels. */
 .slider-row {
   display: flex;
   align-items: center;
@@ -210,6 +211,12 @@
   text-align: right;
   flex-shrink: 0;
 }
+/* Wide-label variant: use when the label is a phrase rather than a symbol. */
+.slider-row.wide .slider-label {
+  width: auto;
+  text-align: left;
+  color: var(--text-dim);
+}
 .slider-val {
   font-family: var(--mono);
   font-size: 0.82em;
@@ -217,6 +224,38 @@
   width: 42px;
   text-align: right;
   flex-shrink: 0;
+  font-weight: 600;
+}
+/* Stacked slider cell: label (with inline value span) on top, slider below.
+   Good for long labels and multi-column grids. Pair with .slider-val for the value.
+   `justify-content: flex-end` keeps sliders aligned to the bottom of each cell so
+   they line up horizontally across a multi-column grid even when label heights vary. */
+.slider-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 0.82em;
+}
+.slider-col label {
+  color: var(--text-dim);
+}
+.slider-col .slider-val {
+  width: auto;
+  text-align: left;
+}
+/* In a column flex context, the base `input[type="range"] { flex: 1 }` rule
+   stretches the input vertically — thickening the track. Reset to natural height. */
+.slider-col input[type="range"] {
+  flex: none;
+}
+/* Small sublabel sitting under a slider (e.g. units, brief explanation). */
+.slider-sublabel {
+  font-family: var(--mono);
+  font-size: 0.72em;
+  color: var(--text-dim);
+  margin-top: 2px;
 }
 
 /* Range input theming */

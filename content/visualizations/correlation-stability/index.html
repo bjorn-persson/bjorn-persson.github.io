@@ -21,18 +21,8 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 12px 18px;
     margin-bottom: 16px;
-    font-family: var(--mono);
-    font-size: 0.82em;
   }
-  .ce-control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    justify-content: flex-end;
-  }
-  .ce-control-group label { color: var(--text-dim); }
-  .ce-control-group input[type="range"] { flex: none; }
-  .ce-val { color: var(--teal); font-weight: 600; }
+  /* Individual sliders use shared .slider-col / .slider-val */
   .ce-button-row {
     display: flex;
     gap: 8px;
@@ -253,13 +243,13 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     </p>
 
     <div class="ce-controls">
-      <div class="ce-control-group">
-        <label>Preset N: <span class="ce-val" id="v_n">60</span></label>
+      <div class="slider-col">
+        <label>Preset N: <span class="slider-val" id="v_n">60</span></label>
         <input type="range" id="s_n" min="10" max="500" step="1" value="60"
           oninput="document.getElementById('v_n').textContent=this.value">
       </div>
-      <div class="ce-control-group">
-        <label>Signal strength: <span class="ce-val" id="v_str">0.80</span></label>
+      <div class="slider-col">
+        <label>Signal strength: <span class="slider-val" id="v_str">0.80</span></label>
         <input type="range" id="s_str" min="-1" max="1" step="0.01" value="0.80"
           oninput="document.getElementById('v_str').textContent=parseFloat(this.value).toFixed(2)">
       </div>

@@ -12,16 +12,8 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     flex-direction: column;
     gap: 10px;
     margin-bottom: 16px;
-    font-family: var(--mono);
-    font-size: 0.82em;
   }
-  .sp-control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .sp-control-group label { color: var(--text-dim); }
-  .sp-val { color: var(--teal); font-weight: 600; }
+  /* Individual sliders use shared .slider-col / .slider-val */
 
   #sp_canvas {
     display: block;
@@ -68,9 +60,10 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   <div class="section">
     <p>A dataset shows a clear <em>negative</em> overall correlation between study hours and exam score — until you account for academic major. Each major shows a <em>positive</em> within-group correlation, reversing the overall trend. Drag the slider to reveal the hidden group structure.</p>
     <div class="sp-controls">
-      <div class="sp-control-group">
-        <label>Group by Academic Major: <span class="sp-val" id="sp_mix_val">0%</span></label>
+      <div class="slider-row wide">
+        <span class="slider-label">Group by Academic Major</span>
         <input type="range" id="sp_mix" min="0" max="1" step="0.01" value="0">
+        <span class="slider-val" id="sp_mix_val">0%</span>
       </div>
     </div>
     <div class="sp-phase-label" id="sp_phase">Overall view: one aggregate group</div>

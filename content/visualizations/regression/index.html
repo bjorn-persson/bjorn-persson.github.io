@@ -10,16 +10,8 @@ summary: "Set population parameters, generate synthetic data, and compare OLS/ML
     grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
     gap: 10px 16px;
     margin-bottom: 14px;
-    font-family: var(--mono);
-    font-size: 0.82em;
   }
-  .reg-control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .reg-control-group label { color: var(--text-dim); }
-  .reg-val { color: var(--teal); font-weight: 600; }
+  /* Individual sliders use shared .slider-col / .slider-val */
 
   .reg-button-row {
     display: flex;
@@ -201,9 +193,9 @@ function buildControls() {
   container.innerHTML = '';
   for (const p of m.params) {
     const div = document.createElement('div');
-    div.className = 'reg-control-group';
+    div.className = 'slider-col';
     div.innerHTML = `
-      <label>${p.label}: <span class="reg-val" id="v_${p.id}">${p.id === 'n' ? p.def : p.def.toFixed(1)}</span></label>
+      <label>${p.label}: <span class="slider-val" id="v_${p.id}">${p.id === 'n' ? p.def : p.def.toFixed(1)}</span></label>
       <input type="range" id="s_${p.id}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.def}" oninput="onSlider()">
     `;
     container.appendChild(div);

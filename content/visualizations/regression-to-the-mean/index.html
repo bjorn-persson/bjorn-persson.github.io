@@ -8,20 +8,12 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
   /* Regression to the mean — page-specific styles */
 
   .rtm-controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 24px;
-    margin-bottom: 16px;
-    font-family: var(--mono);
-    font-size: 0.82em;
-  }
-  .rtm-control-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+    margin-bottom: 16px;
   }
-  .rtm-control-group label { color: var(--text-dim); }
-  .rtm-val { color: var(--teal); font-weight: 600; }
+  /* Individual sliders use shared .slider-row.wide / .slider-val */
 
   .rtm-btn {
     font-family: var(--mono);
@@ -82,13 +74,15 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
   <div class="section">
     <p>Students take the same test twice. The test-retest reliability slider controls how much random error affects scores. At low reliability, extreme Time-1 scorers regress strongly toward the mean at Time-2 — not because they changed, but because their extreme score partly reflected luck. Highlight the top or bottom performers to see the regression effect in action.</p>
     <div class="rtm-controls">
-      <div class="rtm-control-group">
-        <label>Test-retest reliability (&rho;): <span class="rtm-val" id="rtm_rho_val">0.80</span></label>
+      <div class="slider-row wide">
+        <span class="slider-label">Test-retest reliability (&rho;)</span>
         <input type="range" id="rtm_rho" min="0.01" max="0.99" step="0.01" value="0.80">
+        <span class="slider-val" id="rtm_rho_val">0.80</span>
       </div>
-      <div class="rtm-control-group">
-        <label>Extreme group threshold: top/bottom <span class="rtm-val" id="rtm_pct_val">15</span>%</label>
+      <div class="slider-row wide">
+        <span class="slider-label">Extreme group threshold (top/bottom %)</span>
         <input type="range" id="rtm_pct" min="5" max="40" step="1" value="15">
+        <span class="slider-val" id="rtm_pct_val">15%</span>
       </div>
     </div>
 
@@ -356,7 +350,7 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
       `T2 | extreme T1 ≈ ρ × T1 mean ≈ ${(rho).toFixed(2)} × T1`;
 
     document.getElementById('rtm_rho_val').textContent = rho.toFixed(2);
-    document.getElementById('rtm_pct_val').textContent = Math.round(pct * 100);
+    document.getElementById('rtm_pct_val').textContent = Math.round(pct * 100) + '%';
   }
 
   window.rtmHighlight = function(mode) {

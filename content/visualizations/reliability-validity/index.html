@@ -8,20 +8,12 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   /* Reliability-validity — page-specific styles */
 
   .rv-controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 24px;
-    margin-bottom: 21px;
-    font-family: var(--mono);
-    font-size: 0.82em;
-  }
-  .rv-control-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+    margin-bottom: 21px;
   }
-  .rv-control-group label { color: var(--text-dim); }
-  .rv-control-group .rv-val { color: var(--teal); font-weight: 600; }
+  /* Individual sliders use shared .slider-row.wide / .slider-val */
 
   .rv-badges {
     display: flex;
@@ -59,7 +51,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   }
 
   @media (max-width: 600px) {
-    .rv-controls { grid-template-columns: 1fr; }
+    /* .rv-controls already single-column flex; no change needed at narrow widths */
     .rv-canvases { grid-template-columns: 1fr; }
   }
 </style>
@@ -74,13 +66,15 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   <div class="section">
     <p>Classical Test Theory: Observed Score = True Score + Error. <strong>Reliability</strong> concerns <em>random</em> error — how consistently a measure performs. <strong>Validity</strong> concerns <em>systematic</em> error — whether a measure hits its intended target.</p>
     <div class="rv-controls">
-      <div class="rv-control-group">
-        <label>Random Error (low reliability): <span class="rv-val" id="rv_rand_val">0.30</span></label>
+      <div class="slider-row wide">
+        <span class="slider-label">Random Error (low reliability)</span>
         <input type="range" id="rv_rand" min="0" max="1" step="0.01" value="0.30">
+        <span class="slider-val" id="rv_rand_val">0.30</span>
       </div>
-      <div class="rv-control-group">
-        <label>Systematic Bias (&plusmn;): <span class="rv-val" id="rv_sys_val">0.00</span></label>
+      <div class="slider-row wide">
+        <span class="slider-label">Systematic Bias (&plusmn;)</span>
         <input type="range" id="rv_sys" min="-0.85" max="0.85" step="0.01" value="0.00">
+        <span class="slider-val" id="rv_sys_val">0.00</span>
       </div>
     </div>
 
