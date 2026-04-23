@@ -76,7 +76,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     <div class="sp-phase-label" id="sp_phase">Overall view: one aggregate group</div>
     <canvas id="sp_canvas"></canvas>
     <div class="sp-readout">
-      <div class="sp-badge">Overall r: <span class="sp-badge-val" id="sp_overall_r" style="color:#ef4444">—</span></div>
+      <div class="sp-badge">Overall r: <span class="sp-badge-val" id="sp_overall_r" style="color:var(--red)">—</span></div>
       <div class="sp-badge" id="sp_g1_badge" style="display:none">Major A r: <span class="sp-badge-val" id="sp_g1_r"></span></div>
       <div class="sp-badge" id="sp_g2_badge" style="display:none">Major B r: <span class="sp-badge-val" id="sp_g2_r"></span></div>
       <div class="sp-badge" id="sp_g3_badge" style="display:none">Major C r: <span class="sp-badge-val" id="sp_g3_r"></span></div>
@@ -100,6 +100,17 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   const ctx = canvas.getContext('2d');
   let dpr = window.devicePixelRatio || 1;
 
+  // Palette lookup from CSS variables
+  const _css = getComputedStyle(document.documentElement);
+  const C_TEAL     = _css.getPropertyValue('--teal').trim();
+  const C_ORANGE   = _css.getPropertyValue('--orange').trim();
+  const C_BLUE     = _css.getPropertyValue('--blue').trim();
+  const C_PURPLE   = _css.getPropertyValue('--purple').trim();
+  const C_RED      = _css.getPropertyValue('--red').trim();
+  const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
+  const C_BORDER   = _css.getPropertyValue('--border').trim();
+  const C_BG_ELEV  = _css.getPropertyValue('--bg-elevated').trim();
+
   const N_PER_GROUP = 28;
   const SEED_BASE = 99;
 
@@ -122,12 +133,13 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
+  // Group palette mapped to the 5-color viz palette (teal, purple, orange, red, blue)
   const GP = [
-    { cx: 0.18, cy: 0.80, slope: 0.40, sigma: 0.065, color: '#2dd4bf',  name: 'Education',       label: 'A' },
-    { cx: 0.34, cy: 0.65, slope: 0.38, sigma: 0.065, color: '#6d28d9',  name: 'Social Sciences', label: 'B' },
-    { cx: 0.50, cy: 0.50, slope: 0.36, sigma: 0.065, color: '#c2640a',  name: 'Business',        label: 'C' },
-    { cx: 0.66, cy: 0.35, slope: 0.34, sigma: 0.065, color: '#ef4444',  name: 'Engineering',     label: 'D' },
-    { cx: 0.82, cy: 0.20, slope: 0.32, sigma: 0.065, color: '#1565c0',  name: 'Medicine',        label: 'E' },
+    { cx: 0.18, cy: 0.80, slope: 0.40, sigma: 0.065, color: C_TEAL,   name: 'Education',       label: 'A' },
+    { cx: 0.34, cy: 0.65, slope: 0.38, sigma: 0.065, color: C_PURPLE, name: 'Social Sciences', label: 'B' },
+    { cx: 0.50, cy: 0.50, slope: 0.36, sigma: 0.065, color: C_ORANGE, name: 'Business',        label: 'C' },
+    { cx: 0.66, cy: 0.35, slope: 0.34, sigma: 0.065, color: C_RED,    name: 'Engineering',     label: 'D' },
+    { cx: 0.82, cy: 0.20, slope: 0.32, sigma: 0.065, color: C_BLUE,   name: 'Medicine',        label: 'E' },
   ];
 
   const allGroups = GP.map((g, gi) => {
@@ -182,7 +194,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     function toSx(v) { return PAD_L + v * pw; }
     function toSy(v) { return PAD_T + (1 - v) * ph; }
 
-    ctx.strokeStyle = '#1e2030';
+    ctx.strokeStyle = C_BG_ELEV;
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const v = i / 4;
@@ -190,7 +202,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       ctx.beginPath(); ctx.moveTo(PAD_L, toSy(v)); ctx.lineTo(PAD_L + pw, toSy(v)); ctx.stroke();
     }
 
-    ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
+    ctx.strokeStyle = C_BORDER; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
@@ -232,7 +244,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       ctx.beginPath();
       ctx.moveTo(toSx(x0), toSy(reg.m * x0 + reg.b));
       ctx.lineTo(toSx(x1), toSy(reg.m * x1 + reg.b));
-      ctx.strokeStyle = '#b0b4c0';
+      ctx.strokeStyle = C_TEXT_DIM;
       ctx.lineWidth = 2.5;
       ctx.setLineDash([6, 4]);
       ctx.globalAlpha = Math.max(0, 1 - t * 1.4);
@@ -252,7 +264,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       ctx.globalAlpha = 1;
     }
 
-    ctx.fillStyle = '#b0b4c0';
+    ctx.fillStyle = C_TEXT_DIM;
     ctx.font = '14px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
     ctx.fillText('Study Hours →', PAD_L + pw / 2, PAD_T + ph + 38);
@@ -263,7 +275,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     ctx.restore();
 
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#b0b4c0';
+    ctx.fillStyle = C_TEXT_DIM;
     ctx.font = '13px IBM Plex Mono, monospace';
     const xLabels = ['Low', '', 'Mid', '', 'High'];
     for (let i = 0; i <= 4; i++) {
@@ -292,7 +304,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
     const allR = pearsonR(blended);
     document.getElementById('sp_overall_r').textContent = allR.toFixed(3);
-    document.getElementById('sp_overall_r').style.color = allR < 0 ? '#ef4444' : '#2dd4bf';
+    document.getElementById('sp_overall_r').style.color = allR < 0 ? C_RED : C_TEAL;
 
     for (let gi = 0; gi < allGroups.length; gi++) {
       const gPts = blended.filter(p => p.group === gi).map(p => ({ x: p.x, y: p.y }));
@@ -301,7 +313,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       const badge = document.getElementById(`sp_g${gi+1}_badge`);
       if (el) {
         el.textContent = r.toFixed(3);
-        el.style.color = r > 0 ? '#2dd4bf' : '#ef4444';
+        el.style.color = r > 0 ? C_TEAL : C_RED;
       }
       if (badge) badge.style.display = t > 0.15 ? '' : 'none';
     }

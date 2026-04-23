@@ -38,17 +38,17 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
   }
   .ca-stat.warn { border-left-color: var(--red); }
   .ca-stat.ok   { border-left-color: var(--teal); }
-  .ca-stat.acceptable { border-left-color: #c2640a; }
+  .ca-stat.acceptable { border-left-color: var(--orange); }
 
   .ca-stat-value {
     font-family: var(--mono);
-    font-size: 1.25rem;
+    font-size: 1.15em;
     font-weight: 600;
     color: var(--teal);
     transition: color 0.3s;
   }
   .ca-stat-value.warn { color: var(--red); }
-  .ca-stat-value.acceptable { color: #c2640a; }
+  .ca-stat-value.acceptable { color: var(--orange); }
 
   /* Interpretation box */
   .ca-interp {
@@ -64,7 +64,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     min-height: 2.8em;
   }
   .ca-interp.warn { border-left-color: var(--red); }
-  .ca-interp.acceptable { border-left-color: #c2640a; }
+  .ca-interp.acceptable { border-left-color: var(--orange); }
   .ca-interp.ok { border-left-color: var(--teal); }
   .ca-interp span.hl { color: var(--red); font-weight: 600; }
   .ca-interp span.ok { color: var(--teal); font-weight: 600; }
@@ -93,10 +93,11 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     background: var(--teal-dim);
   }
 
-  /* Modal section label */
+  /* Modal section label (scoped override — shared .section-label is teal; inside
+     modals we want a dim-gray subhead that doesn't compete with the modal title) */
   .info-modal .section-label {
     font-family: var(--mono);
-    font-size: 0.83rem;
+    font-size: 0.78em;
     color: var(--text-dim);
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -189,6 +190,15 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
 
 <script>
 (function () {
+  // Palette lookup from CSS variables
+  const _css = getComputedStyle(document.documentElement);
+  const C_TEAL     = _css.getPropertyValue('--teal').trim();
+  const C_ORANGE   = _css.getPropertyValue('--orange').trim();
+  const C_RED      = _css.getPropertyValue('--red').trim();
+  const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
+  const C_BORDER   = _css.getPropertyValue('--border').trim();
+  const C_BG_ELEV  = _css.getPropertyValue('--bg-elevated').trim();
+
   let dpr = window.devicePixelRatio || 1;
 
   const scoreCanvas = document.getElementById('ca_score');
@@ -219,16 +229,16 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
 
     // Axis
     sCtx.beginPath(); sCtx.moveTo(toX(xMin), midY); sCtx.lineTo(toX(xMax), midY);
-    sCtx.strokeStyle = '#2a2d3a'; sCtx.lineWidth = 1; sCtx.stroke();
+    sCtx.strokeStyle = C_BORDER; sCtx.lineWidth = 1; sCtx.stroke();
 
     // Tick marks
     sCtx.font = '14px IBM Plex Mono, monospace';
-    sCtx.fillStyle = '#b0b4c0';
+    sCtx.fillStyle = C_TEXT_DIM;
     sCtx.textAlign = 'center';
     for (let t = xMin; t <= xMax; t += 20) {
       const tx = toX(t);
       sCtx.beginPath(); sCtx.moveTo(tx, midY - 4); sCtx.lineTo(tx, midY + 4);
-      sCtx.strokeStyle = '#2a2d3a'; sCtx.lineWidth = 1; sCtx.stroke();
+      sCtx.strokeStyle = C_BORDER; sCtx.lineWidth = 1; sCtx.stroke();
       sCtx.fillText(t, tx, midY + 18);
     }
 
@@ -262,29 +272,29 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     // True score marker
     const tsx = toX(trueScore);
     sCtx.beginPath(); sCtx.moveTo(tsx, midY - bandH - 2); sCtx.lineTo(tsx, midY + bandH + 2);
-    sCtx.strokeStyle = '#2dd4bf'; sCtx.lineWidth = 2; sCtx.stroke();
+    sCtx.strokeStyle = C_TEAL; sCtx.lineWidth = 2; sCtx.stroke();
 
     // Observed score marker (same as true — user sets true score, observed = true)
     sCtx.beginPath();
     sCtx.arc(tsx, midY, 6, 0, Math.PI * 2);
-    sCtx.fillStyle = '#2dd4bf';
+    sCtx.fillStyle = C_TEAL;
     sCtx.fill();
 
     // Score label below the band
     sCtx.font = '13px IBM Plex Mono, monospace';
-    sCtx.fillStyle = '#2dd4bf';
+    sCtx.fillStyle = C_TEAL;
     sCtx.textAlign = 'center';
     sCtx.fillText(`Observed = ${trueScore}`, tsx, midY + bandH + 34);
 
     // CI annotation below axis
     sCtx.font = '13px IBM Plex Mono, monospace';
-    sCtx.fillStyle = '#b0b4c0';
+    sCtx.fillStyle = C_TEXT_DIM;
     sCtx.textAlign = 'center';
     sCtx.fillText(`68% CI: [${lo68.toFixed(0)}, ${hi68.toFixed(0)}]  |  95% CI: [${lo95.toFixed(0)}, ${hi95.toFixed(0)}]`, W / 2, H - 14);
 
     // Title
     sCtx.font = 'bold 13px IBM Plex Mono, monospace';
-    sCtx.fillStyle = alpha >= 0.9 ? '#2dd4bf' : alpha >= 0.7 ? '#c2640a' : '#ef4444';
+    sCtx.fillStyle = alpha >= 0.9 ? C_TEAL : alpha >= 0.7 ? C_ORANGE : C_RED;
     sCtx.textAlign = 'center';
     sCtx.fillText(`α = ${alpha.toFixed(2)}  →  SEM = ${sem.toFixed(1)}`, W / 2, 22);
   }
@@ -310,7 +320,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     function toY(density) { return PAD_T + ph - (density / (peakPdf * 1.18)) * ph; }
 
     // Grid
-    dCtx.strokeStyle = '#1e2030'; dCtx.lineWidth = 0.5;
+    dCtx.strokeStyle = C_BG_ELEV; dCtx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const xv = xMin + (xMax - xMin) * i / 4;
       dCtx.beginPath(); dCtx.moveTo(toX(xv), PAD_T); dCtx.lineTo(toX(xv), PAD_T + ph); dCtx.stroke();
@@ -345,28 +355,28 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
       const y = toY(normalPdf(x, trueScore, sem));
       i === 0 ? dCtx.moveTo(toX(x), y) : dCtx.lineTo(toX(x), y);
     }
-    dCtx.strokeStyle = '#ef4444'; dCtx.lineWidth = 2; dCtx.stroke();
+    dCtx.strokeStyle = C_RED; dCtx.lineWidth = 2; dCtx.stroke();
 
     // True score vertical line
     const tsx = toX(trueScore);
     dCtx.beginPath(); dCtx.moveTo(tsx, PAD_T); dCtx.lineTo(tsx, PAD_T + ph);
-    dCtx.strokeStyle = '#2dd4bf'; dCtx.lineWidth = 1.5; dCtx.setLineDash([4, 3]);
+    dCtx.strokeStyle = C_TEAL; dCtx.lineWidth = 1.5; dCtx.setLineDash([4, 3]);
     dCtx.stroke(); dCtx.setLineDash([]);
 
     // Axes
-    dCtx.strokeStyle = '#2a2d3a'; dCtx.lineWidth = 1;
+    dCtx.strokeStyle = C_BORDER; dCtx.lineWidth = 1;
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T + ph); dCtx.lineTo(PAD_L + pw, PAD_T + ph); dCtx.stroke();
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T); dCtx.lineTo(PAD_L, PAD_T + ph); dCtx.stroke();
 
     // X-axis ticks
     dCtx.font = '12px IBM Plex Mono, monospace';
-    dCtx.fillStyle = '#b0b4c0';
+    dCtx.fillStyle = C_TEXT_DIM;
     dCtx.textAlign = 'center';
     for (let i = 0; i <= 4; i++) {
       const xv = xMin + (xMax - xMin) * i / 4;
       const sx = toX(xv);
       dCtx.beginPath(); dCtx.moveTo(sx, PAD_T + ph); dCtx.lineTo(sx, PAD_T + ph + 4);
-      dCtx.strokeStyle = '#2a2d3a'; dCtx.lineWidth = 1; dCtx.stroke();
+      dCtx.strokeStyle = C_BORDER; dCtx.lineWidth = 1; dCtx.stroke();
       dCtx.fillText(xv.toFixed(0), sx, PAD_T + ph + 18);
     }
 
@@ -375,21 +385,21 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     dCtx.translate(13, PAD_T + ph / 2);
     dCtx.rotate(-Math.PI / 2);
     dCtx.textAlign = 'center';
-    dCtx.fillStyle = '#b0b4c0';
+    dCtx.fillStyle = C_TEXT_DIM;
     dCtx.font = '12px IBM Plex Mono, monospace';
     dCtx.fillText('frequency', 0, 0);
     dCtx.restore();
 
     // Title
     dCtx.font = 'bold 13px IBM Plex Mono, monospace';
-    dCtx.fillStyle = '#b0b4c0';
+    dCtx.fillStyle = C_TEXT_DIM;
     dCtx.textAlign = 'center';
     dCtx.fillText(`Repeated testing (observed = ${trueScore})`, W / 2, 22);
 
     // Legend
     dCtx.font = '12px IBM Plex Mono, monospace';
     dCtx.textAlign = 'left';
-    dCtx.fillStyle = '#2dd4bf';
+    dCtx.fillStyle = C_TEAL;
     dCtx.fillText(`observed = ${trueScore}`, toX(trueScore) + 6, PAD_T + 16);
 
     // 68%/95% labels
@@ -434,7 +444,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     if (alpha >= 0.90) {
       msg = `<span class="ok">Good reliability (α = ${alpha.toFixed(2)}).</span> An observed score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Suitable for individual high-stakes decisions.`;
     } else if (alpha >= 0.70) {
-      msg = `<span style="color:#c2640a;font-weight:600">Acceptable for research (α = ${alpha.toFixed(2)}).</span> An observed score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Use caution for individual decisions.`;
+      msg = `<span style="color:var(--orange);font-weight:600">Acceptable for research (α = ${alpha.toFixed(2)}).</span> An observed score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Use caution for individual decisions.`;
     } else {
       msg = `<span class="hl">Poor reliability (α = ${alpha.toFixed(2)}).</span> An observed score of ${trueScore} yields a 95% CI of [${lo95}, ${hi95}] — a width of ${ci95.toFixed(1)} points. Do not use for individual-level interpretation.`;
     }

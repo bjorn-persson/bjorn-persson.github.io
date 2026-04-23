@@ -59,7 +59,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     transition: border-color 0.3s;
     font-family: var(--mono);
   }
-  .irt-stat.warn { border-left-color: #ef4444; }
+  .irt-stat.warn { border-left-color: var(--red); }
   .irt-stat.ok   { border-left-color: var(--teal); }
   .irt-stat-label {
     font-size: 0.78em;
@@ -76,7 +76,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     color: var(--teal);
     transition: color 0.3s;
   }
-  .irt-stat-value.warn { color: #ef4444; }
+  .irt-stat-value.warn { color: var(--red); }
   .irt-panel {
     display: flex;
     flex-direction: column;
@@ -114,8 +114,8 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     transition: border-color 0.3s;
     min-height: 2.8em;
   }
-  .irt-interp.warn { border-left-color: #ef4444; }
-  .irt-interp span.hl { color: #ef4444; font-weight: 600; }
+  .irt-interp.warn { border-left-color: var(--red); }
+  .irt-interp span.hl { color: var(--red); font-weight: 600; }
   .irt-interp span.ok { color: var(--teal); font-weight: 600; }
   @media (max-width: 900px) {
     .irt-layout { flex-direction: column; }
@@ -220,6 +220,15 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   const sbCtx = scoreBarCanvas.getContext('2d');
   const iCtx = infoCanvas.getContext('2d');
 
+  // Palette lookup from CSS variables
+  const css = getComputedStyle(document.documentElement);
+  const C_TEAL     = css.getPropertyValue('--teal').trim();
+  const C_ORANGE   = css.getPropertyValue('--orange').trim();
+  const C_RED      = css.getPropertyValue('--red').trim();
+  const C_TEXT_DIM = css.getPropertyValue('--text-dim').trim();
+  const C_BORDER   = css.getPropertyValue('--border').trim();
+  const C_BG_ELEV  = css.getPropertyValue('--bg-elevated').trim();
+
   function generateItems(nItems, avgA, avgB, nCat, model) {
     const items = [];
     for (let i = 0; i < nItems; i++) {
@@ -300,19 +309,19 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     function toX(v) { return PAD_L + (v - xMin) / (xMax - xMin) * pw; }
 
     sbCtx.beginPath(); sbCtx.moveTo(toX(xMin), midY); sbCtx.lineTo(toX(xMax), midY);
-    sbCtx.strokeStyle = '#2a2d3a'; sbCtx.lineWidth = 1; sbCtx.stroke();
+    sbCtx.strokeStyle = C_BORDER; sbCtx.lineWidth = 1; sbCtx.stroke();
 
     sbCtx.font = '12px IBM Plex Mono, monospace';
-    sbCtx.fillStyle = '#b0b4c0';
+    sbCtx.fillStyle = C_TEXT_DIM;
     sbCtx.textAlign = 'center';
     for (let t = -3; t <= 3; t += 1) {
       const tx = toX(t);
       sbCtx.beginPath(); sbCtx.moveTo(tx, midY - 5); sbCtx.lineTo(tx, midY + 5);
-      sbCtx.strokeStyle = '#2a2d3a'; sbCtx.lineWidth = 1; sbCtx.stroke();
+      sbCtx.strokeStyle = C_BORDER; sbCtx.lineWidth = 1; sbCtx.stroke();
       sbCtx.fillText(t, tx, midY + 20);
     }
 
-    sbCtx.fillStyle = '#aaaabc';
+    sbCtx.fillStyle = C_TEXT_DIM;
     sbCtx.font = '10px IBM Plex Mono, monospace';
     for (let t = -3; t <= 3; t += 1) {
       sbCtx.fillText('T=' + thetaToT(t), toX(t), midY + 34);
@@ -342,12 +351,12 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 
     const tsx = toX(theta);
     sbCtx.beginPath(); sbCtx.moveTo(tsx, midY - bandH - 2); sbCtx.lineTo(tsx, midY + bandH + 2);
-    sbCtx.strokeStyle = '#2dd4bf'; sbCtx.lineWidth = 2.5; sbCtx.stroke();
+    sbCtx.strokeStyle = C_TEAL; sbCtx.lineWidth = 2.5; sbCtx.stroke();
     sbCtx.beginPath(); sbCtx.arc(tsx, midY, 6, 0, Math.PI * 2);
-    sbCtx.fillStyle = '#2dd4bf'; sbCtx.fill();
+    sbCtx.fillStyle = C_TEAL; sbCtx.fill();
 
     sbCtx.font = '12px IBM Plex Mono, monospace';
-    sbCtx.fillStyle = '#b0b4c0';
+    sbCtx.fillStyle = C_TEXT_DIM;
     sbCtx.textAlign = 'center';
     sbCtx.fillText(
       '\u03B8 = ' + theta.toFixed(1) + ' (T = ' + thetaToT(theta).toFixed(0) + ')  |  SE = ' + seVal.toFixed(2) + '  |  95% CI: [' + lo95.toFixed(2) + ', ' + hi95.toFixed(2) + ']',
@@ -385,7 +394,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     function toYInfo(v) { return PAD_T + ph - (v / (maxInfo * 1.15)) * ph; }
     function toYSE(v) { return PAD_T + ph - (Math.min(v, maxSE) / maxSE) * ph; }
 
-    iCtx.strokeStyle = '#1e2030'; iCtx.lineWidth = 0.5;
+    iCtx.strokeStyle = C_BG_ELEV; iCtx.lineWidth = 0.5;
     for (let i = 0; i <= 6; i++) {
       const xv = xMin + (xMax - xMin) * i / 6;
       iCtx.beginPath(); iCtx.moveTo(toX(xv), PAD_T); iCtx.lineTo(toX(xv), PAD_T + ph); iCtx.stroke();
@@ -408,7 +417,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
       const y = toYInfo(infoVals[i]);
       i === 0 ? iCtx.moveTo(toX(t), y) : iCtx.lineTo(toX(t), y);
     }
-    iCtx.strokeStyle = '#2dd4bf'; iCtx.lineWidth = 2; iCtx.stroke();
+    iCtx.strokeStyle = C_TEAL; iCtx.lineWidth = 2; iCtx.stroke();
 
     iCtx.beginPath();
     for (let i = 0; i <= steps; i++) {
@@ -416,7 +425,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
       const y = toYSE(seVals[i]);
       i === 0 ? iCtx.moveTo(toX(t), y) : iCtx.lineTo(toX(t), y);
     }
-    iCtx.strokeStyle = '#ef4444'; iCtx.lineWidth = 1.5; iCtx.setLineDash([5, 3]);
+    iCtx.strokeStyle = C_RED; iCtx.lineWidth = 1.5; iCtx.setLineDash([5, 3]);
     iCtx.stroke(); iCtx.setLineDash([]);
 
     const tsx = toX(theta);
@@ -427,9 +436,9 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     const curInfo = testInfo(theta, items, model);
     const curSE = curInfo > 0 ? 1 / Math.sqrt(curInfo) : 10;
     iCtx.beginPath(); iCtx.arc(tsx, toYInfo(curInfo), 4, 0, Math.PI * 2);
-    iCtx.fillStyle = '#2dd4bf'; iCtx.fill();
+    iCtx.fillStyle = C_TEAL; iCtx.fill();
     iCtx.beginPath(); iCtx.arc(tsx, toYSE(curSE), 4, 0, Math.PI * 2);
-    iCtx.fillStyle = '#ef4444'; iCtx.fill();
+    iCtx.fillStyle = C_RED; iCtx.fill();
 
     iCtx.setLineDash([2, 3]);
     iCtx.beginPath(); iCtx.moveTo(tsx, toYInfo(curInfo)); iCtx.lineTo(PAD_L, toYInfo(curInfo));
@@ -438,23 +447,23 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.strokeStyle = 'rgba(200, 60, 90, 0.4)'; iCtx.lineWidth = 1; iCtx.stroke();
     iCtx.setLineDash([]);
 
-    iCtx.strokeStyle = '#2a2d3a'; iCtx.lineWidth = 1;
+    iCtx.strokeStyle = C_BORDER; iCtx.lineWidth = 1;
     iCtx.beginPath(); iCtx.moveTo(PAD_L, PAD_T + ph); iCtx.lineTo(PAD_L + pw, PAD_T + ph); iCtx.stroke();
     iCtx.beginPath(); iCtx.moveTo(PAD_L, PAD_T); iCtx.lineTo(PAD_L, PAD_T + ph); iCtx.stroke();
     iCtx.beginPath(); iCtx.moveTo(PAD_L + pw, PAD_T); iCtx.lineTo(PAD_L + pw, PAD_T + ph); iCtx.stroke();
 
     iCtx.font = '13px IBM Plex Mono, monospace';
-    iCtx.fillStyle = '#b0b4c0';
+    iCtx.fillStyle = C_TEXT_DIM;
     iCtx.textAlign = 'center';
     for (let t = -3; t <= 3; t += 1) {
       const sx = toX(t);
       iCtx.beginPath(); iCtx.moveTo(sx, PAD_T + ph); iCtx.lineTo(sx, PAD_T + ph + 4);
-      iCtx.strokeStyle = '#2a2d3a'; iCtx.lineWidth = 1; iCtx.stroke();
+      iCtx.strokeStyle = C_BORDER; iCtx.lineWidth = 1; iCtx.stroke();
       iCtx.fillText(t, sx, PAD_T + ph + 20);
     }
 
     iCtx.textAlign = 'right';
-    iCtx.fillStyle = '#2dd4bf';
+    iCtx.fillStyle = C_TEAL;
     const infoStep = maxInfo > 20 ? Math.ceil(maxInfo / 4) : maxInfo > 5 ? Math.ceil(maxInfo / 4) : Math.ceil(maxInfo * 10 / 4) / 10;
     for (let v = 0; v <= maxInfo * 1.1; v += infoStep) {
       if (v === 0) continue;
@@ -464,7 +473,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     }
 
     iCtx.textAlign = 'left';
-    iCtx.fillStyle = '#ef4444';
+    iCtx.fillStyle = C_RED;
     for (let v = 0; v <= maxSE; v += 0.5) {
       if (v === 0) continue;
       const y = toYSE(v);
@@ -475,7 +484,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.translate(22, PAD_T + ph / 2);
     iCtx.rotate(-Math.PI / 2);
     iCtx.textAlign = 'center';
-    iCtx.fillStyle = '#2dd4bf';
+    iCtx.fillStyle = C_TEAL;
     iCtx.font = '13px IBM Plex Mono, monospace';
     iCtx.fillText('I(\u03B8)', 0, 0);
     iCtx.restore();
@@ -484,18 +493,18 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.translate(W - 18, PAD_T + ph / 2);
     iCtx.rotate(Math.PI / 2);
     iCtx.textAlign = 'center';
-    iCtx.fillStyle = '#ef4444';
+    iCtx.fillStyle = C_RED;
     iCtx.font = '13px IBM Plex Mono, monospace';
     iCtx.fillText('SE(\u03B8)', 0, 0);
     iCtx.restore();
 
     iCtx.font = 'bold 13px IBM Plex Mono, monospace';
-    iCtx.fillStyle = '#b0b4c0';
+    iCtx.fillStyle = C_TEXT_DIM;
     iCtx.textAlign = 'center';
     iCtx.fillText('Test Information (solid) & SE (dashed)', W / 2, 18);
 
     iCtx.font = '13px IBM Plex Mono, monospace';
-    iCtx.fillStyle = '#b0b4c0';
+    iCtx.fillStyle = C_TEXT_DIM;
     iCtx.textAlign = 'center';
     iCtx.fillText('\u03B8', PAD_L + pw / 2, H - 4);
   }
@@ -528,7 +537,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     if (rho >= 0.90) {
       msg = '<span class="ok">High local precision (\u03C1 = ' + rho.toFixed(2) + ', \u03B1-equivalent).</span> At \u03B8 = ' + theta.toFixed(1) + ' (T = ' + tScore + '), SE = ' + seVal.toFixed(2) + '. 95% CI: [' + ci95lo + ', ' + ci95hi + ']. The test is highly informative at this trait level.';
     } else if (rho >= 0.70) {
-      msg = '<span style="color:#c2640a;font-weight:600">Moderate local precision (\u03C1 = ' + rho.toFixed(2) + ').</span> At \u03B8 = ' + theta.toFixed(1) + ' (T = ' + tScore + '), SE = ' + seVal.toFixed(2) + '. 95% CI: [' + ci95lo + ', ' + ci95hi + ']. Adequate for group comparisons but use caution for individual decisions at this trait level.';
+      msg = '<span style="color:var(--orange);font-weight:600">Moderate local precision (\u03C1 = ' + rho.toFixed(2) + ').</span> At \u03B8 = ' + theta.toFixed(1) + ' (T = ' + tScore + '), SE = ' + seVal.toFixed(2) + '. 95% CI: [' + ci95lo + ', ' + ci95hi + ']. Adequate for group comparisons but use caution for individual decisions at this trait level.';
     } else {
       msg = '<span class="hl">Low local precision (\u03C1 = ' + rho.toFixed(2) + ').</span> At \u03B8 = ' + theta.toFixed(1) + ' (T = ' + tScore + '), SE = ' + seVal.toFixed(2) + '. 95% CI: [' + ci95lo + ', ' + ci95hi + ']. The test provides little information at this trait level \u2014 the information function peaks elsewhere.';
     }

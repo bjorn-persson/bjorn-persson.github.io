@@ -20,7 +20,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     display: block;
     width: 100%;
     aspect-ratio: 1 / 0.6;
-    background: #181a24;
+    background: var(--bg-surface);
     border-radius: 6px;
     cursor: crosshair;
   }
@@ -128,6 +128,16 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   const canvas = document.getElementById('me_canvas');
   const ctx = canvas.getContext('2d');
 
+  // Palette lookup from CSS variables
+  const css = getComputedStyle(document.documentElement);
+  const C_TEAL       = css.getPropertyValue('--teal').trim();
+  const C_ORANGE     = css.getPropertyValue('--orange').trim();
+  const C_TEXT       = css.getPropertyValue('--text').trim();
+  const C_TEXT_DIM   = css.getPropertyValue('--text-dim').trim();
+  const C_BORDER     = css.getPropertyValue('--border').trim();
+  const C_BG_ELEV    = css.getPropertyValue('--bg-elevated').trim();
+  const C_BG_SURFACE = css.getPropertyValue('--bg-surface').trim();
+
   let seed = 42;
   // sample size will be read from slider each draw
 
@@ -232,25 +242,25 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     const tickStart = Math.ceil(mn / step) * step;
 
     // grid lines
-    ctx.strokeStyle = '#1e2030'; ctx.lineWidth = 0.5;
+    ctx.strokeStyle = C_BG_ELEV; ctx.lineWidth = 0.5;
     for (let v = tickStart; v <= mx + 1e-9; v += step) {
       ctx.beginPath(); ctx.moveTo(sx(v), PAD_T); ctx.lineTo(sx(v), PAD_T + ph); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(PAD_L, sy(v)); ctx.lineTo(PAD_L + pw, sy(v)); ctx.stroke();
     }
 
     // axes
-    ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
+    ctx.strokeStyle = C_BORDER; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
     // tick marks and labels
-    ctx.fillStyle = '#b0b4c0';
+    ctx.fillStyle = C_TEXT_DIM;
     ctx.font = '11px IBM Plex Mono, monospace';
     const decimals = step < 0.1 ? 2 : step < 1 ? 1 : 0;
     for (let v = tickStart; v <= mx + 1e-9; v += step) {
       const label = v.toFixed(decimals);
       // x-axis ticks
-      ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
+      ctx.strokeStyle = C_BORDER; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(sx(v), PAD_T + ph); ctx.lineTo(sx(v), PAD_T + ph + 5); ctx.stroke();
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
       ctx.fillText(label, sx(v), PAD_T + ph + 8);
@@ -267,7 +277,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
       ctx.beginPath();
       ctx.moveTo(sx(mn), sy(true_slope * mn));
       ctx.lineTo(sx(mx), sy(true_slope * mx));
-      ctx.strokeStyle = '#b0b4c0';
+      ctx.strokeStyle = C_TEXT_DIM;
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
     }
@@ -285,7 +295,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
       ctx.beginPath();
       ctx.moveTo(sx(mn), sy(slope*mn + inter));
       ctx.lineTo(sx(mx), sy(slope*mx + inter));
-      ctx.strokeStyle = '#2dd4bf';
+      ctx.strokeStyle = C_TEAL;
       ctx.lineWidth = 2.5; ctx.stroke();
     }
 
@@ -294,7 +304,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     for (const p of pts) {
       ctx.beginPath();
       ctx.arc(sx(p.x_obs), sy(p.y_obs), 4, 0, 2*Math.PI);
-      ctx.fillStyle = '#2dd4bf';
+      ctx.fillStyle = C_TEAL;
       ctx.fill();
     }
     ctx.globalAlpha = 1.0;
@@ -342,11 +352,11 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px;">
     <div class="me-canvas-wrap" style="flex: 1; min-width: 300px;">
       <div class="slider-group-title" style="margin-bottom: 6px;">Observed <em>r</em></div>
-      <canvas id="sim_canvas_obs" style="display:block;width:100%;aspect-ratio:1/0.55;background:#181a24;border-radius:6px;"></canvas>
+      <canvas id="sim_canvas_obs" style="display:block;width:100%;aspect-ratio:1/0.55;background:var(--bg-surface);border-radius:6px;"></canvas>
     </div>
     <div class="me-canvas-wrap" style="flex: 1; min-width: 300px;">
       <div class="slider-group-title" style="margin-bottom: 6px;">Corrected <em>r</em></div>
-      <canvas id="sim_canvas_corr" style="display:block;width:100%;aspect-ratio:1/0.55;background:#181a24;border-radius:6px;"></canvas>
+      <canvas id="sim_canvas_corr" style="display:block;width:100%;aspect-ratio:1/0.55;background:var(--bg-surface);border-radius:6px;"></canvas>
     </div>
   </div>
 
@@ -377,6 +387,15 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   const canvasCorr = document.getElementById('sim_canvas_corr');
   const ctxObs = canvasObs.getContext('2d');
   const ctxCorr = canvasCorr.getContext('2d');
+
+  // Palette lookup from CSS variables
+  const css = getComputedStyle(document.documentElement);
+  const C_TEAL     = css.getPropertyValue('--teal').trim();
+  const C_ORANGE   = css.getPropertyValue('--orange').trim();
+  const C_TEXT     = css.getPropertyValue('--text').trim();
+  const C_TEXT_DIM = css.getPropertyValue('--text-dim').trim();
+  const C_BORDER   = css.getPropertyValue('--border').trim();
+  const C_BG_ELEV  = css.getPropertyValue('--bg-elevated').trim();
 
   function makeRng(s) {
     let st = s >>> 0;
@@ -461,7 +480,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     function sy(v) { return PAD_T + (1 - v / maxCount) * ph; }
 
     // Grid
-    ctx.strokeStyle = '#1e2030'; ctx.lineWidth = 0.5;
+    ctx.strokeStyle = C_BG_ELEV; ctx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const y = PAD_T + ph * i / 4;
       ctx.beginPath(); ctx.moveTo(PAD_L, y); ctx.lineTo(PAD_L + pw, y); ctx.stroke();
@@ -480,12 +499,12 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     ctx.globalAlpha = 1.0;
 
     // Axes
-    ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
+    ctx.strokeStyle = C_BORDER; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
     // X-axis ticks
-    ctx.fillStyle = '#b0b4c0';
+    ctx.fillStyle = C_TEXT_DIM;
     ctx.font = '11px IBM Plex Mono, monospace';
     const range = hi - lo;
     const rough = range / 5;
@@ -495,10 +514,10 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     const tickStart = Math.ceil(lo / step) * step;
     const dec = step < 0.1 ? 2 : step < 1 ? 1 : 0;
     for (let v = tickStart; v <= hi + 1e-9; v += step) {
-      ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
+      ctx.strokeStyle = C_BORDER; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(sx(v), PAD_T + ph); ctx.lineTo(sx(v), PAD_T + ph + 5); ctx.stroke();
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      ctx.fillStyle = '#b0b4c0';
+      ctx.fillStyle = C_TEXT_DIM;
       ctx.fillText(v.toFixed(dec), sx(v), PAD_T + ph + 8);
     }
 
@@ -507,7 +526,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     ctx.translate(14, PAD_T + ph / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#b0b4c0'; ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.fillStyle = C_TEXT_DIM; ctx.font = '11px IBM Plex Mono, monospace';
     ctx.fillText('Count', 0, 0);
     ctx.restore();
 
@@ -515,14 +534,14 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     if (expectedR >= lo && expectedR <= hi) {
       ctx.beginPath();
       ctx.moveTo(sx(expectedR), PAD_T); ctx.lineTo(sx(expectedR), PAD_T + ph);
-      ctx.strokeStyle = '#2dd4bf'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.strokeStyle = C_TEAL; ctx.lineWidth = 2; ctx.stroke();
     }
 
     // Vertical line: true r (dashed gray)
     if (trueR >= lo && trueR <= hi) {
       ctx.beginPath();
       ctx.moveTo(sx(trueR), PAD_T); ctx.lineTo(sx(trueR), PAD_T + ph);
-      ctx.strokeStyle = '#c9cdd8'; ctx.lineWidth = 1.5;
+      ctx.strokeStyle = C_TEXT; ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
     }
 
@@ -530,16 +549,16 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     const legX = PAD_L + 8, legY = PAD_T + 6;
     ctx.font = '10px IBM Plex Mono, monospace';
     // true r
-    ctx.strokeStyle = '#c9cdd8'; ctx.lineWidth = 1.5;
+    ctx.strokeStyle = C_TEXT; ctx.lineWidth = 1.5;
     ctx.setLineDash([5, 3]);
     ctx.beginPath(); ctx.moveTo(legX, legY + 4); ctx.lineTo(legX + 18, legY + 4); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#c9cdd8'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = C_TEXT; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     ctx.fillText('True r', legX + 22, legY + 4);
     // expected r
-    ctx.strokeStyle = '#2dd4bf'; ctx.lineWidth = 2;
+    ctx.strokeStyle = C_TEAL; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(legX, legY + 20); ctx.lineTo(legX + 18, legY + 20); ctx.stroke();
-    ctx.fillStyle = '#2dd4bf';
+    ctx.fillStyle = C_TEAL;
     ctx.fillText('Expected r', legX + 22, legY + 20);
   }
 
@@ -587,9 +606,9 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   function drawSimCanvases() {
     if (!simResults) return;
     const { obsRs, corrRs, r_true, expectedR } = simResults;
-    drawHistogram(canvasObs, ctxObs, obsRs, r_true, expectedR, '#2dd4bf', 'Observed r');
+    drawHistogram(canvasObs, ctxObs, obsRs, r_true, expectedR, C_TEAL, 'Observed r');
     if (corrRs.length > 0) {
-      drawHistogram(canvasCorr, ctxCorr, corrRs, r_true, expectedR, '#f97316', 'Corrected r');
+      drawHistogram(canvasCorr, ctxCorr, corrRs, r_true, expectedR, C_ORANGE, 'Corrected r');
     }
   }
 
@@ -622,11 +641,11 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px;">
     <div class="me-canvas-wrap" style="flex: 1; min-width: 300px;">
       <div class="slider-group-title" style="margin-bottom: 6px;">Observed <em>r</em> trajectories</div>
-      <canvas id="traj_canvas_obs" style="display:block;width:100%;height:320px;background:#181a24;border-radius:6px;"></canvas>
+      <canvas id="traj_canvas_obs" style="display:block;width:100%;height:320px;background:var(--bg-surface);border-radius:6px;"></canvas>
     </div>
     <div class="me-canvas-wrap" style="flex: 1; min-width: 300px;">
       <div class="slider-group-title" style="margin-bottom: 6px;">Corrected <em>r</em> trajectories</div>
-      <canvas id="traj_canvas_corr" style="display:block;width:100%;height:320px;background:#181a24;border-radius:6px;"></canvas>
+      <canvas id="traj_canvas_corr" style="display:block;width:100%;height:320px;background:var(--bg-surface);border-radius:6px;"></canvas>
     </div>
   </div>
 </div>
@@ -639,8 +658,20 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   const ctxObs = canvasObs.getContext('2d');
   const ctxCorr = canvasCorr.getContext('2d');
 
+  // Palette lookup from CSS variables
+  const css = getComputedStyle(document.documentElement);
+  const C_TEAL       = css.getPropertyValue('--teal').trim();
+  const C_TEXT       = css.getPropertyValue('--text').trim();
+  const C_TEXT_DIM   = css.getPropertyValue('--text-dim').trim();
+  const C_BORDER     = css.getPropertyValue('--border').trim();
+  const C_BG_ELEV    = css.getPropertyValue('--bg-elevated').trim();
+  const C_BG_SURFACE = css.getPropertyValue('--bg-surface').trim();
+
   const N_MIN = 10, N_MAX = 500;
 
+  // Categorical palette for multi-line trajectory plots (30 distinct hues).
+  // Intentionally broader than the 5-color viz.css palette, which is too
+  // small to distinguish many simultaneous lines.
   const palette = [
     '#818cf8','#a78bfa','#c084fc','#f472b6','#fb923c',
     '#facc15','#4ade80','#22d3ee','#60a5fa','#e879f9',
@@ -750,13 +781,13 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     function sy(r) { return PAD.top + (1 - (r - yMin) / (yMax - yMin)) * ph; }
 
     // Background
-    ctx.fillStyle = '#181a24';
+    ctx.fillStyle = C_BG_SURFACE;
     ctx.fillRect(0, 0, W, H);
 
     // Grid
-    ctx.strokeStyle = '#1e2030'; ctx.lineWidth = 0.5;
+    ctx.strokeStyle = C_BG_ELEV; ctx.lineWidth = 0.5;
     const yStep = 0.2;
-    ctx.fillStyle = '#b0b4c0'; ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.fillStyle = C_TEXT_DIM; ctx.font = '11px IBM Plex Mono, monospace';
     for (let y = Math.ceil(yMin / yStep) * yStep; y <= yMax + 0.001; y += yStep) {
       const py = sy(y);
       ctx.beginPath(); ctx.moveTo(PAD.left, py); ctx.lineTo(W - PAD.right, py); ctx.stroke();
@@ -772,12 +803,12 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     }
 
     // Axes
-    ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
+    ctx.strokeStyle = C_BORDER; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(PAD.left, H - PAD.bottom); ctx.lineTo(W - PAD.right, H - PAD.bottom); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(PAD.left, PAD.top); ctx.lineTo(PAD.left, H - PAD.bottom); ctx.stroke();
 
     // Axis labels
-    ctx.fillStyle = '#b0b4c0'; ctx.font = '11px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillStyle = C_TEXT_DIM; ctx.font = '11px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
     ctx.fillText('Sample size (n)', PAD.left + pw / 2, H - 18);
 
     // Target line (what trajectories converge to)
@@ -798,7 +829,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
 
     // Also show the other reference line if different
     const otherLine = trajKey === 'obsRs' ? trajData.r_true : trajData.expectedR;
-    const otherColor = trajKey === 'obsRs' ? '#c9cdd8' : '#2dd4bf';
+    const otherColor = trajKey === 'obsRs' ? C_TEXT : C_TEAL;
     const otherLabel = trajKey === 'obsRs' ? 'True \u03C1' : 'Expected r';
     const otherDash = trajKey === 'obsRs' ? [6, 4] : [];
     if (Math.abs(otherLine - targetLine) > 0.01 && otherLine >= yMin && otherLine <= yMax) {
@@ -838,8 +869,8 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   function drawAllTrajs(maxN) {
     if (!trajData) return;
     const n = maxN || N_MAX;
-    drawTrajPanel(canvasObs, 'obsRs', trajData.expectedR, 'Expected r', '#2dd4bf', [], n);
-    drawTrajPanel(canvasCorr, 'corrRs', trajData.r_true, 'True \u03C1', '#c9cdd8', [6, 4], n);
+    drawTrajPanel(canvasObs, 'obsRs', trajData.expectedR, 'Expected r', C_TEAL, [], n);
+    drawTrajPanel(canvasCorr, 'corrRs', trajData.r_true, 'True \u03C1', C_TEXT, [6, 4], n);
   }
 
   document.getElementById('traj_k').addEventListener('input', function () {

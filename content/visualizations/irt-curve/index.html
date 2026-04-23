@@ -6,7 +6,6 @@ summary: "Explore how IRT models each item as having its own characteristic curv
 
 <style>
   /* IRT visualization — page-specific styles */
-  html, body, .post-content, .post-single { overflow-x: hidden; }
 
   .equation-box {
     background: var(--bg-elevated);
@@ -148,7 +147,7 @@ summary: "Explore how IRT models each item as having its own characteristic curv
   }
   .demo-table .person-a { color: var(--teal); font-weight: 600; }
   .demo-table .person-b { color: var(--orange); font-weight: 600; }
-  .demo-table .person-c { color: #a78bfa; font-weight: 600; }
+  .demo-table .person-c { color: var(--purple); font-weight: 600; }
 
   .custom-sliders { display: none; }
   .custom-sliders.visible { display: block; }
@@ -644,13 +643,18 @@ function setupCanvas(canvas) {
   return ctx;
 }
 
+// Palette lookup from CSS variables
+const _css = getComputedStyle(document.documentElement);
+const _P = k => _css.getPropertyValue(k).trim();
 const COLORS = {
-  teal: '#2dd4bf', orange: '#f97316', red: '#ef4444',
-  blue: '#3b82f6', purple: '#a78bfa',
-  text: '#c9cdd8', textDim: '#6b7084', textBright: '#e8ecf4',
-  bg: '#181a24', grid: '#1e2030', border: '#2a2d3a', muted: '#4a5568'
+  teal: _P('--teal'), orange: _P('--orange'), red: _P('--red'),
+  blue: _P('--blue'), purple: _P('--purple'),
+  text: _P('--text'), textDim: '#6b7084', textBright: _P('--text-bright'),
+  bg: _P('--bg-surface'), grid: _P('--bg-elevated'), border: _P('--border'), muted: '#4a5568'
 };
-const ITEM_COLORS = ['#2dd4bf','#f97316','#a78bfa','#3b82f6','#f472b6'];
+// Categorical per-item palette; 5th color (pink) is off-palette but kept
+// to maximize distinctness when up to 5 items are drawn together.
+const ITEM_COLORS = [_P('--teal'), _P('--orange'), _P('--purple'), _P('--blue'), '#f472b6'];
 
 function drawAxes(ctx, W, H, pad, xRange, yRange, xLabel, yLabel, opts) {
   opts = opts || {};

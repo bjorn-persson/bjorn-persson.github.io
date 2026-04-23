@@ -247,6 +247,13 @@ summary: "Interactively explore why median splits and other dichotomizations red
 
 <script>
 (function() {
+  // Palette lookup from CSS variables
+  const _css = getComputedStyle(document.documentElement);
+  const C_TEAL     = _css.getPropertyValue('--teal').trim();
+  const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
+  const C_BORDER   = _css.getPropertyValue('--border').trim();
+  const C_BG       = _css.getPropertyValue('--bg').trim();
+
   // === Seeded RNG ===
   function mulberry32(a) {
     return function() {
@@ -592,7 +599,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
     function ty(v) { return pad + ph - (v + r) / (2*r) * ph; }
 
     // Axes
-    ctx.strokeStyle = '#2a2d3a';
+    ctx.strokeStyle = C_BORDER;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(tx(-r), ty(0)); ctx.lineTo(tx(r), ty(0));
@@ -600,7 +607,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
     ctx.stroke();
 
     // Axis labels
-    ctx.fillStyle = '#b0b4c0';
+    ctx.fillStyle = C_TEXT_DIM;
     ctx.font = '11px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
     ctx.fillText('Stress (X)', w/2, h - 6);
@@ -678,12 +685,12 @@ summary: "Interactively explore why median splits and other dichotomizations red
         ctx.moveTo(tx(cutX), ty(mHi)); ctx.lineTo(tx(r), ty(mHi));
         ctx.stroke();
         // Mean markers
-        for (const [mx2, my2, col] of [[mean(lo.map(d=>d[0])), mLo, '#b0b4c0'], [mean(hi.map(d=>d[0])), mHi, '#2dd4bf']]) {
+        for (const [mx2, my2, col] of [[mean(lo.map(d=>d[0])), mLo, C_TEXT_DIM], [mean(hi.map(d=>d[0])), mHi, C_TEAL]]) {
           ctx.fillStyle = col;
           ctx.beginPath();
           ctx.arc(tx(mx2), ty(my2), 6, 0, Math.PI*2);
           ctx.fill();
-          ctx.strokeStyle = '#0f1117';
+          ctx.strokeStyle = C_BG;
           ctx.lineWidth = 2;
           ctx.stroke();
         }

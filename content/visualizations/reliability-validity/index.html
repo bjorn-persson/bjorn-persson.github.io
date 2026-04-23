@@ -116,6 +116,14 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
 
 <script>
 (function () {
+  // Palette lookup from CSS variables
+  const _css = getComputedStyle(document.documentElement);
+  const C_TEAL     = _css.getPropertyValue('--teal').trim();
+  const C_RED      = _css.getPropertyValue('--red').trim();
+  const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
+  const C_BORDER   = _css.getPropertyValue('--border').trim();
+  const C_BG_ELEV  = _css.getPropertyValue('--bg-elevated').trim();
+
   const N_ARROWS = 40;
   const SEED = 42;
 
@@ -227,11 +235,11 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     const smy = cy - meanY * maxR;
     tCtx.beginPath();
     tCtx.arc(smx, smy, 5, 0, Math.PI * 2);
-    tCtx.fillStyle = 'rgba(194, 100, 10, 0.9)';
+    tCtx.fillStyle = 'rgba(249, 115, 22, 0.9)';
     tCtx.fill();
 
     tCtx.font = '14px IBM Plex Mono, monospace';
-    tCtx.fillStyle = '#b0b4c0';
+    tCtx.fillStyle = C_TEXT_DIM;
     tCtx.textAlign = 'center';
     tCtx.fillText('● = cluster mean', cx, H - 8);
   }
@@ -259,7 +267,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     const globalMax = Math.max(maxTruePdf, maxObsPdf) * 1.15;
     function toSy(density) { return PAD_T + ph - (density / globalMax) * ph; }
 
-    dCtx.strokeStyle = '#1e2030';
+    dCtx.strokeStyle = C_BG_ELEV;
     dCtx.lineWidth = 0.5;
     for (let t = 0; t <= 1.001; t += 0.25) {
       const sx = toSx(t);
@@ -286,7 +294,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       const y = toSy(normalPdf(x, mu, sigma));
       i === 0 ? dCtx.moveTo(toSx(x), y) : dCtx.lineTo(toSx(x), y);
     }
-    dCtx.strokeStyle = '#2dd4bf';
+    dCtx.strokeStyle = C_TEAL;
     dCtx.lineWidth = 2;
     dCtx.stroke();
 
@@ -296,7 +304,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       const y = toSy(normalPdf(x, TRUE_SCORE, trueSD));
       i === 0 ? dCtx.moveTo(toSx(x), y) : dCtx.lineTo(toSx(x), y);
     }
-    dCtx.strokeStyle = '#ef4444';
+    dCtx.strokeStyle = C_RED;
     dCtx.lineWidth = 1.5;
     dCtx.setLineDash([5, 4]);
     dCtx.stroke();
@@ -318,18 +326,18 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.stroke();
     dCtx.setLineDash([]);
 
-    dCtx.strokeStyle = '#2a2d3a';
+    dCtx.strokeStyle = C_BORDER;
     dCtx.lineWidth = 1;
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T + ph); dCtx.lineTo(PAD_L + pw, PAD_T + ph); dCtx.stroke();
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T); dCtx.lineTo(PAD_L, PAD_T + ph); dCtx.stroke();
 
     dCtx.font = '13px IBM Plex Mono, monospace';
-    dCtx.fillStyle = '#b0b4c0';
+    dCtx.fillStyle = C_TEXT_DIM;
     dCtx.textAlign = 'center';
     for (let t = 0; t <= 1.001; t += 0.25) {
       const sx = toSx(t);
       dCtx.beginPath(); dCtx.moveTo(sx, PAD_T + ph); dCtx.lineTo(sx, PAD_T + ph + 4);
-      dCtx.strokeStyle = '#2a2d3a'; dCtx.lineWidth = 1; dCtx.stroke();
+      dCtx.strokeStyle = C_BORDER; dCtx.lineWidth = 1; dCtx.stroke();
       dCtx.fillText(t.toFixed(2), sx, PAD_T + ph + 18);
     }
 
@@ -337,7 +345,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.translate(15, PAD_T + ph / 2);
     dCtx.rotate(-Math.PI / 2);
     dCtx.textAlign = 'center';
-    dCtx.fillStyle = '#b0b4c0';
+    dCtx.fillStyle = C_TEXT_DIM;
     dCtx.font = '13px IBM Plex Mono, monospace';
     dCtx.fillText('density', 0, 0);
     dCtx.restore();
@@ -346,15 +354,15 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.textAlign = 'right';
     dCtx.font = '13px IBM Plex Mono, monospace';
 
-    dCtx.strokeStyle = '#2dd4bf'; dCtx.lineWidth = 2; dCtx.setLineDash([]);
+    dCtx.strokeStyle = C_TEAL; dCtx.lineWidth = 2; dCtx.setLineDash([]);
     dCtx.beginPath(); dCtx.moveTo(legX - 52, PAD_T + 10); dCtx.lineTo(legX - 32, PAD_T + 10); dCtx.stroke();
-    dCtx.fillStyle = '#2dd4bf';
+    dCtx.fillStyle = C_TEAL;
     dCtx.fillText('observed', legX, PAD_T + 14);
 
-    dCtx.strokeStyle = '#ef4444'; dCtx.lineWidth = 1.5; dCtx.setLineDash([5, 4]);
+    dCtx.strokeStyle = C_RED; dCtx.lineWidth = 1.5; dCtx.setLineDash([5, 4]);
     dCtx.beginPath(); dCtx.moveTo(legX - 52, PAD_T + 26); dCtx.lineTo(legX - 32, PAD_T + 26); dCtx.stroke();
     dCtx.setLineDash([]);
-    dCtx.fillStyle = '#ef4444';
+    dCtx.fillStyle = C_RED;
     dCtx.fillText('true score', legX, PAD_T + 30);
 
     dCtx.textAlign = 'left';

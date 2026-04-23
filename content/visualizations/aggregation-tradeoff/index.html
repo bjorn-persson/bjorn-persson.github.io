@@ -8,11 +8,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 <style>
   /* Aggregation-tradeoff-specific styles (shared styles from /css/viz.css) */
 
-  /* Extra color variables not in shared CSS */
-  :root {
-    --yellow: #facc15;
-    --green: #4ade80;
-  }
+  /* --yellow and --green are now provided by viz.css. */
 
   /* Equation display */
   .equation-box {
@@ -192,17 +188,10 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     background: var(--teal-dim);
   }
 
-  /* Button overrides */
+  /* Button spacing override (shared .btn.btn-orange used for orange variant) */
   .btn {
     margin-right: 8px;
     margin-top: 8px;
-  }
-  .btn.orange {
-    border-color: var(--orange);
-    color: var(--orange);
-  }
-  .btn.orange:hover {
-    background: var(--orange-dim);
   }
 
   /* Legend dots (round variant) */
@@ -237,32 +226,7 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     font-style: italic;
   }
 
-  /* Info button (?) */
-  .info-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 15px;
-    height: 15px;
-    padding: 0;
-    border-radius: 50%;
-    font-family: var(--mono);
-    font-size: 0.68em;
-    font-weight: 600;
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    cursor: pointer;
-    flex-shrink: 0;
-    line-height: 1;
-    transition: border-color 0.2s, color 0.2s;
-    vertical-align: middle;
-    margin-left: 5px;
-  }
-  .info-btn:hover {
-    border-color: var(--teal);
-    color: var(--teal);
-  }
+  /* .info-btn styling now inherited from viz.css shared styles. */
 
   /* Modal */
   .info-modal-overlay {
@@ -417,9 +381,9 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
   <p>Below, two domains are simulated side by side. Within each domain, items are correlated at $\bar{r}_\text{within}$. Across domains, items correlate at $\bar{r}_\text{across}$. Watch what happens to validity when the two domains are combined.</p>
 
   <div style="margin: 12px 0;">
-    <button class="btn orange" id="btn_athenstaedt">Load Athenstaedt example</button>
+    <button class="btn btn-orange" id="btn_athenstaedt">Load Athenstaedt example</button>
     <span style="font-family: var(--mono); font-size: 0.78em; color: var(--text-dim); margin-left: 6px;">
-      5 feminine + 5 masculine activity items predicting gender, from <a href="https://doi.org/10.1016/j.paid.2024.112552" target="_blank" rel="noopener" style="color: var(--text-dim); text-decoration: underline;">Revelle (2024)</a>.
+      5 feminine + 5 masculine activity items predicting gender, from <a class="ref" href="https://doi.org/10.1016/j.paid.2024.112552" target="_blank" rel="noopener">Revelle (2024)</a>.
     </span>
   </div>
 
@@ -555,9 +519,9 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
     </div>
     <div style="display:flex; gap:0; flex-wrap:wrap;">
       <button class="btn" id="btn_gen">Generate New Items</button>
-      <button class="btn orange" id="btn_preset1">Uniform Validity</button>
-      <button class="btn orange" id="btn_preset2">Mixed Validity</button>
-      <button class="btn orange" id="btn_preset3">Concentrated Signal</button>
+      <button class="btn btn-orange" id="btn_preset1">Uniform Validity</button>
+      <button class="btn btn-orange" id="btn_preset2">Mixed Validity</button>
+      <button class="btn btn-orange" id="btn_preset3">Concentrated Signal</button>
     </div>
   </div>
 

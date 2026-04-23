@@ -47,8 +47,8 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     margin-right: 4px;
   }
   .ce-btn-destructive:hover {
-    border-color: #ef4444 !important;
-    color: #ef4444 !important;
+    border-color: var(--red) !important;
+    color: var(--red) !important;
   }
   .ce-main-area {
     display: grid;
@@ -471,6 +471,14 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
 <!-- ==================== EXPLORER JS ==================== -->
 <script>
 (function() {
+  // Palette lookup from CSS variables
+  const _css = getComputedStyle(document.documentElement);
+  const C_TEAL     = _css.getPropertyValue('--teal').trim();
+  const C_ORANGE   = _css.getPropertyValue('--orange').trim();
+  const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
+  const C_BORDER   = _css.getPropertyValue('--border').trim();
+  const C_BG_ELEV  = _css.getPropertyValue('--bg-elevated').trim();
+
   let points = [];
   let dragging = null;
   let dragStarted = false;
@@ -573,23 +581,23 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     ctx.clearRect(0, 0, W, H);
     const pw = plotW(W), ph = plotH(H);
 
-    ctx.strokeStyle = '#1e2030'; ctx.lineWidth = 0.5;
+    ctx.strokeStyle = C_BG_ELEV; ctx.lineWidth = 0.5;
     for (let t = 0; t <= 1.001; t += 0.2) {
       const sx = toSx(t, W), sy = toSy(t, H);
       ctx.beginPath(); ctx.moveTo(sx, PAD_T); ctx.lineTo(sx, PAD_T + ph); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(PAD_L, sy); ctx.lineTo(PAD_L + pw, sy); ctx.stroke();
     }
 
-    ctx.strokeStyle = '#2a2d3a'; ctx.lineWidth = 1;
+    ctx.strokeStyle = C_BORDER; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
-    ctx.font = '14px IBM Plex Mono, monospace'; ctx.fillStyle = '#b0b4c0'; ctx.textAlign = 'center';
+    ctx.font = '14px IBM Plex Mono, monospace'; ctx.fillStyle = C_TEXT_DIM; ctx.textAlign = 'center';
     for (let t = 0; t <= 1.001; t += 0.2) ctx.fillText(t.toFixed(1), toSx(t, W), PAD_T + ph + 16);
     ctx.textAlign = 'right';
     for (let t = 0; t <= 1.001; t += 0.2) ctx.fillText(t.toFixed(1), PAD_L - 6, toSy(t, H) + 4);
 
-    ctx.fillStyle = '#b0b4c0'; ctx.font = '15px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillStyle = C_TEXT_DIM; ctx.font = '15px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
     ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 30);
     ctx.save(); ctx.translate(13, PAD_T + ph / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Y', 0, 0); ctx.restore();
 
@@ -597,12 +605,12 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       const p = points[i];
       const sx = toSx(p.x, W), sy = toSy(p.y, H);
       ctx.beginPath(); ctx.arc(sx, sy, POINT_RADIUS, 0, Math.PI * 2);
-      ctx.fillStyle = (i === dragging) ? 'rgba(194, 100, 10, 0.9)' : 'rgba(109, 40, 217, 0.65)';
+      ctx.fillStyle = (i === dragging) ? 'rgba(249, 115, 22, 0.9)' : 'rgba(167, 139, 250, 0.65)';
       ctx.fill();
     }
 
     if (points.length === 0) {
-      ctx.fillStyle = '#2a2d3a'; ctx.font = '14px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
+      ctx.fillStyle = C_BORDER; ctx.font = '14px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
       ctx.fillText('Click anywhere to add points', PAD_L + pw / 2, PAD_T + ph / 2);
     }
   }
@@ -787,19 +795,19 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       const cardEl = document.getElementById('card-'+m.id);
       if (val === null) {
         valEl.textContent = '—'; valEl.className = 'ce-stat-value na';
-        barEl.style.width = '0%'; barEl.style.background = '#2a2d3a';
+        barEl.style.width = '0%'; barEl.style.background = C_BORDER;
         cardEl.classList.remove('active'); continue;
       }
       cardEl.classList.add('active');
       valEl.textContent = val.toFixed(4); valEl.className = 'ce-stat-value';
-      if (m.signed) valEl.style.color = val > 0.05 ? '#2dd4bf' : val < -0.05 ? '#c2640a' : '#b0b4c0';
-      else valEl.style.color = '#2dd4bf';
+      if (m.signed) valEl.style.color = val > 0.05 ? C_TEAL : val < -0.05 ? C_ORANGE : C_TEXT_DIM;
+      else valEl.style.color = C_TEAL;
       let barPct;
       if (m.signed) barPct = Math.abs(val)*100;
       else if (m.id === 'mi') { miMax = Math.max(miMax, val*1.2, 1); barPct = (val/miMax)*100; }
       else barPct = val*100;
       barEl.style.width = Math.min(100, barPct)+'%';
-      barEl.style.background = (m.signed && val < 0) ? '#c2640a' : '#2dd4bf';
+      barEl.style.background = (m.signed && val < 0) ? C_ORANGE : C_TEAL;
     }
   }
 
@@ -852,6 +860,15 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
 <!-- ==================== STABILITY JS ==================== -->
 <script>
 (function() {
+  // Palette lookup from CSS variables
+  const _css = getComputedStyle(document.documentElement);
+  const C_TEAL       = _css.getPropertyValue('--teal').trim();
+  const C_ORANGE     = _css.getPropertyValue('--orange').trim();
+  const C_TEXT_DIM   = _css.getPropertyValue('--text-dim').trim();
+  const C_BORDER     = _css.getPropertyValue('--border').trim();
+  const C_BG_SURFACE = _css.getPropertyValue('--bg-surface').trim();
+  const C_BG_ELEV    = _css.getPropertyValue('--bg-elevated').trim();
+
   const trajCanvas = document.getElementById('trajCanvas');
   const trajCtx = trajCanvas.getContext('2d');
   const posCanvas = document.getElementById('posDistCanvas');
@@ -974,24 +991,24 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     const xPx=n=>pad.left+(n-N_MIN)/(N_MAX-N_MIN)*pw;
     const yPx=r=>pad.top+(1-(r-yMin)/(yMax-yMin))*ph;
 
-    ctx.fillStyle='#181a24'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=C_BG_SURFACE; ctx.fillRect(0,0,W,H);
 
-    ctx.strokeStyle='#1e2030'; ctx.lineWidth=1;
+    ctx.strokeStyle=C_BG_ELEV; ctx.lineWidth=1;
     for (let y=Math.ceil(yMin/0.1)*0.1;y<=yMax+0.001;y+=0.1) {
       const py=yPx(y);
       ctx.beginPath(); ctx.moveTo(pad.left,py); ctx.lineTo(W-pad.right,py); ctx.stroke();
-      ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='right'; ctx.textBaseline='middle';
+      ctx.fillStyle=C_TEXT_DIM; ctx.font='11px IBM Plex Mono'; ctx.textAlign='right'; ctx.textBaseline='middle';
       ctx.fillText(y.toFixed(1),pad.left-8,py);
     }
     for (const n of [50,100,150,200,250,300,350,400,450,500]) {
       if (n<N_MIN||n>N_MAX) continue;
       const px=xPx(n);
       ctx.beginPath(); ctx.moveTo(px,pad.top); ctx.lineTo(px,H-pad.bottom); ctx.stroke();
-      ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillStyle=C_TEXT_DIM; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
       ctx.fillText(n,px,H-pad.bottom+10);
     }
 
-    ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillStyle=C_TEXT_DIM; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
     ctx.fillText('Sample size (n)',pad.left+pw/2,H-16);
     ctx.save(); ctx.translate(12,pad.top+ph/2); ctx.rotate(-Math.PI/2); ctx.fillText('Correlation (r)',0,0); ctx.restore();
 
@@ -1002,7 +1019,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     for (const bound of [rho+w,rho-w]) { if (bound>=yMin&&bound<=yMax) { ctx.beginPath(); ctx.moveTo(pad.left,yPx(bound)); ctx.lineTo(W-pad.right,yPx(bound)); ctx.stroke(); } }
     ctx.setLineDash([]);
 
-    ctx.strokeStyle='#2dd4bf'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+    ctx.strokeStyle=C_TEAL; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
     ctx.beginPath(); ctx.moveTo(pad.left,yPx(rho)); ctx.lineTo(W-pad.right,yPx(rho)); ctx.stroke();
     ctx.setLineDash([]);
 
@@ -1024,7 +1041,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     const {ctx,W,H}=setupCanvas(posCanvas);
     const pad={top:20,right:20,bottom:66,left:52};
     const pw=W-pad.left-pad.right, ph=H-pad.top-pad.bottom;
-    ctx.fillStyle='#181a24'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=C_BG_SURFACE; ctx.fillRect(0,0,W,H);
     if (!posValues.length) return;
 
     const binWidth=20; const bins={}; let maxCount=0;
@@ -1032,11 +1049,11 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     const xPx=n=>pad.left+(n-N_MIN)/(N_MAX-N_MIN)*pw;
     const hPx=c=>(c/maxCount)*ph;
 
-    ctx.strokeStyle='#1e2030'; ctx.lineWidth=1;
+    ctx.strokeStyle=C_BG_ELEV; ctx.lineWidth=1;
     for (const n of [50,100,150,200,250,300,350,400,450,500]) {
       const px=xPx(n);
       ctx.beginPath(); ctx.moveTo(px,pad.top); ctx.lineTo(px,H-pad.bottom); ctx.stroke();
-      ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillStyle=C_TEXT_DIM; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center'; ctx.textBaseline='top';
       ctx.fillText(n,px,H-pad.bottom+10);
     }
 
@@ -1048,13 +1065,13 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
 
     const p80=posValues[Math.min(posValues.length-1,Math.floor(posValues.length*0.8))];
     const p80x=xPx(p80);
-    ctx.strokeStyle='#f97316'; ctx.lineWidth=2; ctx.setLineDash([5,3]);
+    ctx.strokeStyle=C_ORANGE; ctx.lineWidth=2; ctx.setLineDash([5,3]);
     ctx.beginPath(); ctx.moveTo(p80x,pad.top); ctx.lineTo(p80x,H-pad.bottom); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle='#f97316'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='left';
+    ctx.fillStyle=C_ORANGE; ctx.font='11px IBM Plex Mono'; ctx.textAlign='left';
     ctx.fillText(`80th pctl: n=${p80}`,p80x+6,pad.top+12);
 
-    ctx.fillStyle='#b0b4c0'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillStyle=C_TEXT_DIM; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
     ctx.fillText('Point of stability (n)',pad.left+pw/2,H-16);
   }
 

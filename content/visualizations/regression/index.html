@@ -28,14 +28,7 @@ summary: "Set population parameters, generate synthetic data, and compare OLS/ML
     flex-wrap: wrap;
   }
 
-  /* Make the "Generate" button match the fitted regression color */
-  .reg-button-row .btn.orange {
-    border-color: #c2640a;
-    color: #c2640a;
-  }
-  .reg-button-row .btn.orange:hover {
-    background: rgba(194,100,10,0.15);
-  }
+  /* Generate button uses shared .btn.btn-orange (palette orange) */
 
   #reg_canvas {
     display: block;
@@ -53,7 +46,7 @@ summary: "Set population parameters, generate synthetic data, and compare OLS/ML
     line-height: 1.6;
   }
   .reg-equation .coef { color: var(--teal); font-weight: 600; }
-  .reg-equation .fit-coef { color: #c2640a; font-weight: 600; }
+  .reg-equation .fit-coef { color: var(--orange); font-weight: 600; }
 
   .reg-stats {
     margin-top: 4px;
@@ -80,8 +73,8 @@ summary: "Set population parameters, generate synthetic data, and compare OLS/ML
       <button class="btn" id="btnQuad" onclick="setType('quadratic')">Quadratic</button>
       <button class="btn" id="btnCubic" onclick="setType('cubic')">Cubic</button>
       <button class="btn" id="btnLogistic" onclick="setType('logistic')">Logistic</button>
-      <button class="btn orange" onclick="generateData()">Generate</button>
-      <button class="btn" onclick="fitModel()" style="border-color:#1565c0;color:#1565c0;">Fit</button>
+      <button class="btn btn-orange" onclick="generateData()">Generate</button>
+      <button class="btn" onclick="fitModel()" style="border-color:var(--blue);color:var(--blue);">Fit</button>
     </div>
 
     <div class="reg-controls" id="paramControls"></div>
@@ -95,12 +88,19 @@ summary: "Set population parameters, generate synthetic data, and compare OLS/ML
     <div class="note">
       <strong>Try it:</strong> Set the population parameters, click "Generate" to draw a sample, then "Fit" to estimate the model. Try small N (e.g., 20) vs large N (e.g., 500) — notice how the fitted curve (orange) tracks the population curve (teal dashed) more closely with more data. Increase σ to see how noise obscures the signal.
     </div>
-    <p class="note caveat" id="noteText"></p>
+    <div class="note caveat" id="noteText"></div>
   </div>
 
 </div>
 
 <script>
+// Palette lookup from CSS variables
+const _css = getComputedStyle(document.documentElement);
+const C_ORANGE   = _css.getPropertyValue('--orange').trim();
+const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
+const C_BORDER   = _css.getPropertyValue('--border').trim();
+const C_BG_ELEV  = _css.getPropertyValue('--bg-elevated').trim();
+
 let modelType = 'linear';
 let data = [];
 let fitResult = null;
@@ -458,7 +458,7 @@ function render() {
   function toSx(v) { return PAD_L + (v - xmin) / (xmax - xmin) * pw; }
   function toSy(v) { return PAD_T + ph - (v - ymin) / (ymax - ymin) * ph; }
 
-  ctx.strokeStyle = '#1e2030';
+  ctx.strokeStyle = C_BG_ELEV;
   ctx.lineWidth = 0.5;
   const xStep = niceStep(xmax - xmin, 8);
   const yStep = niceStep(ymax - ymin, 8);
@@ -469,13 +469,13 @@ function render() {
     ctx.beginPath(); ctx.moveTo(PAD_L, toSy(t)); ctx.lineTo(PAD_L + pw, toSy(t)); ctx.stroke();
   }
 
-  ctx.strokeStyle = '#2a2d3a';
+  ctx.strokeStyle = C_BORDER;
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
   ctx.font = '14px IBM Plex Mono, monospace';
-  ctx.fillStyle = '#b0b4c0';
+  ctx.fillStyle = C_TEXT_DIM;
   ctx.textAlign = 'center';
   for (let t = Math.ceil(xmin / xStep) * xStep; t <= xmax; t += xStep) {
     ctx.fillText(fmtTick(t, xStep), toSx(t), PAD_T + ph + 18);
@@ -485,7 +485,7 @@ function render() {
     ctx.fillText(fmtTick(t, yStep), PAD_L - 6, toSy(t) + 4);
   }
 
-  ctx.fillStyle = '#b0b4c0';
+  ctx.fillStyle = C_TEXT_DIM;
   ctx.font = '15px IBM Plex Mono, monospace';
   ctx.textAlign = 'center';
   ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 38);
@@ -521,7 +521,7 @@ function render() {
       const sx = toSx(xv), sy = toSy(yv);
       if (!started) { ctx.moveTo(sx, sy); started = true; } else ctx.lineTo(sx, sy);
     }
-    ctx.strokeStyle = '#c2640a';
+    ctx.strokeStyle = C_ORANGE;
     ctx.lineWidth = 2;
     ctx.stroke();
   }
@@ -534,7 +534,7 @@ function render() {
       if (sx < PAD_L || sx > PAD_L + pw || sy < PAD_T || sy > PAD_T + ph) continue;
       ctx.beginPath();
       ctx.arc(sx, sy, 3, 0, Math.PI * 2);
-      ctx.fillStyle = d.y === 1 ? 'rgba(109, 40, 217, 0.65)' : 'rgba(239, 68, 68, 0.65)';
+      ctx.fillStyle = d.y === 1 ? 'rgba(167, 139, 250, 0.65)' : 'rgba(239, 68, 68, 0.65)';
       ctx.fill();
     }
   } else {
@@ -543,7 +543,7 @@ function render() {
       if (sx < PAD_L || sx > PAD_L + pw || sy < PAD_T || sy > PAD_T + ph) continue;
       ctx.beginPath();
       ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(109, 40, 217, 0.65)';
+      ctx.fillStyle = 'rgba(167, 139, 250, 0.65)';
       ctx.fill();
     }
   }
@@ -556,27 +556,27 @@ function render() {
   ctx.setLineDash([7, 5]);
   ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx + 22, ly); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = '#b0b4c0';
+  ctx.fillStyle = C_TEXT_DIM;
   ctx.textAlign = 'left';
   ctx.fillText('Population', lx + 28, ly + 4);
 
   if (fitResult) {
-    ctx.strokeStyle = '#c2640a';
+    ctx.strokeStyle = C_ORANGE;
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(lx, ly + 16); ctx.lineTo(lx + 22, ly + 16); ctx.stroke();
-    ctx.fillStyle = '#b0b4c0';
+    ctx.fillStyle = C_TEXT_DIM;
     ctx.fillText('Fitted', lx + 28, ly + 20);
   }
 
   if (isLogistic && data.length > 0) {
     ctx.beginPath(); ctx.arc(lx + 6, ly + 32, 3, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(109, 40, 217, 0.65)'; ctx.fill();
-    ctx.fillStyle = '#b0b4c0';
+    ctx.fillStyle = 'rgba(167, 139, 250, 0.65)'; ctx.fill();
+    ctx.fillStyle = C_TEXT_DIM;
     ctx.fillText('Y = 1', lx + 28, ly + 36);
 
     ctx.beginPath(); ctx.arc(lx + 6, ly + 48, 3, 0, Math.PI*2);
     ctx.fillStyle = 'rgba(239, 68, 68, 0.65)'; ctx.fill();
-    ctx.fillStyle = '#b0b4c0';
+    ctx.fillStyle = C_TEXT_DIM;
     ctx.fillText('Y = 0', lx + 28, ly + 52);
   }
 }

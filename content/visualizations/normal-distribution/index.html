@@ -26,7 +26,7 @@ description: "Interactive visualization of the standard normal density. Click th
   .readout .label { color: var(--text-dim); }
   .readout .value { color: var(--text-bright); font-weight: 600; }
   .readout .prob-val { color: var(--teal); }
-  .readout .accent2 { color: #6d28d9; }
+  .readout .accent2 { color: var(--purple); }
   .readout .hidden { display: none; }
 
   .mode-indicator {
@@ -91,6 +91,13 @@ description: "Interactive visualization of the standard normal density. Click th
 <script>
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
+
+// Palette lookup from CSS variables
+const _css = getComputedStyle(document.documentElement);
+const C_TEAL     = _css.getPropertyValue('--teal').trim();
+const C_PURPLE   = _css.getPropertyValue('--purple').trim();
+const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
+const C_BORDER   = _css.getPropertyValue('--border').trim();
 const z1El = document.getElementById('z1Val');
 const z2El = document.getElementById('z2Val');
 const pEl  = document.getElementById('pVal');
@@ -195,13 +202,13 @@ function draw() {
     drawShade(Z_MIN, z1, 'rgba(45,212,191,0.22)', 'rgba(45,212,191,0.04)');
     if (hoverZ !== null) {
       const lo = Math.min(z1, hoverZ), hi = Math.max(z1, hoverZ);
-      drawShade(lo, hi, 'rgba(109,40,217,0.12)', 'rgba(109,40,217,0.03)');
+      drawShade(lo, hi, 'rgba(167,139,250,0.12)', 'rgba(167,139,250,0.03)');
     }
   } else if (state === 2 && z1 !== null && z2 !== null) {
     const lo = Math.min(z1, z2), hi = Math.max(z1, z2);
     drawShade(lo, hi, 'rgba(45,212,191,0.22)', 'rgba(45,212,191,0.04)');
   } else if (state === 0 && hoverZ !== null) {
-    drawShade(Z_MIN, hoverZ, 'rgba(109,40,217,0.12)', 'rgba(109,40,217,0.03)');
+    drawShade(Z_MIN, hoverZ, 'rgba(167,139,250,0.12)', 'rgba(167,139,250,0.03)');
   }
 
   // Full curve
@@ -212,34 +219,34 @@ function draw() {
     const y = yFromPhi(phi(zi));
     i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
   }
-  ctx.strokeStyle = '#7c7cdd';
+  ctx.strokeStyle = C_PURPLE;
   ctx.lineWidth = 2;
   ctx.stroke();
 
   // Vertical markers
-  if (z1 !== null) drawVertical(z1, '#2dd4bf');
-  if (state === 2 && z2 !== null) drawVertical(z2, '#2dd4bf');
-  // Hover line
-  if (hoverZ !== null && state !== 2) drawVertical(hoverZ, 'rgba(109,40,217,0.5)');
+  if (z1 !== null) drawVertical(z1, C_TEAL);
+  if (state === 2 && z2 !== null) drawVertical(z2, C_TEAL);
+  // Hover line (palette --purple #a78bfa = rgb(167,139,250))
+  if (hoverZ !== null && state !== 2) drawVertical(hoverZ, 'rgba(167,139,250,0.5)');
 
   // X axis
   ctx.beginPath();
   ctx.moveTo(PAD_L, PAD_T + plotH);
   ctx.lineTo(PAD_L + plotW, PAD_T + plotH);
-  ctx.strokeStyle = '#2a2d3a';
+  ctx.strokeStyle = C_BORDER;
   ctx.lineWidth = 1;
   ctx.stroke();
 
   // Ticks
   ctx.font = '14px IBM Plex Mono, monospace';
-  ctx.fillStyle = '#b0b4c0';
+  ctx.fillStyle = C_TEXT_DIM;
   ctx.textAlign = 'center';
   for (let t = Z_MIN; t <= Z_MAX; t++) {
     const tx = zToX(t);
     ctx.beginPath();
     ctx.moveTo(tx, PAD_T + plotH);
     ctx.lineTo(tx, PAD_T + plotH + 5);
-    ctx.strokeStyle = '#2a2d3a';
+    ctx.strokeStyle = C_BORDER;
     ctx.stroke();
     ctx.fillText(t.toString(), tx, PAD_T + plotH + 21);
   }
@@ -249,7 +256,7 @@ function draw() {
   ctx.translate(14, PAD_T + plotH / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#b0b4c0';
+  ctx.fillStyle = C_TEXT_DIM;
   ctx.font = '14px IBM Plex Mono, monospace';
   ctx.fillText('\u03C6(z)', 0, 0);
   ctx.restore();

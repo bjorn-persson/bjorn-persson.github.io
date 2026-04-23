@@ -32,7 +32,7 @@ summary: "Interactively explore how selecting on a variable — like studying GR
   }
   .rr-stat.full { border-left-color: var(--teal); }
   .rr-stat.rest { border-left-color: var(--orange); }
-  .rr-stat.corr { border-left-color: #a78bfa; }
+  .rr-stat.corr { border-left-color: var(--purple); }
   .rr-stat-label {
     font-family: var(--mono);
     font-size: 0.68em;
@@ -49,7 +49,7 @@ summary: "Interactively explore how selecting on a variable — like studying GR
   }
   .rr-stat-value.teal { color: var(--teal); }
   .rr-stat-value.orange { color: var(--orange); }
-  .rr-stat-value.purple { color: #a78bfa; }
+  .rr-stat-value.purple { color: var(--purple); }
   .rr-stat-value.red { color: var(--red); }
   .controls-row {
     display: grid;
@@ -311,6 +311,11 @@ summary: "Interactively explore how selecting on a variable — like studying GR
 
 <script>
 (function() {
+  // Palette lookup from CSS variables
+  const _css = getComputedStyle(document.documentElement);
+  const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
+  const C_BORDER   = _css.getPropertyValue('--border').trim();
+
   // === Seeded RNG ===
   function mulberry32(a) {
     return function() {
@@ -638,7 +643,7 @@ summary: "Interactively explore how selecting on a variable — like studying GR
     function ty(v) { return pad + ph - (v + r) / (2 * r) * ph; }
 
     // Axes
-    ctx.strokeStyle = '#2a2d3a';
+    ctx.strokeStyle = C_BORDER;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(tx(-r), ty(0)); ctx.lineTo(tx(r), ty(0));
@@ -646,7 +651,7 @@ summary: "Interactively explore how selecting on a variable — like studying GR
     ctx.stroke();
 
     // Axis labels
-    ctx.fillStyle = '#b0b4c0';
+    ctx.fillStyle = C_TEXT_DIM;
     ctx.font = '11px IBM Plex Mono, monospace';
     ctx.textAlign = 'center';
     ctx.fillText('GRE Score (X)', w / 2, h - 6);

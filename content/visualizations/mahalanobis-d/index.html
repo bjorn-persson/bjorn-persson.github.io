@@ -284,11 +284,11 @@ draft: true
         <div class="wt-matrix" id="wt-step-R"></div>
       </div>
       <div class="wt-card" style="border-left: 3px solid var(--teal)">
-        <div class="wt-card-title">Simple composite<button class="info-btn" onclick="showInfo('normD')" style="margin-left:6px;font-size:0.85em;width:18px;height:18px;line-height:18px">?</button></div>
+        <div class="wt-card-title">Simple composite<button class="info-btn" onclick="showInfo('normD')">?</button></div>
         <div class="wt-matrix" id="wt-step-wD"></div>
       </div>
       <div class="wt-card" style="border-left: 3px solid var(--orange)">
-        <div class="wt-card-title">Mahalanobis composite<button class="info-btn" onclick="showInfo('normT')" style="margin-left:6px;font-size:0.85em;width:18px;height:18px;line-height:18px">?</button></div>
+        <div class="wt-card-title">Mahalanobis composite<button class="info-btn" onclick="showInfo('normT')">?</button></div>
         <div class="wt-matrix" id="wt-step-wT"></div>
       </div>
     </div>
@@ -307,7 +307,7 @@ draft: true
       <strong>Try this:</strong> Set both <em>d</em>'s to positive (say, 0.80 and 0.60) and increase the correlation. The Mahalanobis D <em>decreases</em> &mdash; because correlated variables with same-sign <em>d</em>'s are partly redundant. Now flip d<sub>2</sub> to negative and watch D <em>increase</em>: when correlated variables pull in opposite directions, that pattern is especially diagnostic of group membership.
     </div>
 
-    <p style="margin-top:16px; font-size:0.88em; color:var(--text-dim)">Formally, the simple composite corresponds to M-F<sub>D</sub> (sex-directionality) and the Mahalanobis composite to M-F<sub>T</sub> (sex-typicality) in <a href="https://doi.org/10.3758/s13428-024-02369-5" target="_blank" style="color:var(--text-dim)">Del Giudice (2024)</a>. Section 2 explores all four indices with more variables.</p>
+    <p style="margin-top:16px; font-size:0.88em; color:var(--text-dim)">Formally, the simple composite corresponds to M-F<sub>D</sub> (sex-directionality) and the Mahalanobis composite to M-F<sub>T</sub> (sex-typicality) in <a class="ref" href="https://doi.org/10.3758/s13428-024-02369-5" target="_blank">Del Giudice (2024)</a>. Section 2 explores all four indices with more variables.</p>
   </div>
 
   <!-- ============ SECTION 2: INTERACTIVE EXPLORER ============ -->
@@ -588,19 +588,30 @@ draft: true
 (function() {
 'use strict';
 
+// Palette lookup from CSS variables
+const _css = getComputedStyle(document.documentElement);
+const _C = {
+  teal:       _css.getPropertyValue('--teal').trim(),
+  orange:     _css.getPropertyValue('--orange').trim(),
+  textDim:    _css.getPropertyValue('--text-dim').trim(),
+  textBright: _css.getPropertyValue('--text-bright').trim(),
+  bgSurface:  _css.getPropertyValue('--bg-surface').trim(),
+};
+
 const WT_N = 150; // per group
+// male/female are intentionally off-palette (distinct group colors for this viz)
 const WT_COLORS = {
   male: '#3b9eff',
   female: '#f472b6',
   maleAlpha: 'rgba(59,158,255,0.22)',
   femaleAlpha: 'rgba(244,114,182,0.22)',
-  teal: '#2dd4bf',
-  orange: '#f97316',
-  text: '#b0b4c0',
-  textBright: '#e8ecf4',
+  teal: _C.teal,
+  orange: _C.orange,
+  text: _C.textDim,
+  textBright: _C.textBright,
   dim: 'rgba(201,205,216,0.3)',
   dimmer: 'rgba(201,205,216,0.12)',
-  bg: '#181a24'
+  bg: _C.bgSurface
 };
 
 // Seeded RNG
@@ -908,19 +919,32 @@ const PRESETS = {
   orthogonal:  { d: [0, -0.50, -0.15, -0.40, 0.10], r: 0.00, alpha: 0.80 }
 };
 
+// Palette lookup from CSS variables
+const _css2 = getComputedStyle(document.documentElement);
+const _C2 = {
+  teal:       _css2.getPropertyValue('--teal').trim(),
+  orange:     _css2.getPropertyValue('--orange').trim(),
+  textDim:    _css2.getPropertyValue('--text-dim').trim(),
+  textBright: _css2.getPropertyValue('--text-bright').trim(),
+  bgSurface:  _css2.getPropertyValue('--bg-surface').trim(),
+  border:     _css2.getPropertyValue('--border').trim(),
+  bg:         _css2.getPropertyValue('--bg').trim(),
+};
+
+// male/female are intentionally off-palette (distinct group colors for this viz)
 const COLORS = {
   male: '#3b9eff',
   female: '#f472b6',
   maleAlpha: 'rgba(59,158,255,0.35)',
   femaleAlpha: 'rgba(244,114,182,0.35)',
-  teal: '#2dd4bf',
-  orange: '#f97316',
-  text: '#b0b4c0',
-  textBright: '#e8ecf4',
+  teal: _C2.teal,
+  orange: _C2.orange,
+  text: _C2.textDim,
+  textBright: _C2.textBright,
   dim: 'rgba(201,205,216,0.3)',
   dimmer: 'rgba(201,205,216,0.15)',
-  bg: '#181a24',
-  border: '#2a2d3a'
+  bg: _C2.bgSurface,
+  border: _C2.border
 };
 
 // ============================================================
@@ -1956,7 +1980,7 @@ function drawMFC() {
     ctx.arc(px(cx), py(cy), 7, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.fill();
-    ctx.strokeStyle = '#0f1117';
+    ctx.strokeStyle = _C2.bg;
     ctx.lineWidth = 2.4;
     ctx.stroke();
     ctx.fillStyle = COLORS.textBright;

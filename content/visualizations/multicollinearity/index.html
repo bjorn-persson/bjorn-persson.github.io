@@ -57,7 +57,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     transition: border-color 0.3s;
     font-family: var(--mono);
   }
-  .mc-stat-card.warn { border-left-color: #ef4444; }
+  .mc-stat-card.warn { border-left-color: var(--red); }
   .mc-stat-label {
     font-size: 0.78em;
     color: var(--text-dim);
@@ -69,7 +69,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     color: var(--teal);
     transition: color 0.3s;
   }
-  .mc-stat-value.warn { color: #ef4444; }
+  .mc-stat-value.warn { color: var(--red); }
   .mc-wobble-label {
     font-family: var(--mono);
     font-size: 0.82em;
@@ -77,7 +77,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     margin-top: 8px;
     min-height: 1.4em;
   }
-  .mc-wobble-label span { color: #ef4444; font-weight: 600; }
+  .mc-wobble-label span { color: var(--red); font-weight: 600; }
   @media (max-width: 580px) {
     .mc-layout { grid-template-columns: 1fr; }
   }
@@ -162,6 +162,15 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   const sCtx = scatterCanvas.getContext('2d');
   const pCtx = planeCanvas.getContext('2d');
 
+  // Palette lookup from CSS variables
+  const css = getComputedStyle(document.documentElement);
+  const C_TEAL     = css.getPropertyValue('--teal').trim();
+  const C_ORANGE   = css.getPropertyValue('--orange').trim();
+  const C_RED      = css.getPropertyValue('--red').trim();
+  const C_TEXT_DIM = css.getPropertyValue('--text-dim').trim();
+  const C_BORDER   = css.getPropertyValue('--border').trim();
+  const C_BG_ELEV  = css.getPropertyValue('--bg-elevated').trim();
+
   const N = 60;
   const SEED = 17;
 
@@ -219,38 +228,39 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     function sx(v) { return PAD + v * pw; }
     function sy(v) { return PAD + (1 - v) * ph; }
 
-    sCtx.strokeStyle = '#1e2030'; sCtx.lineWidth = 0.5;
+    sCtx.strokeStyle = C_BG_ELEV; sCtx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const v = i / 4;
       sCtx.beginPath(); sCtx.moveTo(sx(v), PAD); sCtx.lineTo(sx(v), PAD + ph); sCtx.stroke();
       sCtx.beginPath(); sCtx.moveTo(PAD, sy(v)); sCtx.lineTo(PAD + pw, sy(v)); sCtx.stroke();
     }
 
-    sCtx.strokeStyle = '#2a2d3a'; sCtx.lineWidth = 1;
+    sCtx.strokeStyle = C_BORDER; sCtx.lineWidth = 1;
     sCtx.beginPath(); sCtx.moveTo(PAD, PAD + ph); sCtx.lineTo(PAD + pw, PAD + ph); sCtx.stroke();
     sCtx.beginPath(); sCtx.moveTo(PAD, PAD); sCtx.lineTo(PAD, PAD + ph); sCtx.stroke();
 
     const yn = normalize(pts.map(p => p.y));
+    // Gradient from --teal (45,212,191) at high Y to --purple (167,139,250) at low Y
     for (let i = 0; i < pts.length; i++) {
       const px = sx(x1n[i]), py = sy(x2n[i]);
       const yv = yn[i];
-      const r_c = Math.round(45 + (109-45)*yv);
-      const g_c = Math.round(212 + (40-212)*yv);
-      const b_c = Math.round(191 + (217-191)*yv);
+      const r_c = Math.round(45 + (167-45)*yv);
+      const g_c = Math.round(212 + (139-212)*yv);
+      const b_c = Math.round(191 + (250-191)*yv);
       sCtx.beginPath();
       sCtx.arc(px, py, 4, 0, Math.PI * 2);
       sCtx.fillStyle = `rgba(${r_c},${g_c},${b_c},0.75)`;
       sCtx.fill();
     }
 
-    const rColor = r > 0.9 ? '#ef4444' : r > 0.7 ? '#f59e0b' : '#b0b4c0';
+    const rColor = r > 0.9 ? C_RED : r > 0.7 ? '#f59e0b' : C_TEXT_DIM;
     sCtx.font = 'bold 16px IBM Plex Mono, monospace';
     sCtx.fillStyle = rColor;
     sCtx.textAlign = 'center';
     sCtx.fillText(`r(X₁,X₂) = ${r.toFixed(3)}`, W/2, PAD - 8);
 
     sCtx.font = '14px IBM Plex Mono, monospace';
-    sCtx.fillStyle = '#b0b4c0';
+    sCtx.fillStyle = C_TEXT_DIM;
     sCtx.textAlign = 'center';
     sCtx.fillText('X₁', W/2, PAD + ph + 24);
     sCtx.save();
@@ -263,7 +273,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     sCtx.textAlign = 'left';
     sCtx.fillStyle = 'rgba(45,212,191,0.8)';
     sCtx.fillText('high Y', PAD + pw - 36, PAD + ph - 6);
-    sCtx.fillStyle = 'rgba(109,40,217,0.8)';
+    sCtx.fillStyle = 'rgba(167,139,250,0.8)';
     sCtx.fillText('low Y', PAD, PAD + ph - 6);
   }
 
@@ -282,21 +292,21 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     function sx(v) { return PAD_L + v * pw; }
     function sy_fn(v) { return PAD_T + (1 - v) * ph; }
 
-    pCtx.strokeStyle = '#1e2030'; pCtx.lineWidth = 0.5;
+    pCtx.strokeStyle = C_BG_ELEV; pCtx.lineWidth = 0.5;
     for (let i = 0; i <= 4; i++) {
       const v = i/4;
       pCtx.beginPath(); pCtx.moveTo(sx(v), PAD_T); pCtx.lineTo(sx(v), PAD_T+ph); pCtx.stroke();
       pCtx.beginPath(); pCtx.moveTo(PAD_L, sy_fn(v)); pCtx.lineTo(PAD_L+pw, sy_fn(v)); pCtx.stroke();
     }
 
-    pCtx.strokeStyle = '#2a2d3a'; pCtx.lineWidth = 1;
+    pCtx.strokeStyle = C_BORDER; pCtx.lineWidth = 1;
     pCtx.beginPath(); pCtx.moveTo(PAD_L, PAD_T+ph); pCtx.lineTo(PAD_L+pw, PAD_T+ph); pCtx.stroke();
     pCtx.beginPath(); pCtx.moveTo(PAD_L, PAD_T); pCtx.lineTo(PAD_L, PAD_T+ph); pCtx.stroke();
 
     for (let i = 0; i < pts.length; i++) {
       pCtx.beginPath();
       pCtx.arc(sx(x1n[i]), sy_fn(yn[i]), 3.5, 0, Math.PI*2);
-      pCtx.fillStyle = 'rgba(109,40,217,0.55)';
+      pCtx.fillStyle = 'rgba(167,139,250,0.55)';
       pCtx.fill();
     }
 
@@ -313,7 +323,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     pCtx.beginPath();
     pCtx.moveTo(sx(0), sy_fn(intercept));
     pCtx.lineTo(sx(1), sy_fn(intercept + slope));
-    pCtx.strokeStyle = '#2dd4bf';
+    pCtx.strokeStyle = C_TEAL;
     pCtx.lineWidth = 2.5;
     pCtx.stroke();
 
@@ -350,7 +360,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
       pCtx.fill();
     }
 
-    pCtx.fillStyle = '#b0b4c0';
+    pCtx.fillStyle = C_TEXT_DIM;
     pCtx.font = '14px IBM Plex Mono, monospace';
     pCtx.textAlign = 'center';
     pCtx.fillText('X₁', PAD_L + pw/2, PAD_T + ph + 24);
@@ -360,7 +370,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     pCtx.fillText('Y', 0, 0);
     pCtx.restore();
 
-    const vifColor = vif > 10 ? '#ef4444' : vif > 5 ? '#c2640a' : '#b0b4c0';
+    const vifColor = vif > 10 ? C_RED : vif > 5 ? C_ORANGE : C_TEXT_DIM;
     pCtx.font = 'bold 14px IBM Plex Mono, monospace';
     pCtx.fillStyle = vifColor;
     pCtx.textAlign = 'center';
