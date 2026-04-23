@@ -103,6 +103,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
   const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
   const C_BORDER   = _css.getPropertyValue('--border').trim();
   const C_BG_ELEV  = _css.getPropertyValue('--bg-elevated').trim();
+  const C_MONO     = _css.getPropertyValue('--mono').trim();
 
   const N_PER_GROUP = 28;
   const SEED_BASE = 99;
@@ -258,7 +259,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     }
 
     ctx.fillStyle = C_TEXT_DIM;
-    ctx.font = '14px IBM Plex Mono, monospace';
+    ctx.font = `14px ${C_MONO}`;
     ctx.textAlign = 'center';
     ctx.fillText('Study Hours →', PAD_L + pw / 2, PAD_T + ph + 38);
     ctx.save();
@@ -269,7 +270,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
     ctx.textAlign = 'center';
     ctx.fillStyle = C_TEXT_DIM;
-    ctx.font = '13px IBM Plex Mono, monospace';
+    ctx.font = `13px ${C_MONO}`;
     const xLabels = ['Low', '', 'Mid', '', 'High'];
     for (let i = 0; i <= 4; i++) {
       if (xLabels[i]) ctx.fillText(xLabels[i], toSx(i/4), PAD_T + ph + 17);
@@ -279,7 +280,7 @@ summary: "Watch a global negative trend shatter into positive within-group trend
       const legAlpha = Math.min(1, (t - 0.1) / 0.3);
       ctx.globalAlpha = legAlpha;
       const legY0 = PAD_T + 8;
-      ctx.font = '13px IBM Plex Mono, monospace';
+      ctx.font = `13px ${C_MONO}`;
       for (let gi = 0; gi < allGroups.length; gi++) {
         const g = allGroups[gi];
         const ly = legY0 + gi * 18;

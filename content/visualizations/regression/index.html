@@ -92,6 +92,7 @@ const C_ORANGE   = _css.getPropertyValue('--orange').trim();
 const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
 const C_BORDER   = _css.getPropertyValue('--border').trim();
 const C_BG_ELEV  = _css.getPropertyValue('--bg-elevated').trim();
+const C_MONO     = _css.getPropertyValue('--mono').trim();
 
 let modelType = 'linear';
 let data = [];
@@ -466,7 +467,7 @@ function render() {
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T + ph); ctx.lineTo(PAD_L + pw, PAD_T + ph); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(PAD_L, PAD_T); ctx.lineTo(PAD_L, PAD_T + ph); ctx.stroke();
 
-  ctx.font = '14px IBM Plex Mono, monospace';
+  ctx.font = `14px ${C_MONO}`;
   ctx.fillStyle = C_TEXT_DIM;
   ctx.textAlign = 'center';
   for (let t = Math.ceil(xmin / xStep) * xStep; t <= xmax; t += xStep) {
@@ -478,7 +479,7 @@ function render() {
   }
 
   ctx.fillStyle = C_TEXT_DIM;
-  ctx.font = '15px IBM Plex Mono, monospace';
+  ctx.font = `15px ${C_MONO}`;
   ctx.textAlign = 'center';
   ctx.fillText('X', PAD_L + pw / 2, PAD_T + ph + 38);
   ctx.save();
@@ -541,7 +542,7 @@ function render() {
   }
 
   const lx = PAD_L + 12, ly = PAD_T + 14;
-  ctx.font = '14px IBM Plex Mono, monospace';
+  ctx.font = `14px ${C_MONO}`;
 
   ctx.strokeStyle = 'rgba(45, 212, 191, 0.65)';
   ctx.lineWidth = 2.5;

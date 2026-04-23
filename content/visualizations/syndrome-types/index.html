@@ -514,6 +514,7 @@ draft: true
   const C_TEAL     = _css.getPropertyValue('--teal').trim();
   const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
   const C_BORDER   = _css.getPropertyValue('--border').trim();
+  const C_MONO     = _css.getPropertyValue('--mono').trim();
 
   // ---------- Panel selector ----------
   const selectBtns = document.querySelectorAll('.st-select .btn');
@@ -693,7 +694,7 @@ draft: true
 
     // Y ticks + gridlines
     txCtx.fillStyle = C_TEXT_DIM;
-    txCtx.font = '13px IBM Plex Mono, monospace';
+    txCtx.font = `13px ${C_MONO}`;
     txCtx.textAlign = 'right';
     for (let t = 0; t <= 1; t += 0.25) {
       const y = pad.t + ph - t * ph;
@@ -717,13 +718,13 @@ draft: true
       txCtx.fillRect(bx, by, bw, bh);
 
       txCtx.fillStyle = C_TEXT_DIM;
-      txCtx.font = '13px IBM Plex Mono, monospace';
+      txCtx.font = `13px ${C_MONO}`;
       txCtx.textAlign = 'center';
       txCtx.fillText(i.toString(), bx + bw / 2, pad.t + ph + 20);
     }
 
     txCtx.fillStyle = C_TEXT_DIM;
-    txCtx.font = '13px IBM Plex Mono, monospace';
+    txCtx.font = `13px ${C_MONO}`;
     txCtx.textAlign = 'center';
     txCtx.fillText('Signs present (k)', pad.l + pw / 2, pad.t + ph + 42);
     txCtx.save();
@@ -943,7 +944,7 @@ draft: true
 
     // Axis ticks
     eisCtx.fillStyle = C_TEXT_DIM;
-    eisCtx.font = '13px IBM Plex Mono, monospace';
+    eisCtx.font = `13px ${C_MONO}`;
     eisCtx.textAlign = 'center';
     for (let t = 0; t <= 1; t += 0.5) {
       const x = pad.l + t * pw;
@@ -957,7 +958,7 @@ draft: true
 
     // Axis labels
     eisCtx.textAlign = 'center';
-    eisCtx.font = '14px IBM Plex Mono, monospace';
+    eisCtx.font = `14px ${C_MONO}`;
     eisCtx.fillText('Boldness →', pad.l + pw / 2, pad.t + ph + 40);
     eisCtx.save();
     eisCtx.translate(16, pad.t + ph / 2);
@@ -967,7 +968,7 @@ draft: true
 
     // Corner annotation
     eisCtx.textAlign = 'left';
-    eisCtx.font = '12px IBM Plex Mono, monospace';
+    eisCtx.font = `12px ${C_MONO}`;
     eisCtx.fillStyle = C_TEXT_DIM;
     eisCtx.fillText('D = ' + d.toFixed(2) + '   s = ' + s.toFixed(2), pad.l, pad.t - 8);
   }

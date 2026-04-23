@@ -98,6 +98,7 @@ const C_TEAL     = _css.getPropertyValue('--teal').trim();
 const C_PURPLE   = _css.getPropertyValue('--purple').trim();
 const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
 const C_BORDER   = _css.getPropertyValue('--border').trim();
+const C_MONO     = _css.getPropertyValue('--mono').trim();
 const z1El = document.getElementById('z1Val');
 const z2El = document.getElementById('z2Val');
 const pEl  = document.getElementById('pVal');
@@ -238,7 +239,7 @@ function draw() {
   ctx.stroke();
 
   // Ticks
-  ctx.font = '14px IBM Plex Mono, monospace';
+  ctx.font = `14px ${C_MONO}`;
   ctx.fillStyle = C_TEXT_DIM;
   ctx.textAlign = 'center';
   for (let t = Z_MIN; t <= Z_MAX; t++) {
@@ -257,7 +258,7 @@ function draw() {
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center';
   ctx.fillStyle = C_TEXT_DIM;
-  ctx.font = '14px IBM Plex Mono, monospace';
+  ctx.font = `14px ${C_MONO}`;
   ctx.fillText('\u03C6(z)', 0, 0);
   ctx.restore();
 

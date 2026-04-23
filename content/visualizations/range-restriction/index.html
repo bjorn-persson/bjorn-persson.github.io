@@ -315,6 +315,7 @@ summary: "Interactively explore how selecting on a variable — like studying GR
   const _css = getComputedStyle(document.documentElement);
   const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
   const C_BORDER   = _css.getPropertyValue('--border').trim();
+  const C_MONO     = _css.getPropertyValue('--mono').trim();
 
   // === Seeded RNG ===
   function mulberry32(a) {
@@ -652,7 +653,7 @@ summary: "Interactively explore how selecting on a variable — like studying GR
 
     // Axis labels
     ctx.fillStyle = C_TEXT_DIM;
-    ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.font = `11px ${C_MONO}`;
     ctx.textAlign = 'center';
     ctx.fillText('GRE Score (X)', w / 2, h - 6);
     ctx.save();

@@ -137,6 +137,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   const C_BORDER     = css.getPropertyValue('--border').trim();
   const C_BG_ELEV    = css.getPropertyValue('--bg-elevated').trim();
   const C_BG_SURFACE = css.getPropertyValue('--bg-surface').trim();
+  const C_MONO       = css.getPropertyValue('--mono').trim();
 
   let seed = 42;
   // sample size will be read from slider each draw
@@ -255,7 +256,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
 
     // tick marks and labels
     ctx.fillStyle = C_TEXT_DIM;
-    ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.font = `11px ${C_MONO}`;
     const decimals = step < 0.1 ? 2 : step < 1 ? 1 : 0;
     for (let v = tickStart; v <= mx + 1e-9; v += step) {
       const label = v.toFixed(decimals);
@@ -396,6 +397,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   const C_TEXT_DIM = css.getPropertyValue('--text-dim').trim();
   const C_BORDER   = css.getPropertyValue('--border').trim();
   const C_BG_ELEV  = css.getPropertyValue('--bg-elevated').trim();
+  const C_MONO     = css.getPropertyValue('--mono').trim();
 
   function makeRng(s) {
     let st = s >>> 0;
@@ -505,7 +507,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
 
     // X-axis ticks
     ctx.fillStyle = C_TEXT_DIM;
-    ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.font = `11px ${C_MONO}`;
     const range = hi - lo;
     const rough = range / 5;
     const mag = Math.pow(10, Math.floor(Math.log10(rough)));
@@ -526,7 +528,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     ctx.translate(14, PAD_T + ph / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = C_TEXT_DIM; ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.fillStyle = C_TEXT_DIM; ctx.font = `11px ${C_MONO}`;
     ctx.fillText('Count', 0, 0);
     ctx.restore();
 
@@ -547,7 +549,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
 
     // Legend
     const legX = PAD_L + 8, legY = PAD_T + 6;
-    ctx.font = '10px IBM Plex Mono, monospace';
+    ctx.font = `10px ${C_MONO}`;
     // true r
     ctx.strokeStyle = C_TEXT; ctx.lineWidth = 1.5;
     ctx.setLineDash([5, 3]);
@@ -666,6 +668,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   const C_BORDER     = css.getPropertyValue('--border').trim();
   const C_BG_ELEV    = css.getPropertyValue('--bg-elevated').trim();
   const C_BG_SURFACE = css.getPropertyValue('--bg-surface').trim();
+  const C_MONO       = css.getPropertyValue('--mono').trim();
 
   const N_MIN = 10, N_MAX = 500;
 
@@ -787,7 +790,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     // Grid
     ctx.strokeStyle = C_BG_ELEV; ctx.lineWidth = 0.5;
     const yStep = 0.2;
-    ctx.fillStyle = C_TEXT_DIM; ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.fillStyle = C_TEXT_DIM; ctx.font = `11px ${C_MONO}`;
     for (let y = Math.ceil(yMin / yStep) * yStep; y <= yMax + 0.001; y += yStep) {
       const py = sy(y);
       ctx.beginPath(); ctx.moveTo(PAD.left, py); ctx.lineTo(W - PAD.right, py); ctx.stroke();
@@ -808,7 +811,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     ctx.beginPath(); ctx.moveTo(PAD.left, PAD.top); ctx.lineTo(PAD.left, H - PAD.bottom); ctx.stroke();
 
     // Axis labels
-    ctx.fillStyle = C_TEXT_DIM; ctx.font = '11px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
+    ctx.fillStyle = C_TEXT_DIM; ctx.font = `11px ${C_MONO}`; ctx.textAlign = 'center';
     ctx.fillText('Sample size (n)', PAD.left + pw / 2, H - 18);
 
     // Target line (what trajectories converge to)
@@ -822,7 +825,7 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
       ctx.stroke();
       ctx.setLineDash([]);
       // Label
-      ctx.fillStyle = targetColor; ctx.font = '10px IBM Plex Mono, monospace';
+      ctx.fillStyle = targetColor; ctx.font = `10px ${C_MONO}`;
       ctx.textAlign = 'right';
       ctx.fillText(targetLabel + ' = ' + targetLine.toFixed(2), W - PAD.right - 4, sy(targetLine) - 8);
     }

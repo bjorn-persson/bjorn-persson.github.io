@@ -213,6 +213,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   const C_TEXT_DIM = css.getPropertyValue('--text-dim').trim();
   const C_BORDER   = css.getPropertyValue('--border').trim();
   const C_BG_ELEV  = css.getPropertyValue('--bg-elevated').trim();
+  const C_MONO     = css.getPropertyValue('--mono').trim();
 
   function generateItems(nItems, avgA, avgB, nCat, model) {
     const items = [];
@@ -296,7 +297,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     sbCtx.beginPath(); sbCtx.moveTo(toX(xMin), midY); sbCtx.lineTo(toX(xMax), midY);
     sbCtx.strokeStyle = C_BORDER; sbCtx.lineWidth = 1; sbCtx.stroke();
 
-    sbCtx.font = '12px IBM Plex Mono, monospace';
+    sbCtx.font = `12px ${C_MONO}`;
     sbCtx.fillStyle = C_TEXT_DIM;
     sbCtx.textAlign = 'center';
     for (let t = -3; t <= 3; t += 1) {
@@ -307,7 +308,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     }
 
     sbCtx.fillStyle = C_TEXT_DIM;
-    sbCtx.font = '10px IBM Plex Mono, monospace';
+    sbCtx.font = `10px ${C_MONO}`;
     for (let t = -3; t <= 3; t += 1) {
       sbCtx.fillText('T=' + thetaToT(t), toX(t), midY + 34);
     }
@@ -329,7 +330,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     sbCtx.beginPath(); sbCtx.moveTo(toX(lo95), midY - bandH - 14); sbCtx.lineTo(toX(lo95), midY - bandH - 2); sbCtx.stroke();
     sbCtx.beginPath(); sbCtx.moveTo(toX(hi95), midY - bandH - 14); sbCtx.lineTo(toX(hi95), midY - bandH - 2); sbCtx.stroke();
 
-    sbCtx.font = '11px IBM Plex Mono, monospace';
+    sbCtx.font = `11px ${C_MONO}`;
     sbCtx.fillStyle = 'rgba(200,60,90,0.8)';
     sbCtx.textAlign = 'center';
     sbCtx.fillText('95% CI', toX((lo95 + hi95) / 2), midY - bandH - 16);
@@ -340,7 +341,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     sbCtx.beginPath(); sbCtx.arc(tsx, midY, 6, 0, Math.PI * 2);
     sbCtx.fillStyle = C_TEAL; sbCtx.fill();
 
-    sbCtx.font = '12px IBM Plex Mono, monospace';
+    sbCtx.font = `12px ${C_MONO}`;
     sbCtx.fillStyle = C_TEXT_DIM;
     sbCtx.textAlign = 'center';
     sbCtx.fillText(
@@ -437,7 +438,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.beginPath(); iCtx.moveTo(PAD_L, PAD_T); iCtx.lineTo(PAD_L, PAD_T + ph); iCtx.stroke();
     iCtx.beginPath(); iCtx.moveTo(PAD_L + pw, PAD_T); iCtx.lineTo(PAD_L + pw, PAD_T + ph); iCtx.stroke();
 
-    iCtx.font = '13px IBM Plex Mono, monospace';
+    iCtx.font = `13px ${C_MONO}`;
     iCtx.fillStyle = C_TEXT_DIM;
     iCtx.textAlign = 'center';
     for (let t = -3; t <= 3; t += 1) {
@@ -470,7 +471,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.rotate(-Math.PI / 2);
     iCtx.textAlign = 'center';
     iCtx.fillStyle = C_TEAL;
-    iCtx.font = '13px IBM Plex Mono, monospace';
+    iCtx.font = `13px ${C_MONO}`;
     iCtx.fillText('I(\u03B8)', 0, 0);
     iCtx.restore();
 
@@ -479,16 +480,16 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     iCtx.rotate(Math.PI / 2);
     iCtx.textAlign = 'center';
     iCtx.fillStyle = C_RED;
-    iCtx.font = '13px IBM Plex Mono, monospace';
+    iCtx.font = `13px ${C_MONO}`;
     iCtx.fillText('SE(\u03B8)', 0, 0);
     iCtx.restore();
 
-    iCtx.font = 'bold 13px IBM Plex Mono, monospace';
+    iCtx.font = `bold 13px ${C_MONO}`;
     iCtx.fillStyle = C_TEXT_DIM;
     iCtx.textAlign = 'center';
     iCtx.fillText('Test Information (solid) & SE (dashed)', W / 2, 18);
 
-    iCtx.font = '13px IBM Plex Mono, monospace';
+    iCtx.font = `13px ${C_MONO}`;
     iCtx.fillStyle = C_TEXT_DIM;
     iCtx.textAlign = 'center';
     iCtx.fillText('\u03B8', PAD_L + pw / 2, H - 4);

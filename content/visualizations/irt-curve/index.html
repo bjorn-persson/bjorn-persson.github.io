@@ -650,7 +650,8 @@ const COLORS = {
   teal: _P('--teal'), orange: _P('--orange'), red: _P('--red'),
   blue: _P('--blue'), purple: _P('--purple'),
   text: _P('--text'), textDim: '#6b7084', textBright: _P('--text-bright'),
-  bg: _P('--bg-surface'), grid: _P('--bg-elevated'), border: _P('--border'), muted: '#4a5568'
+  bg: _P('--bg-surface'), grid: _P('--bg-elevated'), border: _P('--border'), muted: '#4a5568',
+  mono: _P('--mono')
 };
 // Categorical per-item palette; 5th color (pink) is off-palette but kept
 // to maximize distinctness when up to 5 items are drawn together.
@@ -671,7 +672,7 @@ function drawAxes(ctx, W, H, pad, xRange, yRange, xLabel, yLabel, opts) {
   // Grid lines
   ctx.strokeStyle = COLORS.grid;
   ctx.lineWidth = 0.5;
-  ctx.font = '13px IBM Plex Mono, monospace';
+  ctx.font = `13px ${COLORS.mono}`;
   ctx.fillStyle = COLORS.text;
   ctx.textAlign = 'center';
 
@@ -695,7 +696,7 @@ function drawAxes(ctx, W, H, pad, xRange, yRange, xLabel, yLabel, opts) {
 
   // Labels
   ctx.fillStyle = COLORS.text;
-  ctx.font = '13px IBM Plex Mono, monospace';
+  ctx.font = `13px ${COLORS.mono}`;
   ctx.textAlign = 'center';
   if (xLabel) ctx.fillText(xLabel, pad.l + plotW/2, H - 4);
   if (yLabel) {
@@ -885,14 +886,14 @@ function drawSection2() {
 
   // P label
   ctx.fillStyle = COLORS.teal;
-  ctx.font = 'bold 13px IBM Plex Mono, monospace';
+  ctx.font = `bold 13px ${COLORS.mono}`;
   ctx.textAlign = 'left';
   ctx.fillText(`P = ${prob.toFixed(2)}`, tx + 8, ty - 8);
 
   // b marker
   const bx = ax.toX(b);
   ctx.fillStyle = COLORS.text;
-  ctx.font = '13px IBM Plex Mono, monospace';
+  ctx.font = `13px ${COLORS.mono}`;
   ctx.textAlign = 'center';
   ctx.fillText('b', bx, ax.toY(0) + 28);
   drawDot(ctx, bx, ax.toY(0.5), 3, COLORS.textDim);
@@ -984,7 +985,7 @@ function drawSection4() {
   ctxC.strokeStyle = COLORS.border; ctxC.lineWidth = 1;
   ctxC.beginPath(); ctxC.moveTo(pad.l, pad.t); ctxC.lineTo(pad.l, H-pad.b); ctxC.lineTo(W-pad.r, H-pad.b); ctxC.stroke();
 
-  ctxC.font = '13px IBM Plex Mono, monospace';
+  ctxC.font = `13px ${COLORS.mono}`;
   ctxC.fillStyle = COLORS.text; ctxC.textAlign = 'right';
   for (let y = 0; y <= maxY; y += 0.2) {
     const py = H - pad.b - (y/maxY)*plotH;
@@ -1026,7 +1027,7 @@ function drawSection4() {
   ctxI.strokeStyle = COLORS.border; ctxI.lineWidth = 1;
   ctxI.beginPath(); ctxI.moveTo(pad.l, pad.t); ctxI.lineTo(pad.l, H2-pad.b); ctxI.lineTo(W2-pad.r, H2-pad.b); ctxI.stroke();
 
-  ctxI.font = '13px IBM Plex Mono, monospace';
+  ctxI.font = `13px ${COLORS.mono}`;
   ctxI.fillStyle = COLORS.text; ctxI.textAlign = 'right';
   const yStep = maxInfo > 2 ? 0.5 : 0.2;
   for (let y = 0; y <= maxInfo; y += yStep) {
@@ -1106,7 +1107,7 @@ function drawSection5() {
 
     // Right axis labels for info
     ctx.fillStyle = COLORS.orange;
-    ctx.font = '13px IBM Plex Mono, monospace';
+    ctx.font = `13px ${COLORS.mono}`;
     ctx.textAlign = 'left';
     const infoStep = maxInfo > 1.5 ? 0.5 : 0.2;
     for (let y = 0; y <= maxInfo; y += infoStep) {
@@ -1192,7 +1193,7 @@ function drawSection6() {
 
   // Right axis for SE
   ctx.fillStyle = COLORS.orange;
-  ctx.font = '13px IBM Plex Mono, monospace';
+  ctx.font = `13px ${COLORS.mono}`;
   ctx.textAlign = 'left';
   for (let y = 0; y <= maxSE; y += 0.5) {
     const py = H - pad.b - (y/maxSE)*plotH;
@@ -1253,7 +1254,7 @@ function drawSection7() {
 
   // Label
   ctxC.fillStyle = COLORS.text;
-  ctxC.font = 'bold 13px IBM Plex Mono, monospace';
+  ctxC.font = `bold 13px ${COLORS.mono}`;
   ctxC.textAlign = 'left';
   ctxC.fillText(`SEM = ${cttSEM.toFixed(2)}`, axC.toX(-3.5), semY - 10);
 
@@ -1288,7 +1289,7 @@ function drawSection7() {
   drawDot(ctxI, axI.toX(theta), axI.toY(seClamp), 5, COLORS.teal);
 
   ctxI.fillStyle = COLORS.teal;
-  ctxI.font = 'bold 13px IBM Plex Mono, monospace';
+  ctxI.font = `bold 13px ${COLORS.mono}`;
   ctxI.textAlign = 'left';
   ctxI.fillText(`SE = ${irtSE.toFixed(2)}`, axI.toX(theta) + 8, axI.toY(seClamp) - 8);
 
@@ -1439,7 +1440,7 @@ function drawSection8TIF() {
   } else {
     // Empty
     ctx.fillStyle = COLORS.text;
-    ctx.font = '14px IBM Plex Mono, monospace';
+    ctx.font = `14px ${COLORS.mono}`;
     ctx.textAlign = 'center';
     ctx.fillText('Select items from the bank above', W/2, H/2);
     document.getElementById('s8-stats').innerHTML = '';

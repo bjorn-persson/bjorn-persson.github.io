@@ -596,6 +596,7 @@ const _C = {
   textDim:    _css.getPropertyValue('--text-dim').trim(),
   textBright: _css.getPropertyValue('--text-bright').trim(),
   bgSurface:  _css.getPropertyValue('--bg-surface').trim(),
+  mono:       _css.getPropertyValue('--mono').trim(),
 };
 
 const WT_N = 150; // per group
@@ -760,7 +761,7 @@ function drawWTScatter(dataF, dataM, d1, d2, a1, a2, dNorm, aNorm, r) {
 
   // Axis labels
   ctx.fillStyle = WT_COLORS.text;
-  ctx.font = '11px IBM Plex Mono';
+  ctx.font = `11px ${_C.mono}`;
   ctx.textAlign = 'center';
   ctx.fillText('X\u2081', w - pad.right + 15, toY(0) + 4);
   ctx.fillText('X\u2082', toX(0), pad.top - 10);
@@ -798,7 +799,7 @@ function drawWTScatter(dataF, dataM, d1, d2, a1, a2, dNorm, aNorm, r) {
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.fillStyle = WT_COLORS.textBright;
-    ctx.font = 'bold 11px IBM Plex Mono';
+    ctx.font = `bold 11px ${_C.mono}`;
     ctx.textAlign = 'left';
     ctx.fillText(label, px + 10, py + 4);
   }
@@ -849,7 +850,7 @@ function drawWTScatter(dataF, dataM, d1, d2, a1, a2, dNorm, aNorm, r) {
 
     // Label
     ctx.fillStyle = color;
-    ctx.font = 'bold 12px IBM Plex Mono';
+    ctx.font = `bold 12px ${_C.mono}`;
     const labelX = toX(ux * (scale + 0.3));
     const labelY = toY(uy * (scale + 0.3));
     ctx.textAlign = 'center';
@@ -863,7 +864,7 @@ function drawWTScatter(dataF, dataM, d1, d2, a1, a2, dNorm, aNorm, r) {
   drawArrow(a1, a2, aNorm, WT_COLORS.orange, true, 'Mah.');
 
   // Legend
-  ctx.font = '11px IBM Plex Mono';
+  ctx.font = `11px ${_C.mono}`;
   ctx.textAlign = 'left';
   const lx = pad.left + 10, ly = pad.top + 16;
   ctx.fillStyle = WT_COLORS.female; ctx.fillRect(lx, ly - 8, 10, 10);
@@ -920,15 +921,16 @@ const PRESETS = {
 };
 
 // Palette lookup from CSS variables
-const _css2 = getComputedStyle(document.documentElement);
-const _C2 = {
-  teal:       _css2.getPropertyValue('--teal').trim(),
-  orange:     _css2.getPropertyValue('--orange').trim(),
-  textDim:    _css2.getPropertyValue('--text-dim').trim(),
-  textBright: _css2.getPropertyValue('--text-bright').trim(),
-  bgSurface:  _css2.getPropertyValue('--bg-surface').trim(),
-  border:     _css2.getPropertyValue('--border').trim(),
-  bg:         _css2.getPropertyValue('--bg').trim(),
+const _css = getComputedStyle(document.documentElement);
+const _C = {
+  teal:       _css.getPropertyValue('--teal').trim(),
+  orange:     _css.getPropertyValue('--orange').trim(),
+  textDim:    _css.getPropertyValue('--text-dim').trim(),
+  textBright: _css.getPropertyValue('--text-bright').trim(),
+  bgSurface:  _css.getPropertyValue('--bg-surface').trim(),
+  border:     _css.getPropertyValue('--border').trim(),
+  bg:         _css.getPropertyValue('--bg').trim(),
+  mono:       _css.getPropertyValue('--mono').trim(),
 };
 
 // male/female are intentionally off-palette (distinct group colors for this viz)
@@ -937,14 +939,14 @@ const COLORS = {
   female: '#f472b6',
   maleAlpha: 'rgba(59,158,255,0.35)',
   femaleAlpha: 'rgba(244,114,182,0.35)',
-  teal: _C2.teal,
-  orange: _C2.orange,
-  text: _C2.textDim,
-  textBright: _C2.textBright,
+  teal: _C.teal,
+  orange: _C.orange,
+  text: _C.textDim,
+  textBright: _C.textBright,
   dim: 'rgba(201,205,216,0.3)',
   dimmer: 'rgba(201,205,216,0.15)',
-  bg: _C2.bgSurface,
-  border: _C2.border
+  bg: _C.bgSurface,
+  border: _C.border
 };
 
 // ============================================================
@@ -1274,7 +1276,7 @@ function drawAxes(ctx, w, h, pad, opts) {
   ctx.stroke();
 
   ctx.fillStyle = COLORS.text;
-  ctx.font = '11px IBM Plex Mono';
+  ctx.font = `11px ${_C.mono}`;
   ctx.textAlign = 'center';
 
   if (opts.xTicks) {
@@ -1303,7 +1305,7 @@ function drawAxes(ctx, w, h, pad, opts) {
   if (opts.xLabel) {
     ctx.textAlign = 'center';
     ctx.fillStyle = COLORS.text;
-    ctx.font = '11px IBM Plex Mono';
+    ctx.font = `11px ${_C.mono}`;
     ctx.fillText(opts.xLabel, pad.left + (w - pad.left - pad.right)/2, h - 2);
   }
 }
@@ -1403,7 +1405,7 @@ function drawOverview() {
 
   // x axis ticks
   ctx.fillStyle = COLORS.text;
-  ctx.font = '11px IBM Plex Mono';
+  ctx.font = `11px ${_C.mono}`;
   ctx.textAlign = 'center';
   [-1, -0.5, 0, 0.5, 1].forEach(function(v) {
     if (Math.abs(v) <= maxD) {
@@ -1428,13 +1430,13 @@ function drawOverview() {
     // Label
     ctx.fillStyle = COLORS.text;
     ctx.textAlign = 'right';
-    ctx.font = '12px IBM Plex Mono';
+    ctx.font = `12px ${_C.mono}`;
     ctx.fillText(TRAITS[i], pad.left - 8, (barTop + barBot) / 2 + 4);
 
     // Value
     ctx.textAlign = 'left';
     ctx.fillStyle = COLORS.textBright;
-    ctx.font = '11px IBM Plex Mono';
+    ctx.font = `11px ${_C.mono}`;
     const valX = Math.max(bx, ex) + 6;
     ctx.fillText(d.toFixed(2), valX, (barTop + barBot) / 2 + 4);
   }
@@ -1490,7 +1492,7 @@ function drawMFPHistogram(g, pVals, sex) {
   ctx.lineTo(w - pad.right, h - pad.bottom);
   ctx.stroke();
   ctx.fillStyle = COLORS.text;
-  ctx.font = '10px IBM Plex Mono';
+  ctx.font = `10px ${_C.mono}`;
   ctx.textAlign = 'center';
   [0, 0.25, 0.5, 0.75, 1].forEach(function(v) {
     ctx.fillText(v.toFixed(2), xPos(v, 0, 1, pad, w), h - pad.bottom + 13);
@@ -1498,7 +1500,7 @@ function drawMFPHistogram(g, pVals, sex) {
   drawDashedV(ctx, xPos(0.5, 0, 1, pad, w), pad.top, h - pad.bottom, COLORS.dim);
   drawHistDensity(ctx, w, h, pad, femP, 0, 1, yMax, COLORS.female, COLORS.femaleAlpha, nBins);
   drawHistDensity(ctx, w, h, pad, maleP, 0, 1, yMax, COLORS.male, COLORS.maleAlpha, nBins);
-  ctx.font = '10px IBM Plex Mono';
+  ctx.font = `10px ${_C.mono}`;
   [[COLORS.male, 'Male'], [COLORS.female, 'Female']].forEach(function(pair, i) {
     const lx = w - pad.right - 80;
     const ly = pad.top + 10 + i * 16;
@@ -1538,7 +1540,7 @@ function drawTwoGroupDensity(g, values, sex, label) {
 
   // x ticks
   ctx.fillStyle = COLORS.text;
-  ctx.font = '10px IBM Plex Mono';
+  ctx.font = `10px ${_C.mono}`;
   ctx.textAlign = 'center';
   const range = xMax - xMin;
   const step = range > 8 ? 2 : range > 4 ? 1 : 0.5;
@@ -1557,7 +1559,7 @@ function drawTwoGroupDensity(g, values, sex, label) {
   drawDensityCurve(ctx, w, h, pad, muM, sdM, xMin, xMax, yMax, COLORS.male, COLORS.maleAlpha);
 
   // Legend
-  ctx.font = '10px IBM Plex Mono';
+  ctx.font = `10px ${_C.mono}`;
   [[COLORS.male, 'Male'], [COLORS.female, 'Female']].forEach(function(pair, i) {
     const lx = w - pad.right - 80;
     const ly = pad.top + 10 + i * 16;
@@ -1607,12 +1609,12 @@ function drawMFD() {
 
     ctx.fillStyle = COLORS.text;
     ctx.textAlign = 'right';
-    ctx.font = '12px IBM Plex Mono';
+    ctx.font = `12px ${_C.mono}`;
     ctx.fillText(TRAITS[i], pad.left - 8, (barTop + barBot) / 2 + 4);
 
     ctx.textAlign = 'left';
     ctx.fillStyle = COLORS.textBright;
-    ctx.font = '11px IBM Plex Mono';
+    ctx.font = `11px ${_C.mono}`;
     ctx.fillText(wt.toFixed(2), Math.max(bx, ex) + 6, (barTop + barBot) / 2 + 4);
   }
 
@@ -1681,7 +1683,7 @@ function drawMFT() {
 
   // Labels
   ctx.fillStyle = COLORS.text;
-  ctx.font = '10px IBM Plex Mono';
+  ctx.font = `10px ${_C.mono}`;
   ctx.textAlign = 'center';
   ctx.fillText('M-F_D', pad.left + plotW/2, h - 3);
   ctx.save();
@@ -1750,7 +1752,7 @@ function drawMFP() {
 
   // Y ticks
   g2.ctx.fillStyle = COLORS.text;
-  g2.ctx.font = '10px IBM Plex Mono';
+  g2.ctx.font = `10px ${_C.mono}`;
   g2.ctx.textAlign = 'right';
   [0, 0.25, 0.5, 0.75, 1].forEach(function(v) {
     const y = yPos(v, 0, 1, pad2, g2.h);
@@ -1970,7 +1972,7 @@ function drawMFC() {
   var midX = (px(cF2d[0]) + px(cM2d[0])) / 2;
   var midY = (py(cF2d[1]) + py(cM2d[1])) / 2;
   ctx.fillStyle = COLORS.teal;
-  ctx.font = '13px IBM Plex Mono';
+  ctx.font = `13px ${_C.mono}`;
   ctx.textAlign = 'center';
   ctx.fillText('D = ' + s.DM.toFixed(2), midX, midY - 10);
 
@@ -1980,11 +1982,11 @@ function drawMFC() {
     ctx.arc(px(cx), py(cy), 7, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.fill();
-    ctx.strokeStyle = _C2.bg;
+    ctx.strokeStyle = _C.bg;
     ctx.lineWidth = 2.4;
     ctx.stroke();
     ctx.fillStyle = COLORS.textBright;
-    ctx.font = 'bold 12px IBM Plex Mono';
+    ctx.font = `bold 12px ${_C.mono}`;
     ctx.textAlign = 'center';
     ctx.fillText(label, px(cx), py(cy) - 13);
   }
@@ -2126,7 +2128,7 @@ function drawAggregation() {
 
   // Y axis ticks
   ctx.fillStyle = COLORS.text;
-  ctx.font = '11px IBM Plex Mono';
+  ctx.font = `11px ${_C.mono}`;
   ctx.textAlign = 'right';
   const yStep = yMax > 8 ? 2 : yMax > 4 ? 1 : 0.5;
   for (let v = 0; v <= yMax; v += yStep) {
@@ -2164,7 +2166,7 @@ function drawAggregation() {
 
     // Values on top
     ctx.fillStyle = COLORS.orange;
-    ctx.font = '11px IBM Plex Mono';
+    ctx.font = `11px ${_C.mono}`;
     ctx.textAlign = 'center';
     ctx.fillText(lev.Draw.toFixed(2), cx - barW/2 - 2, h - pad.bottom - rawH - 5);
     ctx.fillStyle = COLORS.teal;
@@ -2172,16 +2174,16 @@ function drawAggregation() {
 
     // Group label
     ctx.fillStyle = COLORS.text;
-    ctx.font = '11px IBM Plex Mono';
+    ctx.font = `11px ${_C.mono}`;
     ctx.textAlign = 'center';
     ctx.fillText(lev.label, cx, h - pad.bottom + 16);
-    ctx.font = '10px IBM Plex Mono';
+    ctx.font = `10px ${_C.mono}`;
     ctx.fillStyle = COLORS.dim;
     ctx.fillText('\u03B1 = ' + lev.alpha.toFixed(2), cx, h - pad.bottom + 30);
   });
 
   // Legend
-  ctx.font = '10px IBM Plex Mono';
+  ctx.font = `10px ${_C.mono}`;
   [['D (raw)', COLORS.orange], ['D (corrected)', COLORS.teal]].forEach(function(pair, i) {
     const lx = w - pad.right - 120;
     const ly = pad.top + 5 + i * 16;
@@ -2195,7 +2197,7 @@ function drawAggregation() {
   // Y label
   ctx.save();
   ctx.fillStyle = COLORS.text;
-  ctx.font = '11px IBM Plex Mono';
+  ctx.font = `11px ${_C.mono}`;
   ctx.textAlign = 'center';
   ctx.translate(12, pad.top + (h - pad.top - pad.bottom)/2);
   ctx.rotate(-Math.PI/2);

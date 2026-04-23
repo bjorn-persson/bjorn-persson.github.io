@@ -117,6 +117,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
   const C_BORDER   = _css.getPropertyValue('--border').trim();
   const C_BG_ELEV  = _css.getPropertyValue('--bg-elevated').trim();
+  const C_MONO     = _css.getPropertyValue('--mono').trim();
 
   const N_ARROWS = 40;
   const SEED = 42;
@@ -232,7 +233,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     tCtx.fillStyle = 'rgba(249, 115, 22, 0.9)';
     tCtx.fill();
 
-    tCtx.font = '14px IBM Plex Mono, monospace';
+    tCtx.font = `14px ${C_MONO}`;
     tCtx.fillStyle = C_TEXT_DIM;
     tCtx.textAlign = 'center';
     tCtx.fillText('● = cluster mean', cx, H - 8);
@@ -325,7 +326,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T + ph); dCtx.lineTo(PAD_L + pw, PAD_T + ph); dCtx.stroke();
     dCtx.beginPath(); dCtx.moveTo(PAD_L, PAD_T); dCtx.lineTo(PAD_L, PAD_T + ph); dCtx.stroke();
 
-    dCtx.font = '13px IBM Plex Mono, monospace';
+    dCtx.font = `13px ${C_MONO}`;
     dCtx.fillStyle = C_TEXT_DIM;
     dCtx.textAlign = 'center';
     for (let t = 0; t <= 1.001; t += 0.25) {
@@ -340,13 +341,13 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.rotate(-Math.PI / 2);
     dCtx.textAlign = 'center';
     dCtx.fillStyle = C_TEXT_DIM;
-    dCtx.font = '13px IBM Plex Mono, monospace';
+    dCtx.font = `13px ${C_MONO}`;
     dCtx.fillText('density', 0, 0);
     dCtx.restore();
 
     const legX = PAD_L + pw - 4;
     dCtx.textAlign = 'right';
-    dCtx.font = '13px IBM Plex Mono, monospace';
+    dCtx.font = `13px ${C_MONO}`;
 
     dCtx.strokeStyle = C_TEAL; dCtx.lineWidth = 2; dCtx.setLineDash([]);
     dCtx.beginPath(); dCtx.moveTo(legX - 52, PAD_T + 10); dCtx.lineTo(legX - 32, PAD_T + 10); dCtx.stroke();

@@ -253,6 +253,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
   const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
   const C_BORDER   = _css.getPropertyValue('--border').trim();
   const C_BG       = _css.getPropertyValue('--bg').trim();
+  const C_MONO     = _css.getPropertyValue('--mono').trim();
 
   // === Seeded RNG ===
   function mulberry32(a) {
@@ -608,7 +609,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
 
     // Axis labels
     ctx.fillStyle = C_TEXT_DIM;
-    ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.font = `11px ${C_MONO}`;
     ctx.textAlign = 'center';
     ctx.fillText('Stress (X)', w/2, h - 6);
     ctx.save();

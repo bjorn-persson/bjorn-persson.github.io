@@ -670,6 +670,8 @@ summary: "Explore how aggregating questionnaire items into composite scores trad
 </div><!-- /container -->
 
 <script>
+const C_MONO = getComputedStyle(document.documentElement).getPropertyValue('--mono').trim();
+
 // ========================================
 // UTILITY FUNCTIONS
 // ========================================
@@ -757,7 +759,7 @@ function drawAxes(ctx, w, h, pad, opts = {}) {
   ctx.stroke();
 
   ctx.fillStyle = COLORS.text;
-  ctx.font = '13px IBM Plex Mono';
+  ctx.font = `13px ${C_MONO}`;
   ctx.textAlign = 'center';
 
   if (opts.xTicks) {
@@ -793,7 +795,7 @@ function drawAxes(ctx, w, h, pad, opts = {}) {
     ctx.translate(12, pad.top + (h - pad.top - pad.bottom) / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillStyle = COLORS.text;
-    ctx.font = '11px IBM Plex Mono';
+    ctx.font = `11px ${C_MONO}`;
     ctx.fillText(opts.yLabel, 0, 0);
     ctx.restore();
   }
@@ -1297,7 +1299,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
       ctx.lineTo(w - pad.right, y);
       ctx.stroke();
       ctx.fillStyle = COLORS.text;
-      ctx.font = '12px IBM Plex Mono';
+      ctx.font = `12px ${C_MONO}`;
       ctx.textAlign = 'right';
       ctx.fillText(v.toFixed(2), pad.left - 6, y + 3);
     }
@@ -1321,7 +1323,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
     ctx.translate(6, pad.top + plotH / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillStyle = COLORS.text;
-    ctx.font = '13px IBM Plex Mono';
+    ctx.font = `13px ${C_MONO}`;
     ctx.fillText('Weight / Validity', 0, 0);
     ctx.restore();
 
@@ -1332,7 +1334,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
 
       // Labels
       ctx.fillStyle = COLORS.text;
-      ctx.font = '13px IBM Plex Mono';
+      ctx.font = `13px ${C_MONO}`;
       ctx.textAlign = 'center';
       ctx.fillText('Scale A', pad.left + (kPerScale * groupW) / 2, h - pad.bottom + 40);
       ctx.fillText('Scale B', pad.left + kPerScale * groupW + (kPerScale * groupW) / 2, h - pad.bottom + 40);
@@ -1367,7 +1369,7 @@ function drawDashedLine(ctx, x1, y1, x2, y2, color) {
 
       // Item number
       ctx.fillStyle = COLORS.text;
-      ctx.font = '11px IBM Plex Mono';
+      ctx.font = `11px ${C_MONO}`;
       ctx.textAlign = 'center';
       ctx.fillText((i + 1).toString(), x + barW / 2, h - pad.bottom + 14);
     });

@@ -165,6 +165,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
   const C_TEXT_DIM = css.getPropertyValue('--text-dim').trim();
   const C_BORDER   = css.getPropertyValue('--border').trim();
   const C_BG_ELEV  = css.getPropertyValue('--bg-elevated').trim();
+  const C_MONO     = css.getPropertyValue('--mono').trim();
 
   const N = 60;
   const SEED = 17;
@@ -249,12 +250,12 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     }
 
     const rColor = r > 0.9 ? C_RED : r > 0.7 ? '#f59e0b' : C_TEXT_DIM;
-    sCtx.font = 'bold 16px IBM Plex Mono, monospace';
+    sCtx.font = `bold 16px ${C_MONO}`;
     sCtx.fillStyle = rColor;
     sCtx.textAlign = 'center';
     sCtx.fillText(`r(X₁,X₂) = ${r.toFixed(3)}`, W/2, PAD - 8);
 
-    sCtx.font = '14px IBM Plex Mono, monospace';
+    sCtx.font = `14px ${C_MONO}`;
     sCtx.fillStyle = C_TEXT_DIM;
     sCtx.textAlign = 'center';
     sCtx.fillText('X₁', W/2, PAD + ph + 24);
@@ -264,7 +265,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     sCtx.fillText('X₂', 0, 0);
     sCtx.restore();
 
-    sCtx.font = '12px IBM Plex Mono, monospace';
+    sCtx.font = `12px ${C_MONO}`;
     sCtx.textAlign = 'left';
     sCtx.fillStyle = 'rgba(45,212,191,0.8)';
     sCtx.fillText('high Y', PAD + pw - 36, PAD + ph - 6);
@@ -356,7 +357,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     }
 
     pCtx.fillStyle = C_TEXT_DIM;
-    pCtx.font = '14px IBM Plex Mono, monospace';
+    pCtx.font = `14px ${C_MONO}`;
     pCtx.textAlign = 'center';
     pCtx.fillText('X₁', PAD_L + pw/2, PAD_T + ph + 24);
     pCtx.save();
@@ -366,7 +367,7 @@ summary: "Watch how a rising inter-predictor correlation (r → 1) collapses the
     pCtx.restore();
 
     const vifColor = vif > 10 ? C_RED : vif > 5 ? C_ORANGE : C_TEXT_DIM;
-    pCtx.font = 'bold 14px IBM Plex Mono, monospace';
+    pCtx.font = `bold 14px ${C_MONO}`;
     pCtx.fillStyle = vifColor;
     pCtx.textAlign = 'center';
     pCtx.fillText(`VIF = ${vif.toFixed(1)}`, PAD_L + pw/2, PAD_T - 8);
