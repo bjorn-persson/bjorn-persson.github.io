@@ -1,24 +1,45 @@
 ---
 title: "Normal Distribution"
-description: "Interactive visualization of the standard normal density. Click the bell curve to shade the lower tail and read off P(Z ≤ z); a second click shows the probability between two z-values."
+description: "Interactive visualization of the normal density extended with skew and kurtosis. Adjust the four moments and read off lower-tail, upper-tail, two-tailed, central, or range probabilities — or invert from a target probability."
 ---
 
 <style>
-  /* Normal distribution — page-specific styles */
+  .params-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px 24px;
+    margin-bottom: 22px;
+  }
+
+  .mode-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .mode-row .btn {
+    padding: 6px 14px;
+    font-size: 0.78em;
+  }
+  .mode-row .btn.active {
+    background: var(--teal-dim);
+    color: var(--teal);
+    border-color: var(--teal);
+  }
 
   #c {
     display: block;
     width: 100%;
-    height: max(280px, calc(100vh - 460px));
+    height: clamp(300px, 52vh, 460px);
     background: var(--bg-surface);
     border-radius: 6px;
     cursor: crosshair;
   }
 
   .readout {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px 28px;
     margin-top: 16px;
     font-family: var(--mono);
     font-size: 0.82em;
@@ -26,106 +47,187 @@ description: "Interactive visualization of the standard normal density. Click th
   .readout .label { color: var(--text-dim); }
   .readout .value { color: var(--text-bright); font-weight: 600; }
   .readout .prob-val { color: var(--teal); }
-  .readout .accent2 { color: var(--purple); }
-  .readout .hidden { display: none; }
+  .readout .ref-val  { color: var(--purple); }
+  .readout .delta-val { color: var(--text-dim); }
+  .readout .hidden   { display: none; }
+
+  .inverse-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text-dim);
+  }
+  .inverse-row input[type="number"] {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 0.95em;
+    width: 100px;
+  }
+  .inverse-row input[type="number"]:focus {
+    outline: none;
+    border-color: var(--teal);
+  }
+  .inverse-row input[disabled] { opacity: 0.4; }
+  .inverse-row .btn { padding: 5px 14px; font-size: 0.78em; }
+
+  .reset-btn {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    background: none;
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    padding: 6px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-left: auto;
+  }
+  .reset-btn:hover { background: var(--orange-dim); }
 
   .mode-indicator {
     margin-top: 12px;
     font-family: var(--mono);
-    font-size: 0.82em;
-    color: var(--teal);
-    opacity: 0.8;
+    font-size: 0.78em;
+    color: var(--text-dim);
   }
 
-  .reset-btn {
+  .neg-warn {
+    display: none;
     margin-top: 10px;
     font-family: var(--mono);
-    font-size: 0.82em;
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 5px 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
+    font-size: 0.78em;
+    color: var(--orange);
   }
-  .reset-btn:hover {
-    border-color: var(--teal);
-    color: var(--teal);
-  }
-
+  .neg-warn.show { display: block; }
 </style>
 
 <div class="container">
 
   <div class="hero">
-    <h1>Normal Distribution</h1>
+    <h1>Normal Distribution<button class="info-btn hero-info" onclick="showInfo('method')">?</button></h1>
     <div class="subtitle">
-      Interactive exploration of probabilities under the standard normal curve
+      Tail probabilities under a (possibly non-normal) bell curve. Adjust the four moments and watch the percentages move.
     </div>
   </div>
 
   <div class="section">
-    <p>The normal distribution, also known as the bell curve, is the most common probability distribution in statistics. This interactive visualization lets you explore probabilities under the standard normal curve by clicking to place markers.</p>
+    <p>The normal distribution is fully described by two numbers — its mean (μ) and standard deviation (σ) — and tail probabilities follow from those alone. Real data rarely match exactly: distributions skew, and they have heavier or lighter tails than the normal predicts. This visualization extends the standard display with two extra shape parameters — skewness (γ₁) and excess kurtosis (γ₂) — using the Gram–Charlier / Edgeworth expansion, so you can see how tail probabilities shift when those moments deviate from zero.</p>
+
+    <div class="params-grid">
+      <div class="slider-col">
+        <label>μ (mean) <span class="slider-val" id="muVal">0.00</span></label>
+        <input type="range" id="muSlider" min="-3" max="3" step="0.05" value="0">
+      </div>
+      <div class="slider-col">
+        <label>σ (sd) <span class="slider-val" id="sigmaVal">1.00</span></label>
+        <input type="range" id="sigmaSlider" min="0.3" max="3" step="0.05" value="1">
+      </div>
+      <div class="slider-col">
+        <label>γ₁ (skew) <span class="slider-val" id="g1Val">0.00</span></label>
+        <input type="range" id="g1Slider" min="-0.7" max="0.7" step="0.01" value="0">
+      </div>
+      <div class="slider-col">
+        <label>γ₂ (excess kurtosis) <span class="slider-val" id="g2Val">0.00</span></label>
+        <input type="range" id="g2Slider" min="-0.5" max="1.5" step="0.01" value="0">
+      </div>
+    </div>
+
+    <div class="mode-row">
+      <button class="btn active" data-mode="lower">Lower tail</button>
+      <button class="btn" data-mode="upper">Upper tail</button>
+      <button class="btn" data-mode="two-tailed">Two-tailed</button>
+      <button class="btn" data-mode="central">Central</button>
+      <button class="btn" data-mode="range">Range (2 clicks)</button>
+      <button class="reset-btn" id="resetBtn">Reset all</button>
+    </div>
+
     <canvas id="c" height="400"></canvas>
+
     <div class="readout">
-      <div id="r_z1"><span class="label">z = </span><span class="value" id="z1Val">&mdash;</span></div>
-      <div id="r_z2" class="hidden"><span class="label">z&#x2082; = </span><span class="value" id="z2Val">&mdash;</span></div>
-      <div id="r_p"><span class="label" id="pLabel">P(Z &le; z) = </span><span class="value prob-val" id="pVal">&mdash;</span></div>
-      <div><span class="label">hover z = </span><span class="value accent2" id="hVal">&mdash;</span></div>
+      <div id="r_x1"><span class="label" id="x1Label">x = </span><span class="value" id="x1Val">&mdash;</span></div>
+      <div id="r_x2" class="hidden"><span class="label" id="x2Label">x&#x2082; = </span><span class="value" id="x2Val">&mdash;</span></div>
+      <div><span class="label" id="pLabel">P = </span><span class="value prob-val" id="pVal">&mdash;</span></div>
+      <div><span class="label">under N(μ, σ²): </span><span class="value ref-val" id="pNormVal">&mdash;</span> <span class="delta-val" id="deltaVal"></span></div>
     </div>
-    <div class="mode-indicator" id="modeText">Click to place a marker</div>
-    <button class="reset-btn" id="resetBtn">Reset</button>
+
+    <div class="inverse-row">
+      <span>Or invert: find x for P =</span>
+      <input type="number" id="invInput" min="0" max="1" step="0.001" value="0.025">
+      <button class="btn" id="invBtn">Go</button>
+    </div>
+
+    <div class="mode-indicator" id="modeText">Click on the curve to place a marker.</div>
+    <div class="neg-warn" id="negWarn">⚠ Density goes negative in part of the displayed range — the Gram–Charlier expansion is invalid for these moments. Probabilities are still computed from the closed-form CDF.</div>
+
     <div class="note">
-      One click: cumulative P(Z &le; z) from &minus;&infin;.<br>
-      Two clicks: proportion between two z-values. Hover to preview.
-    </div>
-    <div class="note caveat">
-      CDF via Abramowitz &amp; Stegun 26.2.17 (max error ~1.5&times;10&#x207B;&#x2077;).<br>
-      One marker: &Phi;(z). Two markers: &Phi;(z&#x2082;) &minus; &Phi;(z&#x2081;).
+      <strong>μ, σ:</strong> shift and scale the curve. Tail probabilities don't change — μ and σ just relabel the x-axis.<br>
+      <strong>γ₁:</strong> skewness. Positive ⇒ longer right tail and lower-tail probabilities <em>shrink</em>.<br>
+      <strong>γ₂:</strong> excess kurtosis. Positive ⇒ heavier tails (extreme events more likely than the normal predicts) and a sharper peak.<br>
+      The dashed purple curve shows N(μ, σ²) as a reference whenever the distribution is non-normal.
     </div>
   </div>
-
-</div>
 
 <script>
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 
-// Palette lookup from CSS variables
+// Palette lookup
 const _css = getComputedStyle(document.documentElement);
 const C_TEAL     = _css.getPropertyValue('--teal').trim();
 const C_PURPLE   = _css.getPropertyValue('--purple').trim();
 const C_TEXT_DIM = _css.getPropertyValue('--text-dim').trim();
 const C_BORDER   = _css.getPropertyValue('--border').trim();
 const C_MONO     = _css.getPropertyValue('--mono').trim();
-const z1El = document.getElementById('z1Val');
-const z2El = document.getElementById('z2Val');
-const pEl  = document.getElementById('pVal');
+
+// DOM
+const muSlider    = document.getElementById('muSlider');
+const sigmaSlider = document.getElementById('sigmaSlider');
+const g1Slider    = document.getElementById('g1Slider');
+const g2Slider    = document.getElementById('g2Slider');
+const muValEl     = document.getElementById('muVal');
+const sigmaValEl  = document.getElementById('sigmaVal');
+const g1ValEl     = document.getElementById('g1Val');
+const g2ValEl     = document.getElementById('g2Val');
+
+const x1El   = document.getElementById('x1Val');
+const x2El   = document.getElementById('x2Val');
+const x1Lbl  = document.getElementById('x1Label');
+const x2Lbl  = document.getElementById('x2Label');
+const rX2    = document.getElementById('r_x2');
+const pEl    = document.getElementById('pVal');
+const pNormEl= document.getElementById('pNormVal');
+const deltaEl= document.getElementById('deltaVal');
 const pLabel = document.getElementById('pLabel');
-const hEl  = document.getElementById('hVal');
 const modeEl = document.getElementById('modeText');
+const negWarn= document.getElementById('negWarn');
 const resetBtn = document.getElementById('resetBtn');
-const rZ1 = document.getElementById('r_z1');
-const rZ2 = document.getElementById('r_z2');
+const modeButtons = document.querySelectorAll('.mode-row .btn');
+const invInput = document.getElementById('invInput');
+const invBtn   = document.getElementById('invBtn');
 
-const Z_MIN = -4, Z_MAX = 4;
 const PAD_L = 60, PAD_R = 24, PAD_T = 24, PAD_B = 46;
-
 let dpr = 1;
 
-// State: 0 = nothing, 1 = one marker (cumulative), 2 = two markers (range)
-let state = 0;
-let z1 = null, z2 = null;
-let hoverZ = null;
+// Distribution state
+let mu = 0, sigma = 1, g1 = 0, g2 = 0;
+// Interaction state
+let tailMode = 'lower';
+let click1 = null, click2 = null; // x-units
+let hoverX = null;
 
-function phi(z) {
-  return Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
-}
-
+// --- Math: standard normal pdf and cdf ---
+function phi(z) { return Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI); }
 function Phi(z) {
   if (z < -8) return 0;
-  if (z > 8) return 1;
+  if (z >  8) return 1;
   const neg = z < 0;
   const x = neg ? -z : z;
   const t = 1 / (1 + 0.2316419 * x);
@@ -134,37 +236,106 @@ function Phi(z) {
   return neg ? p : 1 - p;
 }
 
-function zToX(z) {
-  const w = canvas.width / dpr - PAD_L - PAD_R;
-  return PAD_L + (z - Z_MIN) / (Z_MAX - Z_MIN) * w;
-}
+// Probabilist's Hermite polynomials
+function He2(z) { return z*z - 1; }
+function He3(z) { return z*z*z - 3*z; }
+function He4(z) { const z2 = z*z; return z2*z2 - 6*z2 + 3; }
 
-function yFromPhi(v) {
-  const h = canvas.height / dpr - PAD_T - PAD_B;
-  const maxPhi = phi(0);
-  return PAD_T + h - (v / maxPhi) * h;
+// Edgeworth in z-space
+function fz(z) {
+  return phi(z) * (1 + (g1/6) * He3(z) + (g2/24) * He4(z));
 }
-
-function xToZ(px) {
-  const w = canvas.width / dpr - PAD_L - PAD_R;
-  return Z_MIN + (px - PAD_L) / w * (Z_MAX - Z_MIN);
+function Fz(z) {
+  return Phi(z) - phi(z) * ((g1/6) * He2(z) + (g2/24) * He3(z));
 }
+// In x-space
+function fx(x) { return fz((x - mu) / sigma) / sigma; }
+function Fx(x) { return Fz((x - mu) / sigma); }
+// Reference normal (same μ, σ; γ₁=γ₂=0)
+function FxNormal(x) { return Phi((x - mu) / sigma); }
 
-function clampZ(z) {
-  return Math.max(Z_MIN, Math.min(Z_MAX, z));
-}
-
-function drawShade(lo, hi, color1, color2) {
-  const steps = 300;
-  ctx.beginPath();
-  const plotH = canvas.height / dpr - PAD_T - PAD_B;
-  ctx.moveTo(zToX(lo), yFromPhi(0));
-  for (let i = 0; i <= steps; i++) {
-    const zi = lo + (hi - lo) * i / steps;
-    ctx.lineTo(zToX(zi), yFromPhi(phi(zi)));
+// Inverse standardized CDF via bisection
+function invFz(p) {
+  let lo = -8, hi = 8;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (Fz(mid) < p) lo = mid; else hi = mid;
   }
-  ctx.lineTo(zToX(hi), yFromPhi(0));
+  return (lo + hi) / 2;
+}
+
+// --- Geometry ---
+function xRange() {
+  const half = 4 * sigma;
+  return [mu - half, mu + half];
+}
+function xToPx(x) {
+  const [lo, hi] = xRange();
+  const w = canvas.width / dpr - PAD_L - PAD_R;
+  return PAD_L + (x - lo) / (hi - lo) * w;
+}
+function pxToX(px) {
+  const [lo, hi] = xRange();
+  const w = canvas.width / dpr - PAD_L - PAD_R;
+  return lo + (px - PAD_L) / w * (hi - lo);
+}
+function yFromDensity(v) {
+  const h = canvas.height / dpr - PAD_T - PAD_B;
+  // Reference peak: normal peak of N(μ, σ²); add headroom for skew/kurtosis bumps
+  const peak = 1 / (sigma * Math.sqrt(2 * Math.PI));
+  return PAD_T + h - (v / (peak * 1.15)) * h;
+}
+function clampX(x) {
+  const [lo, hi] = xRange();
+  return Math.max(lo, Math.min(hi, x));
+}
+
+// --- Probability + shaded regions per tail mode ---
+function probAndRegions(useNormal, primary, secondary) {
+  const F = useNormal ? FxNormal : Fx;
+  const [xlo, xhi] = xRange();
+  if (tailMode === 'lower') {
+    if (primary === null) return null;
+    return { p: F(primary), regions: [[xlo, primary]] };
+  }
+  if (tailMode === 'upper') {
+    if (primary === null) return null;
+    return { p: 1 - F(primary), regions: [[primary, xhi]] };
+  }
+  if (tailMode === 'two-tailed') {
+    if (primary === null) return null;
+    const h = Math.abs(primary - mu);
+    const a = mu - h, b = mu + h;
+    return { p: F(a) + (1 - F(b)), regions: [[xlo, a], [b, xhi]] };
+  }
+  if (tailMode === 'central') {
+    if (primary === null) return null;
+    const h = Math.abs(primary - mu);
+    const a = mu - h, b = mu + h;
+    return { p: F(b) - F(a), regions: [[a, b]] };
+  }
+  if (tailMode === 'range') {
+    if (primary === null || secondary === null) return null;
+    const a = Math.min(primary, secondary), b = Math.max(primary, secondary);
+    return { p: F(b) - F(a), regions: [[a, b]] };
+  }
+  return null;
+}
+
+// --- Drawing ---
+function drawShade(lo, hi, color1, color2) {
+  if (hi <= lo) return;
+  const steps = 200;
+  ctx.beginPath();
+  ctx.moveTo(xToPx(lo), yFromDensity(0));
+  for (let i = 0; i <= steps; i++) {
+    const xi = lo + (hi - lo) * i / steps;
+    const d = Math.max(0, fx(xi));
+    ctx.lineTo(xToPx(xi), yFromDensity(d));
+  }
+  ctx.lineTo(xToPx(hi), yFromDensity(0));
   ctx.closePath();
+  const plotH = canvas.height / dpr - PAD_T - PAD_B;
   const grad = ctx.createLinearGradient(0, PAD_T, 0, PAD_T + plotH);
   grad.addColorStop(0, color1);
   grad.addColorStop(1, color2);
@@ -172,21 +343,30 @@ function drawShade(lo, hi, color1, color2) {
   ctx.fill();
 }
 
-function drawVertical(z, color) {
-  const xz = zToX(z);
+function drawMarker(x, color, dashed) {
+  const px = xToPx(x);
+  const dy = Math.max(0, fx(x));
   ctx.beginPath();
-  ctx.moveTo(xz, yFromPhi(phi(z)));
-  ctx.lineTo(xz, yFromPhi(0));
+  ctx.moveTo(px, yFromDensity(dy));
+  ctx.lineTo(px, yFromDensity(0));
   ctx.strokeStyle = color;
   ctx.lineWidth = 1.5;
-  ctx.setLineDash([4, 3]);
+  ctx.setLineDash(dashed ? [4, 3] : [4, 3]);
   ctx.stroke();
   ctx.setLineDash([]);
-
   ctx.beginPath();
-  ctx.arc(xz, yFromPhi(phi(z)), 5, 0, Math.PI * 2);
+  ctx.arc(px, yFromDensity(dy), 5, 0, Math.PI * 2);
   ctx.fillStyle = color;
   ctx.fill();
+}
+
+function densityNegativeAnywhere() {
+  if (g1 === 0 && g2 === 0) return false;
+  // Check in the meaningful range where φ(z) is non-trivial
+  for (let z = -3; z <= 3.001; z += 0.05) {
+    if (fz(z) < -1e-4) return true;
+  }
+  return false;
 }
 
 function draw() {
@@ -194,41 +374,88 @@ function draw() {
   const H = canvas.height / dpr;
   const plotW = W - PAD_L - PAD_R;
   const plotH = H - PAD_T - PAD_B;
+  const [xlo, xhi] = xRange();
   const steps = 400;
 
   ctx.clearRect(0, 0, W, H);
 
-  // Shading
-  if (state === 1 && z1 !== null) {
-    drawShade(Z_MIN, z1, 'rgba(45,212,191,0.22)', 'rgba(45,212,191,0.04)');
-    if (hoverZ !== null) {
-      const lo = Math.min(z1, hoverZ), hi = Math.max(z1, hoverZ);
-      drawShade(lo, hi, 'rgba(167,139,250,0.12)', 'rgba(167,139,250,0.03)');
-    }
-  } else if (state === 2 && z1 !== null && z2 !== null) {
-    const lo = Math.min(z1, z2), hi = Math.max(z1, z2);
-    drawShade(lo, hi, 'rgba(45,212,191,0.22)', 'rgba(45,212,191,0.04)');
-  } else if (state === 0 && hoverZ !== null) {
-    drawShade(Z_MIN, hoverZ, 'rgba(167,139,250,0.12)', 'rgba(167,139,250,0.03)');
+  // Determine primary/secondary for shading
+  let primary = click1, secondary = click2;
+  let isPreview = false;
+  if (primary === null && hoverX !== null) {
+    primary = hoverX;
+    isPreview = true;
+  }
+  if (tailMode === 'range' && click1 !== null && click2 === null && hoverX !== null) {
+    secondary = hoverX;
+    isPreview = true;
   }
 
-  // Full curve
+  // Shade regions
+  const r = probAndRegions(false, primary, secondary);
+  if (r) {
+    if (isPreview) {
+      for (const [a, b] of r.regions) {
+        drawShade(a, b, 'rgba(167,139,250,0.12)', 'rgba(167,139,250,0.03)');
+      }
+    } else {
+      for (const [a, b] of r.regions) {
+        drawShade(a, b, 'rgba(45,212,191,0.22)', 'rgba(45,212,191,0.04)');
+      }
+    }
+  }
+
+  // Reference normal curve (dashed, only if non-normal)
+  const isNonNormal = (g1 !== 0 || g2 !== 0);
+  if (isNonNormal) {
+    ctx.beginPath();
+    for (let i = 0; i <= steps; i++) {
+      const xi = xlo + (xhi - xlo) * i / steps;
+      const d = phi((xi - mu) / sigma) / sigma;
+      const px = xToPx(xi);
+      const py = yFromDensity(d);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = 'rgba(167,139,250,0.55)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Distribution density curve
   ctx.beginPath();
   for (let i = 0; i <= steps; i++) {
-    const zi = Z_MIN + (Z_MAX - Z_MIN) * i / steps;
-    const x = zToX(zi);
-    const y = yFromPhi(phi(zi));
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    const xi = xlo + (xhi - xlo) * i / steps;
+    const d = Math.max(0, fx(xi));
+    const px = xToPx(xi);
+    const py = yFromDensity(d);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
   }
-  ctx.strokeStyle = C_PURPLE;
+  ctx.strokeStyle = isNonNormal ? C_TEAL : C_PURPLE;
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Vertical markers
-  if (z1 !== null) drawVertical(z1, C_TEAL);
-  if (state === 2 && z2 !== null) drawVertical(z2, C_TEAL);
-  // Hover line (palette --purple #a78bfa = rgb(167,139,250))
-  if (hoverZ !== null && state !== 2) drawVertical(hoverZ, 'rgba(167,139,250,0.5)');
+  // Click markers
+  if (click1 !== null) drawMarker(click1, C_TEAL);
+  if (click2 !== null) drawMarker(click2, C_TEAL);
+  // Symmetric counterpart for two-tailed/central (when click placed)
+  if ((tailMode === 'two-tailed' || tailMode === 'central') && click1 !== null) {
+    const counterpart = 2 * mu - click1;
+    if (Math.abs(counterpart - click1) > 1e-9) drawMarker(counterpart, C_TEAL);
+  }
+  // Hover marker (and its counterpart for symmetric modes) — show only when relevant
+  const showHover = hoverX !== null && (
+    click1 === null ||
+    (tailMode === 'range' && click2 === null)
+  );
+  if (showHover) {
+    drawMarker(hoverX, 'rgba(167,139,250,0.5)');
+    if ((tailMode === 'two-tailed' || tailMode === 'central') && click1 === null) {
+      const counterpart = 2 * mu - hoverX;
+      if (Math.abs(counterpart - hoverX) > 1e-9) drawMarker(counterpart, 'rgba(167,139,250,0.5)');
+    }
+  }
 
   // X axis
   ctx.beginPath();
@@ -238,120 +465,245 @@ function draw() {
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  // Ticks
-  ctx.font = `14px ${C_MONO}`;
+  // Ticks at μ + k·σ for k = -4..4
+  ctx.font = `13px ${C_MONO}`;
   ctx.fillStyle = C_TEXT_DIM;
   ctx.textAlign = 'center';
-  for (let t = Z_MIN; t <= Z_MAX; t++) {
-    const tx = zToX(t);
+  for (let k = -4; k <= 4; k++) {
+    const xk = mu + k * sigma;
+    const tx = xToPx(xk);
     ctx.beginPath();
     ctx.moveTo(tx, PAD_T + plotH);
     ctx.lineTo(tx, PAD_T + plotH + 5);
     ctx.strokeStyle = C_BORDER;
     ctx.stroke();
-    ctx.fillText(t.toString(), tx, PAD_T + plotH + 21);
+    let lbl;
+    if (Math.abs(xk) < 1e-9) lbl = '0';
+    else if (Math.abs(xk - Math.round(xk)) < 1e-6) lbl = xk.toFixed(0);
+    else lbl = xk.toFixed( sigma < 0.5 ? 2 : 1 );
+    ctx.fillStyle = C_TEXT_DIM;
+    ctx.fillText(lbl, tx, PAD_T + plotH + 21);
   }
 
-  // Y axis label
+  // Y label
   ctx.save();
   ctx.translate(14, PAD_T + plotH / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = 'center';
   ctx.fillStyle = C_TEXT_DIM;
   ctx.font = `14px ${C_MONO}`;
-  ctx.fillText('\u03C6(z)', 0, 0);
+  ctx.fillText('density', 0, 0);
   ctx.restore();
 
-  // Update readouts
   updateReadouts();
+  negWarn.classList.toggle('show', densityNegativeAnywhere());
 }
 
 function updateReadouts() {
-  hEl.textContent = hoverZ !== null ? hoverZ.toFixed(2) : '\u2014';
+  let primary = click1, secondary = click2;
+  if (primary === null && hoverX !== null) primary = hoverX;
+  if (tailMode === 'range' && click1 !== null && click2 === null && hoverX !== null) secondary = hoverX;
 
-  if (state === 0) {
-    rZ2.classList.add('hidden');
-    rZ1.querySelector('.label').innerHTML = 'z = ';
-    z1El.textContent = '\u2014';
-    pLabel.innerHTML = 'P(Z &le; z) = ';
-    if (hoverZ !== null) {
-      pEl.textContent = '~' + (Phi(hoverZ) * 100).toFixed(2) + '%';
-    } else {
-      pEl.textContent = '\u2014';
-    }
-  } else if (state === 1) {
-    rZ2.classList.add('hidden');
-    rZ1.querySelector('.label').innerHTML = 'z = ';
-    z1El.textContent = z1.toFixed(2);
-    if (hoverZ !== null) {
-      const lo = Math.min(z1, hoverZ), hi = Math.max(z1, hoverZ);
-      pLabel.innerHTML = 'P(z\u2081 < Z \u2264 z\u2082) = ';
-      pEl.textContent = '~' + ((Phi(hi) - Phi(lo)) * 100).toFixed(2) + '%';
-    } else {
-      pLabel.innerHTML = 'P(Z &le; z) = ';
-      pEl.textContent = (Phi(z1) * 100).toFixed(2) + '%';
-    }
-  } else if (state === 2) {
-    rZ2.classList.remove('hidden');
-    rZ1.querySelector('.label').innerHTML = 'z\u2081 = ';
-    z1El.textContent = z1.toFixed(2);
-    z2El.textContent = z2.toFixed(2);
-    const lo = Math.min(z1, z2), hi = Math.max(z1, z2);
-    pLabel.innerHTML = 'P(z\u2081 < Z \u2264 z\u2082) = ';
-    pEl.textContent = ((Phi(hi) - Phi(lo)) * 100).toFixed(2) + '%';
+  // Labels per mode
+  if (tailMode === 'range') {
+    x1Lbl.innerHTML = 'x₁ = ';
+    x2Lbl.innerHTML = 'x₂ = ';
+    rX2.classList.remove('hidden');
+    pLabel.innerHTML = 'P(x₁ ≤ X ≤ x₂) = ';
+    x1El.textContent = (click1 !== null) ? click1.toFixed(3) : '—';
+    x2El.textContent = (click2 !== null) ? click2.toFixed(3)
+                       : ((hoverX !== null && click1 !== null) ? hoverX.toFixed(3) : '—');
+  } else {
+    rX2.classList.add('hidden');
+    x1Lbl.innerHTML = 'x = ';
+    x1El.textContent = primary !== null ? primary.toFixed(3) : '—';
+    if (tailMode === 'lower')       pLabel.innerHTML = 'P(X ≤ x) = ';
+    else if (tailMode === 'upper')  pLabel.innerHTML = 'P(X ≥ x) = ';
+    else if (tailMode === 'two-tailed') pLabel.innerHTML = 'P(|X−μ| ≥ |x−μ|) = ';
+    else if (tailMode === 'central')    pLabel.innerHTML = 'P(|X−μ| ≤ |x−μ|) = ';
+  }
+
+  const r  = probAndRegions(false, primary, secondary);
+  const rN = probAndRegions(true,  primary, secondary);
+  if (r) {
+    pEl.textContent = (r.p * 100).toFixed(2) + '%';
+  } else {
+    pEl.textContent = '—';
+  }
+  if (rN) {
+    pNormEl.textContent = (rN.p * 100).toFixed(2) + '%';
+  } else {
+    pNormEl.textContent = '—';
+  }
+  if (r && rN && (g1 !== 0 || g2 !== 0)) {
+    const d = (r.p - rN.p) * 100;
+    const sign = d >= 0 ? '+' : '−';
+    deltaEl.textContent = '(Δ ' + sign + Math.abs(d).toFixed(2) + ' pp)';
+  } else {
+    deltaEl.textContent = '';
   }
 }
 
-function getZ(e) {
-  const rect = canvas.getBoundingClientRect();
-  return clampZ(xToZ(e.clientX - rect.left));
-}
-
+// --- Click handling ---
 canvas.addEventListener('click', e => {
-  const z = getZ(e);
-  if (state === 0) {
-    z1 = z; z2 = null; state = 1;
-    modeEl.textContent = 'Showing cumulative. Click again to set a second bound.';
-  } else if (state === 1) {
-    z2 = z; state = 2;
-    if (z1 > z2) { const tmp = z1; z1 = z2; z2 = tmp; }
-    modeEl.textContent = 'Showing range. Click to start over.';
+  const rect = canvas.getBoundingClientRect();
+  const x = clampX(pxToX(e.clientX - rect.left));
+  if (tailMode === 'range') {
+    if (click1 === null || click2 !== null) {
+      click1 = x; click2 = null;
+      modeEl.textContent = 'First marker placed. Click again to set the second bound.';
+    } else {
+      click2 = x;
+      if (click1 > click2) { const t = click1; click1 = click2; click2 = t; }
+      modeEl.textContent = 'Range complete. Click again to start over.';
+    }
   } else {
-    z1 = z; z2 = null; state = 1;
-    modeEl.textContent = 'Showing cumulative. Click again to set a second bound.';
+    click1 = x; click2 = null;
+    modeEl.textContent = 'Marker placed. Click again to move it, or change tail mode.';
   }
   draw();
 });
 
 canvas.addEventListener('mousemove', e => {
-  hoverZ = getZ(e);
+  const rect = canvas.getBoundingClientRect();
+  hoverX = clampX(pxToX(e.clientX - rect.left));
   draw();
 });
-
-canvas.addEventListener('mouseleave', () => {
-  hoverZ = null;
-  draw();
-});
-
-resetBtn.addEventListener('click', () => {
-  state = 0; z1 = null; z2 = null; hoverZ = null;
-  modeEl.textContent = 'Click to place a marker';
-  draw();
-});
-
+canvas.addEventListener('mouseleave', () => { hoverX = null; draw(); });
 canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+
+// --- Mode buttons ---
+modeButtons.forEach(b => {
+  b.addEventListener('click', () => {
+    modeButtons.forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    tailMode = b.dataset.mode;
+    click1 = null; click2 = null;
+    invInput.disabled = (tailMode === 'range');
+    if (tailMode === 'range') {
+      modeEl.textContent = 'Range mode: click twice to set the lower and upper bounds.';
+    } else {
+      modeEl.textContent = 'Click on the curve to place a marker.';
+    }
+    draw();
+  });
+});
+
+// --- Inverse: probability → marker position ---
+function runInverse() {
+  const p = parseFloat(invInput.value);
+  if (!(p > 0 && p < 1)) return;
+  if (tailMode === 'lower') {
+    click1 = mu + sigma * invFz(p); click2 = null;
+  } else if (tailMode === 'upper') {
+    click1 = mu + sigma * invFz(1 - p); click2 = null;
+  } else if (tailMode === 'two-tailed') {
+    let lo = 0, hi = 8 * sigma;
+    for (let i = 0; i < 60; i++) {
+      const h = (lo + hi) / 2;
+      const tail = Fx(mu - h) + (1 - Fx(mu + h));
+      if (tail > p) lo = h; else hi = h;
+    }
+    click1 = mu + (lo + hi) / 2; click2 = null;
+  } else if (tailMode === 'central') {
+    let lo = 0, hi = 8 * sigma;
+    for (let i = 0; i < 60; i++) {
+      const h = (lo + hi) / 2;
+      const c = Fx(mu + h) - Fx(mu - h);
+      if (c < p) lo = h; else hi = h;
+    }
+    click1 = mu + (lo + hi) / 2; click2 = null;
+  } else {
+    return; // range: not applicable
+  }
+  modeEl.textContent = 'Marker placed via inverse lookup.';
+  draw();
+}
+invBtn.addEventListener('click', runInverse);
+invInput.addEventListener('keydown', e => { if (e.key === 'Enter') runInverse(); });
+
+// --- Sliders ---
+function syncParams() {
+  mu    = parseFloat(muSlider.value);
+  sigma = parseFloat(sigmaSlider.value);
+  g1    = parseFloat(g1Slider.value);
+  g2    = parseFloat(g2Slider.value);
+  muValEl.textContent    = mu.toFixed(2);
+  sigmaValEl.textContent = sigma.toFixed(2);
+  g1ValEl.textContent    = g1.toFixed(2);
+  g2ValEl.textContent    = g2.toFixed(2);
+  draw();
+}
+[muSlider, sigmaSlider, g1Slider, g2Slider].forEach(s => s.addEventListener('input', syncParams));
+
+// --- Reset ---
+resetBtn.addEventListener('click', () => {
+  muSlider.value = 0; sigmaSlider.value = 1; g1Slider.value = 0; g2Slider.value = 0;
+  click1 = null; click2 = null; hoverX = null;
+  invInput.value = '';
+  modeButtons.forEach(b => b.classList.remove('active'));
+  document.querySelector('.mode-row .btn[data-mode="lower"]').classList.add('active');
+  tailMode = 'lower';
+  invInput.disabled = false;
+  modeEl.textContent = 'Click on the curve to place a marker.';
+  syncParams();
+});
 
 function resize() {
   dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * dpr;
+  canvas.width  = rect.width  * dpr;
   canvas.height = rect.height * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   draw();
 }
-
 window.addEventListener('resize', resize);
+syncParams();
 resize();
+</script>
+
+<!-- Info overlay -->
+<div class="info-overlay" id="info-overlay" onclick="if(event.target===this)closeInfo()">
+  <div class="info-modal">
+    <button class="info-close" onclick="closeInfo()">&times;</button>
+    <div id="info-modal-content"></div>
+  </div>
+</div>
+
+<script>
+const infoContent = {
+  method: {
+    badge: 'method',
+    title: 'How the curve and probabilities are computed',
+    body: `
+      <p>The standard normal is extended with two extra moments using the <em>Gram–Charlier Type A</em> (Edgeworth) expansion. Letting <em>z = (x − μ)/σ</em> and <em>φ</em>, <em>Φ</em> denote the standard normal density and CDF:</p>
+      <p class="formula">f(x) = φ(z)·[1 + (γ₁/6)·He₃(z) + (γ₂/24)·He₄(z)] / σ</p>
+      <p class="formula">F(x) = Φ(z) − φ(z)·[(γ₁/6)·He₂(z) + (γ₂/24)·He₃(z)]</p>
+      <p>where He₂, He₃, He₄ are the probabilist's Hermite polynomials. The CDF is in closed form, so all tail and range probabilities are exact (no numerical integration). When γ₁ = γ₂ = 0 the expansion reduces to N(μ, σ²) exactly.</p>
+      <p><strong>Validity.</strong> The expansion can produce a <em>negative density</em> in the tails for large |γ₁| or |γ₂|. Slider ranges are capped at moderate values, and an orange warning appears when the visible range contains a negative-density region. The closed-form CDF still returns sensible probabilities even when this happens, but the curve is not a proper density there.</p>
+      <p><strong>Two-tailed / central.</strong> These modes use the <em>symmetric</em> region around μ (|X − μ| ⋛ |x − μ|). Under skewness, this differs from the more common <em>equal-area</em> two-tailed convention (where the lower-tail and upper-tail probabilities are matched, giving an asymmetric interval).</p>
+      <p><strong>Inverse</strong> (probability → x) uses 60-iteration bisection on the closed-form CDF. The base normal CDF Φ uses the Abramowitz &amp; Stegun 26.2.17 rational approximation (maximum error ~1.5×10⁻⁷).</p>
+    `
+  }
+};
+
+function showInfo(key) {
+  const content = infoContent[key];
+  if (!content) return;
+  document.getElementById('info-modal-content').innerHTML = `
+    <div class="info-modal-badge">${content.badge}</div>
+    <h3>${content.title}</h3>
+    ${content.body}`;
+  document.getElementById('info-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeInfo() {
+  document.getElementById('info-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInfo(); });
 </script>
 
   <!-- Citation -->
@@ -367,3 +719,4 @@ resize();
 </span></span></code></pre></div>
   </div>
 
+</div>
