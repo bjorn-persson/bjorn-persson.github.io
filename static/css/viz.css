@@ -606,7 +606,7 @@ a.ref:hover {
   color: var(--teal);
 }
 
-/* Data tables */
+/* Data tables — numeric/centered grid (e.g. correlation matrices) */
 .data-table {
   border-collapse: collapse;
   font-family: var(--mono);
@@ -626,6 +626,56 @@ a.ref:hover {
   padding: 5px 12px;
   text-align: center;
   color: var(--text);
+}
+
+/* Domain tables — left-aligned comparison/contrast tables.
+   Mono body, dim uppercase headers, dim row-label first column,
+   light row borders, teal hover highlight. Use .yes/.no/.maybe
+   spans inside <td> for traffic-light value coloring. Page-specific
+   th color modifiers (e.g. teal/orange column tints) stay local. */
+.domain-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-family: var(--mono);
+  font-size: 0.82em;
+}
+.domain-table th {
+  text-align: left;
+  color: var(--text-dim);
+  font-weight: 600;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.domain-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(42,45,58,0.5);
+  color: var(--text);
+  vertical-align: top;
+}
+.domain-table td:first-child {
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.domain-table tr:hover td {
+  background: var(--teal-dim);
+}
+.domain-table code {
+  background: rgba(42,45,58,0.6);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text-bright);
+  font-size: 0.92em;
+}
+.domain-table .yes { color: var(--green); }
+.domain-table .no { color: var(--red); }
+.domain-table .maybe { color: var(--orange); }
+@media (max-width: 720px) {
+  .domain-table { font-size: 0.78em; }
+  .domain-table th, .domain-table td { padding: 6px 8px; }
 }
 
 /* Footer */

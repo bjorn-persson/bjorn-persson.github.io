@@ -175,40 +175,6 @@ draft: true
   .eis-equation .coef { color: var(--teal); font-weight: 600; }
   .eis-equation .coef-int { color: var(--orange); font-weight: 600; }
 
-  /* Comparison table */
-  .cmp-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9em;
-    margin: 20px 0;
-  }
-  .cmp-table th, .cmp-table td {
-    padding: 10px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    vertical-align: top;
-  }
-  .cmp-table th {
-    font-family: var(--mono);
-    font-size: 0.78em;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-dim);
-    font-weight: 600;
-  }
-  .cmp-table td.row-label {
-    font-family: var(--mono);
-    font-size: 0.85em;
-    color: var(--text-bright);
-    font-weight: 600;
-  }
-  .cmp-table td .yes { color: var(--teal); }
-  .cmp-table td .no { color: var(--text-dim); }
-  .cmp-table td .maybe { color: var(--orange); }
-  @media (max-width: 720px) {
-    .cmp-table { font-size: 0.82em; }
-    .cmp-table th, .cmp-table td { padding: 8px 6px; }
-  }
 </style>
 
 <div class="container">
@@ -433,7 +399,7 @@ draft: true
     <p>The four types differ on four structural questions. This table extends Table 1 of <a class="ref" href="https://doi.org/10.1521/pedi.2019.33.5.577" target="_blank">Lilienfeld et al. (2019)</a> with a fourth column about what the "unity" of the syndrome consists in.</p>
 
     <div style="overflow-x:auto">
-    <table class="cmp-table">
+    <table class="domain-table">
       <thead>
         <tr>
           <th>Type</th>
@@ -445,28 +411,28 @@ draft: true
       </thead>
       <tbody>
         <tr>
-          <td class="row-label">Classical</td>
+          <td>Classical</td>
           <td><span class="yes">Yes</span></td>
           <td>Reflective</td>
           <td><span class="no">No</span></td>
           <td>A shared latent cause produces the covariation.</td>
         </tr>
         <tr>
-          <td class="row-label">Taxonic</td>
+          <td>Taxonic</td>
           <td><span class="no">Not necessarily</span></td>
           <td>Reflective</td>
           <td><span class="no">No</span></td>
           <td>A discrete underlying category whose signs are individually rare.</td>
         </tr>
         <tr>
-          <td class="row-label">Network</td>
+          <td>Network</td>
           <td><span class="yes">Yes</span></td>
           <td>No latent entity invoked</td>
           <td><span class="no">Not necessarily</span></td>
           <td>Mutual causal reinforcement among features.</td>
         </tr>
         <tr>
-          <td class="row-label">Emergent interpersonal</td>
+          <td>Emergent interpersonal</td>
           <td><span class="no">Not necessarily</span></td>
           <td>Formative</td>
           <td><span class="yes">Yes</span></td>

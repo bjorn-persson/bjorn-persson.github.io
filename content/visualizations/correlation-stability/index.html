@@ -190,38 +190,13 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     padding: 4px 10px;
   }
 
-  .pos-table {
-    font-family: var(--mono);
-    font-size: 0.78em;
-    border-collapse: collapse;
-    table-layout: fixed;
-    width: 100%;
-    color: var(--text);
-    margin-top: 8px;
-  }
-  .pos-table th {
-    color: var(--text-dim);
-    font-weight: 500;
-    text-align: center !important;
-    vertical-align: middle;
-    padding: 6px 10px;
-    border-bottom: 1px solid var(--border);
-  }
-  .pos-table td {
-    text-align: center;
-    padding: 5px 10px;
-    border-bottom: 1px solid var(--bg-elevated);
-  }
-  .pos-table thead tr:first-child th:first-child {
-    border-bottom: none;
-  }
-  .pos-table .group-sep {
-    border-left: 1px solid var(--border);
-  }
-  .pos-table .row-hl td {
-    color: var(--teal);
-    font-weight: 600;
-  }
+  /* Numeric-grid overrides on top of shared .domain-table */
+  #posTable { table-layout: fixed; margin-top: 8px; }
+  #posTable th, #posTable td { text-align: center; }
+  #posTable td:first-child { color: var(--text); white-space: normal; }
+  #posTable thead tr:first-child th:first-child { border-bottom: none; }
+  #posTable .group-sep { border-left: 1px solid var(--border); }
+  #posTable .row-hl td { color: var(--teal); font-weight: 600; }
 </style>
 
 <div class="container">
@@ -413,7 +388,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       From the original paper (per the 2018 corrigendum). Each cell shows the sample size at which the running correlation first remains within &plusmn; <span class="m">w</span> of the true correlation <span class="m">&rho;</span>, at the given confidence level. The row closest to your current &rho; is highlighted.
     </p>
     <div class="viz-box" style="overflow-x:auto;">
-      <table class="pos-table" id="posTable">
+      <table class="domain-table" id="posTable">
         <colgroup>
           <col style="width:50px">
           <col style="width:72px"><col style="width:72px"><col style="width:72px">

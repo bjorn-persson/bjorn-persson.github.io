@@ -1,0 +1,840 @@
+---
+draft: true
+title: "Causal Inference: Potential Outcomes vs. Structural Causal Models"
+description: "A practical comparison of Rubin's potential outcomes framework and Pearl's structural causal model, simulated on an antidepressant trial scenario where baseline severity confounds the treatment–outcome relationship."
+summary: "Translate between Rubin's potential outcomes and Pearl's SCM/DAG on a clinical scenario: an antidepressant observational study confounded by baseline severity. See ignorability and the backdoor criterion as the same condition expressed in different vocabularies."
+---
+
+<style>
+  .ci-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: end;
+  }
+  @media (max-width: 600px) { .ci-controls { grid-template-columns: 1fr; } }
+
+  .ci-panels {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 24px;
+    margin-top: 8px;
+  }
+  @media (max-width: 820px) { .ci-panels { grid-template-columns: 1fr; } }
+
+  .ci-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .ci-panel-header {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    font-weight: 600;
+    color: var(--text-bright);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 6px;
+  }
+  .ci-panel-header .framework { color: var(--teal); margin-right: 8px; }
+  .ci-panel-header .framework.orange { color: var(--orange); }
+  .ci-panel-header .sub { font-weight: 400; color: var(--text-dim); margin-left: 6px; }
+
+  /* Mode buttons */
+  .ci-modes {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .ci-modes .btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 7px 10px;
+    font-size: 0.78em;
+  }
+  .ci-modes .btn.active {
+    background: var(--teal);
+    color: var(--bg);
+  }
+  .ci-modes .btn.btn-orange.active {
+    background: var(--orange);
+    color: var(--bg);
+  }
+
+  /* Canvas wrappers */
+  .ci-canvas-wrap {
+    background: var(--bg-surface);
+    border-radius: 6px;
+    padding: 6px;
+  }
+  .ci-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+  }
+  .ci-strip canvas { height: 360px; }
+  .ci-dag canvas { height: 240px; }
+
+  /* Strip plot caption */
+  .ci-strip-caption {
+    font-family: var(--mono);
+    font-size: 0.74em;
+    color: var(--text-dim);
+    line-height: 1.55;
+    margin-top: 4px;
+  }
+  .ci-strip-caption .sw-treat { color: var(--teal); font-weight: 600; }
+  .ci-strip-caption .sw-ctrl { color: var(--text-bright); font-weight: 600; }
+  .ci-strip-caption .sw-ghost { color: var(--purple); font-weight: 600; }
+
+  /* Equations panel */
+  .ci-eq {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    line-height: 1.7;
+    padding: 10px 12px;
+    background: var(--bg-surface);
+    border-radius: 5px;
+  }
+  .ci-eq .lhs { color: var(--text); }
+  .ci-eq .lhs.cut { color: var(--red); text-decoration: line-through; }
+  .ci-eq .replaced { color: var(--orange); }
+
+  /* Estimate cards */
+  .ci-estimates {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  @media (max-width: 600px) { .ci-estimates { grid-template-columns: 1fr; } }
+  .ci-est {
+    background: var(--bg-surface);
+    border-left: 3px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+  }
+  .ci-est.true  { border-left-color: var(--purple); }
+  .ci-est.naive { border-left-color: var(--red); }
+  .ci-est.adj   { border-left-color: var(--teal); }
+  .ci-est-label { color: var(--text-dim); font-size: 0.85em; margin-bottom: 4px; }
+  .ci-est-value { color: var(--text-bright); font-size: 1.4em; font-weight: 600; }
+  .ci-est-bias  { color: var(--text-dim); font-size: 0.85em; margin-top: 2px; }
+  .ci-est-bias.warn { color: var(--red); }
+  .ci-est-bias.ok   { color: var(--green); }
+
+  /* Mapping table — base styles in viz.css; column-tint modifiers local */
+  .domain-table th.pof { color: var(--teal); }
+  .domain-table th.scm { color: var(--orange); }
+</style>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>Causal Inference: Two Languages for One Question</h1>
+    <div class="subtitle">
+      Rubin's <em>potential outcomes</em> and Pearl's <em>structural causal models</em> are often presented as rival frameworks. They are not. They are two vocabularies for the same underlying problem, and the same data. Move the sliders to see how identical assumptions and identical estimators are written in both languages.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">The scenario</div>
+    <h2>Does an SSRI reduce depressive symptoms?</h2>
+
+    <p>A naturalistic clinical study follows 80 adults seeking care for major depressive disorder. At intake, each patient is rated as <em>mild-to-moderate</em> or <em>severe</em> based on a structured interview &mdash; this is the baseline severity X. The treating clinician then decides, based on her own judgement and the patient's preferences, whether to start an SSRI (T = 1) or recommend watchful waiting (T = 0). After 12 weeks, symptom reduction Y (BDI-II baseline minus follow-up; positive = improvement) is recorded for everyone.</p>
+
+    <p>The investigators want to estimate the <em>average treatment effect</em> of the SSRI. The obvious move &mdash; compare mean Y in the treated group to mean Y in the untreated group &mdash; is biased, because severity drives both treatment assignment and outcome. Severe patients are more likely to be put on medication <em>and</em> tend to show larger reductions on follow-up (more room to improve, regression toward the mean, more attention from the clinician). The simple difference confounds drug effect with severity effect.</p>
+
+    <p>This is the canonical setup for which Rubin's potential outcomes framework and Pearl's SCM were each developed. Below, the same simulated data is shown both ways. The sliders control how strongly severity drives treatment assignment, and what the true SSRI effect would be in a randomized trial.</p>
+  </div>
+
+  <div class="section">
+    <div class="viz-title">Controls</div>
+
+    <div class="ci-controls">
+      <div>
+        <div class="slider-row wide">
+          <label class="slider-label">Confounding strength&nbsp;<span class="slider-val" id="ci_conf_val">0.80</span></label>
+          <input type="range" id="ci_conf" min="0" max="1" step="0.01" value="0.80">
+        </div>
+        <div class="slider-sublabel">0 = clinician flips a coin (random assignment). 1 = severe patients almost always treated, mild almost never.</div>
+      </div>
+      <div>
+        <div class="slider-row wide">
+          <label class="slider-label">True SSRI effect β (BDI points)&nbsp;<span class="slider-val" id="ci_beta_val">4.0</span></label>
+          <input type="range" id="ci_beta" min="-2" max="8" step="0.1" value="4">
+        </div>
+        <div class="slider-sublabel">The reduction the drug would cause in a randomized comparison. Y(t) = 2 + β·t + 5·X + ε.</div>
+      </div>
+    </div>
+
+    <div class="dich-mode-row" style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+      <button class="btn btn-orange" id="ci_resample">New Sample</button>
+    </div>
+
+    <div class="ci-panels">
+
+      <!-- POTENTIAL OUTCOMES PANEL -->
+      <div class="ci-panel">
+        <div class="ci-panel-header">
+          <span class="framework">Potential Outcomes</span>
+          <span class="sub">Rubin (1974)</span>
+        </div>
+
+        <div class="ci-modes">
+          <button class="btn active" data-pof-mode="observe">What we observe</button>
+          <button class="btn" data-pof-mode="reveal">Reveal counterfactuals</button>
+        </div>
+
+        <div class="ci-canvas-wrap ci-strip"><canvas id="ci_strip"></canvas></div>
+
+        <div class="ci-strip-caption">
+          Each dot is one patient at 12-week follow-up.
+          <span class="sw-ctrl">●</span> untreated (Y observed at T=0) &nbsp;
+          <span class="sw-treat">●</span> treated (Y observed at T=1) &nbsp;
+          <span class="sw-ghost">●</span> counterfactual Y the patient would have had under the other treatment (visible only in <em>reveal</em>&nbsp;mode).
+          The fundamental problem of causal inference: we never see both columns of the same row.
+        </div>
+
+        <div class="ci-eq">
+          ATE = E[Y(1) − Y(0)]<br>
+          Stratified estimator: for each X, take E[Y|T=1,X] − E[Y|T=0,X]; weight by P(X).
+        </div>
+      </div>
+
+      <!-- SCM PANEL -->
+      <div class="ci-panel">
+        <div class="ci-panel-header">
+          <span class="framework orange">Structural Causal Model</span>
+          <span class="sub">Pearl (1995)</span>
+        </div>
+
+        <div class="ci-modes">
+          <button class="btn btn-orange active" data-scm-mode="obs">Observational</button>
+          <button class="btn btn-orange" data-scm-mode="do1">do(T = 1)</button>
+          <button class="btn btn-orange" data-scm-mode="do0">do(T = 0)</button>
+        </div>
+
+        <div class="ci-canvas-wrap ci-dag"><canvas id="ci_dag"></canvas></div>
+
+        <div class="ci-eq" id="ci_scm_eq">
+          X = baseline severity &nbsp;·&nbsp; T = treatment &nbsp;·&nbsp; Y = symptom reduction<br>
+          <span class="lhs" id="ci_eq_t">T := f<sub>T</sub>(X, U<sub>T</sub>)</span><br>
+          <span class="lhs">Y := 2 + β·T + 5·X + U<sub>Y</sub></span><br>
+          Backdoor adjustment:<br>
+          P(Y | do(T=t)) = Σ<sub>x</sub> P(Y | T=t, X=x)·P(X=x)
+        </div>
+      </div>
+    </div>
+
+    <!-- Estimate cards -->
+    <div class="ci-estimates">
+      <div class="ci-est true">
+        <div class="ci-est-label">True ATE (β + small sample noise)</div>
+        <div class="ci-est-value" id="ci_true">—</div>
+        <div class="ci-est-bias">From the simulation (we know it)</div>
+      </div>
+      <div class="ci-est naive">
+        <div class="ci-est-label">Naive: E[Y | T=1] − E[Y | T=0]</div>
+        <div class="ci-est-value" id="ci_naive">—</div>
+        <div class="ci-est-bias" id="ci_naive_bias">—</div>
+      </div>
+      <div class="ci-est adj">
+        <div class="ci-est-label">Adjusted (stratify on severity)</div>
+        <div class="ci-est-value" id="ci_adj">—</div>
+        <div class="ci-est-bias" id="ci_adj_bias">—</div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:18px;">
+      <strong>Try it.</strong> Drag confounding to 0 — assignment becomes random and the naive estimate collapses onto the truth. Push it toward 1 and the naive number drifts upward (the X-on-Y effect is leaking through T), but the adjusted estimate stays put. Click <em>do(T = 1)</em> on the right: the X→T arrow goes red and dashed (Pearl's "graph surgery"), and on the left every patient is now shown at the Y they would have had on the drug — exactly the counterfactual column you can reveal in observational mode.
+    </div>
+
+    <div class="note caveat">
+      <strong>Caveat.</strong> This is a clean linear-Gaussian world with one binary measured confounder, no interaction, no unmeasured confounding, and no missing data. Real applications rarely cooperate. The hard part of causal inference is defending the assumption that the measured covariates close every backdoor path — choosing the adjustment set, not the arithmetic that follows.
+    </div>
+
+    <!-- Mapping -->
+    <table class="domain-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="pof">Potential Outcomes</th>
+          <th class="scm">Structural Causal Models</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Primitive object</td>
+          <td>Each unit i has fixed counterfactuals Y<sub>i</sub>(0), Y<sub>i</sub>(1)</td>
+          <td>DAG plus structural equations Y := f<sub>Y</sub>(T, X, U<sub>Y</sub>), T := f<sub>T</sub>(X, U<sub>T</sub>)</td>
+        </tr>
+        <tr>
+          <td>Observation problem</td>
+          <td>Only Y<sub>i</sub>(T<sub>i</sub>) is observed; the other column is missing</td>
+          <td>Joint distribution P(X, T, Y); no privileged column</td>
+        </tr>
+        <tr>
+          <td>Intervention</td>
+          <td>Set T<sub>i</sub> = t for every unit and ask for Y<sub>i</sub>(t)</td>
+          <td><code>do(T = t)</code>: delete T's equation, replace with T = t — graph surgery</td>
+        </tr>
+        <tr>
+          <td>Identifying assumption</td>
+          <td>Conditional ignorability: <code>{Y(0), Y(1)} ⊥ T | X</code></td>
+          <td>X satisfies the <em>backdoor criterion</em> for (T, Y)</td>
+        </tr>
+        <tr>
+          <td>Estimand</td>
+          <td>ATE = E[Y(1) − Y(0)]</td>
+          <td>E[Y | do(T = 1)] − E[Y | do(T = 0)]</td>
+        </tr>
+        <tr>
+          <td>Estimator</td>
+          <td>Stratify on X; difference of means within strata, weighted by P(X)</td>
+          <td>Backdoor adjustment Σ<sub>x</sub> P(Y | T, X = x)·P(X = x)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note warn">
+      <strong>Take-home.</strong> Potential outcomes and SCMs are translations, not rivals. Conditional ignorability and the backdoor criterion are the same assumption stated in different vocabularies. The stratification estimator and the backdoor adjustment formula are the same arithmetic. POF makes the missing-data structure of causal inference vivid; SCMs make the algebra of confounding and intervention transparent. Pick whichever language makes your problem easiest to think about.
+    </div>
+
+  </div>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Causal Inference: Potential Outcomes vs. Structural Causal Models</em> [Interactive visualization]. <a href="https://bjorn-persson.github.io/visualizations/causal-inference/" target="_blank">https://bjorn-persson.github.io/visualizations/causal-inference/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026CausalInference,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Causal Inference: Potential Outcomes vs. Structural Causal Models}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Interactive visualization}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/causal-inference/}</span>}
+</span></span></code></pre></div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  const css = getComputedStyle(document.documentElement);
+  const C_TEAL    = css.getPropertyValue('--teal').trim();
+  const C_ORANGE  = css.getPropertyValue('--orange').trim();
+  const C_PURPLE  = css.getPropertyValue('--purple').trim();
+  const C_RED     = css.getPropertyValue('--red').trim();
+  const C_TEXT    = css.getPropertyValue('--text').trim();
+  const C_BRIGHT  = css.getPropertyValue('--text-bright').trim();
+  const C_DIM     = css.getPropertyValue('--text-dim').trim();
+  const C_BORDER  = css.getPropertyValue('--border').trim();
+  const C_BG      = css.getPropertyValue('--bg-surface').trim();
+  const MONO      = css.getPropertyValue('--mono').trim();
+
+  // Color used for "untreated" dots — bright neutral, distinct from teal
+  const C_CTRL = C_BRIGHT;
+
+  // ---------- Seeded RNG ----------
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  let rng = mulberry32(20260429);
+  function randn() {
+    let u, v;
+    do { u = rng(); } while (u === 0);
+    v = rng();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  // ---------- Data ----------
+  const N = 80;
+  const N_PER_STRATUM = 40;
+  const ALPHA = 2;     // baseline reduction for mild untreated
+  const GAMMA = 5;     // extra reduction for severe baseline
+  const SIGMA = 1.6;   // outcome noise SD
+
+  // Patient-level invariants: severity, propensity uniform u, two noise terms.
+  // Re-drawn only when "New sample" is clicked.
+  let X_arr, U_arr, EPS0, EPS1, JIT;
+
+  function drawSample() {
+    X_arr = new Array(N);
+    U_arr = new Array(N);
+    EPS0  = new Array(N);
+    EPS1  = new Array(N);
+    JIT   = new Array(N);
+    for (let i = 0; i < N; i++) {
+      X_arr[i] = i < N_PER_STRATUM ? 0 : 1;
+      U_arr[i] = rng();
+      EPS0[i]  = randn() * SIGMA;
+      EPS1[i]  = randn() * SIGMA;
+      JIT[i]   = (rng() - 0.5);
+    }
+  }
+
+  function assignT(conf) {
+    const T = new Array(N);
+    for (let i = 0; i < N; i++) {
+      const p = X_arr[i] === 0 ? (0.5 - 0.4 * conf) : (0.5 + 0.4 * conf);
+      T[i] = U_arr[i] < p ? 1 : 0;
+    }
+    return T;
+  }
+
+  function potentialOutcomes(beta) {
+    const Y0 = new Array(N), Y1 = new Array(N);
+    for (let i = 0; i < N; i++) {
+      Y0[i] = ALPHA + 0    + GAMMA * X_arr[i] + EPS0[i];
+      Y1[i] = ALPHA + beta + GAMMA * X_arr[i] + EPS1[i];
+    }
+    return { Y0, Y1 };
+  }
+
+  // ---------- State ----------
+  const state = {
+    conf: 0.80,
+    beta: 4.0,
+    pofMode: 'observe',
+    scmMode: 'obs'
+  };
+
+  function fmt(v, d) { d = d == null ? 2 : d; return v.toFixed(d); }
+  function signed(v, d) { d = d == null ? 2 : d; return (v >= 0 ? '+' : '') + v.toFixed(d); }
+
+  // ---------- Strip plot ----------
+  const stripCanvas = document.getElementById('ci_strip');
+  const sctx = stripCanvas.getContext('2d');
+  const dagCanvas = document.getElementById('ci_dag');
+  const dctx = dagCanvas.getContext('2d');
+  let dpr = window.devicePixelRatio || 1;
+
+  function resizeAll() {
+    dpr = window.devicePixelRatio || 1;
+    [stripCanvas, dagCanvas].forEach(c => {
+      const r = c.getBoundingClientRect();
+      c.width = r.width * dpr;
+      c.height = r.height * dpr;
+    });
+    drawAll();
+  }
+
+  // y-axis range: pad around the maximum possible Y
+  // Max Y ≈ ALPHA + (max β) + GAMMA + 2σ ≈ 2 + 8 + 5 + 3 ≈ 18; min ≈ ALPHA - 3 ≈ -1
+  const Y_MIN = -2;
+  const Y_MAX = 19;
+
+  function drawStrip() {
+    const W = stripCanvas.width / dpr;
+    const H = stripCanvas.height / dpr;
+    sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    sctx.clearRect(0, 0, W, H);
+
+    const margin = { top: 60, right: 18, bottom: 44, left: 50 };
+    const plotW = W - margin.left - margin.right;
+    const plotH = H - margin.top - margin.bottom;
+
+    // 4 zone centers
+    const zones = [
+      { label: 'Untreated', x: 0, T: 0 },
+      { label: 'Treated',   x: 1, T: 1 },
+      { label: 'Untreated', x: 0, T: 0 },
+      { label: 'Treated',   x: 1, T: 1 }
+    ];
+    // Zones 0,1 are X=0 (mild); zones 2,3 are X=1 (severe). Reassign:
+    zones[0].X = 0; zones[1].X = 0; zones[2].X = 1; zones[3].X = 1;
+
+    const zoneW = plotW / 4;
+    const cx = i => margin.left + zoneW * (i + 0.5);
+
+    // Y → pixel
+    const yPix = y => margin.top + plotH * (1 - (y - Y_MIN) / (Y_MAX - Y_MIN));
+
+    // Y axis grid + ticks
+    sctx.strokeStyle = C_BORDER;
+    sctx.lineWidth = 1;
+    sctx.fillStyle = C_DIM;
+    sctx.font = `11px ${MONO}`;
+    sctx.textAlign = 'right';
+    sctx.textBaseline = 'middle';
+    for (let y = 0; y <= 16; y += 4) {
+      const py = yPix(y);
+      sctx.beginPath();
+      sctx.moveTo(margin.left, py);
+      sctx.lineTo(margin.left + plotW, py);
+      sctx.strokeStyle = y === 0 ? C_DIM : C_BORDER;
+      sctx.globalAlpha = y === 0 ? 0.6 : 0.35;
+      sctx.stroke();
+      sctx.globalAlpha = 1;
+      sctx.fillText(String(y), margin.left - 6, py);
+    }
+
+    // Y axis label
+    sctx.save();
+    sctx.translate(14, margin.top + plotH / 2);
+    sctx.rotate(-Math.PI / 2);
+    sctx.textAlign = 'center';
+    sctx.fillStyle = C_DIM;
+    sctx.font = `11px ${MONO}`;
+    sctx.fillText('Symptom reduction Y (BDI points)', 0, 0);
+    sctx.restore();
+
+    // Stratum divider
+    sctx.strokeStyle = C_BORDER;
+    sctx.lineWidth = 1;
+    sctx.beginPath();
+    sctx.moveTo(margin.left + zoneW * 2, margin.top - 8);
+    sctx.lineTo(margin.left + zoneW * 2, margin.top + plotH + 4);
+    sctx.stroke();
+
+    // Stratum labels — top row
+    sctx.fillStyle = C_DIM;
+    sctx.font = `600 10px ${MONO}`;
+    sctx.textAlign = 'center';
+    sctx.textBaseline = 'middle';
+    sctx.fillText('MILD-MODERATE  (X = 0)', margin.left + zoneW * 1, margin.top - 44);
+    sctx.fillText('SEVERE  (X = 1)',         margin.left + zoneW * 3, margin.top - 44);
+
+    // Per-zone column labels (Untreated/Treated) at bottom
+    sctx.font = `10px ${MONO}`;
+    zones.forEach((z, i) => {
+      sctx.fillStyle = z.T === 1 ? C_TEAL : C_CTRL;
+      sctx.fillText(z.label, cx(i), margin.top + plotH + 16);
+    });
+
+    // Compute T assignment + outcomes
+    const T = assignT(state.conf);
+    const { Y0, Y1 } = potentialOutcomes(state.beta);
+    const Yobs = T.map((t, i) => t === 1 ? Y1[i] : Y0[i]);
+
+    const intervened = state.scmMode !== 'obs';
+    const doVal = state.scmMode === 'do1' ? 1 : (state.scmMode === 'do0' ? 0 : null);
+    const reveal = state.pofMode === 'reveal';
+
+    // Group patients by zone
+    function zoneIndex(x, t) {
+      if (x === 0 && t === 0) return 0;
+      if (x === 0 && t === 1) return 1;
+      if (x === 1 && t === 0) return 2;
+      return 3;
+    }
+
+    // Counts and means for factual data
+    const factualByZone = [[], [], [], []];
+    for (let i = 0; i < N; i++) {
+      factualByZone[zoneIndex(X_arr[i], T[i])].push({ i, y: Yobs[i] });
+    }
+
+    function dotAt(zoneI, idx, y, color, alpha, r) {
+      const x = cx(zoneI) + JIT[idx] * zoneW * 0.55;
+      const py = yPix(y);
+      sctx.beginPath();
+      sctx.arc(x, py, r, 0, Math.PI * 2);
+      sctx.globalAlpha = alpha;
+      sctx.fillStyle = color;
+      sctx.fill();
+      sctx.globalAlpha = 1;
+    }
+
+    // ----- Drawing modes -----
+    if (intervened) {
+      // do(T = doVal): every patient appears at Y(doVal) in their X stratum's "treated" or "untreated" column
+      const Yt = doVal === 1 ? Y1 : Y0;
+      for (let i = 0; i < N; i++) {
+        const z = zoneIndex(X_arr[i], doVal);
+        dotAt(z, i, Yt[i], doVal === 1 ? C_TEAL : C_CTRL, 0.85, 3.5);
+      }
+      // Other-T zones: faded "empty" hatching to show they're absent under intervention
+      const otherT = doVal === 1 ? 0 : 1;
+      [0, 1].forEach(xVal => {
+        const zi = zoneIndex(xVal, otherT);
+        sctx.fillStyle = C_DIM;
+        sctx.globalAlpha = 0.15;
+        sctx.fillRect(margin.left + zoneW * zi, margin.top, zoneW, plotH);
+        sctx.globalAlpha = 1;
+        sctx.fillStyle = C_DIM;
+        sctx.font = `600 10px ${MONO}`;
+        sctx.textAlign = 'center';
+        sctx.fillText('— no one is here —', cx(zi), margin.top + plotH / 2);
+      });
+    } else {
+      // Observational: factual dots
+      for (let i = 0; i < N; i++) {
+        const z = zoneIndex(X_arr[i], T[i]);
+        const color = T[i] === 1 ? C_TEAL : C_CTRL;
+        dotAt(z, i, Yobs[i], color, 0.85, 3.5);
+      }
+      // If reveal: also draw counterfactuals as purple ghosts in the OPPOSITE T column of same X
+      if (reveal) {
+        for (let i = 0; i < N; i++) {
+          const cfT = 1 - T[i];
+          const cfY = cfT === 1 ? Y1[i] : Y0[i];
+          const z = zoneIndex(X_arr[i], cfT);
+          dotAt(z, i, cfY, C_PURPLE, 0.45, 2.8);
+        }
+      }
+    }
+
+    // Stratum mean lines + per-zone n/ȳ readouts above the plot
+    sctx.lineWidth = 2.5;
+    factualByZone.forEach((cell, zi) => {
+      if (cell.length === 0) return;
+      const m = cell.reduce((s, p) => s + p.y, 0) / cell.length;
+      const py = yPix(m);
+      const color = zones[zi].T === 1 ? C_TEAL : C_CTRL;
+
+      // Mean line spanning the zone width (no inline label)
+      sctx.strokeStyle = color;
+      sctx.beginPath();
+      sctx.moveTo(margin.left + zoneW * zi + 12, py);
+      sctx.lineTo(margin.left + zoneW * (zi + 1) - 12, py);
+      sctx.stroke();
+
+      // Readout in header row, just above plot area
+      sctx.fillStyle = color;
+      sctx.font = `600 10px ${MONO}`;
+      sctx.textAlign = 'center';
+      sctx.textBaseline = 'middle';
+      sctx.fillText(`n=${cell.length}  ȳ=${fmt(m, 1)}`, cx(zi), margin.top - 22);
+    });
+  }
+
+  // ---------- DAG ----------
+  function drawNode(x, y, r, label, fill, stroke, labelColor, fontSize) {
+    dctx.beginPath();
+    dctx.arc(x, y, r, 0, Math.PI * 2);
+    dctx.fillStyle = fill;
+    dctx.fill();
+    dctx.lineWidth = 2;
+    dctx.strokeStyle = stroke;
+    dctx.stroke();
+    dctx.fillStyle = labelColor;
+    dctx.font = `600 ${fontSize || 18}px ${MONO}`;
+    dctx.textAlign = 'center';
+    dctx.textBaseline = 'middle';
+    dctx.fillText(label, x, y);
+  }
+
+  function drawArrow(x1, y1, x2, y2, color, dashed, thickness, nodeR) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const len = Math.hypot(dx, dy);
+    const ux = dx / len, uy = dy / len;
+    const r = nodeR || 24;
+    const sx = x1 + ux * r, sy = y1 + uy * r;
+    const ex = x2 - ux * r, ey = y2 - uy * r;
+    dctx.save();
+    dctx.strokeStyle = color;
+    dctx.lineWidth = thickness;
+    if (dashed) dctx.setLineDash([6, 5]);
+    dctx.beginPath();
+    dctx.moveTo(sx, sy);
+    dctx.lineTo(ex, ey);
+    dctx.stroke();
+    dctx.setLineDash([]);
+    const a = Math.atan2(uy, ux);
+    const ah = 9;
+    dctx.beginPath();
+    dctx.moveTo(ex, ey);
+    dctx.lineTo(ex - ah * Math.cos(a - 0.4), ey - ah * Math.sin(a - 0.4));
+    dctx.lineTo(ex - ah * Math.cos(a + 0.4), ey - ah * Math.sin(a + 0.4));
+    dctx.closePath();
+    dctx.fillStyle = color;
+    dctx.fill();
+    dctx.restore();
+  }
+
+  function drawDag() {
+    const W = dagCanvas.width / dpr;
+    const H = dagCanvas.height / dpr;
+    dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dctx.clearRect(0, 0, W, H);
+
+    const xN = { x: W * 0.5,  y: H * 0.24 };
+    const tN = { x: W * 0.28, y: H * 0.78 };
+    const yN = { x: W * 0.72, y: H * 0.78 };
+    const r = 24;
+
+    const intervened = state.scmMode !== 'obs';
+    const doVal = state.scmMode === 'do1' ? 1 : (state.scmMode === 'do0' ? 0 : null);
+
+    // Edges
+    drawArrow(xN.x, xN.y, tN.x, tN.y, intervened ? C_RED : C_DIM, intervened, 2, r);
+    drawArrow(xN.x, xN.y, yN.x, yN.y, C_DIM, false, 2, r);
+    drawArrow(tN.x, tN.y, yN.x, yN.y, C_TEAL, false, 2.5, r);
+
+    if (intervened) {
+      const mx = (xN.x + tN.x) / 2;
+      const my = (xN.y + tN.y) / 2;
+      dctx.save();
+      dctx.fillStyle = C_RED;
+      dctx.font = `600 11px ${MONO}`;
+      dctx.textAlign = 'center';
+      dctx.textBaseline = 'middle';
+      dctx.fillText('cut', mx - 28, my - 4);
+      dctx.restore();
+    }
+
+    drawNode(xN.x, xN.y, r, 'X', C_BG, C_DIM, C_TEXT, 18);
+    if (intervened) {
+      drawNode(tN.x, tN.y, r, `T=${doVal}`, C_BG, C_ORANGE, C_ORANGE, 14);
+    } else {
+      drawNode(tN.x, tN.y, r, 'T', C_BG, C_TEAL, C_TEAL, 18);
+    }
+    drawNode(yN.x, yN.y, r, 'Y', C_BG, C_TEXT, C_TEXT, 18);
+
+    // Node sublabels — placed close to nodes, kept short so they don't overflow
+    dctx.fillStyle = C_DIM;
+    dctx.font = `10px ${MONO}`;
+    dctx.textAlign = 'center';
+    dctx.textBaseline = 'middle';
+    dctx.fillText('severity',  xN.x, xN.y - r - 12);
+    dctx.fillText('treatment', tN.x, tN.y + r + 14);
+    dctx.fillText('outcome',   yN.x, yN.y + r + 14);
+
+    // Mode label
+    dctx.save();
+    dctx.fillStyle = intervened ? C_ORANGE : C_DIM;
+    dctx.font = `600 11px ${MONO}`;
+    dctx.textAlign = 'left';
+    dctx.textBaseline = 'top';
+    const labelText = state.scmMode === 'obs' ? 'OBSERVATIONAL'
+                    : state.scmMode === 'do1' ? 'INTERVENTION: do(T = 1)'
+                    : 'INTERVENTION: do(T = 0)';
+    dctx.fillText(labelText, 12, 10);
+    dctx.restore();
+  }
+
+  // ---------- Estimates ----------
+  function computeEstimates() {
+    const T = assignT(state.conf);
+    const { Y0, Y1 } = potentialOutcomes(state.beta);
+    const Yobs = T.map((t, i) => t === 1 ? Y1[i] : Y0[i]);
+
+    let ate = 0;
+    for (let i = 0; i < N; i++) ate += (Y1[i] - Y0[i]);
+    ate /= N;
+
+    let s1 = 0, n1 = 0, s0 = 0, n0 = 0;
+    for (let i = 0; i < N; i++) {
+      if (T[i] === 1) { s1 += Yobs[i]; n1++; } else { s0 += Yobs[i]; n0++; }
+    }
+    const naive = (n1 > 0 && n0 > 0) ? (s1 / n1 - s0 / n0) : NaN;
+
+    function strataATE(xVal) {
+      let m1 = 0, c1 = 0, m0 = 0, c0 = 0;
+      for (let i = 0; i < N; i++) {
+        if (X_arr[i] !== xVal) continue;
+        if (T[i] === 1) { m1 += Yobs[i]; c1++; } else { m0 += Yobs[i]; c0++; }
+      }
+      if (c1 === 0 || c0 === 0) return null;
+      return m1 / c1 - m0 / c0;
+    }
+    const a0 = strataATE(0);
+    const a1 = strataATE(1);
+    let adj;
+    let hasOverlap = (a0 != null && a1 != null);
+    if (a0 == null && a1 == null) adj = NaN;
+    else if (a0 == null) adj = a1;
+    else if (a1 == null) adj = a0;
+    else adj = 0.5 * a0 + 0.5 * a1;
+
+    return { ate, naive, adj, hasOverlap };
+  }
+
+  function renderEstimates() {
+    const { ate, naive, adj, hasOverlap } = computeEstimates();
+    document.getElementById('ci_true').textContent = fmt(ate, 2);
+    document.getElementById('ci_naive').textContent = isNaN(naive) ? '—' : fmt(naive, 2);
+
+    const naiveBiasEl = document.getElementById('ci_naive_bias');
+    if (isNaN(naive)) {
+      naiveBiasEl.textContent = 'No variation in T (try lowering confounding)';
+      naiveBiasEl.className = 'ci-est-bias warn';
+    } else {
+      const bias = naive - ate;
+      naiveBiasEl.textContent = `Bias vs truth: ${signed(bias, 2)}`;
+      naiveBiasEl.className = 'ci-est-bias ' + (Math.abs(bias) > 0.6 ? 'warn' : 'ok');
+    }
+
+    const adjEl = document.getElementById('ci_adj');
+    const adjBiasEl = document.getElementById('ci_adj_bias');
+    if (!hasOverlap) {
+      adjEl.textContent = '—';
+      adjBiasEl.textContent = 'Positivity violated: a stratum has no controls or no treated';
+      adjBiasEl.className = 'ci-est-bias warn';
+    } else {
+      adjEl.textContent = fmt(adj, 2);
+      const bias = adj - ate;
+      adjBiasEl.textContent = `Bias vs truth: ${signed(bias, 2)}`;
+      adjBiasEl.className = 'ci-est-bias ' + (Math.abs(bias) > 0.6 ? 'warn' : 'ok');
+    }
+  }
+
+  // ---------- SCM equation update ----------
+  function renderScmEq() {
+    const eq = document.getElementById('ci_eq_t');
+    if (state.scmMode === 'obs') {
+      eq.className = 'lhs';
+      eq.innerHTML = 'T := f<sub>T</sub>(X, U<sub>T</sub>)';
+    } else {
+      const v = state.scmMode === 'do1' ? 1 : 0;
+      eq.className = 'lhs cut';
+      eq.innerHTML = `T := f<sub>T</sub>(X, U<sub>T</sub>) &nbsp; → &nbsp; <span class="replaced" style="text-decoration:none;">T := ${v}</span>`;
+    }
+  }
+
+  // ---------- Wire-up ----------
+  const confSlider = document.getElementById('ci_conf');
+  const betaSlider = document.getElementById('ci_beta');
+  const confValEl = document.getElementById('ci_conf_val');
+  const betaValEl = document.getElementById('ci_beta_val');
+
+  function drawAll() {
+    confValEl.textContent = state.conf.toFixed(2);
+    betaValEl.textContent = state.beta.toFixed(1);
+    drawStrip();
+    drawDag();
+    renderEstimates();
+    renderScmEq();
+  }
+
+  confSlider.addEventListener('input', e => { state.conf = parseFloat(e.target.value); drawAll(); });
+  betaSlider.addEventListener('input', e => { state.beta = parseFloat(e.target.value); drawAll(); });
+
+  document.querySelectorAll('[data-pof-mode]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-pof-mode]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.pofMode = btn.dataset.pofMode;
+      drawStrip();
+    });
+  });
+
+  document.querySelectorAll('[data-scm-mode]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-scm-mode]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.scmMode = btn.dataset.scmMode;
+      drawAll();
+    });
+  });
+
+  document.getElementById('ci_resample').addEventListener('click', () => {
+    rng = mulberry32(Date.now());
+    drawSample();
+    drawAll();
+  });
+
+  window.addEventListener('resize', resizeAll);
+
+  // Init
+  drawSample();
+  resizeAll();
+})();
+</script>
