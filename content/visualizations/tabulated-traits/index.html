@@ -1,0 +1,504 @@
+---
+title: "Personality Tabulated"
+description: "Comparative overview of major perspectives on personality — behavior genetics, CB5T, Five-Factor Theory, Eysenck, Cloninger, evolutionary, lexical Big Five, HEXACO, interpersonal circumplex, socioanalytic, attachment, whole-trait, social-cognitive, psychodynamic, narrative, personology, humanistic/SDT, and social-constructionist — sorted along a reductionist–holistic continuum."
+summary: "Eighteen perspectives on personality compared across structure, locus, causal emphasis, stability, person–situation stance, cross-cultural status, measurement, stance on the Big Five, change mechanism, and empirical grounding. Rows ordered from reductionist (genes/brain) to holistic (narrative/culture)."
+kind: table
+---
+
+<style>
+  /* Run wider than the standard 1000px viz container */
+  .post-content:has(.container.tp-wide) { max-width: 1400px; }
+  .main:has(.container.tp-wide) { --main-width: 1440px; }
+  @media (min-width: 1500px) {
+    .post-content:has(.container.tp-wide) { max-width: 1500px; }
+    .main:has(.container.tp-wide) { --main-width: 1540px; }
+  }
+  .container.tp-wide { max-width: 1500px; }
+
+  .tp-table-wrap { overflow-x: auto; }
+  .tp-table {
+    width: 100%;
+    /* Use separate (with zero spacing) instead of collapse so that
+       position: sticky on the first column actually paints its background
+       behind the 4px row-color border-left. With border-collapse: collapse,
+       browsers detach collapsed borders from the sticky cell background,
+       leaving a transparent strip where scrolled content bleeds through. */
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.82em;
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .post-content .tp-table th {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 10px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-elevated);
+    white-space: nowrap;
+    vertical-align: bottom;
+    min-width: 0;
+  }
+  .post-content .tp-table th:first-child { text-align: left; padding-left: 14px; }
+  .post-content .tp-table th:not(:first-child),
+  .post-content .tp-table td:not(:first-child) {
+    border-left: 1px solid rgba(107,112,132,0.45);
+  }
+  .post-content .tp-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(42,45,58,0.55);
+    vertical-align: top;
+    min-width: 0;
+  }
+  .tp-table tr:hover td { background: rgba(45,212,191,0.04); }
+  .tp-table td:first-child { white-space: nowrap; }
+
+  /* Widen the Structure column (column 2) — its cells carry the most text */
+  .post-content .tp-table th:nth-child(2),
+  .post-content .tp-table td:nth-child(2) {
+    min-width: 280px;
+  }
+
+  /* Sticky first column ("Perspective") — stays visible when scrolling right */
+  .post-content .tp-table th:first-child,
+  .post-content .tp-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #0f1117; /* page bg, occludes scrolled-under content */
+    box-shadow: 1px 0 0 rgba(107,112,132,0.45);
+  }
+  .post-content .tp-table th:first-child {
+    z-index: 3; /* header stays above body cells */
+    background: var(--bg-elevated);
+  }
+  .post-content .tp-table tr:hover td:first-child {
+    background: #131820; /* opaque hover tint, matches teal-tinted hover */
+  }
+
+  /* Category pill — tinted background + accent text */
+  .cat {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .cat.bio   { background: var(--blue-dim);   color: var(--blue);   }
+  .cat.comp  { background: var(--teal-dim);   color: var(--teal);   }
+  .cat.psych { background: var(--purple-dim); color: var(--purple); }
+  .cat.phen  { background: var(--yellow-dim); color: var(--yellow); }
+  .cat.evol  { background: var(--orange-dim); color: var(--orange); }
+  .cat.soc   { background: var(--green-dim);  color: var(--green);  }
+  .cat.integ { background: rgba(176,180,192,0.12); color: var(--text-dim); }
+  .cat.crit  { background: var(--red-dim);    color: var(--red);    }
+
+  /* Reductionist–holistic continuum encoded on the left border of column 1.
+     Linear interpolation from #3b82f6 (blue, reductionist) to #ef4444 (red, holistic),
+     18 steps for 18 rows. */
+  .tp-table .r1  td:first-child { border-left: 4px solid #3b82f6; }
+  .tp-table .r2  td:first-child { border-left: 4px solid #467eeb; }
+  .tp-table .r3  td:first-child { border-left: 4px solid #507be1; }
+  .tp-table .r4  td:first-child { border-left: 4px solid #5b77d7; }
+  .tp-table .r5  td:first-child { border-left: 4px solid #6673cc; }
+  .tp-table .r6  td:first-child { border-left: 4px solid #7070c2; }
+  .tp-table .r7  td:first-child { border-left: 4px solid #7b6cb8; }
+  .tp-table .r8  td:first-child { border-left: 4px solid #8668ad; }
+  .tp-table .r9  td:first-child { border-left: 4px solid #9065a3; }
+  .tp-table .r10 td:first-child { border-left: 4px solid #9b6198; }
+  .tp-table .r11 td:first-child { border-left: 4px solid #a55d8e; }
+  .tp-table .r12 td:first-child { border-left: 4px solid #b05a83; }
+  .tp-table .r13 td:first-child { border-left: 4px solid #bb5679; }
+  .tp-table .r14 td:first-child { border-left: 4px solid #c5526e; }
+  .tp-table .r15 td:first-child { border-left: 4px solid #d04f64; }
+  .tp-table .r16 td:first-child { border-left: 4px solid #da4b59; }
+  .tp-table .r17 td:first-child { border-left: 4px solid #e5474f; }
+  .tp-table .r18 td:first-child { border-left: 4px solid #ef4444; }
+
+  /* Legend */
+  .tp-legend {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .tp-legend h3 {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    font-weight: 600;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 14px;
+  }
+  .tp-legend-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin-bottom: 18px;
+    font-family: var(--mono);
+    font-size: 0.8em;
+    color: var(--text-dim);
+  }
+  .tp-legend-grid .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .border-swatch {
+    width: 4px;
+    height: 16px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+  .tp-note {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--teal);
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: var(--serif);
+    font-size: 0.92em;
+    line-height: 1.6;
+    color: var(--text);
+    border-radius: 0 6px 6px 0;
+    max-width: 720px;
+  }
+  .tp-note p { margin: 0 0 12px; }
+  .tp-note p:last-child { margin-bottom: 0; }
+  .tp-note strong { color: var(--text-bright); }
+
+  @media (max-width: 900px) {
+    .tp-table { font-size: 0.82em; }
+    .tp-table th, .tp-table td { padding: 8px 10px; }
+  }
+</style>
+
+<div class="container tp-wide">
+  <div class="hero">
+    <h1>Personality Tabulated</h1>
+    <div class="subtitle">Eighteen major perspectives on personality, compared across eleven dimensions. Rows are ordered from reductionist (genes and brain systems, top) to holistic (narrative and culture, bottom); the left border of each row encodes its position on that continuum.</div>
+  </div>
+
+  <div class="section">
+    <div class="tp-table-wrap">
+      <table class="tp-table">
+        <thead>
+        <tr>
+          <th>Perspective</th>
+          <th>Structure</th>
+          <th>Primary locus</th>
+          <th>Causal emphasis</th>
+          <th>Stability over lifespan</th>
+          <th>Person&ndash;situation stance</th>
+          <th>Cross-cultural status</th>
+          <th>Measurement tradition</th>
+          <th>Stance on Big Five</th>
+          <th>Change mechanism</th>
+          <th>Empirical grounding</th>
+          <th>Key figures</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="r1">
+          <td><span class="cat bio">Behavior genetics</span></td>
+          <td>Heritable variation in trait dimensions; agnostic about higher-order taxonomy</td>
+          <td>Genome; gene&ndash;environment systems</td>
+          <td>Additive genetics + non-shared environment; shared environment near-zero in adulthood</td>
+          <td>Heritability rises with age; rank-order stability strong by adulthood</td>
+          <td>Trait-realist; heritable variance robust across contexts</td>
+          <td>Heritability estimates broadly similar across populations</td>
+          <td>Twin and adoption designs; GWAS, polygenic scores; self- and informant report behind those</td>
+          <td>Accepts as proximate phenotype; heritability found for all five domains</td>
+          <td>Limited at trait level; environments interact with genotype</td>
+          <td>Strong heritability evidence; weak specific-gene findings</td>
+          <td>Plomin, Bouchard, Tellegen, Polderman</td>
+        </tr>
+        <tr class="r2">
+          <td><span class="cat bio">CB5T (DeYoung)</span></td>
+          <td>Big Five domains × two aspects each (BFAS); grounded in neural cybernetic systems</td>
+          <td>Cybernetic regulation of goals via neural function</td>
+          <td>Neural systems implementing cybernetic functions (e.g. extraversion &ndash; behavioral approach, dopamine)</td>
+          <td>Trait-stable; aspect-level structure neurobiologically anchored</td>
+          <td>Trait-realist; compatible with whole-trait state dynamics</td>
+          <td>Argued universal (rooted in neural design)</td>
+          <td>BFAS; neuroimaging; psychophysiology</td>
+          <td>Endorses; specifies the aspect level and grounds it biologically</td>
+          <td>Slow; via changes in neural and goal-regulatory systems</td>
+          <td>Moderate; growing neuroscience support</td>
+          <td>DeYoung, Hirsh, Peterson, Allen</td>
+        </tr>
+        <tr class="r3">
+          <td><span class="cat bio">Five-Factor Theory</span></td>
+          <td>Five domains × six facets (NEO-PI-R); hierarchical</td>
+          <td>Endogenous "basic tendencies" insulated from environment</td>
+          <td>Biology fully causes basic tendencies; environment shapes only "characteristic adaptations"</td>
+          <td>"Set like plaster" after age 30; intrinsic maturation</td>
+          <td>Strong cross-situational consistency</td>
+          <td>Universal; replicated across ~50 cultures</td>
+          <td>NEO-PI-R, NEO-PI-3; self- and observer reports</td>
+          <td>Defines the canonical Big Five</td>
+          <td>Limited; life events have little effect on basic tendencies</td>
+          <td>Strong psychometric and cross-cultural base; biology claim more theoretical</td>
+          <td>McCrae, Costa</td>
+        </tr>
+        <tr class="r4">
+          <td><span class="cat bio">Eysenck PEN</span></td>
+          <td>Three superfactors (P, E, N); hierarchical superfactor &rarr; trait &rarr; habit &rarr; response</td>
+          <td>Cortical arousal (E), limbic activation (N), arousal regulation (P)</td>
+          <td>Inherited biological substrates of arousal and inhibition</td>
+          <td>High; biologically constrained</td>
+          <td>Trait-realist</td>
+          <td>Argued universal</td>
+          <td>EPQ, EPQ-R</td>
+          <td>Subsumes; argued Big Five reducible to PEN superfactors</td>
+          <td>Limited; biologically anchored</td>
+          <td>Strong for E and N; P contested</td>
+          <td>H. J. Eysenck, S. B. G. Eysenck</td>
+        </tr>
+        <tr class="r5">
+          <td><span class="cat bio">Cloninger TCI</span></td>
+          <td>Four temperament dimensions (NS, HA, RD, P) + three character dimensions (SD, C, ST)</td>
+          <td>Neurotransmitter systems (DA, 5-HT, NE) for temperament; self-concept for character</td>
+          <td>Genetic neurochemistry shapes temperament; development shapes character</td>
+          <td>Temperament highly stable; character matures across the lifespan</td>
+          <td>Trait-realist</td>
+          <td>Replicated in many cultures, with structural variability</td>
+          <td>TCI, TCI-R, JTCI</td>
+          <td>Orthogonal alternative; partial overlap (HA ~ N, NS ~ low C)</td>
+          <td>Character changeable via self-development and meaning</td>
+          <td>Mixed; weaker structural replication than Big Five</td>
+          <td>Cloninger, Svrakic, Przybeck</td>
+        </tr>
+        <tr class="r6">
+          <td><span class="cat evol">Evolutionary</span></td>
+          <td>Adaptive variation around species-typical design; life-history trade-offs; condition-dependent traits</td>
+          <td>Organism in ancestral niches</td>
+          <td>Frequency-dependent selection, mutation&ndash;selection balance, life-history strategy</td>
+          <td>Trait stability reflects adaptive design; calibrated by early environment</td>
+          <td>Trait-realist; situations cue adaptive strategies</td>
+          <td>Universal architecture; expression varies with ecology</td>
+          <td>Big Five usually; behavioral, hormonal, life-history indicators</td>
+          <td>Accepts as proximate description; seeks ultimate (functional) explanation</td>
+          <td>Constrained by adaptive design; calibrated by developmental context</td>
+          <td>Theoretical; uneven empirical translation</td>
+          <td>Buss, Nettle, Penke, Figueredo, Del Giudice</td>
+        </tr>
+        <tr class="r7">
+          <td><span class="cat integ">Lexical Big Five</span></td>
+          <td>Five orthogonal factors from natural-language adjective analysis; hierarchy now extended to aspects, facets, nuances</td>
+          <td>Trait descriptors in language</td>
+          <td>Psychometric/structural; agnostic on mechanism</td>
+          <td>High rank-order stability in adulthood; mean-level maturation</td>
+          <td>Trait-realist but agnostic on underlying mechanism</td>
+          <td>Mostly replicated; Openness least robust outside English-speaking samples</td>
+          <td>IPIP, BFI, TIPI; self- and informant reports</td>
+          <td>Defines the lexical Big Five (Goldberg, 1990)</td>
+          <td>Empirical question; rank-order stable, mean-level changes with age</td>
+          <td>Strong psychometric replication</td>
+          <td>Goldberg, John, Saucier, Peabody</td>
+        </tr>
+        <tr class="r8">
+          <td><span class="cat integ">HEXACO</span></td>
+          <td>Six lexical factors (H, E, X, A, C, O); A and E rotated relative to FFM</td>
+          <td>Trait descriptors across many languages</td>
+          <td>Lexical/psychometric; H&ndash;H additionally tied to fair-exchange evolutionary accounts</td>
+          <td>High</td>
+          <td>Trait-realist</td>
+          <td>Six-factor solution replicates across many languages</td>
+          <td>HEXACO-PI-R; HEXACO-60</td>
+          <td>Extends; argues a sixth factor (Honesty-Humility) is needed; reorganizes A and E</td>
+          <td>Empirical question</td>
+          <td>Strong; H captures variance Big Five misses, including Dark Triad (latent r &asymp; .95 with inverse H&ndash;H; Hodson et al., 2018)</td>
+          <td>Ashton, Lee</td>
+        </tr>
+        <tr class="r9">
+          <td><span class="cat integ">Interpersonal circumplex</span></td>
+          <td>Two-dimensional circular space: Agency (dominance) × Communion (warmth)</td>
+          <td>Interpersonal behavior</td>
+          <td>Interpersonal motives and complementarity</td>
+          <td>Trait-like at the level of interpersonal style</td>
+          <td>Interactionist; complementarity with others' positions</td>
+          <td>Replicated broadly</td>
+          <td>IAS, IIP-C; behavioral coding of interpersonal exchanges</td>
+          <td>Compatible; maps onto Extraversion and Agreeableness (and HEXACO X &times; A)</td>
+          <td>Mediated by relational patterns and complementary responses</td>
+          <td>Strong structural support</td>
+          <td>Leary, Wiggins, Kiesler, Horowitz</td>
+        </tr>
+        <tr class="r10">
+          <td><span class="cat evol">Socioanalytic</span></td>
+          <td>Identity (self-view) vs reputation (observer-view); both organized around the Big Five</td>
+          <td>Person within evolved group living (getting along, getting ahead, finding meaning)</td>
+          <td>Evolved demands of social niches; identity as strategic self-presentation</td>
+          <td>Reputation highly stable; identity more revisable</td>
+          <td>Trait-realist; situations are social-evaluative contexts</td>
+          <td>Universal evolutionary architecture</td>
+          <td>Hogan Personality Inventory; informant reports prioritized — self-report treated as reputation management, not introspective playback</td>
+          <td>Endorses; reorganizes around the observer perspective</td>
+          <td>Limited; reputation harder to revise than identity</td>
+          <td>Strong in I/O and personnel-selection contexts</td>
+          <td>Hogan, Hogan, Kaiser</td>
+        </tr>
+        <tr class="r11">
+          <td><span class="cat psych">Attachment</span></td>
+          <td>Two dimensions (anxiety, avoidance); originally categorical (secure, anxious, avoidant, disorganized)</td>
+          <td>Internal working models of self and other</td>
+          <td>Early caregiving experiences; activated under relational threat</td>
+          <td>Moderate stability from infancy to adulthood</td>
+          <td>Interactionist; activated by relational context</td>
+          <td>Universal but distribution of styles varies by culture</td>
+          <td>AAI (interview); ECR-R, RSQ (self-report)</td>
+          <td>Partial overlap (anxiety ~ Neuroticism; avoidance ~ low A/E); orthogonal in framing</td>
+          <td>Through corrective relational experiences, including therapy</td>
+          <td>Strong developmental tradition; ongoing debates about continuity</td>
+          <td>Bowlby, Ainsworth, Main, Mikulincer, Shaver</td>
+        </tr>
+        <tr class="r12">
+          <td><span class="cat comp">Whole-trait theory</span></td>
+          <td>Big Five domains realized as density distributions of states; each person traverses the full range</td>
+          <td>State-level behavior, aggregated into traits</td>
+          <td>Trait = distribution; processes (goals, cognitions) generate the moment-to-moment states</td>
+          <td>Trait = stable density distribution; state varies</td>
+          <td>Explicit reconciliation: traits real, situations matter</td>
+          <td>Inherits Big Five universality</td>
+          <td>Experience sampling (ESM); event-contingent recording</td>
+          <td>Endorses; reframes traits as density distributions rather than fixed levels</td>
+          <td>Via shifting state distributions over time (volitional change studies)</td>
+          <td>Strong ESM base</td>
+          <td>Fleeson, Jayawickreme</td>
+        </tr>
+        <tr class="r13">
+          <td><span class="cat comp">Social-cognitive / CAPS</span></td>
+          <td>Cognitive-affective units (goals, expectancies, encodings) producing if&ndash;then situation&ndash;behavior signatures</td>
+          <td>Person × situation interaction</td>
+          <td>Cognitive-affective system; situational features</td>
+          <td>Stable if&ndash;then signatures; behavior variable across situations</td>
+          <td>Strongly interactionist; situations are constitutive</td>
+          <td>Framework universal; content culturally specific</td>
+          <td>Behavioral observation across situations; self-report of beliefs, goals, expectancies</td>
+          <td>Skeptical of broad decontextualized traits</td>
+          <td>Through experience, learning, and therapy targeting cognitive-affective units</td>
+          <td>Strong on situational specificity; modest prediction at trait level</td>
+          <td>Mischel, Bandura, Shoda, Cantor</td>
+        </tr>
+        <tr class="r14">
+          <td><span class="cat psych">Psychodynamic</span></td>
+          <td>Levels of personality organization (neurotic, borderline, psychotic); defense styles; object relations</td>
+          <td>Intrapsychic structure; unconscious conflict and representation</td>
+          <td>Developmental conflict; defense; internalized relationships</td>
+          <td>Character structure persistent without intervention</td>
+          <td>Strong intrapsychic consistency</td>
+          <td>Argued universal; expressions culturally shaped</td>
+          <td>Clinical interview, projective methods, SWAP-200, PDM-2</td>
+          <td>Largely orthogonal; PDM-2 incorporates trait dimensions, otherwise skeptical of self-report taxonomies</td>
+          <td>Long-term psychotherapy targeting defense and conflict</td>
+          <td>Mixed; contested but improving via SWAP and PDM-2 work</td>
+          <td>Freud, Kernberg, Shedler, Westen, McWilliams</td>
+        </tr>
+        <tr class="r15">
+          <td><span class="cat phen">Narrative identity</span></td>
+          <td>Three levels: dispositional traits, characteristic adaptations, narrative identity (life story)</td>
+          <td>Internalized, evolving life story</td>
+          <td>Meaning-making, autobiographical reasoning, redemptive and contamination sequences</td>
+          <td>Story themes stable; details revised over time</td>
+          <td>Story integrates behavior across situations and time</td>
+          <td>Story-making universal; content culturally shaped</td>
+          <td>Life Story Interview; coded narrative themes</td>
+          <td>Includes Big Five as level 1; narrative is level 3 above traits and adaptations</td>
+          <td>Via narrative revision; therapy, life transitions, generativity</td>
+          <td>Growing; coding reliability strong, outcomes modest</td>
+          <td>McAdams, Pals, Bauer, Singer</td>
+        </tr>
+        <tr class="r16">
+          <td><span class="cat phen">Personology</span></td>
+          <td>Personal dispositions (cardinal, central, secondary); idiographic constellation; "the individual is a universe of one"</td>
+          <td>The unique individual; the proprium</td>
+          <td>Pluralistic — biology, motives, history, intentions</td>
+          <td>Within-person patterns stable; cross-person comparisons less meaningful</td>
+          <td>Trait-realist; emphasizes proprium and intentionality</td>
+          <td>Each person culture-embedded; modest nomothetic claims</td>
+          <td>Case study, TAT, personal documents; idiographic methods</td>
+          <td>Allport contributed to the lexical approach; both authors skeptical of nomothetic reduction</td>
+          <td>Through life history and intentional self-direction</td>
+          <td>Qualitative tradition; small empirical base by modern standards</td>
+          <td>Allport, Murray, Stern</td>
+        </tr>
+        <tr class="r17">
+          <td><span class="cat phen">Humanistic / SDT</span></td>
+          <td>Organismic actualizing tendency; basic needs (autonomy, competence, relatedness in SDT)</td>
+          <td>Whole person; phenomenological self</td>
+          <td>Growth, self-determination, congruence; need-supportive vs need-thwarting contexts</td>
+          <td>Self-concept stable but oriented toward becoming</td>
+          <td>Person in supportive vs controlling environment</td>
+          <td>SDT claims universal basic needs; expressions vary</td>
+          <td>Self-report (SDT scales); phenomenological methods; experimental manipulations of need support</td>
+          <td>Largely orthogonal; SDT empirically compatible with Big Five but emphasizes motivation over disposition</td>
+          <td>Through need-supportive environments and therapy facilitating congruence</td>
+          <td>SDT strong RCT and applied base; classical humanism weaker</td>
+          <td>Rogers, Maslow, Deci, Ryan</td>
+        </tr>
+        <tr class="r18">
+          <td><span class="cat soc">Social-constructionist</span></td>
+          <td>Personality categories culturally produced and historically variable; no mind-independent traits</td>
+          <td>Discursive and cultural practices</td>
+          <td>Cultural meanings, power, language</td>
+          <td>Stability is itself culturally produced</td>
+          <td>Personality dissolves into culturally situated practice</td>
+          <td>Categories culturally specific; foundational WEIRD critique (Henrich et al., 2010)</td>
+          <td>Discourse analysis, ethnography, critical methods</td>
+          <td>Critiques as WEIRD-bound; questions universality claims</td>
+          <td>Via cultural and discursive change</td>
+          <td>Qualitative, sociological, philosophical</td>
+          <td>Gergen, Shweder, Markus, Henrich</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tp-legend">
+      <h3>Color scheme &mdash; intellectual tradition</h3>
+      <div class="tp-legend-grid">
+        <div class="legend-item"><span class="cat bio">Blue</span> Biological trait theory</div>
+        <div class="legend-item"><span class="cat evol">Orange</span> Evolutionary / functional</div>
+        <div class="legend-item"><span class="cat integ">Gray</span> Descriptive lexical / structural</div>
+        <div class="legend-item"><span class="cat comp">Teal</span> Process / dynamic</div>
+        <div class="legend-item"><span class="cat psych">Purple</span> Psychodynamic / relational</div>
+        <div class="legend-item"><span class="cat phen">Yellow</span> Narrative / humanistic / idiographic</div>
+        <div class="legend-item"><span class="cat soc">Green</span> Social &amp; cultural construction</div>
+      </div>
+      <div class="tp-legend-grid">
+        <div class="legend-item"><span class="border-swatch" style="background:#3b82f6"></span> Blue left border = more reductionist (genes, neural systems)</div>
+        <div class="legend-item"><span class="border-swatch" style="background:#ef4444"></span> Red left border = more holistic (narrative, culture)</div>
+      </div>
+
+      <div class="tp-note">
+        <p><strong>On the continuum.</strong> The reductionist&ndash;holistic axis approximates how deep into biology versus how far out into meaning and culture each tradition locates personality. As with the realism axis in the companion psychiatry table, this single ordering conflates several distinctions &mdash; biological reduction, dispositional vs. interactionist commitments, and nomothetic vs. idiographic methodology &mdash; that are not perfectly correlated. Placement reflects each tradition's central tendency rather than any individual theorist.</p>
+        <p><strong>On Big Five vs. Five-Factor Theory.</strong> Goldberg's lexical Big Five (row 7) and McCrae &amp; Costa's Five-Factor Theory (row 3) are often used interchangeably but make different claims. The lexical Big Five is a descriptive taxonomy from natural-language adjectives, agnostic about causes. FFT adds a strong biological-causal model in which traits are endogenous "basic tendencies" largely insulated from environment and channeled into "characteristic adaptations." Treating them as a single row would obscure this disagreement &mdash; and obscure why a critic of FFT's biology claim (e.g. on the role of life events) need not be a critic of Big Five structure.</p>
+        <p><strong>On HEXACO vs. the Big Five.</strong> HEXACO is not just Big Five + 1. Agreeableness and Emotionality are rotated relative to FFM Agreeableness and Neuroticism, so anger and temperamentalness sit with Agreeableness in HEXACO rather than with Neuroticism. Honesty-Humility correlates so strongly with the inverse of the Dark Triad (latent r &asymp; .95; Hodson et al., 2018) that the two are nearly indistinguishable constructs.</p>
+        <p><strong>On the person&ndash;situation debate.</strong> Mischel's (1968) critique anchors most rows below the descriptive taxonomies. Whole-trait theory (row 12) and CAPS (row 13) are both explicit reconciliations &mdash; but Fleeson keeps the Big Five as the unit of analysis (traits as state distributions), while Mischel and Shoda dissolve traits into if&ndash;then signatures. They are compatible in spirit but not interchangeable.</p>
+        <p><strong>On what counts as a "trait."</strong> Even within trait theory, definitions diverge: McCrae &amp; Costa's "enduring patterns of thoughts, feelings, and actions"; Wiggins' provocation that traits are "lost causes" requiring rather than providing scientific explanation; Wakefield's analysis of traits as stabilities in intentional states. Each row's structure cell should be read as the tradition's working answer rather than a settled definition of the construct.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Personality Tabulated</em> [Comparative table]. <a href="https://bjorn-persson.github.io/visualizations/tabulated-traits/" target="_blank">https://bjorn-persson.github.io/visualizations/tabulated-traits/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026personalitytabulated,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Personality Tabulated}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Comparative table}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/tabulated-traits/}</span>}
+</span></span></code></pre></div>
+  </div>
+</div>

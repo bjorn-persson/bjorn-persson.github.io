@@ -7,6 +7,10 @@
     margin-top: 20px;
 }
 
+.page-header.viz-section-header {
+    margin-top: 64px;
+}
+
 .viz-card {
     display: flex;
     flex-direction: column;

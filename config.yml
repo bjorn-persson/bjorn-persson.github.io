@@ -18,6 +18,9 @@ menu:
         - name: Visualizations
           url: visualizations/
           weight: 5
+        - name: Thoughts
+          url: thoughts/
+          weight: 6
 
 params:
     description: "This website hosts Björn Persson's research papers, courses, data, curriculum vitae, and contact information."
@@ -35,7 +38,7 @@ params:
     ShowBreadCrumbs: false
     ShowCodeCopyButtons: true
     ShowAllPagesInArchive: false
-    MainSections: ["books","courses","papers","data"]
+    MainSections: ["books","courses","papers","data","thoughts"]
     ShowToc: false
     disableScrollToTop: true
     TocOpen: true
@@ -55,6 +58,8 @@ params:
               url: papers/
             - name: Visualizations
               url: visualizations/
+            - name: Thoughts
+              url: thoughts/
 
     socialIcons:
         - name: CV

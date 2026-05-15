@@ -1,0 +1,436 @@
+---
+title: "Psychiatry Tabulated"
+description: "Comparative overview of the major perspectives on psychiatric disorders — biomedical, RDoC, computational, phenomenological, evolutionary, HiTOP, network, psychodynamic, biopsychosocial, cognitive, interpersonal, social/cultural, PTMF, humanistic, and critical psychiatry — sorted along an ontological realism continuum."
+summary: "Fifteen perspectives on psychiatric disorders compared across ontology, locus, causal emphasis, treatment, and ten other dimensions. Rows ordered from ontologically realist to anti-realist."
+kind: table
+---
+
+<style>
+  /* Run wider than the standard 1000px viz container */
+  .post-content:has(.container.tp-wide) { max-width: 1400px; }
+  .main:has(.container.tp-wide) { --main-width: 1440px; }
+  @media (min-width: 1500px) {
+    .post-content:has(.container.tp-wide) { max-width: 1500px; }
+    .main:has(.container.tp-wide) { --main-width: 1540px; }
+  }
+  .container.tp-wide { max-width: 1500px; }
+
+  .tp-table-wrap { overflow-x: auto; }
+  .tp-table {
+    width: 100%;
+    /* Use separate (with zero spacing) instead of collapse so that
+       position: sticky on the first column actually paints its background
+       behind the 4px row-color border-left. With border-collapse: collapse,
+       browsers detach collapsed borders from the sticky cell background,
+       leaving a transparent strip where scrolled content bleeds through. */
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.82em;
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .post-content .tp-table th {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 10px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-elevated);
+    white-space: nowrap;
+    vertical-align: bottom;
+    min-width: 0;
+  }
+  .post-content .tp-table th:first-child { text-align: left; padding-left: 14px; }
+  .post-content .tp-table th:not(:first-child),
+  .post-content .tp-table td:not(:first-child) {
+    border-left: 1px solid rgba(107,112,132,0.45);
+  }
+  .post-content .tp-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(42,45,58,0.55);
+    vertical-align: top;
+    min-width: 0;
+  }
+  .tp-table tr:hover td { background: rgba(45,212,191,0.04); }
+  .tp-table td:first-child { white-space: nowrap; }
+
+  /* Sticky first column ("Perspective") — stays visible when scrolling right */
+  .post-content .tp-table th:first-child,
+  .post-content .tp-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #0f1117; /* page bg, occludes scrolled-under content */
+    box-shadow: 1px 0 0 rgba(107,112,132,0.45);
+  }
+  .post-content .tp-table th:first-child {
+    z-index: 3; /* header stays above body cells */
+    background: var(--bg-elevated);
+  }
+  .post-content .tp-table tr:hover td:first-child {
+    background: #131820; /* opaque hover tint, matches teal-tinted hover */
+  }
+
+  /* Category pill — tinted background + accent text */
+  .cat {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .cat.bio   { background: var(--blue-dim);   color: var(--blue);   }
+  .cat.comp  { background: var(--teal-dim);   color: var(--teal);   }
+  .cat.psych { background: var(--purple-dim); color: var(--purple); }
+  .cat.phen  { background: var(--yellow-dim); color: var(--yellow); }
+  .cat.evol  { background: var(--orange-dim); color: var(--orange); }
+  .cat.soc   { background: var(--green-dim);  color: var(--green);  }
+  .cat.integ { background: rgba(176,180,192,0.12); color: var(--text-dim); }
+  .cat.crit  { background: var(--red-dim);    color: var(--red);    }
+
+  /* Realism continuum encoded on the left border of column 1 */
+  .tp-table .r1  td:first-child { border-left: 4px solid #3b82f6; }
+  .tp-table .r2  td:first-child { border-left: 4px solid #487ee9; }
+  .tp-table .r3  td:first-child { border-left: 4px solid #5579dd; }
+  .tp-table .r4  td:first-child { border-left: 4px solid #6275d0; }
+  .tp-table .r5  td:first-child { border-left: 4px solid #6e70c3; }
+  .tp-table .r6  td:first-child { border-left: 4px solid #7b6cb7; }
+  .tp-table .r7  td:first-child { border-left: 4px solid #8867aa; }
+  .tp-table .r8  td:first-child { border-left: 4px solid #95639d; }
+  .tp-table .r9  td:first-child { border-left: 4px solid #a25e90; }
+  .tp-table .r10 td:first-child { border-left: 4px solid #af5a84; }
+  .tp-table .r11 td:first-child { border-left: 4px solid #bb5577; }
+  .tp-table .r12 td:first-child { border-left: 4px solid #c8516a; }
+  .tp-table .r13 td:first-child { border-left: 4px solid #d54c5d; }
+  .tp-table .r14 td:first-child { border-left: 4px solid #e24851; }
+  .tp-table .r15 td:first-child { border-left: 4px solid #ef4444; }
+
+  /* Legend */
+  .tp-legend {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .tp-legend h3 {
+    font-family: var(--mono);
+    font-size: 0.75em;
+    font-weight: 600;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 14px;
+  }
+  .tp-legend-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin-bottom: 18px;
+    font-family: var(--mono);
+    font-size: 0.8em;
+    color: var(--text-dim);
+  }
+  .tp-legend-grid .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .border-swatch {
+    width: 4px;
+    height: 16px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+  .tp-note {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--teal);
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: var(--serif);
+    font-size: 0.92em;
+    line-height: 1.6;
+    color: var(--text);
+    border-radius: 0 6px 6px 0;
+    max-width: 720px;
+  }
+  .tp-note p { margin: 0 0 12px; }
+  .tp-note p:last-child { margin-bottom: 0; }
+  .tp-note strong { color: var(--text-bright); }
+
+  @media (max-width: 900px) {
+    .tp-table { font-size: 0.82em; }
+    .tp-table th, .tp-table td { padding: 8px 10px; }
+  }
+</style>
+
+<div class="container tp-wide">
+  <div class="hero">
+    <h1>Psychiatry Tabulated</h1>
+    <div class="subtitle">Fifteen major perspectives on psychiatric disorders, compared across eleven dimensions. Rows are ordered from ontologically realist (top) to anti-realist (bottom); the left border of each row encodes its position on that continuum.</div>
+  </div>
+
+  <div class="section">
+    <div class="tp-table-wrap">
+      <table class="tp-table">
+        <thead>
+        <tr>
+          <th>Perspective</th>
+          <th>Disorder ontology</th>
+          <th>Primary locus</th>
+          <th>Causal emphasis</th>
+          <th>Nosological stance</th>
+          <th>Treatment implication</th>
+          <th>Empirical grounding</th>
+          <th>Distress required?</th>
+          <th>Unit of intervention</th>
+          <th>Stance on comorbidity</th>
+          <th>Key figures</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="r1">
+          <td><span class="cat bio">Biomedical</span></td>
+          <td>Disease entity; natural kind</td>
+          <td>Brain</td>
+          <td>Genetic, neurobiological</td>
+          <td>Categorical; natural kinds</td>
+          <td>Pharmacology, somatic</td>
+          <td>Strong (Rx); weak (etiology)</td>
+          <td>In principle no; in practice yes via clinical significance criterion</td>
+          <td>Individual biology</td>
+          <td>Genuine distinct entities</td>
+          <td>Kraepelin, Griesinger</td>
+        </tr>
+        <tr class="r2">
+          <td><span class="cat bio">RDoC</span></td>
+          <td>Circuit dysfunction; real but dimensional</td>
+          <td>Neural circuits</td>
+          <td>Biological / dimensional</td>
+          <td>Dimensional; replaces DSM</td>
+          <td>Targeted bio + behavioral</td>
+          <td>Emerging</td>
+          <td>No</td>
+          <td>Neural circuit</td>
+          <td>Artifact of categorical carving; circuits cut across DSM boundaries</td>
+          <td>Insel, Cuthbert</td>
+        </tr>
+        <tr class="r3">
+          <td><span class="cat comp">Computational</span></td>
+          <td>Aberrant inference/computation; algorithm-level real</td>
+          <td>Inferential processes (Marr's algorithmic level)</td>
+          <td>Predictive coding, RL, Bayesian inference</td>
+          <td>Process-level; transdiagnostic mechanisms</td>
+          <td>Mechanism-targeted; computational-behavioral</td>
+          <td>Emerging; limited clinical translation so far</td>
+          <td>No; computational dysfunction sufficient</td>
+          <td>Inferential / computational process</td>
+          <td>Shared computational signatures across categories; transdiagnostic</td>
+          <td>Friston, Huys, Montague, Adams</td>
+        </tr>
+        <tr class="r4">
+          <td><span class="cat phen">Phenomenological</span></td>
+          <td>Disturbed structure of subjectivity; experientially real</td>
+          <td>Lived experience</td>
+          <td>Constitutional; experiential structure</td>
+          <td>Descriptive realism (esp. endogenous psychoses)</td>
+          <td>Experience-attuned description and care</td>
+          <td>Philosophical; qualitative; structured instruments (e.g. EASE)</td>
+          <td>Altered subjectivity is central; distress typical but not strictly constitutive</td>
+          <td>Whole experiencing person</td>
+          <td>Distinct syndromal Gestalts (Copenhagen school); existential strands more holistic</td>
+          <td>Jaspers, Binswanger, Parnas, Sass</td>
+        </tr>
+        <tr class="r5">
+          <td><span class="cat evol">Evolutionary</span></td>
+          <td>Miscalibrated adaptation (Nesse) or harmful dysfunction (Wakefield) &mdash; see note</td>
+          <td>Organism in environment</td>
+          <td>Evolutionary mismatch; failure of designed function</td>
+          <td>Functional/dimensional (Nesse); realist (Wakefield)</td>
+          <td>Remove trigger; context shift; restore function</td>
+          <td>Theoretical; uneven empirical</td>
+          <td>Yes (Wakefield: harm is constitutive in HDA); functional signal possibly adaptive (Nesse)</td>
+          <td>Organism&ndash;environment fit</td>
+          <td>Often artifacts; shared mechanisms or pleiotropy expected</td>
+          <td>Nesse, Wakefield, Br&uuml;ne, Del Giudice</td>
+        </tr>
+        <tr class="r6">
+          <td><span class="cat integ">HiTOP</span></td>
+          <td>Empirical covariance structure</td>
+          <td>Symptoms / traits</td>
+          <td>Psychometric / structural</td>
+          <td>Hierarchical dimensional</td>
+          <td>Transdiagnostic</td>
+          <td>Strong psychometric</td>
+          <td>Agnostic; empirical question</td>
+          <td>Spectrum / dimension</td>
+          <td>Largely artifacts of arbitrary categorical cuts; explained by shared higher-order dimensions</td>
+          <td>Kotov, Krueger, Watson, Achenbach</td>
+        </tr>
+        <tr class="r7">
+          <td><span class="cat integ">Network theory</span></td>
+          <td>Causal symptom loops; no latent entity</td>
+          <td>Symptom network</td>
+          <td>Mutual reinforcement</td>
+          <td>Rejects latent variable model</td>
+          <td>Symptom-targeted</td>
+          <td>Theoretical; emerging</td>
+          <td>Agnostic; symptoms are the target regardless</td>
+          <td>Individual symptom</td>
+          <td>Expected; overlapping networks with shared bridge symptoms</td>
+          <td>Borsboom, Cramer</td>
+        </tr>
+        <tr class="r8">
+          <td><span class="cat psych">Psychodynamic</span></td>
+          <td>Meaningful conflict; real but psychological</td>
+          <td>Unconscious mind</td>
+          <td>Intrapsychic; developmental</td>
+          <td>Categorical, loosening</td>
+          <td>Long-term psychotherapy</td>
+          <td>Mixed; contested</td>
+          <td>Not strictly; unconscious conflict can be asymptomatic</td>
+          <td>Intrapsychic structure</td>
+          <td>Common; reflect shared underlying character structure</td>
+          <td>Freud, Klein, Kernberg</td>
+        </tr>
+        <tr class="r9">
+          <td><span class="cat integ">Biopsychosocial</span></td>
+          <td>Multifactorial; expands explanatory frame rather than denying disease ontology</td>
+          <td>Person-in-context</td>
+          <td>Mixed (bio + psycho + social)</td>
+          <td>Pragmatic / integrative</td>
+          <td>Integrative</td>
+          <td>Theoretical; weak operationalization</td>
+          <td>Agnostic</td>
+          <td>Person-in-context</td>
+          <td>Agnostic; pragmatic</td>
+          <td>Engel</td>
+        </tr>
+        <tr class="r10">
+          <td><span class="cat psych">Cognitive / CBT</span></td>
+          <td>Dysfunctional processing; real but cognitive</td>
+          <td>Cognition, behavior</td>
+          <td>Schemas, conditioning</td>
+          <td>Dimensional tendency</td>
+          <td>Structured psychotherapy</td>
+          <td>Large RCT base, but effect-size inflation, allegiance effects, and benchmarking debates well documented (Cuijpers et al.)</td>
+          <td>Typically yes; distress or impairment required</td>
+          <td>Cognition and behavior</td>
+          <td>Often artifacts; transdiagnostic protocols increasingly preferred</td>
+          <td>Beck, Ellis, Clark, Barlow</td>
+        </tr>
+        <tr class="r11">
+          <td><span class="cat psych">Interpersonal / relational</span></td>
+          <td>Disrupted relational patterns</td>
+          <td>Relationship patterns</td>
+          <td>Attachment, interpersonal</td>
+          <td>Varies; transdiagnostic</td>
+          <td>IPT, relational therapy</td>
+          <td>Moderate RCT base</td>
+          <td>Yes; relational suffering is central</td>
+          <td>Dyad or relational system</td>
+          <td>Common; shared interpersonal/attachment patterns underlie multiple presentations</td>
+          <td>Sullivan, Klerman, Weissman, Bowlby</td>
+        </tr>
+        <tr class="r12">
+          <td><span class="cat soc">Social &amp; cultural</span></td>
+          <td>Socially produced; culturally variable; some strands favor formulation over diagnosis</td>
+          <td>Social context</td>
+          <td>Poverty, trauma, inequality</td>
+          <td>Cultural relativism</td>
+          <td>Social intervention</td>
+          <td>Strong epidemiology</td>
+          <td>Yes, but culturally defined</td>
+          <td>Social structure / community</td>
+          <td>Categories are culturally variable; Western comorbidity patterns may not generalize</td>
+          <td>Kleinman, Brown &amp; Harris, Hopper</td>
+        </tr>
+        <tr class="r13">
+          <td><span class="cat soc">PTMF</span></td>
+          <td>Coherent response to adversity, power, threat, meaning; rejects diagnostic ontology</td>
+          <td>Person within power structures</td>
+          <td>Power dynamics, threat, meaning-making</td>
+          <td>Replaces diagnosis with formulation</td>
+          <td>Narrative reconstruction; trauma-informed; systemic</td>
+          <td>Conceptual; case-formulation evidence</td>
+          <td>Yes, but reframed as understandable response, not disorder</td>
+          <td>Personal narrative within social structure</td>
+          <td>Concept rejected; presentations reflect coherent response patterns</td>
+          <td>Johnstone, Boyle</td>
+        </tr>
+        <tr class="r14">
+          <td><span class="cat psych">Humanistic</span></td>
+          <td>Blocked growth; skeptical of disorder talk</td>
+          <td>Whole person</td>
+          <td>Existential, contextual</td>
+          <td>Skeptical of nosology</td>
+          <td>Person-centered therapy</td>
+          <td>Weak formal evidence</td>
+          <td>Yes; subjective experience is primary</td>
+          <td>Whole person</td>
+          <td>Skeptical; categories fragment the person</td>
+          <td>Rogers, Yalom, Frankl</td>
+        </tr>
+        <tr class="r15">
+          <td><span class="cat crit">Critical psychiatry</span></td>
+          <td>Social label / instrument of control</td>
+          <td>Society, power</td>
+          <td>Political, institutional</td>
+          <td>Rejects or radically critiques</td>
+          <td>Rights-based; social</td>
+          <td>Sociological; philosophical</td>
+          <td>Irrelevant; the category itself is the problem</td>
+          <td>Political / institutional</td>
+          <td>Comorbidity reflects diagnostic proliferation, not clinical reality</td>
+          <td>Szasz, Laing, Bentall, Moncrieff</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tp-legend">
+      <h3>Color scheme &mdash; intellectual tradition</h3>
+      <div class="tp-legend-grid">
+        <div class="legend-item"><span class="cat bio">Blue</span> Biomedical tradition</div>
+        <div class="legend-item"><span class="cat comp">Teal</span> Computational tradition</div>
+        <div class="legend-item"><span class="cat psych">Purple</span> Psychological traditions</div>
+        <div class="legend-item"><span class="cat phen">Yellow</span> Phenomenological tradition</div>
+        <div class="legend-item"><span class="cat evol">Orange</span> Evolutionary tradition</div>
+        <div class="legend-item"><span class="cat soc">Green</span> Social &amp; cultural tradition</div>
+        <div class="legend-item"><span class="cat crit">Red</span> Critical / anti-psychiatry tradition</div>
+        <div class="legend-item"><span class="cat integ">Gray</span> Integrative or meta-frameworks</div>
+      </div>
+      <div class="tp-legend-grid">
+        <div class="legend-item"><span class="border-swatch" style="background:#3b82f6"></span> Blue left border = stronger ontological realism</div>
+        <div class="legend-item"><span class="border-swatch" style="background:#ef4444"></span> Red left border = stronger anti-realism / constructionism</div>
+      </div>
+
+      <div class="tp-note">
+        <p><strong>On the continuum.</strong> The realism&ndash;anti-realism axis encodes whether a perspective treats psychiatric disorder categories as mind-independent natural kinds (realist) or as social, conventional, or constructed categories (anti-realist). Placement is approximate and reflects each tradition's central tendency rather than any individual theorist. The axis conflates several distinctions &mdash; realism about latent disease entities, categorical vs. dimensional structure, and social construction &mdash; which are not perfectly correlated. Network theory is the cleanest illustration: anti-realist about latent disease entities, yet realist about the causal structure among symptoms.</p>
+        <p><strong>On the evolutionary row.</strong> The Wakefield/Nesse split is unusual in cutting across the very axis the table is sorted on. Wakefield's harmful-dysfunction analysis is among the most realist positions in philosophy of psychiatry (disorder = failure of an evolved function plus harm). Nesse's mismatch/functional framing treats many presentations as adaptive signals operating in evolutionarily novel environments &mdash; closer to dimensional and contextualist. A single placement misrepresents the tradition; #5 is a compromise.</p>
+        <p><strong>On phenomenological psychiatry.</strong> Placed relatively high in realism. Jaspers founded much of descriptive realism; the Copenhagen school (Parnas, Sass) treats schizophrenia as a real ipseity disturbance with a specific phenomenological signature, operationalized in instruments such as EASE. Existential-phenomenological strands (Binswanger, early Laing) are less categorically realist; the row's central tendency lands toward realism about experiential structure.</p>
+        <p><strong>On computational psychiatry vs. RDoC.</strong> Both are realist about mechanism, but at different Marr levels: RDoC commits to neural circuits (implementational level); computational psychiatry to inferential or algorithmic processes, often agnostic about the biological substrate that realizes them. The two are complementary rather than competing.</p>
+        <p><strong>On PTMF.</strong> The Power Threat Meaning Framework (Johnstone &amp; Boyle, 2018) is the most developed instance of a broader formulation-based move that also includes trauma-informed and liberation-psychology traditions. It sits between social/cultural realism about causes and critical-psychiatry rejection of diagnostic categories.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Citation -->
+  <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 0; max-width: 720px;">
+    <h5 id="citation">Citation</h5>
+    <p>Persson, B. N. (2026). <em>Psychiatry Tabulated</em> [Comparative table]. <a href="https://bjorn-persson.github.io/visualizations/tabulated-psychiatry/" target="_blank">https://bjorn-persson.github.io/visualizations/tabulated-psychiatry/</a></p>
+    <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-BibTeX" data-lang="BibTeX"><span style="display:flex;"><span><span style="color:#0a0;text-decoration:underline">@misc</span>{Persson2026psychiatrytabulated,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">author</span> = <span style="color:#a50">{Björn N. Persson}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">year</span> = <span style="color:#a50">{2026}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">title</span> = <span style="color:#a50">{Psychiatry Tabulated}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">note</span> = <span style="color:#a50">{Comparative table}</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#1e90ff">url</span> = <span style="color:#a50">{https://bjorn-persson.github.io/visualizations/tabulated-psychiatry/}</span>}
+</span></span></code></pre></div>
+  </div>
+</div>
