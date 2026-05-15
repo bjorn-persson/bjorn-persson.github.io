@@ -2,7 +2,6 @@
 title: "Credentials in the Age of the Prompt"
 date: 2026-05-15
 summary: "The male–female gap in higher education will widen, and the men opting out are not who you think. A short argument about generative AI, the right-tail of the male ability distribution, and the future of credential-based hiring."
-draft: true
 ---
 
 *The male–female gap in higher education will widen, and the men opting out are not who you think.*

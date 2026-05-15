@@ -2,7 +2,6 @@
 title: "Does it hurt to ask?"
 date: 2026-05-13
 summary: "On whether asking participants about trauma, depression, or suicidal thoughts is harmful. The empirical answer, across four decades of studies and tens of thousands of participants, is no — and the more interesting question is what it costs us not to ask."
-draft: true
 ---
 
 Every researcher who studies anything emotionally loaded — trauma, abuse, depression, suicidality, bereavement — has had some version of the following conversation with an ethics board:
