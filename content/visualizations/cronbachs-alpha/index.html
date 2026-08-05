@@ -7,10 +7,10 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
 <style>
   /* Cronbach's alpha — page-specific styles */
 
-  /* Controls grid (3-column layout) */
+  /* Controls grid (4-column layout) */
   .ca-controls {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 10px 20px;
   }
   /* Individual sliders use shared .slider-col / .slider-val */
@@ -49,12 +49,31 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     border-left: 3px solid var(--border);
     transition: border-color 0.3s;
     min-height: 2.8em;
+    margin-top: 14px;
   }
   .ca-interp.warn { border-left-color: var(--red); }
   .ca-interp.acceptable { border-left-color: var(--orange); }
   .ca-interp.ok { border-left-color: var(--teal); }
   .ca-interp span.hl { color: var(--red); font-weight: 600; }
   .ca-interp span.ok { color: var(--teal); font-weight: 600; }
+
+  /* Classification verdict */
+  .ca-verdict {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text-dim);
+    line-height: 1.6;
+    padding: 9px 12px;
+    background: var(--bg-surface);
+    border-radius: 5px;
+    border-left: 3px solid var(--border);
+    transition: border-color 0.3s;
+    min-height: 7.7em;
+    margin-top: 8px;
+  }
+  .ca-verdict.warn    { border-left-color: var(--red); }
+  .ca-verdict.ok      { border-left-color: var(--teal); }
+  .ca-verdict.caution { border-left-color: var(--orange); }
 
   /* Canvas panels */
   .ca-panels {
@@ -113,7 +132,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
   </div>
 
   <div class="section">
-    <p>Cronbach's &alpha; determines the <strong>Standard Error of Measurement (SEM)</strong>: how much a single observed score is expected to differ from a person's true score. A score is not a point — it is an interval. Low &alpha; widens that interval and increases classification errors.</p>
+    <p>Cronbach's &alpha; determines the <strong>Standard Error of Measurement (SEM)</strong>: how much a single observed score is expected to differ from a person's true score. A score is not a point — it is an interval. Low &alpha; widens that interval and increases classification errors. The consequences shown here concern <strong>individual-level decisions</strong> — whether a single person's score falls reliably on one side of a cut-score across repeated testing.</p>
     <div class="ca-controls">
       <div class="slider-col">
         <label>Cronbach's &alpha;: <span class="slider-val" id="ca_alpha_val">0.80</span></label>
@@ -126,6 +145,10 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
       <div class="slider-col">
         <label>Test SD (score units): <span class="slider-val" id="ca_sd_val">15</span></label>
         <input type="range" id="ca_sd" min="1" max="30" step="1" value="15">
+      </div>
+      <div class="slider-col">
+        <label>Cut-score: <span class="slider-val" id="ca_cut_val">110</span> <button class="info-btn" onclick="caShowInfo('cutScore')" title="About classification cut-scores">?</button></label>
+        <input type="range" id="ca_cut" min="40" max="160" step="1" value="110">
       </div>
     </div>
 
@@ -144,8 +167,6 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
       </div>
     </div>
 
-    <div class="ca-interp" id="ca_interp">—</div>
-    <br>
     <div class="ca-panels">
       <div class="ca-panel">
         <div class="viz-title">Observed score → true-score CI <button class="info-btn" onclick="caShowInfo('scorePanel')" title="About this panel">?</button></div>
@@ -156,6 +177,8 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
         <canvas id="ca_dist" height="420"></canvas>
       </div>
     </div>
+    <div class="ca-interp" id="ca_interp">—</div>
+    <div class="ca-verdict" id="ca_verdict"></div>
 
     <div class="note">
       <strong>SEM = SD × √(1 − α).</strong>
@@ -201,7 +224,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
   }
 
   // ── Score scale panel ─────────────────────────────────────────────────────
-  function drawScore(alpha, trueScore, sd) {
+  function drawScore(alpha, trueScore, sd, cutScore) {
     const W = scoreCanvas.width / dpr;
     const H = scoreCanvas.height / dpr;
     sCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -257,12 +280,12 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     sCtx.textAlign = 'center';
     sCtx.fillText('95% CI', toX((lo95 + hi95) / 2), midY - bandH - 16);
 
-    // True score marker
+    // Observed score marker line
     const tsx = toX(trueScore);
     sCtx.beginPath(); sCtx.moveTo(tsx, midY - bandH - 2); sCtx.lineTo(tsx, midY + bandH + 2);
     sCtx.strokeStyle = C_TEAL; sCtx.lineWidth = 2; sCtx.stroke();
 
-    // Observed score marker (same as true — user sets true score, observed = true)
+    // Observed score point
     sCtx.beginPath();
     sCtx.arc(tsx, midY, 6, 0, Math.PI * 2);
     sCtx.fillStyle = C_TEAL;
@@ -285,10 +308,27 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     sCtx.fillStyle = alpha >= 0.9 ? C_TEAL : alpha >= 0.7 ? C_ORANGE : C_RED;
     sCtx.textAlign = 'center';
     sCtx.fillText(`α = ${alpha.toFixed(2)}  →  SEM = ${sem.toFixed(1)}`, W / 2, 22);
+
+    // Cut-score line
+    const distSEM_cut = sem < 0.001 ? Infinity : Math.abs(trueScore - cutScore) / sem;
+    const cutColor = distSEM_cut < 1 ? C_RED : distSEM_cut < 1.96 ? C_ORANGE : C_TEAL;
+    const csx = toX(Math.max(xMin, Math.min(xMax, cutScore)));
+    sCtx.beginPath();
+    sCtx.moveTo(csx, 32);
+    sCtx.lineTo(csx, midY + bandH + 4);
+    sCtx.strokeStyle = cutColor;
+    sCtx.lineWidth = 1.5;
+    sCtx.setLineDash([5, 4]);
+    sCtx.stroke();
+    sCtx.setLineDash([]);
+    sCtx.font = `12px ${C_MONO}`;
+    sCtx.fillStyle = cutColor;
+    sCtx.textAlign = 'center';
+    sCtx.fillText(`cut = ${cutScore}`, csx, 30);
   }
 
   // ── Repeated-testing distribution ────────────────────────────────────────
-  function drawDist(alpha, trueScore, sd) {
+  function drawDist(alpha, trueScore, sd, cutScore) {
     const W = distCanvas.width / dpr;
     const H = distCanvas.height / dpr;
     dCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -382,13 +422,13 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     dCtx.font = `bold 13px ${C_MONO}`;
     dCtx.fillStyle = C_TEXT_DIM;
     dCtx.textAlign = 'center';
-    dCtx.fillText(`Repeated testing (observed = ${trueScore})`, W / 2, 22);
+    dCtx.fillText(`Repeated testing (true score = ${trueScore})`, W / 2, 22);
 
     // Legend
     dCtx.font = `12px ${C_MONO}`;
     dCtx.textAlign = 'left';
     dCtx.fillStyle = C_TEAL;
-    dCtx.fillText(`observed = ${trueScore}`, toX(trueScore) + 6, PAD_T + 16);
+    dCtx.fillText(`true score = ${trueScore}`, toX(trueScore) + 6, PAD_T + 16);
 
     // 68%/95% labels
     const lo68x = Math.max(xMin, lo68);
@@ -397,10 +437,29 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     dCtx.fillStyle = 'rgba(200,60,90,0.9)';
     dCtx.textAlign = 'center';
     dCtx.fillText('68%', toX((lo68x + hi68x) / 2), PAD_T + ph - 8);
+
+    // Cut-score line on distribution panel
+    const csx_cut = toX(cutScore);
+    if (csx_cut >= PAD_L && csx_cut <= PAD_L + pw) {
+      dCtx.beginPath();
+      dCtx.moveTo(csx_cut, PAD_T);
+      dCtx.lineTo(csx_cut, PAD_T + ph);
+      dCtx.strokeStyle = C_ORANGE;
+      dCtx.lineWidth = 1.5;
+      dCtx.setLineDash([5, 4]);
+      dCtx.stroke();
+      dCtx.setLineDash([]);
+      dCtx.font = `12px ${C_MONO}`;
+      dCtx.fillStyle = C_ORANGE;
+      const cutSide = csx_cut > toX(trueScore) ? 'left' : 'right';
+      dCtx.textAlign = cutSide;
+      const cutLabelX = csx_cut > toX(trueScore) ? csx_cut + 4 : csx_cut - 4;
+      dCtx.fillText('cut', cutLabelX, PAD_T + 16);
+    }
   }
 
   // ── Stats update ──────────────────────────────────────────────────────────
-  function updateStats(alpha, trueScore, sd) {
+  function updateStats(alpha, trueScore, sd, cutScore) {
     const sem = sd * Math.sqrt(1 - alpha);
     const ci68 = 2 * sem;
     const ci95 = 2 * 1.96 * sem;
@@ -445,7 +504,29 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     const lo95c = (trueScore - 1.96 * sem).toFixed(0);
     const hi95c = (trueScore + 1.96 * sem).toFixed(0);
     const width95 = ci95.toFixed(1);
-    clinicalEl.innerHTML = `A psychologist interpreting this score should treat ${trueScore} as a point estimate surrounded by measurement uncertainty. If the same patient were administered many parallel versions of this test, 95% of those scores would be expected to fall between ${lo95c} and ${hi95c} — a range of ${width95} points. Diagnostic cut-offs and comparisons between patients should always be evaluated against this interval: two scores that differ on paper may not reflect a real difference if their confidence intervals overlap substantially.`;
+    clinicalEl.innerHTML = `A psychologist interpreting this score should treat ${trueScore} as a point estimate surrounded by measurement uncertainty. If this person's true score were ${trueScore}, then across many parallel versions of this test 95% of the scores they obtained would fall between ${lo95c} and ${hi95c} — a range of ${width95} points. Diagnostic cut-offs and comparisons between patients should always be evaluated against this interval: two scores that differ on paper may not reflect a real difference if their confidence intervals overlap substantially.`;
+
+    // Classification verdict relative to cut-score (SEM-distance bands, not Emons et al.'s
+    // latent-trait unreliability interval — see the cut-score modal)
+    const distSEM = sem < 0.001 ? Infinity : Math.abs(trueScore - cutScore) / sem;
+    const verdictEl = document.getElementById('ca_verdict');
+    let vClass, vMsg;
+    if (sem < 0.001) {
+      vClass = 'ok';
+      vMsg = `<strong>Classification certain:</strong> with α = 1.00 the SEM is zero — there is no measurement error. The observed score equals the true score exactly, and classification is perfectly consistent regardless of cut-score position.`;
+    } else if (distSEM < 1) {
+      vClass = 'warn';
+      vMsg = `<strong>Classification unreliable:</strong> the cut-score (${cutScore}) is only ${distSEM.toFixed(2)} SEMs from this score — inside the 68% CI. Measurement error alone will frequently push repeated scores across the boundary. This score sits in the zone around the cut-score where classification is least trustworthy, and should not be used for high-stakes decisions without additional information.`;
+    } else if (distSEM < 1.96) {
+      vClass = 'caution';
+      vMsg = `<strong>Classification uncertain:</strong> the cut-score (${cutScore}) falls within the 95% CI — ${distSEM.toFixed(2)} SEMs away. The true score could plausibly fall on either side of the boundary. High-stakes decisions should not rest on this result alone.`;
+    } else {
+      const side = cutScore > trueScore ? 'below' : 'above';
+      vClass = 'ok';
+      vMsg = `<strong>Classification consistent:</strong> the cut-score (${cutScore}) is ${distSEM.toFixed(2)} SEMs away — outside the 95% CI. This score would reliably be classified as ${side} the cut-score across repeated testing.`;
+    }
+    verdictEl.className = `ca-verdict ${vClass}`;
+    verdictEl.innerHTML = vMsg;
   }
 
   // ── Resize + render ───────────────────────────────────────────────────────
@@ -463,14 +544,16 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     const alpha = parseFloat(document.getElementById('ca_alpha').value);
     const trueScore = parseFloat(document.getElementById('ca_true').value);
     const sd = parseFloat(document.getElementById('ca_sd').value);
+    const cutScore = parseFloat(document.getElementById('ca_cut').value);
 
     document.getElementById('ca_alpha_val').textContent = alpha.toFixed(2);
     document.getElementById('ca_true_val').textContent = trueScore.toFixed(0);
     document.getElementById('ca_sd_val').textContent = sd.toFixed(0);
+    document.getElementById('ca_cut_val').textContent = cutScore.toFixed(0);
 
-    updateStats(alpha, trueScore, sd);
-    drawScore(alpha, trueScore, sd);
-    drawDist(alpha, trueScore, sd);
+    updateStats(alpha, trueScore, sd, cutScore);
+    drawScore(alpha, trueScore, sd, cutScore);
+    drawDist(alpha, trueScore, sd, cutScore);
   }
 
   function resize() {
@@ -478,7 +561,7 @@ summary: "Explore how Cronbach's alpha shapes the Standard Error of Measurement 
     update();
   }
 
-  for (const id of ['ca_alpha', 'ca_true', 'ca_sd']) {
+  for (const id of ['ca_alpha', 'ca_true', 'ca_sd', 'ca_cut']) {
     document.getElementById(id).addEventListener('input', update);
   }
 
@@ -493,9 +576,9 @@ const caInfoContent = {
     body: `
       <p>This tool illustrates a core idea in psychometrics: any single test score contains measurement error. Cronbach's &alpha; quantifies a test's internal-consistency reliability, and that reliability directly controls how precise — or imprecise — individual scores are.</p>
       <div class="section-label">What you can explore</div>
-      <p>Use the sliders to set a reliability level (&alpha;), an observed score, and a test's standard deviation. The visualization then shows the Standard Error of Measurement (SEM), the resulting confidence intervals around the observed score, and the distribution of scores you would expect on repeated testing.</p>
+      <p>Use the sliders to set a reliability level (&alpha;), an observed score, a test's standard deviation, and a classification cut-score. The visualization shows the Standard Error of Measurement (SEM), confidence intervals around the observed score, the distribution of scores on repeated testing, and whether the observed score can be consistently classified relative to the cut-score boundary.</p>
       <div class="section-label">Key assumption</div>
-      <p>The confidence intervals use the classical formula X &plusmn; z &times; SEM, centered on the observed score. This is the standard textbook approach (Nunnally &amp; Bernstein, 1994). It does not incorporate regression to the mean — a more precise estimate would shrink extreme scores toward the population average. For most practical purposes the difference is small, but it is worth noting for scores far from the mean.</p>
+      <p>The confidence intervals use the classical formula X &plusmn; z &times; SEM, centered on the observed score. This is the standard textbook approach (Nunnally &amp; Bernstein, 1994). It does not incorporate regression to the mean — a more precise estimate would shrink extreme scores toward the population average. The difference is small when &alpha; is high and the score is close to the mean, but it grows quickly as &alpha; falls or the score becomes more extreme: at &alpha; = 0.40 the interval shown here is roughly 1.6 times wider than the shrunken estimate, and it is centred in the wrong place.</p>
     `
   },
   sem: {
@@ -532,7 +615,7 @@ const caInfoContent = {
       <div class="section-label">Interpretation</div>
       <p>This is the interval most commonly reported in clinical and educational assessment. If the 95% CI is wide relative to meaningful score differences, individual scores cannot be interpreted with confidence.</p>
       <div class="section-label">Example</div>
-      <p>On an IQ-scale test (SD = 15) with &alpha; = 0.90, the 95% CI width is about 18.6 points. A person scoring 110 has a 95% CI of roughly [101, 119]. With &alpha; = 0.70, that width balloons to about 32.3 points — nearly the entire range between "average" and "superior" classifications.</p>
+      <p>On an IQ-scale test (SD = 15) with &alpha; = 0.90, the 95% CI width is about 18.6 points. A person scoring 110 has a 95% CI of roughly [101, 119]. With &alpha; = 0.70, that width balloons to about 32.2 points — nearly the entire range between "average" and "superior" classifications.</p>
       <div class="section-label">Clinical guideline</div>
       <p>&alpha; &ge; 0.90 is generally recommended for high-stakes individual decisions (diagnosis, placement). &alpha; &ge; 0.70 may suffice for group-level research comparisons where individual precision is less critical.</p>
     `
@@ -554,13 +637,29 @@ const caInfoContent = {
     title: 'Repeated Testing Distribution',
     badge: 'Error distribution',
     body: `
-      <p>This panel shows the distribution of scores you would expect if you tested the same person many times with parallel forms of the test. The curve is a normal distribution centered on the observed score, with a standard deviation equal to the SEM.</p>
+      <p>This panel shows the distribution of scores you would expect if you tested the same person many times with parallel forms of the test. The curve is a normal distribution centered on that person's <em>true</em> score, with a standard deviation equal to the SEM. For this panel the slider value is read as the true score, whereas the left-hand panel reads the same value as a single observed score. The two panels answer complementary questions: where repeated observations land given a true score, and where the true score might lie given one observation.</p>
       <div class="section-label">What the curve shows</div>
-      <p>The peak of the curve is at the observed score. The spread is determined entirely by the SEM: lower reliability means a wider, flatter curve (more variable scores across administrations), while higher reliability produces a tall, narrow curve (scores cluster tightly together).</p>
+      <p>The peak of the curve is at the true score. The spread is determined entirely by the SEM: lower reliability means a wider, flatter curve (more variable scores across administrations), while higher reliability produces a tall, narrow curve (scores cluster tightly together).</p>
       <div class="section-label">The shaded regions</div>
-      <p>The darker shading covers the central 68% of the distribution — the range within which most scores would fall on retesting. The lighter shading extends to 95%. Scores outside the 95% region would occur fewer than 1 in 20 times.</p>
+      <p>The darker shading covers the central 68% of the distribution — the range within which most scores would fall on retesting. The lighter shading extends to 95%. Scores outside the 95% region would occur about 1 in 20 times.</p>
       <div class="section-label">Intuition</div>
       <p>Think of this as the "noise" in the measurement process. Even if a person's true ability never changes, their observed scores will vary from one testing to the next. This panel makes that variability visible.</p>
+    `
+  },
+  cutScore: {
+    title: 'Classification Cut-Score',
+    badge: 'Cut-score',
+    body: `
+      <p>The cut-score sets a decision boundary: scores above it are classified one way (e.g., "needs treatment"), scores below another. This slider lets you place the boundary anywhere on the scale so you can see whether the observed score falls clearly enough to one side to support a reliable classification.</p>
+      <div class="section-label">The unreliability interval</div>
+      <p>Around any cut-score there is an <em>unreliability interval</em> — a zone where measurement error is large enough that repeated testing will frequently produce conflicting classifications. Its width depends on how certain you require the classification to be. Emons, Sijtsma, &amp; Meijer (2007) showed that for short scales (6–12 items) this interval covers a large part of the score scale — up to half of it for a 6-item test. Even with highly discriminating items placed directly at the cut-score, a 6-item scale classified only about a third to two-thirds of the above-cut group consistently at a 90% certainty level, depending on how extreme the cut-score was.</p>
+      <div class="section-label">Interpreting the verdict</div>
+      <p>The colored verdict box reports how many SEMs the cut-score is from the observed score:</p>
+      <p><span style="color:var(--teal);font-weight:600">Outside 95% CI (&ge;1.96 SEMs):</span> classification is consistent.</p>
+      <p><span style="color:var(--orange);font-weight:600">Within 95% CI (1–1.96 SEMs):</span> classification is uncertain.</p>
+      <p><span style="color:var(--red);font-weight:600">Within 68% CI (&lt;1 SEM):</span> classification is unreliable, approaching a coin flip as the score nears the cut-score itself.</p>
+      <div class="section-label">Reference</div>
+      <p>Emons, W. H. M., Sijtsma, K., &amp; Meijer, R. R. (2007). On the consistency of individual classification using short scales. <em>Psychological Methods, 12</em>(1), 105–120.</p>
     `
   }
 };
