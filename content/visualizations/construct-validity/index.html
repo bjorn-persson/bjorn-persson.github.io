@@ -395,6 +395,11 @@ summary: "Compare six influential frameworks for construct validity and see how 
   .mtmm-control .mtmm-val.teal { color: var(--teal); }
   .mtmm-control .mtmm-val.orange { color: var(--orange); }
   .mtmm-control .mtmm-val.dim { color: var(--text-dim); }
+  /* Live matrix values quoted inside the key-idea note */
+  .mtmm-inline { font-family: var(--mono); font-weight: 600; }
+  .mtmm-inline.teal { color: var(--teal); }
+  .mtmm-inline.orange { color: var(--orange); }
+  .mtmm-inline.purple { color: var(--purple); }
   .mtmm-wrap {
     overflow-x: auto;
     margin-bottom: 16px;
@@ -449,8 +454,9 @@ summary: "Compare six influential frameworks for construct validity and see how 
     margin-bottom: 16px;
   }
   .mtmm-legend-item { display: flex; align-items: center; gap: 5px; }
+  /* Solid category colour, ringed in that category's cell tint. */
   .mtmm-legend-swatch {
-    width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border);
+    width: 14px; height: 14px; border-radius: 3px; border: 1px solid;
   }
   .mtmm-criteria {
     display: flex;
@@ -628,30 +634,30 @@ summary: "Compare six influential frameworks for construct validity and see how 
     <div class="section">
       <div class="fw-period"><a class="ref" href="https://doi.org/10.1037/h0046016" target="_blank">Campbell &amp; Fiske (1959)</a> &middot; Multitrait-Multimethod Matrix</div>
       <div class="fw-intro">
-        Campbell and Fiske operationalized validation by measuring <strong>multiple traits</strong> using <strong>multiple methods</strong>. This established two core principles: <strong>convergent validity</strong> (different methods measuring the same trait should agree) and <strong>discriminant validity</strong> (measures of different traits should diverge, even when sharing a method). Method variance &mdash; artificial correlation inflated by shared measurement method &mdash; is the key threat.<br><br>
-        <em>Adjust the three parameters to see how convergent validity, trait similarity, and method effects shape the MTMM matrix. Watch what happens when method variance exceeds convergent validity.</em>
+        Campbell and Fiske operationalized validation by measuring <strong>multiple traits</strong> using <strong>multiple methods</strong>. This established two core principles: <strong>convergent validity</strong> (different methods measuring the same trait should agree) and <strong>discriminant validity</strong> (measures of different traits should diverge, even when sharing a method). Method variance &mdash; systematic variance coming from the measuring procedure rather than from the trait, which inflates the correlation between any two measures sharing a method &mdash; is the key threat.<br><br>
+        <em>The three sliders decide where each measure's variance comes from. <strong>Trait variance</strong> is the share reflecting the trait a measure targets, and <strong>method variance</strong> the share coming from the procedure used; between them they set how much of the measure is signal and how much is an artefact of asking. <strong>Trait correlation</strong> is different in kind &mdash; it is how much the underlying traits genuinely overlap, how related depression and anxiety really are before any measurement enters. Every cell is generated from a single trait-and-method decomposition, so the matrix is always one real data could produce. Watch what happens when method variance grows large relative to trait variance.</em>
       </div>
 
       <div class="mtmm-controls">
         <div class="mtmm-control">
-          <label>Convergent validity: <span class="mtmm-val teal" id="mtmm-conv-val">0.65</span></label>
+          <label>Trait variance: <span class="mtmm-val teal" id="mtmm-conv-val">0.65</span></label>
           <input type="range" id="mtmm-conv" min="0" max="90" value="65">
         </div>
         <div class="mtmm-control">
-          <label>Trait similarity: <span class="mtmm-val dim" id="mtmm-disc-val">0.30</span></label>
-          <input type="range" id="mtmm-disc" min="0" max="80" value="30">
+          <label>Trait correlation: <span class="mtmm-val dim" id="mtmm-disc-val">0.30</span></label>
+          <input type="range" id="mtmm-disc" min="0" max="100" value="30">
         </div>
         <div class="mtmm-control">
-          <label>Method effect: <span class="mtmm-val orange" id="mtmm-meth-val">0.10</span></label>
+          <label>Method variance: <span class="mtmm-val orange" id="mtmm-meth-val">0.10</span></label>
           <input type="range" id="mtmm-meth" min="0" max="45" value="10">
         </div>
       </div>
 
       <div class="mtmm-legend">
-        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(234,179,8,0.22)"></div> Reliability (diagonal)</div>
-        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(45,212,191,0.20)"></div> Convergent (same trait, diff method)</div>
-        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(249,115,22,0.35)"></div> Heterotrait-monomethod</div>
-        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:rgba(167,139,250,0.18)"></div> Heterotrait-heteromethod</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:var(--yellow);border-color:rgba(234,179,8,0.12)"></div> Reliability (diagonal)</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:var(--teal);border-color:rgba(45,212,191,0.18)"></div> Convergent (same trait, diff method)</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:var(--orange);border-color:rgba(249,115,22,0.16)"></div> Heterotrait-monomethod</div>
+        <div class="mtmm-legend-item"><div class="mtmm-legend-swatch" style="background:var(--purple);border-color:rgba(167,139,250,0.10)"></div> Heterotrait-heteromethod</div>
       </div>
 
       <div class="mtmm-wrap">
@@ -666,8 +672,16 @@ summary: "Compare six influential frameworks for construct validity and see how 
 
       <div class="density-status" id="mtmm-status"></div>
 
+      <div class="note caveat">
+        The three checks above are Campbell and Fiske's first three. Their fourth asks that the same pattern of trait interrelationships appear in every heterotrait triangle &mdash; if depression and anxiety are the most correlated pair under self-report, they should be the most correlated pair under clinician rating too. Here all three traits share a single correlation, so each triangle is internally constant and there is no pattern left to violate.<br><br>
+        Each measure is trait variance + method variance + error, so the sliders always produce a matrix real data could yield. Trait and method variance share one budget and cannot sum past 1 &mdash; which is why the method variance slider loses range as trait variance climbs. The diagonal shows each measure's reliable variance &mdash; the values Campbell and Fiske expected to be largest in the matrix, and under this model they always are.
+      </div>
+
       <div class="note">
-        <strong>Key idea:</strong> High correlations between a test and a criterion are not sufficient evidence of validity. If a self-report depression scale correlates .60 with a self-report anxiety scale, is that convergent validity or method variance? Only by crossing traits with methods can you tell.
+        <strong>Key idea:</strong> A high correlation is not evidence of validity on its own. What matters is which cell of the matrix it sits in.<br><br>
+        <strong>Convergent validity</strong> is the PHQ-9 against a clinician's rating of the same trait: <span class="mtmm-inline teal" id="mtmm-k-conv">0.65</span>. Two quite different procedures &mdash; a patient ticking boxes, a clinician forming a judgment &mdash; agreeing that closely about who is depressed is what tells you the PHQ-9 is tracking depression, and not just a quirk of how people fill in questionnaires.<br><br>
+        <strong>Discriminant validity</strong> asks whether that number beats what the PHQ-9 shares with a <em>different</em> trait. Against a self-report anxiety scale it correlates <span class="mtmm-inline orange" id="mtmm-k-mono">0.30</span>; against a clinician's anxiety rating, only <span class="mtmm-inline purple" id="mtmm-k-hetero">0.20</span>. Depression and anxiety genuinely overlap by that second figure &mdash; the difference between the two, <span class="mtmm-inline orange" id="mtmm-k-meth">0.10</span>, is method variance and nothing else, bought purely by sharing a questionnaire format.<br><br>
+        That gap is why crossing traits with methods is the whole point. Push method variance far enough and the anxiety questionnaire correlation overtakes the clinician's depression rating &mdash; at which point the PHQ-9 is telling you more about how people answer questionnaires than about who is depressed.
       </div>
     </div>
   </div>
@@ -994,9 +1008,12 @@ fwBtns.forEach(btn => {
 
   function updateNetwork() {
     edges.forEach(updateEdge);
+    /* Embedding counts the whole lawful web, not just links to the target:
+       for Cronbach & Meehl the surrounding lattice also gives a construct meaning.
+       But if the target itself is cut loose, the verdict is vacuous regardless. */
     const depEdges = edges.filter(e => e.from === 'dep' || e.to === 'dep');
     const activeDep = depEdges.filter(e => e.active).length;
-    const density = depEdges.length > 0 ? activeDep / depEdges.length : 0;
+    const density = edges.length > 0 ? edges.filter(e => e.active).length / edges.length : 0;
 
     document.getElementById('density-val').textContent = Math.round(density * 100) + '%';
     const bar = document.getElementById('density-bar');
@@ -1004,15 +1021,16 @@ fwBtns.forEach(btn => {
     bar.style.background = density > 0.5 ? 'var(--teal)' : density > 0.15 ? 'var(--orange)' : 'var(--red)';
 
     const status = document.getElementById('density-status');
-    if (density === 1)        status.textContent = 'The construct is richly embedded in a network of lawful relationships \u2014 well-defined and scientifically meaningful.';
+    if (activeDep === 0)      status.textContent = 'Scientifically vacuous. Depression has been cut loose from the network entirely \u2014 whatever else survives, there is nothing left to validate the construct against.';
+    else if (density === 1)   status.textContent = 'The construct is richly embedded in a network of lawful relationships \u2014 well-defined and scientifically meaningful.';
     else if (density > 0.7)   status.textContent = 'Strong nomological embedding. Most theoretical and observational connections remain intact.';
     else if (density > 0.4)   status.textContent = 'Embedding is weakening. The construct\'s meaning becomes less precise as relationships are lost.';
     else if (density > 0.15)  status.textContent = 'Sparse embedding. The construct is poorly defined \u2014 few lawful relationships anchor its meaning.';
-    else if (density > 0)     status.textContent = 'Nearly isolated. The construct is barely connected to the network \u2014 its scientific status is precarious.';
-    else                      status.textContent = 'Scientifically vacuous. With no nomological connections, the construct has no empirical meaning \u2014 there is nothing to validate.';
+    else                      status.textContent = 'Nearly isolated. The construct is barely connected to the network \u2014 its scientific status is precarious.';
 
-    const depOp = density === 0 ? 0.15 : density < 0.3 ? 0.45 : 1;
-    nodeMap['dep'].groupEl.style.opacity = depOp;
+    /* The target's own fading tracks its own links, not the whole web */
+    const depFrac = depEdges.length > 0 ? activeDep / depEdges.length : 0;
+    nodeMap['dep'].groupEl.style.opacity = depFrac === 0 ? 0.15 : depFrac < 0.3 ? 0.45 : 1;
 
     nodes.forEach(n => {
       if (n.id === 'dep') return;
@@ -1040,12 +1058,20 @@ fwBtns.forEach(btn => {
   const discSlider = document.getElementById('mtmm-disc');
   const methSlider = document.getElementById('mtmm-meth');
 
+  /* Every cell comes from one trait/method variance decomposition:
+       each measure = t2 of trait variance + m2 of method variance + error.
+     Trait and method variance share a single budget (they cannot sum past 1),
+     so method variance is capped by whatever trait variance leaves behind. */
   function getParams() {
-    return {
-      conv: parseInt(convSlider.value) / 100,
-      disc: parseInt(discSlider.value) / 100,
-      meth: parseInt(methSlider.value) / 100,
-    };
+    const t2 = parseInt(convSlider.value) / 100;
+    /* Trait and method variance share one budget, so the method slider loses
+       range as trait variance climbs. Capping max (rather than the value)
+       keeps the handle and the readout in agreement. */
+    const maxM2 = Math.min(0.45, Math.max(0, 0.98 - t2));
+    methSlider.max = String(Math.round(maxM2 * 100));
+    const r  = parseInt(discSlider.value) / 100;
+    const m2 = Math.min(parseInt(methSlider.value) / 100, maxM2);
+    return { t2: t2, r: r, m2: m2 };
   }
 
   function cellType(i, j) {
@@ -1057,20 +1083,28 @@ fwBtns.forEach(btn => {
   }
 
   function cellValue(type, p) {
-    if (type === 'diag') return null;
-    if (type === 'conv') return p.conv;
-    if (type === 'mono') return Math.min(p.disc + p.meth, 0.99);
-    return p.disc;
+    if (type === 'diag') return p.t2 + p.m2;          /* reliable variance */
+    if (type === 'conv') return p.t2;                 /* shares trait only */
+    if (type === 'mono') return p.r * p.t2 + p.m2;    /* shares method + correlated traits */
+    return p.r * p.t2;                                /* shares correlated traits only */
   }
 
   function renderTable() {
     const p = getParams();
-    document.getElementById('mtmm-conv-val').textContent = p.conv.toFixed(2);
-    document.getElementById('mtmm-disc-val').textContent = p.disc.toFixed(2);
-    document.getElementById('mtmm-meth-val').textContent = p.meth.toFixed(2);
+    document.getElementById('mtmm-conv-val').textContent = p.t2.toFixed(2);
+    document.getElementById('mtmm-disc-val').textContent = p.r.toFixed(2);
+    document.getElementById('mtmm-meth-val').textContent = p.m2.toFixed(2);
 
-    const monoVal = Math.min(p.disc + p.meth, 0.99);
-    const warnMono = monoVal >= p.conv;
+    const convVal = cellValue('conv', p);
+    const monoVal = cellValue('mono', p);
+    const heteroVal = cellValue('hetero', p);
+    const warnMono = monoVal >= convVal;
+
+    /* Figures quoted in the key-idea note track the matrix */
+    document.getElementById('mtmm-k-conv').textContent = convVal.toFixed(2);
+    document.getElementById('mtmm-k-mono').textContent = monoVal.toFixed(2);
+    document.getElementById('mtmm-k-hetero').textContent = heteroVal.toFixed(2);
+    document.getElementById('mtmm-k-meth').textContent = p.m2.toFixed(2);
 
     /* Build table */
     let html = '<colgroup><col style="width:60px">';
@@ -1096,7 +1130,7 @@ fwBtns.forEach(btn => {
           const val = cellValue(type, p);
           let cls = 'cell-' + type;
           if (type === 'mono' && warnMono) cls += ' warn';
-          const display = val === null ? '\u2014' : val.toFixed(2);
+          const display = val.toFixed(2);
           html += '<td class="' + cls + '">' + display + '</td>';
         }
       }
@@ -1106,15 +1140,15 @@ fwBtns.forEach(btn => {
     document.getElementById('mtmm-table').innerHTML = html;
 
     /* Criteria */
-    const crit1 = p.conv > 0.3;
-    const crit2 = p.conv > monoVal;
-    const crit3 = p.conv > p.disc;
+    const crit1 = convVal > 0.3;
+    const crit2 = convVal > monoVal;
+    const crit3 = convVal > heteroVal;
     const icon = (pass) => '<span class="crit-icon ' + (pass ? 'pass' : 'fail') + '">' + (pass ? '\u2713' : '\u2717') + '</span>';
 
     document.getElementById('mtmm-criteria').innerHTML =
       '<div class="mtmm-criterion">' + icon(crit1) + ' Convergent coefficients sufficiently large (conventional floor: .30)</div>' +
-      '<div class="mtmm-criterion">' + icon(crit2) + ' Convergent > heterotrait-monomethod (' + p.conv.toFixed(2) + ' vs ' + monoVal.toFixed(2) + ')</div>' +
-      '<div class="mtmm-criterion">' + icon(crit3) + ' Convergent > heterotrait-heteromethod (' + p.conv.toFixed(2) + ' vs ' + p.disc.toFixed(2) + ')</div>';
+      '<div class="mtmm-criterion">' + icon(crit2) + ' Convergent > heterotrait-monomethod (' + convVal.toFixed(2) + ' vs ' + monoVal.toFixed(2) + ')</div>' +
+      '<div class="mtmm-criterion">' + icon(crit3) + ' Convergent > heterotrait-heteromethod (' + convVal.toFixed(2) + ' vs ' + heteroVal.toFixed(2) + ')</div>';
 
     /* Status */
     const status = document.getElementById('mtmm-status');
