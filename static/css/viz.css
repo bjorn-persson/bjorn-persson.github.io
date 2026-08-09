@@ -217,14 +217,30 @@
   text-align: left;
   color: var(--text-dim);
 }
+/* 42px is a min, not a cap. A fixed `width` fit "0.30" but not "-0.36": at the
+   17px base, 0.82em of IBM Plex Mono is ~8.4px per glyph, so five characters need
+   ~42px and the minus sign tipped every negative-range slider over the edge. The
+   box could not grow, so the value wrapped onto a second line and pushed the row
+   taller. `min-width` keeps every 4-character value aligned exactly as before and
+   lets the rest grow; `nowrap` guarantees a numeric readout never breaks in two,
+   whatever font actually resolves.
+   `nowrap` alone isn't enough, though: PaperMod's reset.css sets
+   `body { word-break: break-word }`, which is inherited and gives the browser
+   permission to break mid-token specifically to avoid overflow -- it overrides
+   `white-space: nowrap`'s no-break behavior whenever the row is squeezed (e.g. a
+   range input that can't shrink enough, see the `min-width: 0` note below). Reset
+   both break properties here so a numeric readout can never split. */
 .slider-val {
   font-family: var(--mono);
   font-size: 0.82em;
   color: var(--teal);
-  width: 42px;
+  min-width: 42px;
   text-align: right;
   flex-shrink: 0;
   font-weight: 600;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 /* Stacked slider cell: label (with inline value span) on top, slider below.
    Good for long labels and multi-column grids. Pair with .slider-val for the value.
@@ -241,8 +257,12 @@
 .slider-col label {
   color: var(--text-dim);
 }
+/* In a stacked cell the value sits inline after the label text, so it shrinks to
+   fit. `min-width: 0` cancels the 42px floor from the base rule, which these never
+   had (the old base set `width`, and `width: auto` here overrode it outright). */
 .slider-col .slider-val {
   width: auto;
+  min-width: 0;
   text-align: left;
 }
 /* In a column flex context, the base `input[type="range"] { flex: 1 }` rule
@@ -263,6 +283,9 @@ input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   flex: 1;
+  min-width: 0; /* form controls have a non-zero automatic min-width; without
+    this a flex row can't compress the track enough to leave room for a wide
+    label + value, and something has to give -- see .slider-val above. */
   height: 4px;
   background: var(--border);
   border-radius: 2px;

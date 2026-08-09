@@ -1,7 +1,7 @@
 ---
 title: "Regression to the Mean"
-description: "Interactive scatterplot demonstrating how extreme scorers at Time 1 tend to score closer to the mean at Time 2, purely due to measurement error. A reliability slider controls the test-retest correlation, and you can click to highlight top and bottom performers."
-summary: "Explore why extreme scores regress toward the mean across repeated measurement — a consequence of measurement error, not genuine change — using an interactive test-retest scatterplot."
+description: "Interactive scatterplot demonstrating how extreme scorers at Time 1 tend to score closer to the mean at Time 2 whenever the test-retest correlation is less than perfect. A reliability slider controls that correlation, and you can click to highlight top and bottom performers."
+summary: "Explore why extreme scores regress toward the mean across repeated measurement — anywhere the test-retest correlation falls short of 1, whether from measurement error, day-to-day fluctuation, or luck — using an interactive test-retest scatterplot."
 ---
 
 <style>
@@ -68,7 +68,7 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
 
   <div class="hero">
     <h1>Regression to the Mean</h1>
-    <div class="subtitle">Why extreme scores tend to move toward the average on retest — a consequence of measurement error, not real change</div>
+    <div class="subtitle">Why extreme scores tend to move toward the average on retest — a consequence of imperfect correlation between the two occasions, not real change</div>
   </div>
 
   <div class="section">
@@ -103,11 +103,11 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
     </div>
 
     <div class="note">
-      The diagonal dashed line is the identity (T1 = T2). The solid line is the OLS regression of T2 on T1 — its slope equals the test-retest reliability &rho;.
+      The diagonal dashed line is the identity (T1 = T2). The solid line is the OLS regression of T2 on T1. Because both scores are in SD units, its slope estimates the test-retest correlation &rho; — but only estimates it. The value printed on the plot scatters around the slider setting: at &rho; = 0.20 with N = 120, a sample slope of 0.10 is entirely ordinary.
       When &rho; &lt; 1, the regression line is less steep than the identity. This means: if you scored 2 SD above the mean at T1, your expected T2 score is only 2&rho; SD above the mean.
     </div>
     <div class="note warn">
-      <strong>Real-world consequences:</strong> Top scorers who receive an intervention appear to "improve" relative to the control group, and bottom scorers appear to "improve" after treatment — even if the treatment does nothing. Without a control group, regression to the mean masquerades as a treatment effect. Always include a control group.
+      <strong>Real-world consequences:</strong> Selecting people <em>because</em> they scored at an extreme guarantees movement toward the mean on retest, and the direction follows the selection. Recruit the lowest scorers and they appear to <em>improve</em>; recruit the highest scorers and they appear to <em>deteriorate</em> — even if the treatment does nothing at all. So regression to the mean can manufacture a treatment effect in a low-scoring sample and hide a real one in a high-scoring sample. Only a control group selected the same way can separate the two. Always include one.
     </div>
   </div>
 
@@ -187,7 +187,6 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
     const mn = Math.min(...allT1, ...allT2) - 0.2;
     const mx = Math.max(...allT1, ...allT2) + 0.2;
 
-    const sorted = [...pts].sort((a, b) => a.t1 - b.t1);
     const cutK = Math.max(1, Math.round(N * pct));
 
     const t1sorted = [...allT1].sort((a, b) => a - b);
@@ -244,7 +243,10 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
       ctx.font = `13px ${C_MONO}`;
       ctx.fillStyle = C_TEAL;
       ctx.textAlign = 'left';
-      ctx.fillText(`slope = ρ ≈ ${regSlope.toFixed(2)}`, PAD_L + pw * 0.05, PAD_T + 16);
+      // "b", not "rho": this is the sample OLS slope, which equals r only when the
+      // two SDs match. At n = 120 they differ enough that printing the population
+      // symbol next to a sample number invites the reader to call it a bug.
+      ctx.fillText(`slope b ≈ ${regSlope.toFixed(2)}`, PAD_L + pw * 0.05, PAD_T + 16);
     }
 
     // Highlight bands
@@ -298,14 +300,6 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
         ctx.closePath();
         ctx.fillStyle = lineColor; ctx.fill();
 
-        document.getElementById('rtm_top_t1').textContent =
-          highlight === 'top' ? t1mean.toFixed(2) : document.getElementById('rtm_top_t1').textContent;
-        document.getElementById('rtm_top_t2').textContent =
-          highlight === 'top' ? t2mean.toFixed(2) : document.getElementById('rtm_top_t2').textContent;
-        document.getElementById('rtm_bot_t1').textContent =
-          highlight === 'bot' ? t1mean.toFixed(2) : document.getElementById('rtm_bot_t1').textContent;
-        document.getElementById('rtm_bot_t2').textContent =
-          highlight === 'bot' ? t2mean.toFixed(2) : document.getElementById('rtm_bot_t2').textContent;
       }
     }
 
@@ -313,11 +307,11 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
     ctx.fillStyle = C_TEXT_DIM;
     ctx.font = `14px ${C_MONO}`;
     ctx.textAlign = 'center';
-    ctx.fillText('Score at Time 1', PAD_L + pw/2, PAD_T + ph + 38);
+    ctx.fillText('Score at Time 1 (SD units)', PAD_L + pw/2, PAD_T + ph + 38);
     ctx.save();
     ctx.translate(16, PAD_T + ph/2);
     ctx.rotate(-Math.PI/2);
-    ctx.fillText('Score at Time 2', 0, 0);
+    ctx.fillText('Score at Time 2 (SD units)', 0, 0);
     ctx.restore();
 
     // Tick labels
@@ -347,8 +341,17 @@ summary: "Explore why extreme scores regress toward the mean across repeated mea
       document.getElementById('rtm_bot_t2').textContent = mean(botPts.map(p => p.t2)).toFixed(2);
     }
 
-    document.getElementById('rtm_expected').textContent =
-      `T2 | extreme T1 ≈ ρ × T1 mean ≈ ${(rho).toFixed(2)} × T1`;
+    // Print the actual prediction for the group currently highlighted, so the
+    // badge can be compared against the observed T2 mean beside it. With nothing
+    // highlighted there is no selected group, so fall back to naming the rule.
+    const expEl = document.getElementById('rtm_expected');
+    if (highlight === 'top' && topPts.length > 0) {
+      expEl.textContent = `top group: ρ × ${mean(topPts.map(p => p.t1)).toFixed(2)} = ${(rho * mean(topPts.map(p => p.t1))).toFixed(2)}`;
+    } else if (highlight === 'bot' && botPts.length > 0) {
+      expEl.textContent = `bottom group: ρ × ${mean(botPts.map(p => p.t1)).toFixed(2)} = ${(rho * mean(botPts.map(p => p.t1))).toFixed(2)}`;
+    } else {
+      expEl.textContent = `ρ × (T1 mean) — highlight a group to see the number`;
+    }
 
     document.getElementById('rtm_rho_val').textContent = rho.toFixed(2);
     document.getElementById('rtm_pct_val').textContent = Math.round(pct * 100) + '%';

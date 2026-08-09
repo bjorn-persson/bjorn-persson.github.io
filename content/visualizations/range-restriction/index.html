@@ -183,16 +183,16 @@ summary: "Interactively explore how selecting on a variable — like studying GR
       <div>
         <div class="slider-row">
           <span class="slider-label">Lo</span>
-          <input type="range" class="orange-slider" id="sl-lo" min="0" max="0.85" step="0.01" value="0.00">
-          <span class="slider-val" id="val-lo" style="color:var(--orange);">0%</span>
+          <input type="range" class="orange-slider" id="sl-lo" min="0" max="0.85" step="0.01" value="0.50">
+          <span class="slider-val" id="val-lo" style="color:var(--orange);">50%</span>
         </div>
         <div class="slider-sublabel" style="margin-left:38px">Lower bound (percentile on selection variable)</div>
       </div>
       <div>
         <div class="slider-row">
           <span class="slider-label">Hi</span>
-          <input type="range" class="orange-slider" id="sl-hi" min="0.15" max="1.00" step="0.01" value="0.70">
-          <span class="slider-val" id="val-hi" style="color:var(--orange);">70%</span>
+          <input type="range" class="orange-slider" id="sl-hi" min="0.15" max="1.00" step="0.01" value="1.00">
+          <span class="slider-val" id="val-hi" style="color:var(--orange);">100%</span>
         </div>
         <div class="slider-sublabel" style="margin-left:38px">Upper bound (percentile on selection variable)</div>
       </div>
@@ -233,19 +233,19 @@ summary: "Interactively explore how selecting on a variable — like studying GR
     <div class="rr-stats">
       <div class="rr-stat full">
         <div class="rr-stat-label">r (full range)</div>
-        <div class="rr-stat-value teal" id="stat-r-full">r = .40</div>
+        <div class="rr-stat-value teal" id="stat-r-full">r = 0.450</div>
       </div>
       <div class="rr-stat rest">
         <div class="rr-stat-label">r (restricted)</div>
-        <div class="rr-stat-value orange" id="stat-r-rest">r = .22</div>
+        <div class="rr-stat-value orange" id="stat-r-rest">r = 0.271</div>
       </div>
       <div class="rr-stat corr">
         <div class="rr-stat-label">r (Thorndike corrected)</div>
-        <div class="rr-stat-value purple" id="stat-r-corr">r = .39</div>
+        <div class="rr-stat-value purple" id="stat-r-corr">r = 0.396</div>
       </div>
       <div class="rr-stat rest">
-        <div class="rr-stat-label">Variance explained lost</div>
-        <div class="rr-stat-value red" id="stat-r2-loss">−11.2%</div>
+        <div class="rr-stat-label">Change in variance explained</div>
+        <div class="rr-stat-value red" id="stat-r2-loss">−12.9%</div>
       </div>
     </div>
 
@@ -255,20 +255,20 @@ summary: "Interactively explore how selecting on a variable — like studying GR
         <span style="color:var(--red);font-size:0.9em;">&#9660; 80% threshold</span>
       </div>
       <div class="power-bar-track">
-        <div class="power-bar-fill full" id="bar-full" style="width:50%"></div>
+        <div class="power-bar-fill full" id="bar-full" style="width:100%"></div>
         <div class="power-bar-marker"></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.78em;">
-        <span style="color:var(--teal);" id="power-full-label">Full range: 95%</span>
+        <span style="color:var(--teal);" id="power-full-label">Full range: 100%</span>
         <span></span>
       </div>
       <div class="power-bar-track" style="margin-top:6px;">
-        <div class="power-bar-fill rest" id="bar-rest" style="width:35%"></div>
+        <div class="power-bar-fill rest" id="bar-rest" style="width:80%"></div>
         <div class="power-bar-marker"></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.78em;">
-        <span style="color:var(--orange);" id="power-rest-label">Restricted: 62%</span>
-        <span style="color:var(--text-dim);" id="power-loss-label">−33 percentage points</span>
+        <span style="color:var(--orange);" id="power-rest-label">Restricted: 80%</span>
+        <span style="color:var(--text-dim);" id="power-loss-label">−20 percentage points</span>
       </div>
     </div>
   </div>
@@ -277,7 +277,7 @@ summary: "Interactively explore how selecting on a variable — like studying GR
     <div class="section-label">The correction</div>
     <h2>Thorndike's Case II Formula</h2>
 
-    <p>When the full-range standard deviation of the selection variable is known (e.g., from normative data or the full applicant pool), the restricted correlation can be corrected back to an estimate of the unrestricted value:</p>
+    <p>The three cases are Thorndike's (1949, <em>Personnel Selection</em>); Case II is the one where selection acts directly on the predictor. When the full-range standard deviation of the selection variable is known (e.g., from normative data or the full applicant pool), the restricted correlation can be corrected back to an estimate of the unrestricted value:</p>
 
     <div class="equation-box" style="font-size: 1.1em;">
       $r_c = \dfrac{r_r \cdot \dfrac{S_X}{s_x}}{\sqrt{1 - r_r^2 + r_r^2 \cdot \dfrac{S_X^2}{s_x^2}}}$
@@ -286,8 +286,10 @@ summary: "Interactively explore how selecting on a variable — like studying GR
 
     <p>Here $r_r$ is the restricted correlation, $S_X$ is the unrestricted standard deviation, $s_x$ is the restricted standard deviation, and $r_c$ is the corrected estimate. The purple stat card above shows this correction applied to the observed restricted $r$. The formula works by inflating the correlation in proportion to how much variance was lost — the ratio $S_X / s_x$ captures the degree of compression.</p>
 
+    <p>The SD ratio must be computed on <em>the variable selection actually acted on</em>. In "Select on Y" mode the card above therefore uses $S_Y / s_y$ rather than $S_X / s_x$; substituting the wrong variable's ratio badly under-corrects. "Select on Z" is the exception: here $Z$ influences $Y$ only through $X$, so the regression of $Y$ on $X$ survives selection intact and the ordinary Case II correction on $X$ still applies.</p>
+
     <div class="note warn">
-      <strong>Direct vs. indirect restriction.</strong> "Select on X" is <em>direct</em> restriction — the selection variable is the predictor itself. "Select on Z" is <em>indirect</em> restriction — selection occurs on a third variable correlated with X but not directly in the model. Indirect restriction is harder to detect and correct because the researcher may not realize selection has occurred. For instance, restricting a clinical sample by diagnosis severity (Z) compresses both the predictor (X) and outcome (Y) ranges simultaneously, attenuating their correlation even though neither was directly truncated. The correction requires knowing ρ(X,Z) — often unavailable.
+      <strong>Direct vs. indirect restriction.</strong> "Select on X" is <em>direct</em> restriction — the selection variable is the predictor itself. "Select on Z" is <em>indirect</em> restriction — selection occurs on a third variable correlated with X but not directly in the model. Indirect restriction is harder to detect and correct because the researcher may not realize selection has occurred. For instance, restricting a clinical sample by diagnosis severity (Z) compresses both the predictor (X) and outcome (Y) ranges simultaneously, attenuating their correlation even though neither was directly truncated. Whether it can be corrected depends on how Z enters the model. In the simulation here, Z affects Y only through X, so plain Case II on X remains exact and no knowledge of ρ(X,Z) is needed. When Z has its own path to Y, that no longer holds: the correction then requires ρ(X,Z), which is often unavailable — see Hunter, Schmidt and Le (2006) for the estimators used in that case.
     </div>
     <div class="note caveat">
       <strong>The correction has limits.</strong> Thorndike's formula assumes linearity (the regression of Y on X is linear across the full range) and homoscedasticity (the spread of Y is constant across levels of X). When these assumptions fail — for example, with ceiling effects or nonlinear relationships — the correction can over- or under-shoot. It also requires knowing the unrestricted SD, which may only be available from normative data or prior studies. Treat corrected correlations as estimates, not ground truth.
@@ -579,21 +581,36 @@ summary: "Interactively explore how selecting on a variable — like studying GR
     const ryRest = restricted.map(d => d.y);
     const rRest = pearsonR(rxRest, ryRest);
 
-    // Thorndike correction: correct on X (the predictor)
-    const sdXFull = sdFunc(xs);
-    const sdXRest = sdFunc(rxRest);
-    const rCorrected = thorndikeCorrection(rRest, sdXFull, sdXRest);
+    // Thorndike Case II corrects using the SD ratio of the variable selection
+    // ACTUALLY acted on. Using X's ratio when selection happened on Y recovers
+    // only ~.30 of a true .40.
+    // "Select on Z" keeps X's ratio on purpose: generateTrivariate builds
+    // rho_YZ = rho_XY * rho_XZ, so Y is independent of Z given X. The regression
+    // of Y on X survives selection and plain Case II on X is exact there.
+    let sdSelFull, sdSelRest;
+    if (mode === 'y') {
+      sdSelFull = sdFunc(ys);
+      sdSelRest = sdFunc(ryRest);
+    } else {
+      sdSelFull = sdFunc(xs);
+      sdSelRest = sdFunc(rxRest);
+    }
+    const rCorrected = thorndikeCorrection(rRest, sdSelFull, sdSelRest);
 
     // Variance explained
     const r2Full = rFull * rFull;
     const r2Rest = rRest * rRest;
     const r2Loss = r2Rest - r2Full;
 
-    // Power
+    // Power. Both bars are EXPECTED power under the true population rho, so the
+    // comparison is like-for-like and neither bar jumps on "New Sample". The
+    // restricted bar uses rho attenuated by the observed SD ratio rather than the
+    // noisy sample r. Inverting Thorndike gives
+    //   rho_r = rho / sqrt(u^2*(1 - rho^2) + rho^2),  u = S_sel / s_sel.
+    const u = sdSelFull / Math.max(1e-9, sdSelRest);
+    const rhoRest = p.rho / Math.sqrt(u*u*(1 - p.rho*p.rho) + p.rho*p.rho);
     const powFull = powerCorr(p.rho, p.n, 0.05);
-    // For restricted power, use the theoretical attenuated rho and the restricted n
-    // Theoretical attenuated rho based on variance ratio
-    const powRest = powerCorr(Math.abs(rRest), nRest, 0.05);
+    const powRest = powerCorr(rhoRest, nRest, 0.05);
 
     // Update DOM
     document.getElementById('stat-r-full').textContent = 'r = ' + rFull.toFixed(3);
@@ -755,10 +772,12 @@ summary: "Interactively explore how selecting on a variable — like studying GR
   slN.addEventListener('input', resample);
   slLo.addEventListener('input', update);
   slHi.addEventListener('input', update);
-  slRhoXZ.addEventListener('input', function() {
-    ensureData();
-    resample();
-  });
+  // Same handler as the other structural sliders: update() calls ensureData(),
+  // which regenerates from the fixed seed when rho_xz changes. The old handler
+  // called ensureData() and then resample(), which threw that work away and
+  // reshuffled the cloud on every pixel of the drag -- inconsistent with the
+  // rho slider next to it, and it made the scatter impossible to read while moving.
+  slRhoXZ.addEventListener('input', update);
 
   document.getElementById('btn-resample').addEventListener('click', resample);
 

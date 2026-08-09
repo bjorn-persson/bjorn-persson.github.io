@@ -70,18 +70,24 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     <canvas id="sp_canvas"></canvas>
     <div class="sp-readout">
       <div class="sp-badge">Overall r: <span class="sp-badge-val" id="sp_overall_r" style="color:var(--red)">—</span></div>
-      <div class="sp-badge" id="sp_g1_badge" style="display:none">Major A r: <span class="sp-badge-val" id="sp_g1_r"></span></div>
-      <div class="sp-badge" id="sp_g2_badge" style="display:none">Major B r: <span class="sp-badge-val" id="sp_g2_r"></span></div>
-      <div class="sp-badge" id="sp_g3_badge" style="display:none">Major C r: <span class="sp-badge-val" id="sp_g3_r"></span></div>
-      <div class="sp-badge" id="sp_g4_badge" style="display:none">Major D r: <span class="sp-badge-val" id="sp_g4_r"></span></div>
-      <div class="sp-badge" id="sp_g5_badge" style="display:none">Major E r: <span class="sp-badge-val" id="sp_g5_r"></span></div>
+      <!-- Names and colours are filled from allGroups so each badge is traceable
+           to its cloud on the canvas. The old "Major A"-"Major E" labels appeared
+           nowhere in the legend, which draws g.name. -->
+      <div class="sp-badge" id="sp_g1_badge" style="display:none"><span id="sp_g1_name"></span> r: <span class="sp-badge-val" id="sp_g1_r"></span></div>
+      <div class="sp-badge" id="sp_g2_badge" style="display:none"><span id="sp_g2_name"></span> r: <span class="sp-badge-val" id="sp_g2_r"></span></div>
+      <div class="sp-badge" id="sp_g3_badge" style="display:none"><span id="sp_g3_name"></span> r: <span class="sp-badge-val" id="sp_g3_r"></span></div>
+      <div class="sp-badge" id="sp_g4_badge" style="display:none"><span id="sp_g4_name"></span> r: <span class="sp-badge-val" id="sp_g4_r"></span></div>
+      <div class="sp-badge" id="sp_g5_badge" style="display:none"><span id="sp_g5_name"></span> r: <span class="sp-badge-val" id="sp_g5_r"></span></div>
     </div>
     <div class="note warn">
       <strong>The lesson:</strong> An association that holds in each subgroup can reverse (or vanish) in the aggregate.
       The mechanism here: harder majors require more study hours yet produce lower average scores (confound). Within each major, more studying does improve scores — but the major-level confound overwhelms this within-group effect in the aggregate.
     </div>
     <div class="note caveat">
-      Named after Edward H. Simpson (1951), though the phenomenon was noted earlier by Yule (1903).
+      <strong>But do not read this as "always split by subgroup."</strong> The within-group estimate is the right one <em>here</em> because major is a common cause of both study hours and score — a confounder. Had the grouping variable instead been a mediator (something study hours cause, which in turn affects the score) or a collider (something both variables cause), splitting on it would have introduced the bias rather than removed it, and the aggregate estimate would have been the correct one. The data alone cannot tell you which case you are in; that takes an argument about what causes what.
+    </div>
+    <div class="note caveat">
+      Named after Edward H. Simpson (1951), though the phenomenon was described earlier by Pearson (1899) and Yule (1903) — and the name itself was coined by Blyth (1972), not by Simpson.
     </div>
   </div>
 
@@ -216,11 +222,16 @@ summary: "Watch a global negative trend shatter into positive within-group trend
         const g = allGroups[gi];
         const gPts = blended.filter(p => p.group === gi);
         const reg = linReg(gPts);
-        let x0 = 0, x1 = 1;
-        let y0 = reg.m * x0 + reg.b;
-        let y1 = reg.m * x1 + reg.b;
-        if (y0 < 0) { x0 = -reg.b / reg.m; y0 = 0; }
-        if (y1 < 0) { x1 = -reg.b / reg.m; y1 = 0; }
+        // Draw each fit only across its own group's x-range. Extrapolating every
+        // line over the full [0,1] axis (with a one-sided y<0 clip) sent lines
+        // clean off the top of the plot and had Medicine's line starting five
+        // group-widths left of any Medicine data -- five long lines crisscrossing
+        // the panel, muddying the "positive within, negative between" contrast
+        // the figure exists to show.
+        const gxs = gPts.map(p => p.x);
+        const x0 = Math.min(...gxs), x1 = Math.max(...gxs);
+        const y0 = reg.m * x0 + reg.b;
+        const y1 = reg.m * x1 + reg.b;
         ctx.beginPath();
         ctx.moveTo(toSx(x0), toSy(y0));
         ctx.lineTo(toSx(x1), toSy(y1));
@@ -301,10 +312,16 @@ summary: "Watch a global negative trend shatter into positive within-group trend
     document.getElementById('sp_overall_r').style.color = allR < 0 ? C_RED : C_TEAL;
 
     for (let gi = 0; gi < allGroups.length; gi++) {
+      const g = allGroups[gi];
       const gPts = blended.filter(p => p.group === gi).map(p => ({ x: p.x, y: p.y }));
       const r = pearsonR(gPts);
       const el = document.getElementById(`sp_g${gi+1}_r`);
       const badge = document.getElementById(`sp_g${gi+1}_badge`);
+      const nameEl = document.getElementById(`sp_g${gi+1}_name`);
+      if (nameEl) {
+        nameEl.textContent = g.name;
+        nameEl.style.color = g.color;   // ties the badge to its cloud on the canvas
+      }
       if (el) {
         el.textContent = r.toFixed(3);
         el.style.color = r > 0 ? C_TEAL : C_RED;
@@ -314,7 +331,9 @@ summary: "Watch a global negative trend shatter into positive within-group trend
 
     const phaseEl = document.getElementById('sp_phase');
     if (t < 0.05) phaseEl.textContent = 'Overall view: one aggregate group — overall r is negative';
-    else if (t < 0.5) phaseEl.textContent = 'Groups separating… watch the regression lines appear';
+    // The points never move -- the slider only reveals group colour and the
+    // within-group fits. Saying "separating" described motion that never happens.
+    else if (t < 0.5) phaseEl.textContent = 'Revealing majors by colour… watch the within-group regression lines appear';
     else phaseEl.textContent = 'Grouped view: each major shows a positive within-group correlation';
   }
 

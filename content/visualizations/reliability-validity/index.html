@@ -102,7 +102,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
       High reliability + high validity = tight cluster on the bullseye. High reliability + low validity = tight cluster, wrong place.
     </div>
     <div class="note caveat">
-      <strong>Note:</strong> maximum validity = &radic;reliability (CTT upper bound). A measure cannot correlate with any criterion more than the square root of its own reliability, so validity is bounded here accordingly.
+      <strong>Note:</strong> maximum validity = &radic;reliability (CTT upper bound). A measure cannot correlate with any criterion more than the square root of its own reliability, so validity is bounded here accordingly. That bound assumes a perfectly measured criterion; when the criterion is itself fallible the tighter limit is $r_{xy} \le \sqrt{r_{xx'} \cdot r_{yy'}}$ — both measures' unreliability drags the ceiling down.
     </div>
   </div>
 
@@ -250,16 +250,23 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     const ph = H - PAD_T - PAD_B;
 
     const TRUE_SCORE = 0.5;
-    const sigma = 0.05 + randomError * 0.18;
+    // The true-score reference curve is drawn with a small non-zero width purely
+    // so it is visible. The observed curve has to be able to shrink ONTO it:
+    // flooring sigma at 0.05 while trueSD was 0.025 meant that at randomError = 0
+    // the badge read "Reliability = 1.00" next to an observed distribution still
+    // twice as wide as the true score -- contradicting the panel's whole point at
+    // exactly the setting meant to demonstrate it.
+    const trueSD = 0.025;
+    const sigma = trueSD + randomError * 0.205;   // 0.025 -> 0.230 across the slider
     const mu = TRUE_SCORE + sysOffset * 0.35;
 
     const xMin = 0, xMax = 1;
     function toSx(v) { return PAD_L + (v - xMin) / (xMax - xMin) * pw; }
 
-    const trueSD = 0.025;
-    const maxTruePdf = normalPdf(TRUE_SCORE, TRUE_SCORE, trueSD);
-    const maxObsPdf = normalPdf(mu, mu, sigma);
-    const globalMax = Math.max(maxTruePdf, maxObsPdf) * 1.15;
+    // Fixed y-scale, pinned to the tallest the observed curve ever gets (sigma at
+    // randomError = 0). Rescaling per frame would hide the flattening that the
+    // random-error slider is meant to show -- only the widening would remain.
+    const globalMax = normalPdf(0, 0, trueSD) * 1.15;
     function toSy(density) { return PAD_T + ph - (density / globalMax) * ph; }
 
     dCtx.strokeStyle = C_BG_ELEV;
@@ -293,23 +300,16 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.lineWidth = 2;
     dCtx.stroke();
 
-    dCtx.beginPath();
-    for (let i = 0; i <= 300; i++) {
-      const x = xMin + (xMax - xMin) * i / 300;
-      const y = toSy(normalPdf(x, TRUE_SCORE, trueSD));
-      i === 0 ? dCtx.moveTo(toSx(x), y) : dCtx.lineTo(toSx(x), y);
-    }
+    // The true score is a fixed point, so it gets a marker line and nothing more.
+    // It used to be drawn as a second bell curve (a normal with SD = 0.025), which
+    // is a rendering device with no meaning here -- a student could reasonably read
+    // it as "true scores also vary randomly," which is the opposite of the CTT
+    // assumption the rest of the page rests on.
+    const bx = toSx(TRUE_SCORE);
+    dCtx.beginPath(); dCtx.moveTo(bx, PAD_T); dCtx.lineTo(bx, PAD_T + ph);
     dCtx.strokeStyle = C_RED;
     dCtx.lineWidth = 1.5;
     dCtx.setLineDash([5, 4]);
-    dCtx.stroke();
-    dCtx.setLineDash([]);
-
-    const bx = toSx(TRUE_SCORE);
-    dCtx.beginPath(); dCtx.moveTo(bx, PAD_T); dCtx.lineTo(bx, PAD_T + ph);
-    dCtx.strokeStyle = 'rgba(239,68,68,0.35)';
-    dCtx.lineWidth = 1;
-    dCtx.setLineDash([3, 3]);
     dCtx.stroke();
     dCtx.setLineDash([]);
 
@@ -358,7 +358,7 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
     dCtx.beginPath(); dCtx.moveTo(legX - 52, PAD_T + 26); dCtx.lineTo(legX - 32, PAD_T + 26); dCtx.stroke();
     dCtx.setLineDash([]);
     dCtx.fillStyle = C_RED;
-    dCtx.fillText('true score', legX, PAD_T + 30);
+    dCtx.fillText('true score (a fixed point)', legX, PAD_T + 30);
 
     dCtx.textAlign = 'left';
   }
@@ -366,12 +366,39 @@ summary: "Explore Classical Test Theory's distinction between random error (reli
   function getBadges(randomError, sysOffset) {
     const rho = Math.max(0, 1 - randomError * randomError);
     const maxValidity = Math.sqrt(rho);
-    const validity = Math.max(0, (1 - Math.abs(sysOffset) * 1.18) * maxValidity);
+    // Bias penalty read straight off the picture: generateArrows() displaces the
+    // cluster by (0.65, 0.38) * sysOffset in target-radius units, so the mean sits
+    // |sysOffset| * 0.753 radii from the bullseye. Validity is what is left of the
+    // reliability ceiling after that displacement.
+    //
+    // The old coefficient of 1.18 was hand-tuned to make validity hit exactly 0.00
+    // at the slider maximum -- but at that setting the cluster mean is only 64% of
+    // the way to the rim, still plainly on the target face, so the number and the
+    // picture contradicted each other. This mapping gives 0.36 there instead.
+    const displacement = Math.abs(sysOffset) * Math.hypot(0.65, 0.38);
+    const validity = Math.max(0, 1 - displacement) * maxValidity;
+    // Diagnose the two dimensions from the two sliders that actually control
+    // them: spread (random error -> reliability) and displacement (bias).
+    // The previous test for the unbiased case compared validity against
+    // 0.8 * maxValidity, which degenerates to 0 >= 0 once randomError hits its
+    // maximum -- rho = 0 makes maxValidity = 0, so the page announced
+    // "Low reliability, unbiased" with the bias slider pushed to +-0.85 and the
+    // whole cluster visibly displaced off the bullseye.
+    // One absolute rule for both reliability levels: the cluster counts as unbiased
+    // when its mean sits within 20% of the target radius of the bullseye. The old
+    // code mixed an absolute threshold for the high-reliability branch with a
+    // relative one (>= 0.8 * maxValidity) for the low-reliability branch.
+    const unbiased = displacement <= 0.20;
     let diag;
-    if (rho >= 0.8 && validity >= 0.8) diag = 'High reliability, high validity';
-    else if (rho >= 0.8 && validity < 0.8) diag = 'High reliability, low validity';
-    else if (rho < 0.8 && validity >= 0.8 * maxValidity) diag = 'Low reliability, unbiased (but limited validity)';
-    else diag = 'Low reliability, low validity';
+    // Branch on the rho the badge actually displays, not the raw value: at
+    // randomError = 0.45, rho = 0.7975 rounds to "0.80" on screen while failing a
+    // raw >= 0.8 test, so the page printed "0.80" and "Low reliability" together.
+    const rhoShown = Number(rho.toFixed(2));
+    const relLabel = rhoShown < 0.05 ? 'No reliability' : 'Low reliability';
+    if (rhoShown >= 0.8 && unbiased) diag = 'High reliability, high validity';
+    else if (rhoShown >= 0.8) diag = 'High reliability, low validity';
+    else if (unbiased) diag = relLabel + ', unbiased (but limited validity)';
+    else diag = relLabel + ', low validity';
     return { rho: rho.toFixed(2), validity: validity.toFixed(2), diag };
   }
 

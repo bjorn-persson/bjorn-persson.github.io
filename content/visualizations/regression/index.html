@@ -78,7 +78,7 @@ summary: "Set population parameters, generate synthetic data, and compare OLS/ML
     <div class="reg-stats" id="statsText"></div>
 
     <div class="note">
-      <strong>Try it:</strong> Set the population parameters, click "Generate" to draw a sample, then "Fit" to estimate the model. Try small N (e.g., 20) vs large N (e.g., 500) — notice how the fitted curve (orange) tracks the population curve (teal dashed) more closely with more data. Increase σ to see how noise obscures the signal.
+      <strong>Try it:</strong> Set the population parameters, click "Generate" to draw a sample, then "Fit" to estimate the model. Try small N (e.g., 20) vs large N (e.g., 500) — notice how the fitted curve (orange) tracks the population curve (teal dashed) more closely with more data. In the linear, quadratic, and cubic models, increase σ to see how noise obscures the signal; the logistic model has no σ, because the Bernoulli outcome carries its own variance.
     </div>
     <div class="note caveat" id="noteText"></div>
   </div>
@@ -97,6 +97,9 @@ const C_MONO     = _css.getPropertyValue('--mono').trim();
 let modelType = 'linear';
 let data = [];
 let fitResult = null;
+// Parameter values in force when the current sample was drawn, so the page can
+// tell when the on-screen points no longer match the population curve.
+let dataParamSig = null;
 
 function randn() {
   let u, v, s;
@@ -174,7 +177,7 @@ const models = {
       const x = randn();
       const prob = sigmoid(p.b0 + p.b1 * x);
       const y = Math.random() < prob ? 1 : 0;
-      return { x, y };
+      return { x, y, jitter: (Math.random() - 0.5) * 0.04 };
     },
     popFn(x, p) { return sigmoid(p.b0 + p.b1*x); },
     popEq(p) { return `P(Y=1|X) = σ(<span class="coef">${f(p.b0)}</span> + <span class="coef">${f(p.b1)}</span>X)`; },
@@ -196,7 +199,7 @@ function buildControls() {
     const div = document.createElement('div');
     div.className = 'slider-col';
     div.innerHTML = `
-      <label>${p.label}: <span class="slider-val" id="v_${p.id}">${p.id === 'n' ? p.def : p.def.toFixed(1)}</span></label>
+      <label>${p.label}: <span class="slider-val" id="v_${p.id}">${p.id === 'n' ? p.def : p.def.toFixed(p.step < 0.1 ? 2 : 1)}</span></label>
       <input type="range" id="s_${p.id}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.def}" oninput="onSlider()">
     `;
     container.appendChild(div);
@@ -229,6 +232,7 @@ function setType(t) {
   modelType = t;
   data = [];
   fitResult = null;
+  dataParamSig = null;
   for (const k of ['Linear','Quad','Cubic','Logistic']) {
     document.getElementById('btn'+k).classList.remove('active');
   }
@@ -249,14 +253,30 @@ function updateEquation() {
 
   const sigmaStr = p.sigma !== undefined ? `,  ε ~ N(0, ${f(p.sigma)}²)` : '';
   popEl.innerHTML = 'Population: ' + m.popEq(p) + sigmaStr;
+  // KaTeX auto-render only fires once on load. updateEquation() also runs from
+  // onSlider() and setType(), and each call overwrites the already-rendered
+  // KaTeX nodes with raw source -- so without this re-render, moving any slider
+  // once left the note showing literal $\beta_0$ markup for the rest of the session.
   noteEl.textContent = m.note;
+  if (window.renderMath) window.renderMath(noteEl);
 
+  statsEl.style.color = '';
   if (fitResult) {
-    fitEl.innerHTML = 'Fitted: ' + m.fitEq(fitResult);
+    // The sample was drawn from whatever the parameters were when "Generate" was
+    // pressed. Moving a slider afterwards redraws the teal population curve but
+    // leaves the old points and the old fit in place, so say plainly that the
+    // orange curve and its R2 no longer belong to the curve above them.
+    const stale = dataParamSig !== JSON.stringify(p);
+    fitEl.innerHTML = 'Fitted: ' + m.fitEq(fitResult) + (stale
+      ? ' <span style="color:var(--text-dim)">(fitted to the earlier sample — press Generate, then Fit)</span>' : '');
     if (fitResult.r2 !== undefined) {
       statsEl.textContent = `R² = ${fitResult.r2.toFixed(4)},  N = ${data.length}`;
     } else if (fitResult.ll !== undefined) {
       statsEl.textContent = `Log-lik = ${fitResult.ll.toFixed(2)},  null log-lik = ${fitResult.ll0.toFixed(2)},  McFadden R² = ${fitResult.mcfadden.toFixed(4)},  Nagelkerke R² = ${fitResult.nagelkerke.toFixed(4)},  N = ${data.length},  iter = ${fitResult.iter}`;
+      if (fitResult.separated) {
+        statsEl.textContent += '  — the outcomes are perfectly separated, so no maximum-likelihood estimate exists: IRLS is running away toward infinity and these coefficients are arbitrary. Lower β₁ or raise N.';
+        statsEl.style.color = 'var(--red)';
+      }
     }
   } else {
     fitEl.innerHTML = '';
@@ -269,6 +289,7 @@ function generateData() {
   const p = getParams();
   data = [];
   fitResult = null;
+  dataParamSig = JSON.stringify(p);
   for (let i = 0; i < p.n; i++) {
     data.push(m.dgp(p));
   }
@@ -324,8 +345,39 @@ function olsFit(designRowFn, k) {
   return { b, r2: sstot > 0 ? 1 - ssres / sstot : 0 };
 }
 
+// Log-likelihood evaluated at a given coefficient vector. Needed because the
+// IRLS loop computes its LL *before* updating b, so returning that value would
+// report the log-likelihood of the previous iterate alongside the current
+// coefficients -- negligible once converged, but plainly wrong when it is not.
+function logLikAt(b) {
+  let ll = 0;
+  for (const d of data) {
+    const mu = sigmoid(b[0] + b[1] * d.x);
+    ll += d.y * Math.log(mu + 1e-15) + (1 - d.y) * Math.log(1 - mu + 1e-15);
+  }
+  return ll;
+}
+
+// Complete/quasi-complete separation: no linear predictor value belonging to a
+// zero outcome reaches any belonging to a one. The MLE does not exist here --
+// IRLS runs away toward |beta| = infinity -- so the coefficients must not be
+// reported as if they were estimates.
+function isSeparated(b) {
+  let maxEta0 = -Infinity, minEta1 = Infinity;
+  for (const d of data) {
+    const eta = b[0] + b[1] * d.x;
+    if (d.y === 1) { if (eta < minEta1) minEta1 = eta; }
+    else if (eta > maxEta0) maxEta0 = eta;
+  }
+  return maxEta0 < minEta1;
+}
+
+function finishLogistic(b, iter) {
+  const ll = logLikAt(b);
+  return { b: [...b], ll, iter, separated: isSeparated(b), ...pseudoR2(data, b, ll) };
+}
+
 function logisticFit() {
-  const n = data.length;
   const k = 2;
   let b = [0, 0];
   let prevLL = -Infinity;
@@ -353,20 +405,16 @@ function logisticFit() {
     }
 
     const det = XtWX[0][0]*XtWX[1][1] - XtWX[0][1]*XtWX[1][0];
-    if (Math.abs(det) < 1e-15) break;
+    if (Math.abs(det) < 1e-15) return finishLogistic(b, iter + 1);
     const d0 = (XtWX[1][1]*XtR[0] - XtWX[0][1]*XtR[1]) / det;
     const d1 = (XtWX[0][0]*XtR[1] - XtWX[1][0]*XtR[0]) / det;
     b[0] += d0;
     b[1] += d1;
 
-    if (Math.abs(ll - prevLL) < 1e-8) {
-      const pr2 = pseudoR2(data, b, ll);
-      return { b: [...b], ll, iter: iter + 1, ...pr2 };
-    }
+    if (Math.abs(ll - prevLL) < 1e-8) return finishLogistic(b, iter + 1);
     prevLL = ll;
   }
-  const pr2 = pseudoR2(data, b, prevLL);
-  return { b: [...b], ll: prevLL, iter: 50, ...pr2 };
+  return finishLogistic(b, 50);
 }
 
 function pseudoR2(data, b, ll) {
@@ -522,8 +570,10 @@ function render() {
   if (isLogistic) {
     for (const d of data) {
       const sx = toSx(d.x);
-      const jitter = (Math.random() - 0.5) * 0.04;
-      const sy = toSy(d.y + jitter);
+      // Jitter is stored on the point at generation time. Drawing it from
+      // Math.random() here made every point hop on each resize and on each
+      // slider move, which reads as the data changing when it has not.
+      const sy = toSy(d.y + d.jitter);
       if (sx < PAD_L || sx > PAD_L + pw || sy < PAD_T || sy > PAD_T + ph) continue;
       ctx.beginPath();
       ctx.arc(sx, sy, 3, 0, Math.PI * 2);

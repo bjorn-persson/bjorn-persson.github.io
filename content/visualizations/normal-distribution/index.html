@@ -281,8 +281,11 @@ function pxToX(px) {
 }
 function yFromDensity(v) {
   const h = canvas.height / dpr - PAD_T - PAD_B;
-  // Reference peak: normal peak of N(μ, σ²); add headroom for skew/kurtosis bumps
-  const peak = 1 / (sigma * Math.sqrt(2 * Math.PI));
+  // Reference peak: normal peak of N(μ, σ²), scaled up by the Gram-Charlier apex
+  // factor before the 1.15 headroom is applied. The apex sits at φ(0)·(1 + γ₂/8),
+  // which is 1.1875× the normal peak at the γ₂ slider maximum of 1.5 — so a flat
+  // 1.15 multiplier clipped the top of the curve off the canvas.
+  const peak = (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.max(1, 1 + g2 / 8);
   return PAD_T + h - (v / (peak * 1.15)) * h;
 }
 function clampX(x) {
@@ -362,8 +365,11 @@ function drawMarker(x, color, dashed) {
 
 function densityNegativeAnywhere() {
   if (g1 === 0 && g2 === 0) return false;
-  // Check in the meaningful range where φ(z) is non-trivial
-  for (let z = -3; z <= 3.001; z += 0.05) {
+  // Scan the full plotted range, not just [-3, 3]. The canvas draws z in
+  // [-4, 4], and with g1 = 0, g2 = -0.5 the Gram-Charlier density first goes
+  // negative at |z| = 3.24 — visible on screen but outside the old scan, so no
+  // warning fired.
+  for (let z = -4; z <= 4.001; z += 0.05) {
     if (fz(z) < -1e-4) return true;
   }
   return false;
@@ -526,7 +532,12 @@ function updateReadouts() {
   const r  = probAndRegions(false, primary, secondary);
   const rN = probAndRegions(true,  primary, secondary);
   if (r) {
-    pEl.textContent = (r.p * 100).toFixed(2) + '%';
+    // Clamp the displayed probability to [0, 1]. Where the Gram-Charlier density
+    // dips below zero its closed-form CDF can too — at g1 = 0.7 the far-left edge
+    // gives F(-4) = -2.03e-4, which rendered as "-0.02%". The negative-density
+    // warning already fires in that regime; showing a negative probability on top
+    // of it just looks like a bug.
+    pEl.textContent = (Math.min(1, Math.max(0, r.p)) * 100).toFixed(2) + '%';
   } else {
     pEl.textContent = '—';
   }
@@ -536,7 +547,8 @@ function updateReadouts() {
     pNormEl.textContent = '—';
   }
   if (r && rN && (g1 !== 0 || g2 !== 0)) {
-    const d = (r.p - rN.p) * 100;
+    // Use the same clamped value the readout above shows, so the two agree.
+    const d = (Math.min(1, Math.max(0, r.p)) - rN.p) * 100;
     const sign = d >= 0 ? '+' : '−';
     deltaEl.textContent = '(Δ ' + sign + Math.abs(d).toFixed(2) + ' pp)';
   } else {
@@ -624,10 +636,21 @@ invInput.addEventListener('keydown', e => { if (e.key === 'Enter') runInverse();
 
 // --- Sliders ---
 function syncParams() {
+  const prevMu = mu, prevSigma = sigma;
   mu    = parseFloat(muSlider.value);
   sigma = parseFloat(sigmaSlider.value);
   g1    = parseFloat(g1Slider.value);
   g2    = parseFloat(g2Slider.value);
+  // Markers are stored in x-units, but what they mean is a z-score. Re-anchor
+  // them when mu/sigma move so a marker keeps its standardized position -- this
+  // is what makes the note's claim ("tail probabilities don't change; mu and
+  // sigma just relabel the x-axis") actually true. Left un-anchored, a marker
+  // placed at x = 1 under N(0,1) read 84.13%, then 50.00% after sliding mu to 1.
+  if (prevSigma > 0 && (mu !== prevMu || sigma !== prevSigma)) {
+    const reanchor = x => (x === null ? null : mu + sigma * ((x - prevMu) / prevSigma));
+    click1 = reanchor(click1);
+    click2 = reanchor(click2);
+  }
   muValEl.textContent    = mu.toFixed(2);
   sigmaValEl.textContent = sigma.toFixed(2);
   g1ValEl.textContent    = g1.toFixed(2);
@@ -640,7 +663,7 @@ function syncParams() {
 resetBtn.addEventListener('click', () => {
   muSlider.value = 0; sigmaSlider.value = 1; g1Slider.value = 0; g2Slider.value = 0;
   click1 = null; click2 = null; hoverX = null;
-  invInput.value = '';
+  invInput.value = '0.025';   // restore the initial value, not blank
   modeButtons.forEach(b => b.classList.remove('active'));
   document.querySelector('.mode-row .btn[data-mode="lower"]').classList.add('active');
   tailMode = 'lower';
@@ -682,7 +705,7 @@ const infoContent = {
       <p>where He₂, He₃, He₄ are the probabilist's Hermite polynomials. The CDF is in closed form, so all tail and range probabilities are exact (no numerical integration). When γ₁ = γ₂ = 0 the expansion reduces to N(μ, σ²) exactly.</p>
       <p><strong>Validity.</strong> The expansion can produce a <em>negative density</em> in the tails for large |γ₁| or |γ₂|. Slider ranges are capped at moderate values, and an orange warning appears when the visible range contains a negative-density region. The closed-form CDF still returns sensible probabilities even when this happens, but the curve is not a proper density there.</p>
       <p><strong>Two-tailed / central.</strong> These modes use the <em>symmetric</em> region around μ (|X − μ| ⋛ |x − μ|). Under skewness, this differs from the more common <em>equal-area</em> two-tailed convention (where the lower-tail and upper-tail probabilities are matched, giving an asymmetric interval).</p>
-      <p><strong>Inverse</strong> (probability → x) uses 60-iteration bisection on the closed-form CDF. The base normal CDF Φ uses the Abramowitz &amp; Stegun 26.2.17 rational approximation (maximum error ~1.5×10⁻⁷).</p>
+      <p><strong>Inverse</strong> (probability → x) uses 60-iteration bisection on the closed-form CDF. The base normal CDF Φ uses the Abramowitz &amp; Stegun 26.2.17 rational approximation (maximum absolute error 7.5×10⁻⁸).</p>
     `
   }
 };

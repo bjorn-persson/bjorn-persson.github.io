@@ -4,20 +4,34 @@
   onload="renderMathInElement(document.body);"></script>
 
 <script>
+    // Shared KaTeX config plus a re-render helper.
+    //
+    // auto-render only runs once, on load. Any page that injects math into the
+    // DOM afterwards -- info modals, captions rewritten by a slider handler --
+    // must call window.renderMath(el) on the new content, or its $...$ will sit
+    // there as raw source. Safe to call before KaTeX has loaded (it no-ops) and
+    // safe to call twice on the same element.
+    window.katexDelimiters = [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false},
+      {left: "\\begin{equation}", right: "\\end{equation}", display: true},
+      {left: "\\begin{equation*}", right: "\\end{equation*}", display: true},
+      {left: "\\begin{align}", right: "\\end{align}", display: true},
+      {left: "\\begin{align*}", right: "\\end{align*}", display: true},
+      {left: "\\begin{alignat}", right: "\\end{alignat}", display: true},
+      {left: "\\begin{gather}", right: "\\end{gather}", display: true},
+      {left: "\\begin{CD}", right: "\\end{CD}", display: true},
+    ];
+
+    window.renderMath = function(el) {
+      if (typeof renderMathInElement !== 'function') return;
+      renderMathInElement(el || document.body, {
+        delimiters: window.katexDelimiters,
+        throwOnError: false
+      });
+    };
+
     document.addEventListener("DOMContentLoaded", function() {
-        renderMathInElement(document.body, {
-          delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '$', right: '$', display: false},
-            {left: "\\begin{equation}", right: "\\end{equation}", display: true},
-            {left: "\\begin{equation*}", right: "\\end{equation*}", display: true},
-            {left: "\\begin{align}", right: "\\end{align}", display: true},
-            {left: "\\begin{align*}", right: "\\end{align*}", display: true},
-            {left: "\\begin{alignat}", right: "\\end{alignat}", display: true},
-            {left: "\\begin{gather}", right: "\\end{gather}", display: true},
-            {left: "\\begin{CD}", right: "\\end{CD}", display: true},
-          ],
-          throwOnError : false
-        });
+        window.renderMath(document.body);
     });
 </script>

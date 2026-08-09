@@ -14,6 +14,13 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
   input[type="range"].phi-slider::-moz-range-thumb {
     background: var(--orange);
   }
+  /* Phi is the only readout on this page that can go negative, and "-0.95" is
+     one character wider than the 42px .slider-val default allows — it overflows
+     the control column. Widened to match the N readouts in the same column. */
+  .slider-val.phi-val {
+    width: 52px;
+    color: var(--orange);
+  }
 
   /* Heatmap */
   .heatmap-container {
@@ -226,7 +233,7 @@ summary: "Explore how a two-factor CFA model constrains the covariance structure
     <div class="equation"><span class="eq-sym">Σ(θ)<span class="eq-tip"><span class="tip-label">Model-implied correlation matrix (6 × 6)</span><span class="tip-matrix"><pre>       x₁    x₂    x₃    x₄    x₅    x₆
 x₁   1.00  .600  .488  .184  .223  .158
 x₂    ·    1.00  .520  .196  .238  .168
-x₃    ·      ·   1.00  .159  .194  .137
+x₃    ·      ·   1.00  .159  .193  .137
 x₄    ·      ·     ·   1.00  .595  .420
 x₅    ·      ·     ·     ·   1.00  .510
 x₆    ·      ·     ·     ·     ·   1.00</pre></span></span></span> = <span class="eq-sym">Λ<span class="eq-tip"><span class="tip-label">Factor loading matrix (6 × 2)</span><span class="tip-matrix"><pre>       F₁    F₂
@@ -337,7 +344,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
   <div class="section" id="sec5">
     <div class="section-label">Section 5</div>
     <h2>Why constraints matter<button class="info-btn" onclick="showInfo('sec5')">?</button></h2>
-    <p>A subtle problem: different parameter values can produce the <em>exact same</em> implied matrix. If we multiply all loadings by some constant <span class="m">c</span> and divide the factor variance by <span class="m">c²</span>, the product <span class="m">ΛΦΛ′</span> is unchanged. The model is <em>underidentified</em>.</p>
+    <p>A subtle problem: different parameter values can produce the <em>exact same</em> implied matrix. Let <span class="m">Ψ</span> be the factor <em>covariance</em> matrix — the same object as <span class="m">Φ</span> in Section 2, but with the factor variances left free on the diagonal rather than fixed at 1. If we multiply all loadings by some constant <span class="m">c</span> and divide the factor variances by <span class="m">c²</span>, the product <span class="m">ΛΨΛ′</span> is unchanged. The model is <em>underidentified</em>.</p>
     <p>The standard fix is to constrain the factor variances to 1 — which is exactly what we do when we work with standardized loadings. This collapses the infinite family of equivalent solutions down to one. Below, drag the scaling constant and watch two parameter sets produce identical implied correlations.</p>
 
     <div class="viz-box">
@@ -415,6 +422,10 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
         </div>
       </div>
     </div>
+
+    <div class="note caveat">
+      The <span class="m">N</span> slider re-scales the indices without redrawing the data — the observed matrix stays the one sample of 500 that this page loaded with. So at <span class="m">N</span> = 5000 you are reading the fit statistics this residual matrix <em>would</em> produce in a sample that large, not statistics from a sample actually drawn. That is exactly what makes the point about <span class="m">χ²</span>: nothing about the misfit changed, only the sample size multiplying it. The same slider drives the fit statistics in Sections 7 and 11, and sets how many people are plotted in Section 8.
+    </div>
   </div>
 
   <!-- SECTION 7 -->
@@ -460,7 +471,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
     </div>
 
     <div class="note">
-      <strong>Try it:</strong> Select "Missing Factor" and notice the block of structured residuals — the model can't reproduce correlations between items that actually belong to separate factors it doesn't know about. Select "Omitted Cross-Loading" and notice the residuals concentrate around one item. Select "Correlated Residual" and notice how the extra covariance between x₃ and x₄ (which load on different factors) forces the optimizer to inflate φ, creating a pattern of positive and negative residuals across the cross-block. In each case, the modification indices point toward the missing parameter.
+      <strong>Try it:</strong> Select "Missing Factor" and notice the block of structured residuals — the model can't reproduce correlations between items that actually belong to separate factors it doesn't know about. Select "Omitted Cross-Loading" and notice the residuals concentrate around one item. Select "Correlated Residual" and notice how the extra covariance between x₃ and x₄ (which load on different factors) leaves almost all of its mark in that one cell — a residual near +0.23, against about 0.03 in the rest of the cross-block. The optimizer raises φ slightly to absorb what it can (typically .35 → about .38), but a single pair's shared residual cannot be spread across the block. In each case, the modification indices point toward the affected items.
     </div>
     <div class="note warn">
       <strong>The lesson:</strong> Good fit indices do not mean the model is correct — they mean the model reproduces the covariance matrix reasonably well. Structured residuals and large modification indices are the diagnostic. A model that fits well by the numbers but shows patterned residuals is telling you something is missing.
@@ -472,7 +483,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
     <div class="section-label">Section 8</div>
     <h2>What misspecification does to factor scores<button class="info-btn" onclick="showInfo('sec8')">?</button></h2>
     <p>The preceding sections focused on reproducing correlations and diagnosing model fit. But in practice, we usually want <em>factor scores</em> — estimated latent variable values for each person. These scores are computed from the model parameters. If the parameters are wrong, the scores are wrong.</p>
-    <p>Below, 500 simulated individuals are generated from the true model. Each scatterplot shows how a person's <em>true</em> factor score (computed with the correct parameters) compares to their <em>estimated</em> score (computed with whatever the sliders are currently set to). When the sliders match the true values, the dots fall on the diagonal. As you introduce misspecification, the cloud disperses.</p>
+    <p>Below, <span class="m" id="s8-n-count">500</span> simulated individuals are drawn from the true model — the N slider decides how many of a 5,000-person pool get plotted. Each scatterplot puts a person's factor score computed with the <em>true</em> parameters on the horizontal axis against the same person's score computed with whatever the sliders are currently set to on the vertical axis. Both are estimates from the same six item responses; only the parameters used to weight those responses differ. When the sliders match the true values, the dots fall on the diagonal. As you introduce misspecification, the cloud disperses.</p>
 
     <div class="viz-box wide">
       <div style="display:flex;gap:28px;flex-wrap:wrap;">
@@ -525,7 +536,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
     </div>
 
     <div class="note">
-      <strong>Try it:</strong> Click "Fit the Model" first — the dots should cluster tightly around the diagonal. Then drag a single F1 loading to its minimum and notice two things: the F1 scatterplot disperses (obvious), but the F2 scatterplot also degrades when <span class="m">φ</span> is large (less obvious). Misspecification propagates through the factor correlation.
+      <strong>Try it:</strong> Click "Fit the Model" first — the dots should cluster tightly around the diagonal, <span class="m">r</span> ≈ .99 on both plots. Now drag <span class="m">λ₁</span> to its maximum: F1 disperses to about .89 while F2 barely moves (still ≈ .99). At the fitted <span class="m">φ</span> ≈ .35 the factors are nearly independent, so an error in one block stays in that block. Now fit again, raise <span class="m">φ</span> to its maximum, and repeat the same drag: this time F2 falls with it, from about .91 to about .73. Misspecification propagates through the factor correlation, but only in proportion to how large that correlation is.
     </div>
     <div class="note warn">
       <strong>Note:</strong> These are <em>regression factor scores</em> (W = ΦΛ′Σ⁻¹), the most common method. They are not the only method — Bartlett scores and others exist and would show somewhat different sensitivity patterns. The key lesson is general: wrong parameters yield wrong scores.
@@ -568,7 +579,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
     </div>
 
     <div class="note">
-      <strong>Try it:</strong> Click "Fit the Model" so the loadings match the data — notice that omega and alpha are close when the true loadings are similar. Then drag one loading to its maximum and another to its minimum within the same factor. Alpha barely moves (it only sees the average inter-item correlation) while omega tracks the actual reliability. Note the absence of the factor correlation slider: per-factor reliability depends only on the loadings within that factor.
+      <strong>Try it:</strong> Click "Fit the Model" so the loadings match the data — notice that omega and alpha are nearly identical while the loadings within a factor are similar. Then drag one loading to its maximum and another to its minimum within the same factor. Both coefficients fall, but alpha falls about twice as far (roughly .30 against omega's .15), and the gap between them opens to about .15. That gap is the point: alpha assumes the loadings are equal, so as soon as they are not, it <em>underestimates</em> the reliability the factor model implies. Note the absence of the factor correlation slider: per-factor reliability depends only on the loadings within that factor.
     </div>
   </div>
 
@@ -602,7 +613,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
   <div class="section" id="sec11">
     <div class="section-label">Section 11</div>
     <h2>Comparing models<button class="info-btn" onclick="showInfo('sec11')">?</button></h2>
-    <p>A natural question: how do we know two factors are needed? Maybe one factor is enough. Below, both models are fitted to the same observed data. The 1-factor model forces all 6 items onto a single factor. Compare the residual matrices — the 1-factor model leaves structured residuals in the cross-block cells because it can't represent two distinct clusters of items.</p>
+    <p>A natural question: how do we know two factors are needed? Maybe one factor is enough. Below, both models are fitted to the same observed data. The 1-factor model forces all 6 items onto a single factor. Compare the residual matrices — the 1-factor model can't hold two clusters at once, so it fits one block and leaves large positive residuals inside the other.</p>
 
     <div class="viz-box wide">
       <div class="model-compare-row">
@@ -621,7 +632,7 @@ x₆     ·     ·     ·     ·     ·   .640</pre></span></span></span></div>
     </div>
 
     <div class="note">
-      <strong>Why AIC/BIC?</strong> The 1-factor model is not simply the 2-factor model with an added constraint — they have different loading patterns. So instead of a likelihood ratio test, we use information criteria. AIC and BIC both balance fit against complexity; lower values are better. When the difference is large, the conclusion is unambiguous.
+      <strong>Why AIC/BIC?</strong> These two models <em>are</em> nested — the 1-factor model is the 2-factor model with <span class="m">φ</span> fixed at 1 — so a chi-square difference test is available and is routinely used. But <span class="m">φ = 1</span> sits on the boundary of the admissible parameter space, which makes the usual <span class="m">χ²(1)</span> reference distribution inexact. Information criteria need no reference distribution: AIC and BIC balance fit against complexity, lower values are better, and when the difference is large the conclusion is unambiguous.
     </div>
     <div class="note caveat">
       This visualization is built as a pedagogical tool, this is not lavaan!<br><br>The observed matrix is a sample correlation matrix from 500 simulated observations drawn from the true model (a larger pool is generated for the factor score scatterplots). Each page load generates a fresh sample, so the exact numbers will vary. The optimizer uses gradient descent on the ML discrepancy function. All computations happen in your browser.
@@ -1212,18 +1223,21 @@ function computeFitIndices(lambdaVals, phi, S) {
   // RMSEA
   const rmsea = Math.sqrt(Math.max(0, (chiSq - df) / (df * (currentN - 1))));
 
-  // SRMR (off-diagonal only — diagonal residuals are zero by construction
-  // in a correlation-structure model, so including them just deflates SRMR)
-  let sumSqResid = 0, count = 0;
+  // SRMR — standard form: root mean square of the p(p+1)/2 unique residuals,
+  // diagonal included. This is what lavaan reports and what the Hu & Bentler
+  // .08 cutoff refers to. In this correlation-structure model the diagonal
+  // residuals are zero, so they add nothing to the sum but still count in the
+  // denominator (21 rather than 15) — dropping them inflates SRMR by 1.183x.
+  let sumSqResid = 0;
+  const nUnique = p * (p + 1) / 2;
   const sigma = impliedMatrix(lambdaVals, phi);
   for (let i=0; i<p; i++) {
-    for (let j=0; j<i; j++) {
+    for (let j=0; j<=i; j++) {
       const r = S[i][j] - sigma[i][j];
       sumSqResid += r * r;
-      count++;
     }
   }
-  const srmr = Math.sqrt(sumSqResid / count);
+  const srmr = Math.sqrt(sumSqResid / nUnique);
 
   // CFI: need baseline model (independence model)
   // Independence: all off-diag = 0, only diagonal variances free
@@ -1369,7 +1383,7 @@ function createSlidersForSection(suffix) {
       <span class="slider-label">φ</span>
       <input type="range" class="phi-slider" min="-0.95" max="0.95" step="0.01" value="${params.phi}"
         id="sl-phi${suffix}" oninput="onPhiSlider(this.value)">
-      <span class="slider-val" id="sv-phi${suffix}" style="color:var(--orange)">${params.phi.toFixed(2)}</span>
+      <span class="slider-val phi-val" id="sv-phi${suffix}">${params.phi.toFixed(2)}</span>
     </div>`;
 }
 
@@ -1423,6 +1437,9 @@ function onSampleNSlider(val) {
     const miIndices = computeModificationIndices(misspecFittedLambda, misspecFittedPhi, S_MISSPEC);
     renderModificationIndices(miIndices);
   }
+  // Section 11's chi-square, AIC and BIC scale with N too — keep them in step
+  // with Section 6 rather than pinned at the sample's own N.
+  renderModelComparison();
 }
 
 // =============================================================
@@ -1437,13 +1454,13 @@ function updateAll() {
   renderHeatmap('heatmap-implied', sigma, {cellSize:52, fontSize:13, labelSize:14});
   renderHeatmap('heatmap-residual', residual, {cellSize:52, fontSize:13, labelSize:14, maxAbs:0.4, showDiag:true});
 
-  // Path diagram
-  renderPathDiagram('path-diagram');
+  // (No path diagram redraw here — it depicts the true model, not the sliders,
+  //  so init() renders it once and nothing it draws ever changes.)
 
   // Theta display
   const thetaDiv = document.getElementById('theta-display');
   thetaDiv.innerHTML = params.lambda.map((l,i) =>
-    `<span class="theta-item">θ${i+1}=<span class="theta-val">${Math.max(0,1-l*l).toFixed(2)}</span></span>`
+    `<span class="theta-item">θ${i+1}=<span class="theta-val">${Math.max(0.01,1-l*l).toFixed(2)}</span></span>`
   ).join('');
 
   // Fit function
@@ -1463,7 +1480,7 @@ function updateAll() {
 }
 
 // =============================================================
-// SECTION 7: FACTOR SCORES (data reused from generateObserved)
+// SECTION 8: FACTOR SCORES (data reused from generateObserved)
 // =============================================================
 
 // Compute regression factor scores: f = Phi * Lambda' * Sigma^-1 * x
@@ -1566,11 +1583,11 @@ function renderScatterplot(containerId, statsId, trueScores, estScores, factorId
   }
 
   // Axis labels
-  svg += `<text x="${pad + plotW/2}" y="${h - 4}" text-anchor="middle" 
-    font-family="var(--mono)" font-size="10" fill="var(--text-dim)">True Score</text>`;
-  svg += `<text x="10" y="${pad + plotH/2}" text-anchor="middle" 
-    font-family="var(--mono)" font-size="10" fill="var(--text-dim)" 
-    transform="rotate(-90, 10, ${pad + plotH/2})">Estimated Score</text>`;
+  svg += `<text x="${pad + plotW/2}" y="${h - 4}" text-anchor="middle"
+    font-family="var(--mono)" font-size="10" fill="var(--text-dim)">Score at true parameters</text>`;
+  svg += `<text x="10" y="${pad + plotH/2}" text-anchor="middle"
+    font-family="var(--mono)" font-size="10" fill="var(--text-dim)"
+    transform="rotate(-90, 10, ${pad + plotH/2})">Score at current sliders</text>`;
 
   // Tick labels at extremes
   svg += `<text x="${pad}" y="${pad + plotH + 14}" text-anchor="middle" 
@@ -1588,6 +1605,8 @@ function renderScatterplot(containerId, statsId, trueScores, estScores, factorId
 
 function updateScatterplots() {
   const n = Math.min(currentN, POOL_N);
+  const nEl = document.getElementById('s8-n-count');
+  if (nEl) nEl.textContent = n;
   const dataSlice = SIM_DATA.slice(0, n);
   const trueSlice = TRUE_SCORES.slice(0, n);
   const estScores = computeFactorScores(dataSlice, params.lambda, params.phi);
@@ -1645,7 +1664,7 @@ const SCENARIOS = {
   },
   correlatedResidual: {
     label: 'Correlated Residual',
-    description: 'Truth: 2 factors with correct simple structure, but x₃ and x₄ share residual covariance (θ₃₄ = 0.25) — e.g., similar wording across subscales. These items load on different factors, so the model can only account for their extra correlation through φ. The optimizer inflates φ to compensate, distorting the entire cross-block and producing a distinctive residual pattern.',
+    description: 'Truth: 2 factors with correct simple structure, but x₃ and x₄ share residual covariance (θ₃₄ = 0.25) — e.g., similar wording across subscales. These items load on different factors, so the only route the model has to their extra correlation is φ. The optimizer nudges φ up a little (0.35 → about 0.38), but that spreads across all nine cross-block cells, so nearly all of the extra covariance stays behind as one large residual in the x₃–x₄ cell.',
     nFactors: 2,
     lambdaMatrix: [
       [0.75, 0.00],
@@ -1687,16 +1706,8 @@ function generateFromScenario(scenario) {
       for (let m = 0; m < k; m++)
         LPLt[i][j] += LP[i][m] * Lam[j][m];
 
-  // Theta: diagonal, theta_i = 1 - sum_f lambda_{if}^2 * phi_{ff} - cross terms
-  // More precisely: theta_i = 1 - (LPL')_{ii}
-  const sigma = matCreate(p, p);
-  for (let i = 0; i < p; i++)
-    for (let j = 0; j < p; j++)
-      sigma[i][j] = LPLt[i][j];
-  for (let i = 0; i < p; i++)
-    sigma[i][i] = 1.0; // standardized: total variance = 1
-
-  // Ensure positive definite by adding small diagonal if needed
+  // Theta: diagonal, theta_i = 1 - (LPL')_ii, so each item's total variance is 1.
+  // Floored at 0.01 to keep Sigma positive definite (matches buildTheta).
   const Theta = matCreate(p, p);
   for (let i = 0; i < p; i++)
     Theta[i][i] = Math.max(0.01, 1 - LPLt[i][i]);
@@ -1924,7 +1935,7 @@ function computeReliability(lambdaVals) {
     const items = factorItems[f];
     const k = items.length;
     const lams = items.map(i => lambdaVals[i]);
-    const thetas = lams.map(l => Math.max(0, 1 - l*l));
+    const thetas = lams.map(l => Math.max(0.01, 1 - l*l)); // same floor as buildTheta
 
     // Omega: (sum_lambda)^2 / [(sum_lambda)^2 + sum_theta]
     const sumLam = lams.reduce((a,b) => a+b, 0);
@@ -2005,14 +2016,14 @@ function drawSamplingDemo() {
     const chiSq = Math.max(0, (n - 1) * fml);
     const rmsea = Math.sqrt(Math.max(0, (chiSq - df) / (df * (n - 1))));
 
-    let srmrSum = 0, srmrCount = 0;
+    // SRMR — standard form, as in computeFitIndices (diagonal included, / p(p+1)/2)
+    let srmrSum = 0;
     for (let i = 0; i < N_ITEMS; i++) {
-      for (let j = 0; j < i; j++) {
+      for (let j = 0; j <= i; j++) {
         srmrSum += (S[i][j] - sigmaHat[i][j]) ** 2;
-        srmrCount++;
       }
     }
-    const srmr = Math.sqrt(srmrSum / srmrCount);
+    const srmr = Math.sqrt(srmrSum / (N_ITEMS * (N_ITEMS + 1) / 2));
 
     const fml_base = mlFitFunction_independence(S);
     const df_base = N_ITEMS * (N_ITEMS - 1) / 2;
@@ -2137,14 +2148,14 @@ function computeFitIndicesGeneric(sigma, nFree, S, N) {
   const chiSq = Math.max(0, (N - 1) * fml);
   const rmsea = df > 0 ? Math.sqrt(Math.max(0, (chiSq - df) / (df * (N - 1)))) : 0;
 
-  let srmrSum = 0, srmrCount = 0;
+  // SRMR — standard form, as in computeFitIndices (diagonal included, / p(p+1)/2)
+  let srmrSum = 0;
   for (let i = 0; i < p; i++) {
-    for (let j = 0; j < i; j++) {
+    for (let j = 0; j <= i; j++) {
       srmrSum += (S[i][j] - sigma[i][j]) ** 2;
-      srmrCount++;
     }
   }
-  const srmr = Math.sqrt(srmrSum / srmrCount);
+  const srmr = Math.sqrt(srmrSum / (p * (p + 1) / 2));
 
   const fml_base = mlFitFunction_independence(S);
   const df_base = p * (p - 1) / 2;
@@ -2158,15 +2169,21 @@ function computeFitIndicesGeneric(sigma, nFree, S, N) {
   return { chiSq, df, rmsea, srmr, cfi, fml, aic, bic };
 }
 
-function renderModelComparison() {
-  // Fit 1-factor model
-  const lam1F = fitOneFactorModel(S_OBS);
-  const sigma1F = impliedMatrix1F(lam1F);
-  const residual1F = matSub(S_OBS, sigma1F);
+// Both fits depend only on S_OBS, which is fixed for the page load — cache them so
+// the N slider can re-render this section without re-running the optimizer.
+let modelCompareFits = null;
 
-  // Fit 2-factor model
-  const fitted2F = fitModelToS(S_OBS);
-  const sigma2F = impliedMatrix(fitted2F.lambda, fitted2F.phi);
+function renderModelComparison() {
+  if (!modelCompareFits) {
+    const lam1F = fitOneFactorModel(S_OBS);
+    const fitted2F = fitModelToS(S_OBS);
+    modelCompareFits = {
+      sigma1F: impliedMatrix1F(lam1F),
+      sigma2F: impliedMatrix(fitted2F.lambda, fitted2F.phi)
+    };
+  }
+  const { sigma1F, sigma2F } = modelCompareFits;
+  const residual1F = matSub(S_OBS, sigma1F);
   const residual2F = matSub(S_OBS, sigma2F);
 
   // Render heatmaps
@@ -2174,8 +2191,8 @@ function renderModelComparison() {
   renderHeatmap('heatmap-2f-residual', residual2F, {cellSize:52, fontSize:13, labelSize:14, maxAbs:0.2, showDiag:true});
 
   // Fit indices
-  const fi1F = computeFitIndicesGeneric(sigma1F, N_ITEMS, S_OBS, SAMPLE_N);
-  const fi2F = computeFitIndicesGeneric(sigma2F, N_ITEMS + 1, S_OBS, SAMPLE_N);
+  const fi1F = computeFitIndicesGeneric(sigma1F, N_ITEMS, S_OBS, currentN);
+  const fi2F = computeFitIndicesGeneric(sigma2F, N_ITEMS + 1, S_OBS, currentN);
 
   function renderFitRow(fi) {
     return [
@@ -2325,7 +2342,7 @@ const infoContent = {
     badge: 'identification',
     body: `
       <p>Latent variables have no inherent scale. Unlike observed variables, which come in specific units (points on a Likert scale, reaction times in milliseconds), a factor is a mathematical abstraction. Nothing in the data tells you whether the factor ranges from −1 to 1 or from −1000 to 1000.</p>
-      <p>This creates a problem: if you double all the loadings and halve the factor variance, the implied covariance matrix doesn't change. There are infinitely many parameter sets that fit equally well. The model is <em>underidentified</em> — the data can't distinguish between these solutions.</p>
+      <p>This creates a problem: if you double all the loadings and divide the factor variance by four, the implied covariance matrix doesn't change — each loading enters every implied covariance twice, so the two doublings cancel the quartering exactly. There are infinitely many parameter sets that fit equally well. The model is <em>underidentified</em> — the data can't distinguish between these solutions.</p>
       <p>Fixing the factor variance to 1 says: "express the factor in standard deviation units." This is the <em>standardized solution</em>, and it's what this page uses throughout. Each loading then represents a correlation between item and factor.</p>
       <p>The other common fix is the <em>marker variable</em> approach: fix one loading per factor to 1.0 and freely estimate the factor variance. This says "express the factor in the same units as that reference item." Both approaches give the same model fit and the same implied covariance matrix — they're just different parameterizations of the same model.</p>
     `
@@ -2350,7 +2367,7 @@ const infoContent = {
       <p>The key diagnostic is the <em>residual matrix</em>. Under correct specification, residuals are small and random — they reflect sampling variability. Under misspecification, residuals show <em>structure</em>: systematic clusters of positive or negative values that the model can't account for. This structured pattern tells you <em>where</em> the model fails, not just <em>that</em> it fails.</p>
       <p><em>Modification indices</em> formalize this intuition. For each currently fixed parameter (here, the cross-loadings constrained to zero), the MI estimates the expected drop in χ² if that parameter were freed. Technically, it is the squared score statistic divided by the expected information — essentially a one-degree-of-freedom Lagrange multiplier test.</p>
       <p>A common rule of thumb is MI > 3.84 (the χ²(1) critical value at α = .05) as a threshold for "worth investigating." But modification indices should be interpreted substantively, not mechanically. A large MI might reflect a genuine cross-loading, or it might reflect a correlated residual, a method effect, or model misspecification elsewhere propagating through the system.</p>
-      <p>The misspecification scenarios illustrate different failure modes. "Missing Factor" shows what happens when dimensionality is wrong — the model can't separate constructs it doesn't know about. "Omitted Cross-Loading" shows a subtler problem where one item's relationship to a second factor is ignored. "Correlated Residual" shows what happens when two items on different factors share residual covariance — the model can only absorb the extra correlation by distorting φ and the loadings, creating a distinctive pattern of over- and under-predicted cross-block correlations. All are common in practice, and all leave fingerprints in the residuals.</p>
+      <p>The misspecification scenarios illustrate different failure modes. "Missing Factor" shows what happens when dimensionality is wrong — the model can't separate constructs it doesn't know about. "Omitted Cross-Loading" shows a subtler problem where one item's relationship to a second factor is ignored. "Correlated Residual" shows what happens when two items on different factors share residual covariance — the model's only route to that correlation is φ, which raises every cross-block cell at once, so it can absorb only a little of it and the rest stands out as one large residual in the offending cell. All are common in practice, and all leave fingerprints in the residuals.</p>
     `
   },
   sec9: {
@@ -2372,19 +2389,20 @@ const infoContent = {
     body: `
       <p>There is no single answer — it depends on the number of factors, the number of items per factor, the magnitude of loadings, and the complexity of the model. But some patterns are robust:</p>
       <p><em>Loadings matter.</em> Models with high loadings (λ > .70) recover well even at modest N. Models with weak loadings (λ < .40) need much larger samples because the signal-to-noise ratio is lower.</p>
-      <p><em>More items help.</em> Three items per factor is the minimum for identification, but estimates are noisy. Five or more items per factor produces much more stable recovery.</p>
+      <p><em>More items help.</em> A factor standing on its own needs three items to be identified, and at three it is just-identified — df = 0, so there is no fit to test. Two items per factor is enough once the factors are correlated with each other (the "Missing Factor" scenario in Section 7 is three factors of two items apiece, and it is identified with df = 6), but such models are fragile: they hinge on the factor correlations being non-zero and they estimate poorly at small N. Five or more items per factor produces much more stable recovery.</p>
       <p><em>Fit indices are noisy at small N.</em> RMSEA and CFI can fluctuate wildly when N < 100. A model that truly fits the population can easily show "poor fit" in a small sample — and a misspecified model can look adequate. This is one reason fit index cutoffs should not be applied rigidly.</p>
-      <p>Common rules of thumb range from N = 200 (a traditional minimum) to N:parameter ratios of 10:1 or 20:1. Simulation-based power analyses (e.g., via <a href="https://doi.org/10.1080/10705511.2014.859510" target="_blank" rel="noopener" style="color:var(--teal);">Monte Carlo methods in Mplus</a> or the <a href="https://cran.r-project.org/package=simsem" target="_blank" rel="noopener" style="color:var(--teal);">simsem R package</a>) are the gold standard: simulate data from your expected model and see what N gives acceptable recovery.</p>
+      <p>Common rules of thumb range from N = 200 (a traditional minimum) to N:parameter ratios of 10:1 or 20:1. Simulation-based power analyses (e.g., the Monte Carlo approach of <a href="https://doi.org/10.1207/S15328007SEM0904_8" target="_blank" rel="noopener" style="color:var(--teal);">Muthén and Muthén, 2002</a>, or the <a href="https://cran.r-project.org/package=simsem" target="_blank" rel="noopener" style="color:var(--teal);">simsem R package</a>) are the gold standard: simulate data from your expected model and see what N gives acceptable recovery.</p>
     `
   },
   sec11: {
     title: 'How do information criteria compare models?',
     badge: 'model selection',
     body: `
-      <p>When two models are not nested — meaning neither is a special case of the other — the chi-square difference test doesn't apply. Instead, we use <em>information criteria</em> that balance fit against parsimony.</p>
+      <p><em>Information criteria</em> balance fit against parsimony. They are indispensable when two models are not nested — when neither is a special case of the other — because then no chi-square difference test exists. They are also useful when models <em>are</em> nested but the difference test is awkward, which is the situation here.</p>
       <p><em>AIC</em> (Akaike Information Criterion) penalizes by the number of free parameters: AIC = χ² − 2·df. Lower is better. AIC tends to favor more complex models and is asymptotically equivalent to leave-one-out cross-validation.</p>
       <p><em>BIC</em> (Bayesian Information Criterion) adds a heavier penalty that grows with sample size: BIC = χ² − df·ln(N). It is more conservative than AIC, especially at large N, and is consistent (it will select the true model as N → ∞, assuming the true model is among the candidates).</p>
-      <p>In the comparison here, the 1-factor and 2-factor models have different loading patterns — the 2-factor model isn't simply the 1-factor model with an added constraint. The 1-factor model says all items share one source of common variance. The 2-factor model says there are two distinct sources. The data clearly prefer two factors: the 1-factor model can't account for the weak cross-block correlations and leaves structured residuals.</p>
+      <p>In the comparison here the two models <em>are</em> nested: the 1-factor model is the 2-factor model with φ fixed at 1, so they differ by exactly one degree of freedom (df 9 versus 8), and lavaan's anova() will run the difference test on them without complaint. The wrinkle is that φ = 1 lies on the edge of the admissible parameter space — a factor correlation cannot exceed 1 — so the difference statistic does not follow a clean χ²(1) distribution and its p-value is only approximate. AIC and BIC sidestep the issue, which is why they are reported here.</p>
+      <p>The substantive reading is unaffected. The 1-factor model says all items share one source of common variance; the 2-factor model says there are two distinct sources; the data clearly prefer two. Fitted to these data, the 1-factor model reproduces one cluster of items well and shrinks the other cluster's loadings toward zero, leaving large positive residuals inside that block.</p>
       <p>Note that "lower AIC/BIC" doesn't mean "correct model" — it means "best among the candidates you tested." A model that fits better than alternatives could still be wrong in absolute terms.</p>
     `
   },

@@ -1,6 +1,7 @@
 ---
 title: "Measurement Error and Attenuation"
-description: "Interactive demonstration of how imperfect reliability weakens correlations and regression slopes. Adjust the true correlation and the reliability of each observed variable."
+description: "Interactive demonstration of how imperfect reliability attenuates observed correlations, and what the correction for attenuation costs in sampling variance. Adjust the true correlation and the reliability of each observed variable."
+summary: "See how unreliable measures shrink an observed correlation below its true value, and why correcting for attenuation recovers the estimate but inflates its sampling variance."
 ---
 
 <style>
@@ -46,11 +47,11 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     is called <strong>attenuation</strong>, and its magnitude depends on how reliable each measure is.
   </p>
   <p>
-    The attenuation formula, $r_{\text{obs}} \approx r_{\text{true}} \sqrt{\rho_x \rho_y}$, shows that even a strong
+    The attenuation formula, $r_{\text{obs}} \approx r_{\text{true}} \sqrt{\rho_{xx'} \rho_{yy'}}$, shows that even a strong
     true relationship can appear weak if the measures are noisy. A correlation between two scales with reliability
     0.70 each is attenuated to about 70% of its true value before sampling variability is even considered.
     The <strong>correction for attenuation</strong> reverses this by dividing the observed correlation by
-    $\sqrt{\rho_x \rho_y}$, recovering an estimate of the true relationship — but at the cost of amplified
+    $\sqrt{\rho_{xx'} \rho_{yy'}}$, recovering an estimate of the true relationship — but at the cost of amplified
     sampling variance, particularly when reliability is low.
   </p>
   <p class="note warn">
@@ -65,8 +66,8 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   <p class="note">
     Three correlations are shown below:<br>
     <strong>Observed <em>r</em></strong> &mdash; the sample correlation between the noisy observed scores.<br>
-    <strong>Expected <em>r</em></strong> &mdash; the predicted attenuated correlation: $r_{\text{expected}} = r_{\text{true}} \sqrt{\rho_x \rho_y}$. Low reliability pushes this toward zero.<br>
-    <strong>Corrected <em>r</em></strong> &mdash; the correction for attenuation applied to the observed <em>r</em>: $r_{\text{corrected}} = \frac{r_{\text{obs}}}{\sqrt{\rho_x \rho_y}}$. This attempts to recover the true correlation from the noisy data. With low reliability, even small observed correlations inflate toward &plusmn;1.
+    <strong>Expected <em>r</em></strong> &mdash; the predicted attenuated correlation: $r_{\text{expected}} = r_{\text{true}} \sqrt{\rho_{xx'} \rho_{yy'}}$. Low reliability pushes this toward zero.<br>
+    <strong>Corrected <em>r</em></strong> &mdash; the correction for attenuation applied to the observed <em>r</em>: $r_{\text{corrected}} = \frac{r_{\text{obs}}}{\sqrt{\rho_{xx'} \rho_{yy'}}}$. This attempts to recover the true correlation from the noisy data. With low reliability the correction is violently unstable: at &rho;<sub>xx&prime;</sub> = &rho;<sub>yy&prime;</sub> = .20 roughly one replication in ten returns a corrected <em>r</em> that <em>exceeds</em> &plusmn;1 outright &mdash; an impossible value for a correlation, and a signal that the correction has been pushed past what the data can support.
   </p>
   <div class="slider-group">
     <div class="slider-group-title">Sample size</div>
@@ -188,6 +189,9 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   }
 
   function resizeCanvas() {
+    // Re-read devicePixelRatio here, not just once at load: dragging the window
+    // to a display with a different ratio otherwise leaves the canvas blurry.
+    dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
@@ -309,6 +313,34 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
       ctx.fill();
     }
     ctx.globalAlpha = 1.0;
+
+    // Legend and axis labels. Without these there was no way to tell what the
+    // grey dashed line was — the other two panels both have legends.
+    ctx.font = `11px ${C_MONO}`;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    const legX = PAD_L + 10;
+    let legY = PAD_T + 12;   // top-left of the plot, which is empty for r > 0
+    ctx.strokeStyle = C_TEXT_DIM; ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath(); ctx.moveTo(legX, legY); ctx.lineTo(legX + 22, legY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = C_TEXT_DIM;
+    ctx.fillText('true-score line (slope = r_true)', legX + 28, legY);
+    legY += 16;
+    ctx.strokeStyle = C_TEAL; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(legX, legY); ctx.lineTo(legX + 22, legY); ctx.stroke();
+    ctx.fillStyle = C_TEAL;
+    ctx.fillText('fitted to observed scores', legX + 28, legY);
+
+    ctx.fillStyle = C_TEXT_DIM;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('observed X', PAD_L + (W - PAD_L - PAD_R) / 2, H - 6);
+    ctx.save();
+    ctx.translate(12, PAD_T + (H - PAD_T - PAD_B) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textBaseline = 'middle';
+    ctx.fillText('observed Y', 0, 0);
+    ctx.restore();
   }
 
   function updateAll() {
@@ -399,6 +431,11 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
   const C_BG_ELEV  = css.getPropertyValue('--bg-elevated').trim();
   const C_MONO     = css.getPropertyValue('--mono').trim();
 
+  // Advanced on each "Run simulation". Must live in THIS IIFE -- each <script>
+  // block on this page is its own closure, so a copy declared in another block
+  // is not visible here.
+  let simSeed = 12345;
+
   function makeRng(s) {
     let st = s >>> 0;
     return () => {
@@ -471,10 +508,18 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     const nBins = 50;
     const binW = (hi - lo) / nBins;
     const bins = new Array(nBins).fill(0);
+    // Clamp BOTH tails into the edge bins. Previously values above the range were
+    // folded into the last bin but values below it were silently dropped, so at
+    // low reliability the corrected-r histogram lost ~5% of replications off the
+    // left while ~16% piled into a spurious right-edge spike -- and because the
+    // y-axis scales to maxCount, that spike flattened the real distribution.
+    // This is the one panel whose entire point is the SHAPE of that distribution.
+    let underflow = 0, overflow = 0;
     for (const v of values) {
       const idx = Math.floor((v - lo) / binW);
-      if (idx >= 0 && idx < nBins) bins[idx]++;
-      else if (idx >= nBins) bins[nBins - 1]++;
+      if (idx < 0) { bins[0]++; underflow++; }
+      else if (idx >= nBins) { bins[nBins - 1]++; overflow++; }
+      else bins[idx]++;
     }
     const maxCount = Math.max(...bins);
 
@@ -499,6 +544,20 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
       ctx.fillRect(x, PAD_T + ph - bh, bw - 1, bh);
     }
     ctx.globalAlpha = 1.0;
+
+    // Flag any replications that fell outside the plotted range and were folded
+    // into the edge bars. Silently absorbing them would understate exactly the
+    // volatility this panel exists to show.
+    if (underflow > 0 || overflow > 0) {
+      const pct = n => (n / values.length * 100).toFixed(n / values.length >= 0.1 ? 0 : 1) + '%';
+      const parts = [];
+      if (underflow > 0) parts.push('◀ ' + pct(underflow) + ' below');
+      if (overflow > 0) parts.push(pct(overflow) + ' above ▶');
+      ctx.fillStyle = C_TEXT_DIM;
+      ctx.font = `10px ${C_MONO}`;
+      ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+      ctx.fillText(parts.join('   ') + ' (stacked at the edges)', PAD_L + pw, PAD_T + 2);
+    }
 
     // Axes
     ctx.strokeStyle = C_BORDER; ctx.lineWidth = 1;
@@ -580,7 +639,10 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
     const denom = Math.sqrt(relx * rely);
     const expectedR = r_true * denom;
 
-    const rng = makeRng(12345);
+    // Advance the seed each run. Hard-coding 12345 meant pressing "Run simulation"
+    // repeatedly redrew an identical histogram, which reads as a dead button.
+    simSeed += 1;
+    const rng = makeRng(simSeed);
     const obsRs = [], corrRs = [];
     for (let k = 0; k < K; k++) {
       const r = runOneSample(rng, r_true, relx, rely, sampleN);
@@ -848,7 +910,14 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
       ctx.globalAlpha = 1;
     }
 
-    // Trajectories
+    // Trajectories. Clip to the plot rectangle rather than clamping each value
+    // into [yMin, yMax]: clamping drew runaway corrected-r excursions as flat
+    // lines riding the border, which understates exactly the volatility this
+    // panel is teaching. Clipped, an excursion visibly leaves the frame.
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(PAD.left, PAD.top, pw, ph);
+    ctx.clip();
     for (let t = 0; t < trajData.trajs.length; t++) {
       const rs = trajData.trajs[t][trajKey];
       const end = Math.min(drawUpTo, rs.length);
@@ -860,12 +929,13 @@ description: "Interactive demonstration of how imperfect reliability weakens cor
       for (let k = 0; k < end; k++) {
         const r = rs[k];
         if (isNaN(r)) continue;
-        const px = sx(N_MIN + k), py = sy(Math.max(yMin, Math.min(yMax, r)));
+        const px = sx(N_MIN + k), py = sy(r);
         if (!started) { ctx.moveTo(px, py); started = true; }
         else ctx.lineTo(px, py);
       }
       ctx.stroke();
     }
+    ctx.restore();
     ctx.globalAlpha = 1;
   }
 

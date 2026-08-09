@@ -1,7 +1,7 @@
 ---
 title: "IRT Precision: How Test Information Shapes Measurement Error"
 description: "Interactive visualization of how Item Response Theory determines measurement precision. Unlike Classical Test Theory, IRT precision varies across the trait continuum — explore how item parameters control where a test is most informative."
-summary: "Explore how item discrimination, difficulty, and response categories shape the Test Information Function and local measurement precision in IRT, compared to the flat SEM of Classical Test Theory."
+summary: "Explore how the number of items, their discrimination, and their difficulty shape the Test Information Function and local measurement precision in IRT, compared to the flat SEM of Classical Test Theory."
 ---
 
 <style>
@@ -140,10 +140,6 @@ summary: "Explore how item discrimination, difficulty, and response categories s
             <label>Avg difficulty (b): <span class="slider-val" id="irt_avgdiff_val">0.0</span></label>
             <input type="range" id="irt_avgdiff" min="-2.0" max="2.0" step="0.1" value="0.0">
           </div>
-          <div class="slider-col" id="irt_cat_group" style="display:none">
-            <label>Response categories: <span class="slider-val" id="irt_ncat_val">5</span></label>
-            <input type="range" id="irt_ncat" min="2" max="7" step="1" value="5">
-          </div>
     </div>
     <div style="height: 18px;"></div>
     <div class="irt-layout">
@@ -154,11 +150,11 @@ summary: "Explore how item discrimination, difficulty, and response categories s
             <div class="irt-stat-value" id="irt_se_val">&mdash;</div>
           </div>
           <div class="irt-stat" id="irt_ci68_card">
-            <div class="irt-stat-label">68% CI <button class="info-btn" onclick="irtShowInfo('ci68')" title="About 68% CI">?</button></div>
+            <div class="irt-stat-label">68% CI width <button class="info-btn" onclick="irtShowInfo('ci68')" title="About 68% CI">?</button></div>
             <div class="irt-stat-value" id="irt_ci68_val">&mdash;</div>
           </div>
           <div class="irt-stat" id="irt_ci95_card">
-            <div class="irt-stat-label">95% CI <button class="info-btn" onclick="irtShowInfo('ci95')" title="About 95% CI">?</button></div>
+            <div class="irt-stat-label">95% CI width <button class="info-btn" onclick="irtShowInfo('ci95')" title="About 95% CI">?</button></div>
             <div class="irt-stat-value" id="irt_ci95_val">&mdash;</div>
           </div>
         </div>
@@ -190,7 +186,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   <div class="info-modal">
     <button class="info-close" onclick="irtCloseInfo()">&times;</button>
     <h2 id="irtModalTitle"></h2>
-    <span class="info-badge" id="irtModalBadge"></span>
+    <span class="info-modal-badge" id="irtModalBadge"></span>
     <div id="irtModalBody"></div>
   </div>
 </div>
@@ -198,7 +194,6 @@ summary: "Explore how item discrimination, difficulty, and response categories s
 <script>
 (function () {
   let dpr = window.devicePixelRatio || 1;
-  let currentModel = '2pl';
 
   const scoreBarCanvas = document.getElementById('irt_scorebar');
   const infoCanvas = document.getElementById('irt_info');
@@ -215,23 +210,11 @@ summary: "Explore how item discrimination, difficulty, and response categories s
   const C_BG_ELEV  = css.getPropertyValue('--bg-elevated').trim();
   const C_MONO     = css.getPropertyValue('--mono').trim();
 
-  function generateItems(nItems, avgA, avgB, nCat, model) {
+  function generateItems(nItems, avgA, avgB) {
     const items = [];
     for (let i = 0; i < nItems; i++) {
       const t = nItems > 1 ? i / (nItems - 1) : 0.5;
-      const a = Math.max(0.3, avgA);
-      if (model === '2pl') {
-        const b = avgB + 1.5 * (2 * t - 1);
-        items.push({ a, bs: [b] });
-      } else {
-        const nThresh = nCat - 1;
-        const itemShift = 1.5 * (2 * t - 1);
-        const bs = [];
-        for (let k = 0; k < nThresh; k++) {
-          bs.push(avgB + itemShift + 1.0 * (k - (nThresh - 1) / 2));
-        }
-        items.push({ a, bs });
-      }
+      items.push({ a: Math.max(0.3, avgA), b: avgB + 1.5 * (2 * t - 1) });
     }
     return items;
   }
@@ -241,47 +224,25 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     return a * a * p * (1 - p);
   }
 
-  function itemInfoGRM(theta, a, bs) {
-    const nCat = bs.length + 1;
-    const pStar = [1];
-    const dpStar = [0];
-    for (let k = 0; k < bs.length; k++) {
-      const pk = 1 / (1 + Math.exp(-a * (theta - bs[k])));
-      pStar.push(pk);
-      dpStar.push(a * pk * (1 - pk));
-    }
-    pStar.push(0);
-    dpStar.push(0);
-    let info = 0;
-    for (let k = 0; k < nCat; k++) {
-      const Pk = pStar[k] - pStar[k + 1];
-      const dPk = dpStar[k] - dpStar[k + 1];
-      if (Pk > 1e-10) info += (dPk * dPk) / Pk;
-    }
-    return info;
-  }
-
-  function testInfo(theta, items, model) {
+  function testInfo(theta, items) {
     let I = 0;
-    for (const item of items) {
-      I += model === '2pl' ? itemInfo2PL(theta, item.a, item.bs[0]) : itemInfoGRM(theta, item.a, item.bs);
-    }
+    for (const item of items) I += itemInfo2PL(theta, item.a, item.b);
     return I;
   }
 
-  function se(theta, items, model) {
-    const I = testInfo(theta, items, model);
+  function se(theta, items) {
+    const I = testInfo(theta, items);
     return I > 0 ? 1 / Math.sqrt(I) : 10;
   }
 
-  function localRel(theta, items, model) {
-    const I = testInfo(theta, items, model);
+  function localRel(theta, items) {
+    const I = testInfo(theta, items);
     return I > 1 ? 1 - 1 / I : 0;
   }
 
   function thetaToT(theta) { return 50 + 10 * theta; }
 
-  function drawScoreBar(theta, seVal, items, model) {
+  function drawScoreBar(theta, seVal, items) {
     const W = scoreBarCanvas.width / dpr;
     const H = scoreBarCanvas.height / dpr;
     sbCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -313,27 +274,34 @@ summary: "Explore how item discrimination, difficulty, and response categories s
       sbCtx.fillText('T=' + thetaToT(t), toX(t), midY + 34);
     }
 
-    const lo95 = Math.max(xMin, theta - 1.96 * seVal);
-    const hi95 = Math.min(xMax, theta + 1.96 * seVal);
-    const lo68 = Math.max(xMin, theta - seVal);
-    const hi68 = Math.min(xMax, theta + seVal);
+    // True interval. This is what gets printed, so the caption agrees with the
+    // interpretation box below the canvas.
+    const lo95 = theta - 1.96 * seVal;
+    const hi95 = theta + 1.96 * seVal;
+    // Clamped copies used ONLY for canvas coordinates, so the bands stay inside
+    // the plot. Printing these was what put a truncated "95% CI: [0.49, 3.00]"
+    // in the caption while the interpretation box said [0.49, 3.51].
+    const dLo95 = Math.max(xMin, lo95), dHi95 = Math.min(xMax, hi95);
+    const dLo68 = Math.max(xMin, theta - seVal), dHi68 = Math.min(xMax, theta + seVal);
     const bandH = 20;
 
     sbCtx.fillStyle = 'rgba(200,60,90,0.10)';
-    sbCtx.fillRect(toX(lo95), midY - bandH, toX(hi95) - toX(lo95), bandH * 2);
+    sbCtx.fillRect(toX(dLo95), midY - bandH, toX(dHi95) - toX(dLo95), bandH * 2);
     sbCtx.fillStyle = 'rgba(200,60,90,0.22)';
-    sbCtx.fillRect(toX(lo68), midY - bandH, toX(hi68) - toX(lo68), bandH * 2);
+    sbCtx.fillRect(toX(dLo68), midY - bandH, toX(dHi68) - toX(dLo68), bandH * 2);
 
     sbCtx.strokeStyle = 'rgba(200,60,90,0.55)'; sbCtx.lineWidth = 1.5; sbCtx.setLineDash([4,3]);
-    sbCtx.beginPath(); sbCtx.moveTo(toX(lo95), midY - bandH - 8); sbCtx.lineTo(toX(hi95), midY - bandH - 8); sbCtx.stroke();
+    sbCtx.beginPath(); sbCtx.moveTo(toX(dLo95), midY - bandH - 8); sbCtx.lineTo(toX(dHi95), midY - bandH - 8); sbCtx.stroke();
     sbCtx.setLineDash([]);
-    sbCtx.beginPath(); sbCtx.moveTo(toX(lo95), midY - bandH - 14); sbCtx.lineTo(toX(lo95), midY - bandH - 2); sbCtx.stroke();
-    sbCtx.beginPath(); sbCtx.moveTo(toX(hi95), midY - bandH - 14); sbCtx.lineTo(toX(hi95), midY - bandH - 2); sbCtx.stroke();
+    // End caps only where the interval actually ends inside the plot; a capped
+    // end at the axis edge would read as the interval stopping there.
+    if (lo95 >= xMin) { sbCtx.beginPath(); sbCtx.moveTo(toX(dLo95), midY - bandH - 14); sbCtx.lineTo(toX(dLo95), midY - bandH - 2); sbCtx.stroke(); }
+    if (hi95 <= xMax) { sbCtx.beginPath(); sbCtx.moveTo(toX(dHi95), midY - bandH - 14); sbCtx.lineTo(toX(dHi95), midY - bandH - 2); sbCtx.stroke(); }
 
     sbCtx.font = `11px ${C_MONO}`;
     sbCtx.fillStyle = 'rgba(200,60,90,0.8)';
     sbCtx.textAlign = 'center';
-    sbCtx.fillText('95% CI', toX((lo95 + hi95) / 2), midY - bandH - 16);
+    sbCtx.fillText('95% CI', toX((dLo95 + dHi95) / 2), midY - bandH - 16);
 
     const tsx = toX(theta);
     sbCtx.beginPath(); sbCtx.moveTo(tsx, midY - bandH - 2); sbCtx.lineTo(tsx, midY + bandH + 2);
@@ -350,7 +318,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     );
   }
 
-  function drawInfoPanel(theta, items, model) {
+  function drawInfoPanel(theta, items) {
     const W = infoCanvas.width / dpr;
     const H = infoCanvas.height / dpr;
     iCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -369,7 +337,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     let maxInfo = 0;
     for (let i = 0; i <= steps; i++) {
       const t = xMin + (xMax - xMin) * i / steps;
-      const inf = testInfo(t, items, model);
+      const inf = testInfo(t, items);
       infoVals.push(inf);
       seVals.push(inf > 0 ? 1 / Math.sqrt(inf) : 10);
       if (inf > maxInfo) maxInfo = inf;
@@ -378,7 +346,11 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     const maxSE = 2.0;
 
     function toYInfo(v) { return PAD_T + ph - (v / (maxInfo * 1.15)) * ph; }
-    function toYSE(v) { return PAD_T + ph - (Math.min(v, maxSE) / maxSE) * ph; }
+    // Unclamped: everything drawn on the SE axis is clipped to the plot rect
+    // instead. Clamping used to pin the dashed red curve to the top border, which
+    // reads as "SE levels off at 2.0" — but SE reaches 3.25 at n=5, a=0.5, b=-2,
+    // theta=3, and the tails running away is exactly what this panel is showing.
+    function toYSE(v) { return PAD_T + ph - (v / maxSE) * ph; }
 
     iCtx.strokeStyle = C_BG_ELEV; iCtx.lineWidth = 0.5;
     for (let i = 0; i <= 6; i++) {
@@ -405,6 +377,8 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     }
     iCtx.strokeStyle = C_TEAL; iCtx.lineWidth = 2; iCtx.stroke();
 
+    iCtx.save();
+    iCtx.beginPath(); iCtx.rect(PAD_L, PAD_T, pw, ph); iCtx.clip();
     iCtx.beginPath();
     for (let i = 0; i <= steps; i++) {
       const t = xMin + (xMax - xMin) * i / steps;
@@ -413,24 +387,30 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     }
     iCtx.strokeStyle = C_RED; iCtx.lineWidth = 1.5; iCtx.setLineDash([5, 3]);
     iCtx.stroke(); iCtx.setLineDash([]);
+    iCtx.restore();
 
     const tsx = toX(theta);
     iCtx.beginPath(); iCtx.moveTo(tsx, PAD_T); iCtx.lineTo(tsx, PAD_T + ph);
     iCtx.strokeStyle = 'rgba(45, 212, 191, 0.5)'; iCtx.lineWidth = 1.5; iCtx.setLineDash([4, 3]);
     iCtx.stroke(); iCtx.setLineDash([]);
 
-    const curInfo = testInfo(theta, items, model);
+    const curInfo = testInfo(theta, items);
     const curSE = curInfo > 0 ? 1 / Math.sqrt(curInfo) : 10;
     iCtx.beginPath(); iCtx.arc(tsx, toYInfo(curInfo), 4, 0, Math.PI * 2);
     iCtx.fillStyle = C_TEAL; iCtx.fill();
+    iCtx.save();
+    iCtx.beginPath(); iCtx.rect(PAD_L, PAD_T, pw, ph); iCtx.clip();
     iCtx.beginPath(); iCtx.arc(tsx, toYSE(curSE), 4, 0, Math.PI * 2);
     iCtx.fillStyle = C_RED; iCtx.fill();
+    iCtx.restore();
 
     iCtx.setLineDash([2, 3]);
     iCtx.beginPath(); iCtx.moveTo(tsx, toYInfo(curInfo)); iCtx.lineTo(PAD_L, toYInfo(curInfo));
     iCtx.strokeStyle = 'rgba(45, 212, 191, 0.4)'; iCtx.lineWidth = 1; iCtx.stroke();
-    iCtx.beginPath(); iCtx.moveTo(tsx, toYSE(curSE)); iCtx.lineTo(PAD_L + pw, toYSE(curSE));
-    iCtx.strokeStyle = 'rgba(200, 60, 90, 0.4)'; iCtx.lineWidth = 1; iCtx.stroke();
+    if (curSE <= maxSE) {
+      iCtx.beginPath(); iCtx.moveTo(tsx, toYSE(curSE)); iCtx.lineTo(PAD_L + pw, toYSE(curSE));
+      iCtx.strokeStyle = 'rgba(200, 60, 90, 0.4)'; iCtx.lineWidth = 1; iCtx.stroke();
+    }
     iCtx.setLineDash([]);
 
     iCtx.strokeStyle = C_BORDER; iCtx.lineWidth = 1;
@@ -521,7 +501,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     const tScore = thetaToT(theta).toFixed(0);
     let msg = '';
     if (rho >= 0.90) {
-      msg = '<span class="ok">High local precision (\u03C1 = ' + rho.toFixed(2) + ', \u03B1-equivalent).</span> At \u03B8 = ' + theta.toFixed(1) + ' (T = ' + tScore + '), SE = ' + seVal.toFixed(2) + '. 95% CI: [' + ci95lo + ', ' + ci95hi + ']. The test is highly informative at this trait level.';
+      msg = '<span class="ok">High local precision (\u03C1 = ' + rho.toFixed(2) + ' \u2014 as precise here as a test with \u03B1 = ' + rho.toFixed(2).slice(1) + ' is on average).</span> At \u03B8 = ' + theta.toFixed(1) + ' (T = ' + tScore + '), SE = ' + seVal.toFixed(2) + '. 95% CI: [' + ci95lo + ', ' + ci95hi + ']. The test is highly informative at this trait level.';
     } else if (rho >= 0.70) {
       msg = '<span style="color:var(--orange);font-weight:600">Moderate local precision (\u03C1 = ' + rho.toFixed(2) + ').</span> At \u03B8 = ' + theta.toFixed(1) + ' (T = ' + tScore + '), SE = ' + seVal.toFixed(2) + '. 95% CI: [' + ci95lo + ', ' + ci95hi + ']. Adequate for group comparisons but use caution for individual decisions at this trait level.';
     } else {
@@ -530,12 +510,6 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     interpEl.innerHTML = msg;
     interpEl.classList.toggle('warn', rho < 0.70);
   }
-
-  window.irtSetModel = function(model) {
-    currentModel = model;
-    document.getElementById('irt_cat_group').style.display = model === 'grm' ? '' : 'none';
-    update();
-  };
 
   function resizeCanvases() {
     dpr = window.devicePixelRatio || 1;
@@ -552,22 +526,20 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     const nItems = parseInt(document.getElementById('irt_nitems').value);
     const avgDisc = parseFloat(document.getElementById('irt_avgdisc').value);
     const avgDiff = parseFloat(document.getElementById('irt_avgdiff').value);
-    const nCat = parseInt(document.getElementById('irt_ncat').value);
     const theta = parseFloat(document.getElementById('irt_theta').value);
 
     document.getElementById('irt_nitems_val').textContent = nItems;
     document.getElementById('irt_avgdisc_val').textContent = avgDisc.toFixed(1);
     document.getElementById('irt_avgdiff_val').textContent = avgDiff.toFixed(1);
-    document.getElementById('irt_ncat_val').textContent = nCat;
     document.getElementById('irt_theta_val').textContent = theta.toFixed(1);
 
-    const items = generateItems(nItems, avgDisc, avgDiff, currentModel === '2pl' ? 2 : nCat, currentModel);
-    const seVal = se(theta, items, currentModel);
-    const rho = localRel(theta, items, currentModel);
+    const items = generateItems(nItems, avgDisc, avgDiff);
+    const seVal = se(theta, items);
+    const rho = localRel(theta, items);
 
     updateStats(theta, seVal, rho);
-    drawScoreBar(theta, seVal, items, currentModel);
-    drawInfoPanel(theta, items, currentModel);
+    drawScoreBar(theta, seVal, items);
+    drawInfoPanel(theta, items);
   }
 
   function resize() {
@@ -575,7 +547,7 @@ summary: "Explore how item discrimination, difficulty, and response categories s
     update();
   }
 
-  for (const id of ['irt_nitems', 'irt_avgdisc', 'irt_avgdiff', 'irt_ncat', 'irt_theta']) {
+  for (const id of ['irt_nitems', 'irt_avgdisc', 'irt_avgdiff', 'irt_theta']) {
     document.getElementById(id).addEventListener('input', update);
   }
 
@@ -588,10 +560,10 @@ const irtInfoContent = {
     title: 'Standard Error SE(\u03B8)',
     badge: 'SE',
     body: '<p>In IRT, the Standard Error at a given trait level \u03B8 is determined by the Test Information Function:</p>' +
-      '<div class="eq-formula">$$SE(\theta) = \frac{1}{\sqrt{I(\theta)}}$$</div>' +
+      '<div class="formula">$$SE(\\theta) = \\frac{1}{\\sqrt{I(\\theta)}}$$</div>' +
       '<p>Unlike the SEM in Classical Test Theory, which is a single number for the entire test, SE(\u03B8) <strong>varies across the trait continuum</strong>.</p>' +
       '<p class="info-section-label">Comparison to CTT</p>' +
-      '<p>In CTT, $SEM = SD \times \sqrt{1 - \alpha}$ is constant for all examinees. IRT reveals that this "average" hides systematic variation.</p>' +
+      '<p>In CTT, $SEM = SD \\times \\sqrt{1 - \\alpha}$ is constant for all examinees. IRT reveals that this "average" hides systematic variation.</p>' +
       '<p class="info-section-label">Interpretation</p>' +
       '<p>An SE of 0.30 means that if you tested the same person many times, their estimated \u03B8 values would have a standard deviation of about 0.30 around the true value.</p>'
   },
@@ -599,7 +571,7 @@ const irtInfoContent = {
     title: '68% Confidence Interval',
     badge: '68% CI',
     body: '<p>The 68% CI gives the range within which the true \u03B8 falls with roughly 68% probability. Its width equals two SEs.</p>' +
-      '<div class="eq-formula">$$68\%\ \text{CI width} = 2 \times SE(\theta)$$</div>' +
+      '<div class="formula">$$68\\%\\ \\text{CI width} = 2 \\times SE(\\theta)$$</div>' +
       '<p class="info-section-label">Key IRT insight</p>' +
       '<p>Because SE varies with \u03B8, the CI width is <strong>different at different trait levels</strong>. In CTT, the CI is the same width everywhere.</p>'
   },
@@ -607,7 +579,7 @@ const irtInfoContent = {
     title: '95% Confidence Interval',
     badge: '95% CI',
     body: '<p>The 95% CI extends \u00B11.96 SEs around the estimated \u03B8.</p>' +
-      '<div class="eq-formula">$$95\%\ \text{CI width} = 2 \times 1.96 \times SE(\theta) \approx 3.92 \times SE(\theta)$$</div>' +
+      '<div class="formula">$$95\\%\\ \\text{CI width} = 2 \\times 1.96 \\times SE(\\theta) \\approx 3.92 \\times SE(\\theta)$$</div>' +
       '<p class="info-section-label">When to worry</p>' +
       '<p>Move \u03B8 to the tails (e.g., \u03B8 = \u00B12.5) and notice how the CI balloons. Most psychological scales lose precision at the extremes, which is exactly where clinical decisions are often made.</p>'
   },
@@ -615,7 +587,7 @@ const irtInfoContent = {
     title: 'Test Information Function',
     badge: 'I(\u03B8) & SE(\u03B8)',
     body: '<p><strong>Solid teal curve (left axis):</strong> The Test Information Function I(\u03B8). Higher values mean more precision.</p>' +
-      '<p><strong>Dashed red curve (right axis):</strong> $SE(\theta) = 1/\sqrt{I(\theta)}$. Where information is high, SE is low.</p>' +
+      '<p><strong>Dashed red curve (right axis):</strong> $SE(\\theta) = 1/\\sqrt{I(\\theta)}$. Where information is high, SE is low.</p>' +
       '<p class="info-section-label">What shapes the curve</p>' +
       '<p><strong>Discrimination (a):</strong> Higher a values produce taller, narrower information peaks.</p>' +
       '<p><strong>Difficulty (b):</strong> Each item contributes most information near its difficulty parameter.</p>' +
@@ -627,7 +599,11 @@ function irtShowInfo(key) {
   const info = irtInfoContent[key];
   document.getElementById('irtModalTitle').textContent = info.title;
   document.getElementById('irtModalBadge').textContent = info.badge;
-  document.getElementById('irtModalBody').innerHTML = info.body;
+  const body = document.getElementById('irtModalBody');
+  body.innerHTML = info.body;
+  // KaTeX auto-render fires once on load; this body is injected afterwards, so
+  // typeset it explicitly or the formulas render as literal $$...$$ text.
+  if (window.renderMath) window.renderMath(body);
   document.getElementById('irtModalOverlay').classList.add('active');
 }
 

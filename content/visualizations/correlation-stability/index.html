@@ -307,7 +307,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
   <div class="section">
     <h2>At what sample size do correlations stabilize?</h2>
     <p>
-      Sample correlations converge to the population value as <span class="m">N</span> grows, but estimates in small samples can be wildly inaccurate. A correlation that starts at <span class="m">r = .69</span> with 20 participants might settle at <span class="m">r = .26</span> by the time you have 274. The <strong>corridor of stability</strong> (COS) is a band of width <span class="m">&plusmn;w</span> around the true <span class="m">&rho;</span>, and the <strong>point of stability</strong> (POS) is the sample size from which the running correlation never again leaves this corridor (Sch&ouml;nbrodt &amp; Perugini, 2013).
+      Sample correlations converge to the population value as <span class="m">N</span> grows, but estimates in small samples can be wildly inaccurate. In Schönbrodt and Perugini's own worked example, a correlation sitting at <span class="m">r = .69</span> with 20 participants had settled to <span class="m">r = .26</span> by the time the sample reached 274. The <strong>corridor of stability</strong> (COS) is a band of width <span class="m">&plusmn;w</span> around the true <span class="m">&rho;</span>, and the <strong>point of stability</strong> (POS) is the sample size from which the running correlation never again leaves this corridor (Sch&ouml;nbrodt &amp; Perugini, 2013).
     </p>
 
     <div class="viz-box">
@@ -385,7 +385,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     <div class="section-label">Reference</div>
     <h2>Critical sample sizes (Table 1)</h2>
     <p>
-      From the original paper (per the 2018 corrigendum). Each cell shows the sample size at which the running correlation first remains within &plusmn; <span class="m">w</span> of the true correlation <span class="m">&rho;</span>, at the given confidence level. The row closest to your current &rho; is highlighted.
+      From the original paper. (A 2018 corrigendum corrected an <span class="m">r</span>-to-<span class="m">Z</span> metric issue; the <span class="m">r</span>-metric values reproduced below are unchanged.) Each cell shows the sample size at which the stated percentage (80/90/95%) of simulated studies have entered the corridor of stability and never leave it again. It is a percentile of the point-of-stability distribution <em>across many studies</em> &mdash; not the point at which a single trajectory settles, and not a confidence interval. The row closest to your current <span class="m">&rho;</span> is highlighted.
     </p>
     <div class="viz-box" style="overflow-x:auto;">
       <table class="domain-table" id="posTable">
@@ -452,8 +452,8 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
   const GRAB_RADIUS = 12;
   const POINT_RADIUS = 5;
   const MIN_N_CORR = 3;
-  const MIN_N_MI = 5;
   const MIN_N_DCOR = 4;
+  // (no MIN_N_MI: mutualInfo gates on n < k+1 with k = 3, inline at its own definition)
 
   const infoContent = {
     pearson: {
@@ -493,7 +493,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     dcor: {
       title: 'Distance Correlation (dCor)',
       badge: 'general dependence',
-      body: '<p>dCor = 0 if and only if X and Y are independent. Detects both linear and nonlinear association.</p>' +
+      body: '<p>In the population, dCor = 0 if and only if X and Y are independent — it detects nonlinear association as well as linear. The <em>sample</em> statistic is never exactly 0, though: for genuinely independent data it typically lands around 0.07–0.18 depending on n, so read small values as "no evidence of association" rather than as proof of independence.</p>' +
         '<div class="formula" style="font-size:16px;">\\(\\text{dCor}(X,Y) = \\frac{\\text{dCov}(X,Y)}{\\sqrt{\\text{dVar}(X) \\cdot \\text{dVar}(Y)}}\\)</div><br>' +
         '<p class="info-section-label">Range</p>' +
         '<p>[0, 1]. Unsigned — measures dependence strength without indicating direction. Introduced by Székely, Rizzo & Bakirov (2007).</p>'
@@ -920,13 +920,27 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     updateStats(rho,w); drawTrajectories(N_MAX); drawPOSDistribution();
   }
 
+  // Nearest-rank percentile on the sorted POS array: index = ceil(p*n) - 1.
+  // The old form, floor(p*n), is off by one order statistic: at the default 15
+  // trajectories floor(15*0.8) = 12 picks the 13th of 15, i.e. the 86.7th
+  // percentile, so the "80th pctl" readout ran ~27 above the reference table
+  // sitting directly beneath it.
+  function posPercentile(sorted, p) {
+    if (!sorted.length) return null;
+    const i = Math.ceil(p * sorted.length) - 1;
+    return sorted[Math.max(0, Math.min(sorted.length - 1, i))];
+  }
+
   function updateStats(rho, w) {
     const lo=Math.max(-1,rho-w).toFixed(2), hi=Math.min(1,rho+w).toFixed(2);
     document.getElementById('cosRange').textContent = `[${lo}, ${hi}]`;
     if (!posValues.length) return;
     const s=[...posValues];
-    document.getElementById('medianPOS').textContent = `n = ${s[Math.floor(s.length*0.5)]}`;
-    document.getElementById('p80POS').textContent = `n = ${s[Math.min(s.length-1, Math.floor(s.length*0.8))]}`;
+    // findPOS returns N_MAX + 1 as a sentinel for "still outside the corridor at
+    // n = N_MAX" — a right-censored observation, not a sample size of 501.
+    const fmtPOS = v => (v === null ? '—' : v > N_MAX ? `> ${N_MAX}` : `n = ${v}`);
+    document.getElementById('medianPOS').textContent = fmtPOS(posPercentile(s, 0.5));
+    document.getElementById('p80POS').textContent = fmtPOS(posPercentile(s, 0.8));
     document.getElementById('pctStable').textContent = `${(s.filter(v=>v<=250).length/s.length*100).toFixed(0)}%`;
   }
 
@@ -991,6 +1005,12 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     ctx.setLineDash([]);
 
     const drawUpTo=Math.min(maxN,N_MAX)-N_MIN;
+    // Clip to the plot rectangle. Early running correlations regularly overshoot
+    // the y-range (at rho=.30/w=.10 the axis tops out at 0.80, which n=10-20
+    // samples exceed often), and the segments were being drawn over the padding
+    // and axis labels.
+    ctx.save();
+    ctx.beginPath(); ctx.rect(pad.left,pad.top,pw,ph); ctx.clip();
     for (let t=0;t<trajectories.length;t++) {
       const rs=trajectories[t]; const end=Math.min(drawUpTo,rs.length);
       ctx.strokeStyle=palette[t%palette.length]; ctx.globalAlpha=0.5; ctx.lineWidth=1.3;
@@ -998,6 +1018,7 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       for (let k=0;k<end;k++) { const px=xPx(N_MIN+k),py=yPx(rs[k]); k===0?ctx.moveTo(px,py):ctx.lineTo(px,py); }
       ctx.stroke();
     }
+    ctx.restore();
     ctx.globalAlpha=1;
 
     ctx.fillStyle='rgba(45,212,191,0.55)'; ctx.font=`11px ${C_MONO}`; ctx.textAlign='left';
@@ -1011,8 +1032,13 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
     ctx.fillStyle=C_BG_SURFACE; ctx.fillRect(0,0,W,H);
     if (!posValues.length) return;
 
+    // Bin from N_MIN, not from 0. Keying on floor(pos/binWidth)*binWidth put the
+    // first bin (POS 0-19) at xPx(0), which is left of the axis origin at n = 10.
     const binWidth=20; const bins={}; let maxCount=0;
-    for (const pos of posValues) { const bin=Math.floor(pos/binWidth)*binWidth; bins[bin]=(bins[bin]||0)+1; if (bins[bin]>maxCount) maxCount=bins[bin]; }
+    for (const pos of posValues) {
+      const bin=N_MIN+Math.floor((pos-N_MIN)/binWidth)*binWidth;
+      bins[bin]=(bins[bin]||0)+1; if (bins[bin]>maxCount) maxCount=bins[bin];
+    }
     const xPx=n=>pad.left+(n-N_MIN)/(N_MAX-N_MIN)*pw;
     const hPx=c=>(c/maxCount)*ph;
 
@@ -1030,13 +1056,19 @@ summary: "Compare Pearson r, Spearman ρ, Kendall τ, mutual information, and di
       ctx.strokeStyle='rgba(129,140,248,0.7)'; ctx.lineWidth=1; ctx.strokeRect(x,H-pad.bottom-barH,barW,barH);
     }
 
-    const p80=posValues[Math.min(posValues.length-1,Math.floor(posValues.length*0.8))];
-    const p80x=xPx(p80);
+    const p80=posPercentile(posValues, 0.8);
+    // POS is right-censored at N_MAX: findPOS returns N_MAX+1 for trajectories
+    // still outside the corridor at the end. Pin the marker to the axis edge and
+    // label it as censored rather than printing "n=501", which is off the plot
+    // and reads as a real sample size.
+    const censored=p80>N_MAX;
+    const p80x=xPx(Math.min(p80,N_MAX));
     ctx.strokeStyle=C_ORANGE; ctx.lineWidth=2; ctx.setLineDash([5,3]);
     ctx.beginPath(); ctx.moveTo(p80x,pad.top); ctx.lineTo(p80x,H-pad.bottom); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle=C_ORANGE; ctx.font=`11px ${C_MONO}`; ctx.textAlign='left';
-    ctx.fillText(`80th pctl: n=${p80}`,p80x+6,pad.top+12);
+    ctx.fillStyle=C_ORANGE; ctx.font=`11px ${C_MONO}`;
+    ctx.textAlign = censored ? 'right' : 'left';
+    ctx.fillText(censored?`80th pctl: > ${N_MAX}`:`80th pctl: n=${p80}`,p80x+(censored?-6:6),pad.top+12);
 
     ctx.fillStyle=C_TEXT_DIM; ctx.font=`11px ${C_MONO}`; ctx.textAlign='center';
     ctx.fillText('Point of stability (n)',pad.left+pw/2,H-16);

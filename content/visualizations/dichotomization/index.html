@@ -119,7 +119,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
 
     <p>Analyzing these variables continuously — correlating the full stress scores with blood pressure readings — uses all available information. But some researchers instead perform a <em>median split</em>: they label participants as "high stress" or "low stress" based on whether their score falls above or below the sample median, then compare blood pressure between the two groups using a t-test.</p>
 
-    <p>This feels intuitive — "high" versus "low" stress is easy to interpret. But the split throws away all within-group differences. A person scoring 21 (just above a median of 20) is treated identically to someone scoring 40, even though their stress levels are vastly different. The result is a weaker effect size, a less significant p-value, and lower statistical power. In the simulation below, X represents stress and Y represents blood pressure. Adjust the sliders to see how much information is lost.</p>
+    <p>This feels intuitive — "high" versus "low" stress is easy to interpret. But the split throws away all within-group differences. A person scoring 15 (just above a median of 14, which is about where published PSS-10 samples cluster) is treated identically to someone scoring 34, even though their stress levels are vastly different. The result is a weaker effect size, a less significant p-value, and lower statistical power. In the simulation below, X represents stress and Y represents blood pressure. Adjust the sliders to see how much information is lost.</p>
   </div>
 
   <div class="section">
@@ -172,19 +172,40 @@ summary: "Interactively explore why median splits and other dichotomizations red
     <div class="dich-stats">
       <div class="dich-stat cont">
         <div class="dich-stat-label">Effect size (continuous)</div>
-        <div class="dich-stat-value teal" id="stat-r-cont">r = .30</div>
+        <div class="dich-stat-value teal" id="stat-r-cont">r = 0.343</div>
       </div>
       <div class="dich-stat cont">
         <div class="dich-stat-label">p-value (continuous)</div>
-        <div class="dich-stat-value" id="stat-p-cont">p = .002</div>
+        <div class="dich-stat-value" id="stat-p-cont">p &lt; .001</div>
       </div>
       <div class="dich-stat dich">
         <div class="dich-stat-label">Effect size (dichotomized)</div>
-        <div class="dich-stat-value orange" id="stat-r-dich">d = .50</div>
+        <div class="dich-stat-value orange" id="stat-r-dich">r = 0.266  (d = 0.55)</div>
       </div>
       <div class="dich-stat dich">
         <div class="dich-stat-label">p-value (dichotomized)</div>
-        <div class="dich-stat-value" id="stat-p-dich">p = .031</div>
+        <div class="dich-stat-value" id="stat-p-dich">p = 0.007</div>
+      </div>
+    </div>
+
+    <div class="power-bar-wrap">
+      <div class="power-bar-label">
+        <span>Effect Size Retained</span>
+        <span style="color:var(--text-dim);font-size:0.9em;">population values, not this sample</span>
+      </div>
+      <div class="power-bar-track">
+        <div class="power-bar-fill cont" id="bar-eff-cont" style="width:100%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.78em;">
+        <span style="color:var(--teal);" id="eff-cont-label">Continuous: &rho; = 0.30</span>
+        <span></span>
+      </div>
+      <div class="power-bar-track" style="margin-top:6px;">
+        <div class="power-bar-fill dich" id="bar-eff-dich" style="width:80%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.78em;">
+        <span style="color:var(--orange);" id="eff-dich-label">Dichotomized: r = 0.239</span>
+        <span style="color:var(--text-dim);" id="eff-loss-label">20% of the effect discarded</span>
       </div>
     </div>
 
@@ -194,31 +215,39 @@ summary: "Interactively explore why median splits and other dichotomizations red
         <span style="color:var(--red);font-size:0.9em;">&#9660; 80% threshold</span>
       </div>
       <div class="power-bar-track">
-        <div class="power-bar-fill cont" id="bar-cont" style="width:50%"></div>
+        <div class="power-bar-fill cont" id="bar-cont" style="width:87%"></div>
         <div class="power-bar-marker"></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.78em;">
-        <span style="color:var(--teal);" id="power-cont-label">Continuous: 85%</span>
+        <span style="color:var(--teal);" id="power-cont-label">Continuous: 87%</span>
         <span></span>
       </div>
       <div class="power-bar-track" style="margin-top:6px;">
-        <div class="power-bar-fill dich" id="bar-dich" style="width:35%"></div>
+        <div class="power-bar-fill dich" id="bar-dich" style="width:68%"></div>
         <div class="power-bar-marker"></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.78em;">
-        <span style="color:var(--orange);" id="power-dich-label">Dichotomized: 62%</span>
-        <span style="color:var(--text-dim);" id="power-loss-label">-23 percentage points</span>
+        <span style="color:var(--orange);" id="power-dich-label">Dichotomized: 68%</span>
+        <span style="color:var(--text-dim);" id="power-loss-label">-18 percentage points</span>
+      </div>
+
+      <div style="margin-top:14px;font-family:var(--mono);font-size:0.78em;color:var(--text-dim);">
+        N needed for 80% power:
+        <span style="color:var(--teal);" id="n80-cont">84</span> continuous
+        &rarr;
+        <span style="color:var(--orange);" id="n80-dich">131</span> dichotomized
+        <span id="n80-ratio">(1.6&times; the sample)</span>
       </div>
     </div>
   </div>
 
   <div class="section">
     <div class="note">
-      <strong>Why does this happen?</strong> Dichotomization replaces each data point's actual value with its group membership, discarding within-group variance. For a median split on a normally distributed variable, this attenuates the correlation by a factor of roughly &radic;(2/&pi;) &asymp; 0.798. Dichotomizing <em>both</em> variables multiplies the attenuation: r is reduced by 2/&pi; &asymp; 0.637. The lost information directly translates to reduced statistical power &mdash; you need a larger sample to detect the same underlying effect.
+      <strong>Why does this happen?</strong> Dichotomization replaces each data point's actual value with its group membership, discarding within-group variance. For a median split on a normally distributed variable, this attenuates the correlation by a factor of roughly &radic;(2/&pi;) &asymp; 0.798. Dichotomizing <em>both</em> variables multiplies the attenuation: r is reduced by roughly 2/&pi; &asymp; 0.637. That multiplier is a small-&rho; approximation to the exact result, (2/&pi;)&middot;arcsin(&rho;) &mdash; close enough below &rho; &asymp; .3 (1.5% off at &rho; = .30) but increasingly optimistic further up: at the slider's maximum of &rho; = .80 the true attenuated value is 0.590, not 0.509. The <em>Effect Size Retained</em> bars above track the exact value rather than the rule of thumb, which is why they read 74% retained at &rho; = .80 and not 64%. The lost information translates directly into reduced statistical power &mdash; you need a larger sample to detect the same underlying effect, which is what the <em>N needed for 80% power</em> line puts a number on.
     </div>
 
     <div class="note warn">
-      <strong>How much sample do you waste?</strong> Dichotomizing one variable at the median is equivalent to discarding roughly 1/3 of your data. Dichotomizing both is like throwing away nearly half. The <em>N needed</em> to maintain the same power can increase by 50&ndash;100% or more. This is not just theory: <a href="https://doi.org/10.1002/sim.70402" target="_blank" rel="noopener">van Zwet, Harrell &amp; Senn (2026)</a> analyzed 21,435 randomized controlled trials from the Cochrane Database and found that on average only about 60% of information is retained after dichotomization. Despite binary-outcome trials enrolling larger samples to compensate, fewer of them reached statistical significance than trials that kept the outcome continuous. Their recommendation: <em>model continuously but interpret dichotomously</em> &mdash; derive "percentage achieving clinically meaningful improvement" from a continuous analysis rather than by splitting the raw data.
+      <strong>How much sample do you waste?</strong> Dichotomizing one variable at the median is equivalent to discarding roughly 1/3 of your data. Dichotomizing both is like throwing away about 60% of it &mdash; you keep only 2/&pi; &asymp; 64% of the information each time, and the losses multiply. The <em>N needed</em> to maintain the same power can increase by 50&ndash;100% or more. This is not just theory: <a href="https://doi.org/10.1002/sim.70402" target="_blank" rel="noopener">van Zwet, Harrell &amp; Senn (2026)</a> analyzed 21,435 randomized controlled trials from the Cochrane Database and found that on average only about 60% of information is retained after dichotomization. Despite binary-outcome trials enrolling larger samples to compensate, fewer of them reached statistical significance than trials that kept the outcome continuous. Their recommendation: <em>model continuously but interpret dichotomously</em> &mdash; derive "percentage achieving clinically meaningful improvement" from a continuous analysis rather than by splitting the raw data.
     </div>
 
     <div class="note caveat">
@@ -239,7 +268,9 @@ summary: "Interactively explore why median splits and other dichotomizations red
     <div>
       <p><strong>&rho; (population correlation)</strong> sets the true linear association between X and Y before any data are generated. Higher values make the cost of dichotomization easier to see &mdash; but even modest correlations (&rho; &asymp; .20&ndash;.30) lose noticeably once you split.</p>
       <p><strong>N (sample size)</strong> controls statistical power for both analyses. Try lowering it to 60&ndash;80 and watch how quickly the dichotomized test loses significance while the continuous test still holds.</p>
-      <p><strong>Cut-point percentile</strong> determines where the continuous variable is split. The median (50%) is the most common choice, but it is not the only one &mdash; and that is the problem. Try dragging the slider back and forth and watch the p-value on the right. Notice how it swings between significant and non-significant depending on where you place the split? That is not a bug in the simulation &mdash; it is a real analytic choice that researchers make, and it is rarely preregistered.</p>
+      <p><strong>Cut-point percentile</strong> determines where the continuous variable is split. The median (50%) is the most common choice, but it is not the only one &mdash; and that is the problem. Try dragging the slider back and forth and watch the p-value on the right. On the default sample it runs from <em>p</em> = .0001 at a 61% cut to <em>p</em> = .068 at an 18% cut &mdash; from overwhelming to non-significant, out of the same 100 observations and the same underlying effect. That is not a quirk of this particular draw: across simulated samples at these settings, about 92% contain at least one cut point that is significant and at least one that is not. Press <em>New Sample</em> and try. That is not a bug in the simulation &mdash; it is a real analytic choice that researchers make, and it is rarely preregistered.</p>
+      <p><strong>Watch the effect size as you move the cut, and do not be fooled by it.</strong> Pushing the split toward either extreme <em>raises</em> Cohen's <em>d</em> while <em>lowering</em> power. At &rho; = .30 and N = 100, the median split gives <em>d</em> = 0.49 with 68% power; a 10/90 split gives a larger-looking <em>d</em> = 0.59 with only 42% power. The effect size grows because the two groups are drawn from further apart in the distribution, but the smaller group shrinks to 10 people and the test gets weaker. An extreme cut is the worst of both worlds: it discards more information <em>and</em> flatters the effect size, which is precisely why a reported <em>d</em> from a dichotomized analysis cannot be compared with one from a continuous analysis.</p>
+      <p><strong>When both power bars hit 100%.</strong> Push &rho; or N high enough and both analyses become near-certain to return a significant result, so the power bars saturate and stop discriminating. The cost has not disappeared; it has moved. The <em>Effect Size Retained</em> bars still show a median split discarding about 20% of &rho; (35% if you split both variables), and the <em>N needed for 80% power</em> line still shows the dichotomized test demanding a substantially larger sample. Statistical power is a property of the design, not of the estimate you report: a study large enough to survive dichotomization still publishes an attenuated effect size, and every meta-analysis that pools that estimate inherits the attenuation.</p>
       <p><strong>Dichotomize X / Both</strong> toggles whether only the predictor is split (yielding a two-group t-test) or both variables are split (yielding a 2&times;2 &chi;&sup2; test). Splitting both compounds the information loss.</p>
     </div>
   </div>
@@ -443,15 +474,27 @@ summary: "Interactively explore why median splits and other dichotomizations red
     return 1 - noncentralTCDF(tCrit, df, nc) + noncentralTCDF(-tCrit, df, nc);
   }
 
+  // Noncentral chi-square CDF. For df = 1 -- the only case used here -- this is
+  // exact: X = (Z + sqrt(nc))^2 with Z ~ N(0,1), so
+  //   P(X <= x) = Phi(sqrt(x) - sqrt(nc)) - Phi(-sqrt(x) - sqrt(nc)).
+  // The plain normal approximation (mean df+nc, variance 2(df+2nc)) is badly
+  // miscalibrated at df = 1: it puts the null rejection rate at 2.2%, not 5%.
   function noncentralChiCDF(x, df, nc) {
+    if (x <= 0) return 0;
+    if (df === 1) {
+      const sx = Math.sqrt(x), sl = Math.sqrt(nc);
+      return normCDF(sx - sl) - normCDF(-sx - sl);
+    }
     const m = df + nc, v = 2*(df + 2*nc);
     return normCDF((x - m) / Math.sqrt(v));
   }
 
   function powerChi(phi, n, alpha) {
     const nc = n * phi * phi;
-    const chiCrit = normQuantile(1 - alpha);
-    const chiCrit2 = chiCrit * chiCrit; // df=1 chi-square critical = z^2
+    // df=1 chi-square critical value = z^2 at the TWO-sided normal quantile:
+    // qchisq(.95, 1) = 3.8415 = qnorm(.975)^2, not qnorm(.95)^2 = 2.7055.
+    const chiCrit = normQuantile(1 - alpha/2);
+    const chiCrit2 = chiCrit * chiCrit;
     return 1 - noncentralChiCDF(chiCrit2, 1, nc);
   }
 
@@ -466,11 +509,67 @@ summary: "Interactively explore why median splits and other dichotomizations red
     return denom === 0 ? 0 : (a*dd - b*c) / denom;
   }
 
-  // Theoretical Cohen's d after dichotomizing X at percentile cutP
-  function theoreticalD(rho, cutP) {
+  // Theoretical point-biserial correlation after dichotomizing X at percentile cutP.
+  // This is rho * phi(z) / sqrt(pq) -- a CORRELATION, not a d.
+  function theoreticalRpb(rho, cutP) {
     const z = normQuantile(cutP);
     const phiZ = dnorm(z);
     return rho * phiZ / Math.sqrt(cutP * (1 - cutP));
+  }
+
+  // Theoretical Cohen's d after dichotomizing X at percentile cutP.
+  // d = [rho*phi(z)/pq] / sqrt(1 - rho^2*phi(z)^2/pq). At a median split with
+  // rho = .30 this is 0.493, whereas the point-biserial r above is 0.239 --
+  // feeding r_pb into a t-test power routine understates power by ~2x.
+  function theoreticalD(rho, cutP) {
+    const z = normQuantile(cutP);
+    const phiZ = dnorm(z);
+    const pq = cutP * (1 - cutP);
+    return (rho * phiZ / pq) / Math.sqrt(1 - rho*rho * phiZ*phiZ / pq);
+  }
+
+  // Excess of the bivariate normal CDF over independence,
+  //   Phi2(h,k;rho) - Phi(h)Phi(k) = integral from 0 to rho of phi2(h,k;t) dt
+  // (Plackett's identity: d/drho Phi2 = phi2). Simpson's rule on a smooth
+  // integrand; rho maxes out at .80 here, so the t -> 1 singularity is never
+  // approached.
+  function bvnExcess(h, k, rho) {
+    if (rho === 0) return 0;
+    const N = 200;                       // even, as Simpson requires
+    const step = rho / N;
+    const f = t => {
+      const om = 1 - t*t;
+      return Math.exp(-(h*h - 2*t*h*k + k*k) / (2*om)) / (2*Math.PI*Math.sqrt(om));
+    };
+    let s = f(0) + f(rho);
+    for (let i = 1; i < N; i++) s += (i % 2 ? 4 : 2) * f(i * step);
+    return s * step / 3;
+  }
+
+  // Exact population phi after splitting BOTH variables at the same percentile.
+  // phi = [P(X>z, Y>z) - q^2] / pq, and P(X>z, Y>z) = q^2 + bvnExcess, so the
+  // marginals cancel entirely. The small-rho shortcut rho*[phi(z)/sqrt(pq)]^2
+  // used previously is 14% low at rho = .80 (.509 where the truth is .590) --
+  // tolerable buried in a power calculation, not tolerable as the headline
+  // "effect retained" number.
+  function popPhi(rho, cutP) {
+    const z = normQuantile(cutP);
+    return bvnExcess(z, z, rho) / (cutP * (1 - cutP));
+  }
+
+  // Smallest N reaching `target` power; both power curves are monotone in N.
+  function nForPower(powerAtN, target) {
+    let hi = 8;
+    while (powerAtN(hi) < target) {
+      hi *= 2;
+      if (hi > 262144) return null;
+    }
+    let lo = 4;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (powerAtN(mid) >= target) hi = mid; else lo = mid + 1;
+    }
+    return lo;
   }
 
   // === State ===
@@ -495,8 +594,15 @@ summary: "Interactively explore why median splits and other dichotomizations red
     return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
   }
 
+  // Seed for the sample currently on screen. "New Sample" advances it; the
+  // regeneration inside update() reuses it. Previously update() reset to
+  // mulberry32(42) whenever rho or N changed, so nudging either slider silently
+  // threw away whatever "New Sample" had drawn and snapped back to the first one.
+  let sampleSeed = 42;
+
   function resample() {
-    rng = mulberry32(Date.now() ^ (Math.random()*1e9));
+    sampleSeed = (Date.now() ^ (Math.random() * 1e9)) >>> 0;
+    rng = mulberry32(sampleSeed);
     const p = getParams();
     data = generateData(p.n, p.rho);
     data._rho = p.rho;
@@ -511,7 +617,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
 
     // Regenerate if rho or n changed
     if (data.length !== p.n || data._rho === undefined || Math.abs(data._rho - p.rho) > 0.001) {
-      rng = mulberry32(42);
+      rng = mulberry32(sampleSeed);
       data = generateData(p.n, p.rho);
       data._rho = p.rho;
     }
@@ -526,7 +632,11 @@ summary: "Interactively explore why median splits and other dichotomizations red
     const pCont = pFromT(tR, p.n - 2);
 
     // --- Dichotomized stats ---
-    let effectLabel, effectVal, pDich, powDich;
+    // popEff is the POPULATION effect surviving the split, expressed as a
+    // correlation so it is directly comparable with rho. The stat cards above
+    // show this particular sample and jitter from draw to draw; the bars below
+    // need a stable quantity, and so does the "N needed" search.
+    let effectText, pDich, powDich, popEff, popEffText, powDichAtN;
 
     if (mode === 'x') {
       const loY = data.filter(d => d[0] <= cutX).map(d=>d[1]);
@@ -535,20 +645,30 @@ summary: "Interactively explore why median splits and other dichotomizations red
       const d = cohensD(loY, hiY);
       const tD = d / Math.sqrt(1/loY.length + 1/hiY.length);
       pDich = pFromT(tD, loY.length + hiY.length - 2);
-      effectLabel = 'd';
-      effectVal = d;
+      // Lead with the point-biserial r so this card shares a metric with the
+      // continuous card. Reporting d alone made the dichotomized effect look
+      // LARGER than the continuous one (d = .55 next to r = .34), which is the
+      // opposite of the lesson. d is kept in parentheses since it is what the
+      // t-test below is actually built on.
+      const rpb = pearsonR(data.map(pt => [pt[0] > cutX ? 1 : 0, pt[1]]));
+      effectText = 'r = ' + rpb.toFixed(3) + '  (d = ' + d.toFixed(2) + ')';
+      popEff = theoreticalRpb(p.rho, p.cutP);
+      popEffText = 'r = ' + popEff.toFixed(3);
       const dPop = theoreticalD(p.rho, p.cutP);
-      powDich = powerTTest(dPop, Math.round(p.n * p.cutP), Math.round(p.n * (1-p.cutP)), 0.05);
+      powDichAtN = nn => powerTTest(dPop, Math.round(nn * p.cutP), Math.round(nn * (1-p.cutP)), 0.05);
+      powDich = powDichAtN(p.n);
     } else {
       const phiVal = phi2x2(data, cutX, cutY);
       const chi2 = p.n * phiVal * phiVal;
       pDich = pFromChi2(chi2, 1);
-      effectLabel = "\u03C6";
-      effectVal = phiVal;
-      // Population phi: rho * (2*dnorm(z))^2 where z = normQuantile(cutP)
-      const adjFactor = 2 * dnorm(normQuantile(p.cutP));
-      const phiPop = p.rho * adjFactor * adjFactor;
-      powDich = powerChi(Math.abs(phiPop), p.n, 0.05);
+      // phi IS a correlation (Pearson r on two binary variables), so this branch
+      // is already on the same metric as the continuous card.
+      effectText = "\u03C6 = " + phiVal.toFixed(3);
+      const phiPop = popPhi(p.rho, p.cutP);
+      popEff = phiPop;
+      popEffText = "\u03C6 = " + phiPop.toFixed(3);
+      powDichAtN = nn => powerChi(Math.abs(phiPop), nn, 0.05);
+      powDich = powDichAtN(p.n);
     }
 
     // Continuous power
@@ -556,7 +676,7 @@ summary: "Interactively explore why median splits and other dichotomizations red
 
     // --- Update DOM ---
     document.getElementById('stat-r-cont').textContent = 'r = ' + r.toFixed(3);
-    document.getElementById('stat-r-dich').textContent = effectLabel + ' = ' + effectVal.toFixed(3);
+    document.getElementById('stat-r-dich').textContent = effectText;
 
     const fmtP = v => {
       if (v < 0.001) return 'p < .001';
@@ -567,6 +687,20 @@ summary: "Interactively explore why median splits and other dichotomizations red
     document.getElementById('stat-p-cont').className = 'dich-stat-value ' + (pCont < 0.05 ? 'teal' : 'red');
     document.getElementById('stat-p-dich').className = 'dich-stat-value ' + (pDich < 0.05 ? 'orange' : 'red');
 
+    // --- Effect size retained ---
+    // The continuous bar is the full width by construction: it is the reference,
+    // and the orange bar is the fraction of it that survives the split. Scaling
+    // both against the slider's maximum instead would shrink the pair to slivers
+    // at low rho, exactly where the comparison still matters.
+    const retained = p.rho > 0 ? popEff / p.rho : 0;
+    document.getElementById('bar-eff-dich').style.width =
+      Math.max(0, Math.min(100, retained * 100)).toFixed(1) + '%';
+    document.getElementById('eff-cont-label').textContent =
+      'Continuous: ρ = ' + p.rho.toFixed(2);
+    document.getElementById('eff-dich-label').textContent = 'Dichotomized: ' + popEffText;
+    document.getElementById('eff-loss-label').textContent =
+      Math.round((1 - retained) * 100) + '% of the effect discarded';
+
     const pc = Math.max(0, Math.min(100, powCont * 100));
     const pd = Math.max(0, Math.min(100, powDich * 100));
     document.getElementById('bar-cont').style.width = pc + '%';
@@ -574,7 +708,22 @@ summary: "Interactively explore why median splits and other dichotomizations red
     document.getElementById('power-cont-label').textContent = 'Continuous: ' + Math.round(pc) + '%';
     document.getElementById('power-dich-label').textContent = 'Dichotomized: ' + Math.round(pd) + '%';
     const loss = Math.round(pd - pc);
-    document.getElementById('power-loss-label').textContent = (loss >= 0 ? '+' : '') + loss + ' percentage points';
+    // At high rho or large N both bars peg at 100% and the difference reads as
+    // "+0", which looks like dichotomization is free. It is not -- the cost has
+    // just moved out of the power column and into the two rows above and below.
+    document.getElementById('power-loss-label').textContent =
+      (pc >= 99.5 && pd >= 99.5)
+        ? 'both at ceiling — see N and effect size'
+        : (loss >= 0 ? '+' : '') + loss + ' percentage points';
+
+    // --- N needed for 80% power ---
+    const n80c = nForPower(nn => powerCorr(p.rho, nn, 0.05), 0.80);
+    const n80d = nForPower(powDichAtN, 0.80);
+    const fmtN = v => v === null ? '>262,000' : v.toLocaleString('en-US');
+    document.getElementById('n80-cont').textContent = fmtN(n80c);
+    document.getElementById('n80-dich').textContent = fmtN(n80d);
+    document.getElementById('n80-ratio').textContent =
+      (n80c && n80d) ? '(' + (n80d / n80c).toFixed(1) + '× the sample)' : '';
 
     drawScatter(ctxCont, cvCont, data, null, null);
     drawScatter(ctxDich, cvDich, data, cutX, mode === 'both' ? cutY : null);
@@ -715,7 +864,11 @@ summary: "Interactively explore why median splits and other dichotomizations red
   });
 
   window.addEventListener('resize', update);
-  resample();
+  // Deterministic first render (sampleSeed is still 42 here), so a fresh load
+  // always shows the same sample. The prose quotes numbers from it, and the
+  // hard-coded stat placeholders in the markup match it. "New Sample" is how you
+  // get a different draw. resample() here would have randomised on every load.
+  update();
 })();
 
 function dichShowInfo() {

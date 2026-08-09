@@ -207,7 +207,7 @@ summary: "Explore how IRT models each item as having its own characteristic curv
           <div class="irt-stat-row">
             <div class="irt-stat good">
               <div class="irt-stat-label">P(&theta;)</div>
-              <div class="irt-stat-value" id="s2-prob">0.50</div>
+              <div class="irt-stat-value" id="s2-prob">0.500</div>
             </div>
           </div>
         </div>
@@ -252,7 +252,7 @@ summary: "Explore how IRT models each item as having its own characteristic curv
       <strong>Try it:</strong> "Vary Difficulty" spreads items across the trait axis — each item targets a different ability level. "Vary Discrimination" keeps them at the same difficulty but changes how sharp each one is. Switch to "Custom" to design your own set.
     </div>
     <div class="note warn">
-      Items with very low discrimination (a &lt; 0.5) are nearly flat — they contribute almost no measurement information. In practice, such items would be flagged for removal or revision.
+      Items with very low discrimination (a &#8776; 0.5 or below — the flattest item in the "Vary Discrimination" set) are nearly flat: they contribute almost no measurement information. In practice, such items would be flagged for removal or revision.
     </div>
   </div>
 
@@ -305,7 +305,7 @@ summary: "Explore how IRT models each item as having its own characteristic curv
       $$I_i(\theta) = a_i^2 \, P_i(\theta) \, Q_i(\theta)$$
       <div class="eq-label">Item information function, where $Q = 1 - P$</div>
     </div>
-    <p>This is always a bell-shaped curve, peaking at $\theta = b$ with height $a^2/4$. High discrimination means a tall, narrow peak of information. Low discrimination means a short, wide bump — less information everywhere.</p>
+    <p>This is always a bell-shaped curve, peaking at $\theta = b$ with height $a^2/4$. High discrimination means a tall, narrow peak of information. Low discrimination means a short, wide bump — far less information near its own difficulty, though it holds its small value further out into the tails, where a sharply peaked item has already fallen away to nothing. Integrated across the whole trait range the area under this curve is exactly $a$, so the low-discrimination item does carry less information in total.</p>
 
     <div class="viz-box">
       <div class="viz-title">ICC and Item Information Function</div>
@@ -331,11 +331,11 @@ summary: "Explore how IRT models each item as having its own characteristic curv
           <div class="irt-stat-row">
             <div class="irt-stat good">
               <div class="irt-stat-label">Peak Info</div>
-              <div class="irt-stat-value" id="s5-peak">0.56</div>
+              <div class="irt-stat-value" id="s5-peak">0.563</div>
             </div>
             <div class="irt-stat">
               <div class="irt-stat-label">Peak at &theta;</div>
-              <div class="irt-stat-value" id="s5-peakat">0.00</div>
+              <div class="irt-stat-value" id="s5-peakat">0.0</div>
             </div>
           </div>
         </div>
@@ -513,7 +513,9 @@ summary: "Explore how IRT models each item as having its own characteristic curv
       <div id="sec9-table"></div>
     </div>
 
-    <p>Person A's pattern — getting easy items right and hard items wrong — is the most likely pattern for someone near the middle of the trait range, and IRT rewards this consistency with a smaller standard error. Person B's reversed pattern is improbable under the model; the MLE still produces an estimate, but the likelihood surface is flatter, yielding a larger SE. Person C's scattered pattern is the least informative, and IRT reports this honestly through an even wider SE.</p>
+    <p>All three answered six items correctly — but not the <em>same</em> six. IRT weights each item by its discrimination, so what drives the estimate is not the raw count but the discrimination-weighted sum $\sum a_i u_i$: 10.1 for Person A, 7.7 for Person B, 5.9 for Person C. Person A's correct answers land on the sharply discriminating items (a = 2.4, 2.2, 2.3, 2.1), while Person C's land mostly on the weak ones (a = 0.5, 0.6, 0.7) — and their estimates end up more than a point and a half apart, from the same 6/10.</p>
+
+    <p>Now notice what the standard errors do <em>not</em> do. They do not track how orderly the pattern looks. Person B's reversed pattern is the most improbable of the three, yet it carries the <em>smallest</em> SE. Under the 2PL, test information $\sum a_i^2 P_i Q_i$ depends only on where $\hat\theta$ lands — the responses $u_i$ drop out of the second derivative entirely — so an aberrant pattern cannot widen the interval by itself. Catching genuinely odd responding takes a dedicated <em>person-fit</em> statistic ($l_z$, infit/outfit), not the standard error.</p>
 
     <div class="note warn">
       IRT doesn't just change how we think about measurement. It changes what's <em>possible</em>: adaptive testing that adjusts difficulty in real time, fair comparison across different test forms (equating), detection of items that function differently across groups (DIF), and honest reporting of where a test is precise and where it isn't.
@@ -599,10 +601,14 @@ function seAtMLE(theta, items) {
 // =============================================================
 // DEMO DATA (Sections 1 & 9)
 // =============================================================
-// 10 items with known parameters, ordered by difficulty
+// 10 items with known parameters, ordered by difficulty.
+// Discriminations deliberately span a wide range (0.5-2.4). With all a's packed
+// into 1.2-1.8 the weighted sums Sum(a*u) came out nearly identical for the three
+// response patterns, so Section 9's "Same Sum Score, Different Estimates" table
+// showed three near-identical rows.
 const DEMO_ITEMS = [
-  {a:1.2, b:-2.0}, {a:1.5, b:-1.5}, {a:1.8, b:-1.0}, {a:1.4, b:-0.5}, {a:1.6, b: 0.0},
-  {a:1.3, b: 0.5}, {a:1.7, b: 1.0}, {a:1.5, b: 1.5}, {a:1.2, b: 2.0}, {a:1.4, b: 2.5}
+  {a:2.4, b:-2.0}, {a:2.2, b:-1.5}, {a:0.6, b:-1.0}, {a:0.5, b:-0.5}, {a:2.3, b: 0.0},
+  {a:2.1, b: 0.5}, {a:0.5, b: 1.0}, {a:0.9, b: 1.5}, {a:1.2, b: 2.0}, {a:0.7, b: 2.5}
 ];
 // Person A: sensible pattern (easy correct, hard wrong) — 6/10
 const RESP_A = [1,1,1,1,1,1,0,0,0,0];
@@ -761,16 +767,23 @@ function generateTestItems(n, avgA, avgB, spread) {
 }
 
 function generateItemBank() {
-  // Seeded pseudo-random for consistent bank
-  let seed = 42;
-  function rand() { seed = (seed * 16807 + 0) % 2147483647; return seed / 2147483647; }
-  const bank = [];
-  for (let i = 0; i < 18; i++) {
-    const a = 0.5 + rand() * 2.0;  // 0.5 to 2.5
-    const b = -2.5 + rand() * 5.0; // -2.5 to 2.5
-    bank.push({ a: Math.round(a*100)/100, b: Math.round(b*100)/100 });
-  }
-  return bank;
+  // Hand-authored 18-item bank. The previous seeded-random bank happened to put
+  // only five items above b = 1.3, four of them weak (a = 0.55-0.71), so no
+  // selection rule could build a test that actually peaked near the theta = 1.5
+  // cutoff -- "Screen at Cutoff" peaked at theta = 0.0 instead. This bank keeps
+  // a realistic spread of discriminations but guarantees enough informative
+  // items in each region for all three strategies below to be satisfiable.
+  return [
+    // low region
+    { a: 1.5, b: -2.3 }, { a: 1.8, b: -1.8 }, { a: 1.2, b: -1.4 },
+    { a: 2.0, b: -1.1 }, { a: 0.7, b: -2.5 },
+    // mid region (research / general-purpose tests draw from here)
+    { a: 2.4, b: -0.5 }, { a: 2.2, b: -0.2 }, { a: 2.5, b: 0.1 },
+    { a: 2.1, b: 0.4 }, { a: 1.3, b: 0.6 }, { a: 0.8, b: -0.7 },
+    // high region (screening at a cutoff draws from here)
+    { a: 2.3, b: 1.1 }, { a: 2.5, b: 1.4 }, { a: 2.2, b: 1.6 },
+    { a: 2.4, b: 1.8 }, { a: 1.9, b: 2.1 }, { a: 1.1, b: 2.4 }, { a: 0.6, b: 1.3 }
+  ];
 }
 
 // Section 4 items
@@ -812,7 +825,7 @@ function drawSection1() {
   let html = '<table class="data-table domain-table" style="margin:0;width:102%;font-size:0.78em;">';
   html += '<tr><th></th>';
   for (let i = 0; i < items.length; i++) {
-    html += `<th style="font-size:0.92em;padding:4px 3px;text-align:center;color:var(--text);">Item ${i+1}<br><span style="color:var(--text);font-weight:400;font-size:0.85em;">b=${items[i].b.toFixed(1)}</span></th>`;
+    html += `<th style="font-size:0.92em;padding:4px 3px;text-align:center;color:var(--text);">Item ${i+1}<br><span style="color:var(--text);font-weight:400;font-size:0.85em;">b=${items[i].b.toFixed(1)}</span><br><span style="color:var(--text-dim);font-weight:400;font-size:0.85em;">a=${items[i].a.toFixed(1)}</span></th>`;
   }
   html += '<th style="font-size:0.92em;padding:4px 3px;text-align:center;color:var(--text);">Sum</th></tr>';
 
@@ -1068,7 +1081,15 @@ function drawSection5() {
   ctx.clearRect(0, 0, W, H);
 
   const maxInfo = Math.max(1.0, a*a/4 * 1.3);
-  const ax = drawAxes(ctx, W, H, pad, [-4, 4], [0, 1], 'θ', mode === 'info' ? '' : 'P(θ)');
+  const infoStep = maxInfo > 1.5 ? 0.5 : 0.2;
+  const infoOnly = mode === 'info';
+
+  // In "Info Only" mode no ICC is drawn, so give the left axis to I(θ) outright
+  // rather than leaving 0.0–1.0 probability ticks and gridlines standing under a
+  // curve they do not describe.
+  const ax = infoOnly
+    ? drawAxes(ctx, W, H, pad, [-4, 4], [0, maxInfo], 'θ', 'I(θ)', { yStep: infoStep })
+    : drawAxes(ctx, W, H, pad, [-4, 4], [0, 1], 'θ', 'P(θ)');
 
   // Draw ICC
   if (mode === 'icc' || mode === 'both') {
@@ -1077,32 +1098,33 @@ function drawSection5() {
     drawCurve(ctx, pts, COLORS.teal, 2.5);
   }
 
-  // Draw info function (scaled to right axis)
+  // Draw info function — on the left axis when it owns it, otherwise scaled to a
+  // separate right-hand axis alongside the ICC.
   if (mode === 'info' || mode === 'both') {
     const plotH = H - pad.t - pad.b;
     const pts = [];
     for (let t = -4; t <= 4; t += 0.05) {
       const info = itemInfo2PL(t, a, b);
-      const py = H - pad.b - (info / maxInfo) * plotH;
-      pts.push([ax.toX(t), py]);
+      pts.push([ax.toX(t), infoOnly ? ax.toY(info) : H - pad.b - (info / maxInfo) * plotH]);
     }
     drawCurve(ctx, pts, COLORS.orange, 2.5);
 
-    // Right axis labels for info
-    ctx.fillStyle = COLORS.orange;
-    ctx.font = `13px ${COLORS.mono}`;
-    ctx.textAlign = 'left';
-    const infoStep = maxInfo > 1.5 ? 0.5 : 0.2;
-    for (let y = 0; y <= maxInfo; y += infoStep) {
-      const py = H - pad.b - (y/maxInfo)*plotH;
-      ctx.fillText(y.toFixed(1), W - pad.r + 6, py + 4);
+    if (!infoOnly) {
+      // Right axis labels for info
+      ctx.fillStyle = COLORS.orange;
+      ctx.font = `13px ${COLORS.mono}`;
+      ctx.textAlign = 'left';
+      for (let y = 0; y <= maxInfo; y += infoStep) {
+        const py = H - pad.b - (y/maxInfo)*plotH;
+        ctx.fillText(y.toFixed(1), W - pad.r + 6, py + 4);
+      }
+      ctx.save();
+      ctx.translate(W - 8, pad.t + plotH/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.textAlign = 'center';
+      ctx.fillText('I(θ)', 0, 0);
+      ctx.restore();
     }
-    ctx.save();
-    ctx.translate(W - 8, pad.t + plotH/2);
-    ctx.rotate(-Math.PI/2);
-    ctx.textAlign = 'center';
-    ctx.fillText('I(θ)', 0, 0);
-    ctx.restore();
   }
 
   const peak = a*a/4;
@@ -1164,15 +1186,22 @@ function drawSection6() {
   }
   drawCurve(ctx, tifPts, COLORS.teal, 3);
 
-  // SE curve on right axis (max SE = 2.0)
+  // SE curve on right axis (axis tops out at SE = 2.0). Clip to the plot rect
+  // rather than clamping the values: a clamped curve draws a flat line along the
+  // top border, which reads as "SE is exactly 2.0 out here" instead of "SE has
+  // run off the top of the scale."
   const maxSE = 2.0;
   const sePts = [];
   for (let t = -4; t <= 4; t += 0.05) {
-    const seVal = se(t, items);
-    const py = H - pad.b - (Math.min(seVal, maxSE) / maxSE) * plotH;
+    const py = H - pad.b - (se(t, items) / maxSE) * plotH;
     sePts.push([ax.toX(t), py]);
   }
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(pad.l, pad.t, plotW, plotH);
+  ctx.clip();
   drawCurve(ctx, sePts, COLORS.orange, 2, [6, 4]);
+  ctx.restore();
 
   // Right axis for SE
   ctx.fillStyle = COLORS.orange;
@@ -1206,13 +1235,20 @@ function drawSection7() {
   const items = PRECISION_SCENARIOS[STATE.precisionScenario]();
   const theta = STATE.s7theta;
 
-  // Compute CTT-equivalent SEM: average SE across theta range
-  let sumSE = 0, countSE = 0;
-  for (let t = -3; t <= 3; t += 0.1) {
-    sumSE += se(t, items);
-    countSE++;
+  // CTT-equivalent SEM. SEM is a variance-scale quantity, so aggregate the
+  // conditional SEs as a DENSITY-WEIGHTED root-mean-square, not as a flat mean:
+  //   SEM = sqrt( E[SE(theta)^2] ),  theta ~ N(0,1).
+  // A plain unweighted mean over a uniform grid over-weights the tails, where SE
+  // explodes; on the clinical scenario it returned 1.351, which on a metric with
+  // SD(theta) = 1 implies a reliability of 1 - 1.351^2 = -0.83.
+  let sumW = 0, sumWSE2 = 0;
+  for (let t = -4; t <= 4; t += 0.05) {
+    const w = Math.exp(-t*t/2);          // proportional to the N(0,1) density
+    const s = se(t, items);
+    sumWSE2 += w * s * s;
+    sumW += w;
   }
-  const cttSEM = sumSE / countSE;
+  const cttSEM = Math.sqrt(sumWSE2 / sumW);
   const irtSE = se(theta, items);
 
   // CTT panel
@@ -1249,12 +1285,18 @@ function drawSection7() {
   ctxI.clearRect(0, 0, W2, H2);
   const axI = drawAxes(ctxI, W2, H2, pad, [-4, 4], [0, maxSE], 'θ', 'SE(θ)', { yStep: 0.3, yDecimals: 1 });
 
-  // SE curve
+  // SE curve. Values above the 1.5 axis maximum are clipped away rather than
+  // clamped onto the top border — this panel's whole point is that SE blows up
+  // in the tails, which a flat line at the ceiling hides.
   const sePts = [];
   for (let t = -4; t <= 4; t += 0.05) {
-    const seVal = Math.min(se(t, items), maxSE);
-    sePts.push([axI.toX(t), axI.toY(seVal)]);
+    sePts.push([axI.toX(t), axI.toY(se(t, items))]);
   }
+
+  ctxI.save();
+  ctxI.beginPath();
+  ctxI.rect(pad.l, pad.t, W2 - pad.l - pad.r, H2 - pad.t - pad.b);
+  ctxI.clip();
 
   // Fill under curve
   ctxI.fillStyle = 'rgba(45,212,191,0.1)';
@@ -1266,15 +1308,17 @@ function drawSection7() {
 
   drawCurve(ctxI, sePts, COLORS.teal, 2.5);
 
-  // Theta marker
-  const seClamp = Math.min(irtSE, maxSE);
+  // Theta marker. The dot sits at the true SE, so it leaves the frame when the
+  // value is off-scale; the printed readout below always shows the real number.
   drawVerticalLine(ctxI, axI.toX(theta), H2-pad.b, pad.t, COLORS.textDim);
-  drawDot(ctxI, axI.toX(theta), axI.toY(seClamp), 5, COLORS.teal);
+  drawDot(ctxI, axI.toX(theta), axI.toY(irtSE), 5, COLORS.teal);
+  ctxI.restore();
 
+  const labelY = Math.max(pad.t + 14, axI.toY(Math.min(irtSE, maxSE)) - 8);
   ctxI.fillStyle = COLORS.teal;
   ctxI.font = `bold 13px ${COLORS.mono}`;
   ctxI.textAlign = 'left';
-  ctxI.fillText(`SE = ${irtSE.toFixed(2)}`, axI.toX(theta) + 8, axI.toY(seClamp) - 8);
+  ctxI.fillText(`SE = ${irtSE.toFixed(2)}${irtSE > maxSE ? ' (off scale)' : ''}`, axI.toX(theta) + 8, labelY);
 
   // Stats
   const statsEl = document.getElementById('s7-stats');
@@ -1348,18 +1392,38 @@ function toggleItem(idx) {
 
 function autoSelect(strategy) {
   STATE.selected.clear();
+
+  // Rank by INFORMATION at the target theta, not by |b - target|. Difficulty
+  // alone ignores discrimination, so the old rule would happily pick a flat
+  // item sitting exactly at the cutoff over a sharp one just beside it. Ranking
+  // on information is also what adaptive testing actually does.
+  function topByInfoAt(target, k) {
+    return STATE.itemBank
+      .map((it, i) => ({ i, info: itemInfo2PL(target, it.a, it.b) }))
+      .sort((x, y) => y.info - x.info)
+      .slice(0, k)
+      .map(o => o.i);
+  }
+
   if (strategy === 'screening') {
-    // Select items near theta = 1.5
-    const ranked = STATE.itemBank.map((it,i) => ({i, dist: Math.abs(it.b - 1.5)})).sort((a,b) => a.dist - b.dist);
-    for (let j = 0; j < 8; j++) STATE.selected.add(ranked[j].i);
-  } else if (strategy === 'broad') {
-    // Select items spread across the range
-    const ranked = STATE.itemBank.map((it,i) => ({i, b: it.b})).sort((a,b) => a.b - b.b);
-    for (let j = 0; j < ranked.length; j += 2) STATE.selected.add(ranked[j].i);
+    // Maximize precision at the theta = 1.5 cutoff.
+    for (const i of topByInfoAt(1.5, 8)) STATE.selected.add(i);
   } else if (strategy === 'research') {
-    // Select items near theta = 0
-    const ranked = STATE.itemBank.map((it,i) => ({i, dist: Math.abs(it.b)})).sort((a,b) => a.dist - b.dist);
-    for (let j = 0; j < 8; j++) STATE.selected.add(ranked[j].i);
+    // Maximize precision at the population mean.
+    for (const i of topByInfoAt(0, 8)) STATE.selected.add(i);
+  } else if (strategy === 'broad') {
+    // Cover the range: at each stop along a grid of target thetas, take the most
+    // informative item not already chosen. This keeps the TIF from collapsing
+    // onto one region the way "every other item sorted by b" did.
+    for (const t of [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]) {
+      let best = -1, bestInfo = -1;
+      for (let i = 0; i < STATE.itemBank.length; i++) {
+        if (STATE.selected.has(i)) continue;
+        const inf = itemInfo2PL(t, STATE.itemBank[i].a, STATE.itemBank[i].b);
+        if (inf > bestInfo) { bestInfo = inf; best = i; }
+      }
+      if (best >= 0) STATE.selected.add(best);
+    }
   }
   // Redraw all cards
   drawItemBank();
@@ -1477,7 +1541,10 @@ function wireSlider(id, stateKey, path, callback) {
     } else {
       STATE[stateKey] = val;
     }
-    if (sv) sv.textContent = val.toFixed(val === Math.round(val) && Math.abs(val) < 100 ? 0 : 2);
+    // Decimals come from the slider's own step, not from whether this particular
+    // value happens to be round — otherwise a = 2.0 prints as "2" while a = 1.5
+    // prints as "1.50", and the readout jumps width as you drag.
+    if (sv) sv.textContent = val.toFixed(String(sl.step).includes('.') ? 2 : 0);
     if (callback) callback();
   });
 }
@@ -1515,7 +1582,7 @@ const INFO_CONTENT = {
   sec4: {
     badge: 'Section 4',
     title: 'CTT vs IRT Item Contributions',
-    body: `<p>In CTT, each item contributes \\(1/k\\) to the total score (where \\(k\\) is the number of items). Item difficulty and discrimination affect the overall reliability coefficient but do not change how individual items are weighted in the score.</p>
+    body: `<p>In CTT, every item carries the same weight: one point each on a sum score, or \\(1/k\\) each if you express the total as a proportion (where \\(k\\) is the number of items). Item difficulty and discrimination affect the overall reliability coefficient but do not change how individual items are weighted in the score.</p>
     <p>In IRT, each item's contribution is measured by its <em>information function</em>: \\(I(\\theta) = a^2 P(\\theta) Q(\\theta)\\). This varies with \\(\\theta\\), so the same item can be highly informative for one person and useless for another.</p>`
   },
   sec5: {
