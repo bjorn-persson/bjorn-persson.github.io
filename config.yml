@@ -25,7 +25,8 @@ menu:
 params:
     description: "This website hosts Björn Persson's research papers, courses, data, curriculum vitae, and contact information."
     author: Björn Persson
-    # googleAnalyticsID: "G-XXXXX"
+    # GA4 Measurement ID. Only loads on the deployed site, not in `hugo server`.
+    googleAnalyticsID: "G-YW2DZP5E3G"
     DateFormat: "January 2006"
     defaultTheme: dark
     hideFooter: false
